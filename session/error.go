@@ -29,6 +29,21 @@ func TransactionError(ctx context.Context, err error) Error {
 	return createError(ctx, http.StatusInternalServerError, 10001, description, err)
 }
 
+func InvalidEmailFormatError(ctx context.Context, email string) Error {
+	description := fmt.Sprintf("Invalid email format %s.", email)
+	return createError(ctx, http.StatusInternalServerError, 10010, description, nil)
+}
+
+func PasswordTooSimpleError(ctx context.Context) Error {
+	description := "Password too simple, at least 8 characters required."
+	return createError(ctx, http.StatusAccepted, 10011, description, nil)
+}
+
+func ServerError(ctx context.Context, err error) Error {
+	description := http.StatusText(http.StatusInternalServerError)
+	return createError(ctx, http.StatusInternalServerError, http.StatusInternalServerError, description, err)
+}
+
 func createError(ctx context.Context, status, code int, description string, err error) Error {
 	pc, file, line, _ := runtime.Caller(2)
 	funcName := runtime.FuncForPC(pc).Name()

@@ -5,6 +5,7 @@ import (
 
 	"github.com/godiscourse/godiscourse/session"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestUserCRUD(t *testing.T) {
@@ -13,7 +14,16 @@ func TestUserCRUD(t *testing.T) {
 	defer session.Database(ctx).Close()
 	defer teardownTestContext(ctx)
 
-	user, err := CreateUser(ctx, "username", "nickname")
+	user, err := CreateUser(ctx, "im.yuqlee@gmailabcefgh.com", "username", "nickname", "password")
+	assert.NotNil(err)
+	assert.Nil(user)
+	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "pass")
+	assert.NotNil(err)
+	assert.Nil(user)
+	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "    pass     ")
+	assert.NotNil(err)
+	assert.Nil(user)
+	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "password")
 	assert.Nil(err)
 	assert.NotNil(user)
 	new, err := FindUser(ctx, user.UserId)
@@ -21,4 +31,6 @@ func TestUserCRUD(t *testing.T) {
 	assert.NotNil(new)
 	assert.Equal(user.Username, new.Username)
 	assert.Equal(user.Nickname, new.Nickname)
+	err = bcrypt.CompareHashAndPassword([]byte(new.EncryptedPassword), []byte("password"))
+	assert.Nil(err)
 }
