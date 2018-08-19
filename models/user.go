@@ -35,11 +35,13 @@ type User struct {
 	EncryptedPassword string    `sql:"encrypted_password"`
 	CreatedAt         time.Time `sql:"created_at"`
 	UpdatedAt         time.Time `sql:"updated_at"`
+
+	SessionId string `sql:"-"`
 }
 
 var userCols = []string{"user_id", "email", "username", "nickname", "encrypted_password", "created_at", "updated_at"}
 
-func CreateUser(ctx context.Context, email, username, nickname, password string) (*User, error) {
+func CreateUser(ctx context.Context, email, username, nickname, password string, sessionSecret string) (*User, error) {
 	t := time.Now()
 
 	if err := validateEmailFormat(ctx, email); err != nil {
@@ -62,9 +64,23 @@ func CreateUser(ctx context.Context, email, username, nickname, password string)
 		CreatedAt:         t,
 		UpdatedAt:         t,
 	}
-	if err := session.Database(ctx).Insert(user); err != nil {
+	tx, err := session.Database(ctx).Begin()
+	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
+	defer tx.Rollback()
+
+	if err := tx.Insert(user); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	sess, err := user.createSession(ctx, tx, sessionSecret)
+	if err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	user.SessionId = sess.SessionId
 	return user, nil
 }
 

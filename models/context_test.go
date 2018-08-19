@@ -15,12 +15,14 @@ const (
 )
 
 const (
-	drop_users_DDL = `DROP TABLE IF EXISTS users;`
+	drop_users_DDL    = `DROP TABLE IF EXISTS users;`
+	drop_sessions_DDL = `DROP TABLE IF EXISTS sessions;`
 )
 
 func teardownTestContext(ctx context.Context) {
 	tables := []string{
 		drop_users_DDL,
+		drop_sessions_DDL,
 	}
 	for _, q := range tables {
 		session.Database(ctx).Exec(q)
@@ -34,6 +36,7 @@ func setupTestContext() context.Context {
 	db := durable.OpenDatabaseClient(context.Background())
 	tables := []string{
 		users_DDL,
+		sessions_DDL,
 	}
 	for _, q := range tables {
 		db.Exec(q)
