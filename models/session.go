@@ -29,7 +29,7 @@ type Session struct {
 
 var sessionCols = []string{"session_id", "user_id", "secret", "created_at"}
 
-func (user *User) createSession(ctx context.Context, tx *pg.Tx, secret string) (*Session, error) {
+func (user *User) addSession(ctx context.Context, tx *pg.Tx, secret string) (*Session, error) {
 	sess := &Session{
 		SessionId: uuid.NewV4().String(),
 		UserId:    user.UserId,

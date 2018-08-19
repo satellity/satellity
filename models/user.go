@@ -73,7 +73,7 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 	if err := tx.Insert(user); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	sess, err := user.createSession(ctx, tx, sessionSecret)
+	sess, err := user.addSession(ctx, tx, sessionSecret)
 	if err != nil {
 		return nil, err
 	}
