@@ -88,6 +88,20 @@ func FindUser(ctx context.Context, id string) (*User, error) {
 	return findUserById(ctx, id)
 }
 
+func FindUserByUsernameOrEmail(ctx context.Context, q string) (*User, error) {
+	user := &User{}
+	q = strings.ToLower(strings.TrimSpace(q))
+	if len(q) < 3 {
+		return nil, nil
+	}
+	if err := session.Database(ctx).Model(user).Column(userCols...).Where("username = ? OR email = ?", q, q).Select(); err == pg.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return user, nil
+}
+
 func findUserById(ctx context.Context, id string) (*User, error) {
 	user := &User{UserId: id}
 	if err := session.Database(ctx).Model(user).Column(userCols...).WherePK().Select(); err == pg.ErrNoRows {
