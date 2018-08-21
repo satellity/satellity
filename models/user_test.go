@@ -1,6 +1,11 @@
 package models
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/x509"
+	"encoding/hex"
 	"testing"
 
 	"github.com/godiscourse/godiscourse/session"
@@ -14,16 +19,20 @@ func TestUserCRUD(t *testing.T) {
 	defer session.Database(ctx).Close()
 	defer teardownTestContext(ctx)
 
-	user, err := CreateUser(ctx, "im.yuqlee@gmailabcefgh.com", "username", "nickname", "password", "secret")
+	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	assert.Nil(err)
+	public, err := x509.MarshalPKIXPublicKey(priv.Public())
+	assert.Nil(err)
+	user, err := CreateUser(ctx, "im.yuqlee@gmailabcefgh.com", "username", "nickname", "password", hex.EncodeToString(public))
 	assert.NotNil(err)
 	assert.Nil(user)
-	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "pass", "secret")
+	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "pass", hex.EncodeToString(public))
 	assert.NotNil(err)
 	assert.Nil(user)
-	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "    pass     ", "secret")
+	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "    pass     ", hex.EncodeToString(public))
 	assert.NotNil(err)
 	assert.Nil(user)
-	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "password", "secret")
+	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "password", hex.EncodeToString(public))
 	assert.Nil(err)
 	assert.NotNil(user)
 	assert.NotEqual("", user.SessionId)

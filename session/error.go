@@ -29,6 +29,11 @@ func TransactionError(ctx context.Context, err error) Error {
 	return createError(ctx, http.StatusInternalServerError, 10001, description, err)
 }
 
+func BadDataError(ctx context.Context) Error {
+	description := "The request data has invalid field."
+	return createError(ctx, http.StatusAccepted, 10002, description, nil)
+}
+
 func InvalidEmailFormatError(ctx context.Context, email string) Error {
 	description := fmt.Sprintf("Invalid email format %s.", email)
 	return createError(ctx, http.StatusInternalServerError, 10010, description, nil)

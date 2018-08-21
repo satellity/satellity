@@ -2,6 +2,9 @@ package models
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/x509"
+	"encoding/hex"
 	"strings"
 	"time"
 
@@ -43,6 +46,19 @@ var userCols = []string{"user_id", "email", "username", "nickname", "encrypted_p
 
 func CreateUser(ctx context.Context, email, username, nickname, password string, sessionSecret string) (*User, error) {
 	t := time.Now()
+	data, err := hex.DecodeString(sessionSecret)
+	if err != nil {
+		return nil, session.BadDataError(ctx)
+	}
+	public, err := x509.ParsePKIXPublicKey(data)
+	if err != nil {
+		return nil, session.BadDataError(ctx)
+	}
+	switch public.(type) {
+	case *ecdsa.PublicKey:
+	default:
+		return nil, session.BadDataError(ctx)
+	}
 
 	if err := validateEmailFormat(ctx, email); err != nil {
 		return nil, err
@@ -50,7 +66,7 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 	if nickname == "" {
 		nickname = username
 	}
-	password, err := validateAndEncryptPassword(ctx, password)
+	password, err = validateAndEncryptPassword(ctx, password)
 	if err != nil {
 		return nil, err
 	}
