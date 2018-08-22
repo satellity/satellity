@@ -55,4 +55,8 @@ func TestUserCRUD(t *testing.T) {
 	new, err = FindUserByUsernameOrEmail(ctx, "im.yuqlee@Gmail.com")
 	assert.Nil(err)
 	assert.NotNil(new)
+	new, err = CreateSession(ctx, "im.yuqlee@Gmail.com", "password", hex.EncodeToString(public))
+	assert.Nil(err)
+	assert.NotNil(new)
+	assert.Equal("username", user.Username)
 }

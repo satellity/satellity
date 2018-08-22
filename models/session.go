@@ -2,8 +2,12 @@ package models
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/x509"
+	"encoding/hex"
 	"time"
 
+	"github.com/btcsuite/golangcrypto/bcrypt"
 	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/session"
 	"github.com/godiscourse/godiscourse/uuid"
@@ -29,6 +33,45 @@ type Session struct {
 
 var sessionCols = []string{"session_id", "user_id", "secret", "created_at"}
 
+func CreateSession(ctx context.Context, identity, password, sessionSecret string) (*User, error) {
+	data, err := hex.DecodeString(sessionSecret)
+	if err != nil {
+		return nil, session.BadDataError(ctx)
+	}
+	public, err := x509.ParsePKIXPublicKey(data)
+	if err != nil {
+		return nil, session.BadDataError(ctx)
+	}
+	switch public.(type) {
+	case *ecdsa.PublicKey:
+	default:
+		return nil, session.BadDataError(ctx)
+	}
+
+	user, err := FindUserByUsernameOrEmail(ctx, identity)
+	if err != nil {
+		return nil, err
+	} else if user == nil {
+		return nil, session.IdentityNonExistError(ctx)
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(password)); err != nil {
+		return nil, session.InvalidPasswordError(ctx)
+	}
+
+	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+		sess, err := user.addSession(ctx, tx, sessionSecret)
+		if err != nil {
+			return err
+		}
+		user.SessionId = sess.SessionId
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return user, nil
+}
+
 func (user *User) addSession(ctx context.Context, tx *pg.Tx, secret string) (*Session, error) {
 	sess := &Session{
 		SessionId: uuid.NewV4().String(),
@@ -38,7 +81,7 @@ func (user *User) addSession(ctx context.Context, tx *pg.Tx, secret string) (*Se
 	}
 	err := tx.Insert(sess)
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
 	}
 	return sess, nil
 }

@@ -85,18 +85,20 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 		return nil, session.TransactionError(ctx, err)
 	}
 	defer tx.Rollback()
-
-	if err := tx.Insert(user); err != nil {
+	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+		if err := tx.Insert(user); err != nil {
+			return err
+		}
+		sess, err := user.addSession(ctx, tx, sessionSecret)
+		if err != nil {
+			return err
+		}
+		user.SessionId = sess.SessionId
+		return nil
+	})
+	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	sess, err := user.addSession(ctx, tx, sessionSecret)
-	if err != nil {
-		return nil, err
-	}
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-	user.SessionId = sess.SessionId
 	return user, nil
 }
 
@@ -104,13 +106,13 @@ func FindUser(ctx context.Context, id string) (*User, error) {
 	return findUserById(ctx, id)
 }
 
-func FindUserByUsernameOrEmail(ctx context.Context, q string) (*User, error) {
+func FindUserByUsernameOrEmail(ctx context.Context, identity string) (*User, error) {
 	user := &User{}
-	q = strings.ToLower(strings.TrimSpace(q))
-	if len(q) < 3 {
+	identity = strings.ToLower(strings.TrimSpace(identity))
+	if len(identity) < 3 {
 		return nil, nil
 	}
-	if err := session.Database(ctx).Model(user).Column(userCols...).Where("username = ? OR email = ?", q, q).Select(); err == pg.ErrNoRows {
+	if err := session.Database(ctx).Model(user).Column(userCols...).Where("username = ? OR email = ?", identity, identity).Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, session.TransactionError(ctx, err)

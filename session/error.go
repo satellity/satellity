@@ -39,9 +39,19 @@ func InvalidEmailFormatError(ctx context.Context, email string) Error {
 	return createError(ctx, http.StatusInternalServerError, 10010, description, nil)
 }
 
+func IdentityNonExistError(ctx context.Context) Error {
+	description := "Email or Username is not exist."
+	return createError(ctx, http.StatusAccepted, 10011, description, nil)
+}
+
+func InvalidPasswordError(ctx context.Context) Error {
+	description := "Password invalid."
+	return createError(ctx, http.StatusAccepted, 10012, description, nil)
+}
+
 func PasswordTooSimpleError(ctx context.Context) Error {
 	description := "Password too simple, at least 8 characters required."
-	return createError(ctx, http.StatusAccepted, 10011, description, nil)
+	return createError(ctx, http.StatusAccepted, 10013, description, nil)
 }
 
 func ServerError(ctx context.Context, err error) Error {
