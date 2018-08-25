@@ -8,7 +8,9 @@ import (
 	"encoding/hex"
 	"testing"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/godiscourse/godiscourse/session"
+	"github.com/godiscourse/godiscourse/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -59,4 +61,22 @@ func TestUserCRUD(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(new)
 	assert.Equal("username", user.Username)
+
+	sess, err := readSession(ctx, new.UserId, new.SessionId)
+	assert.Nil(err)
+	assert.NotNil(sess)
+	sess, err = readSession(ctx, uuid.NewV4().String(), new.SessionId)
+	assert.Nil(err)
+	assert.Nil(sess)
+
+	claims := &jwt.MapClaims{
+		"uid": new.UserId,
+		"sid": new.SessionId,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	ss, err := token.SignedString(priv)
+	assert.Nil(err)
+	new, err = AuthenticateUser(ctx, ss)
+	assert.Nil(err)
+	assert.NotNil(new)
 }

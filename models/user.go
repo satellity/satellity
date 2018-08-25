@@ -5,9 +5,11 @@ import (
 	"crypto/ecdsa"
 	"crypto/x509"
 	"encoding/hex"
+	"fmt"
 	"strings"
 	"time"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/session"
 	"github.com/godiscourse/godiscourse/uuid"
@@ -98,6 +100,46 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
+	}
+	return user, nil
+}
+
+func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
+	var user *User
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return nil, nil
+		}
+		if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
+			return nil, nil
+		}
+		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
+		u, err := findUserById(ctx, uid)
+		if err != nil {
+			return nil, err
+		} else if u == nil {
+			return nil, nil
+		}
+		user = u
+		sess, err := readSession(ctx, uid, sid)
+		if err != nil {
+			return nil, err
+		} else if sess == nil {
+			return nil, nil
+		}
+		user.SessionId = sess.SessionId
+		pkix, err := hex.DecodeString(sess.Secret)
+		if err != nil {
+			return nil, err
+		}
+		return x509.ParsePKIXPublicKey(pkix)
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	if !token.Valid {
+		return nil, nil
 	}
 	return user, nil
 }
