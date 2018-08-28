@@ -3,15 +3,16 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/dimfeld/httptreemux"
+	"github.com/godiscourse/godiscourse/views"
 )
 
-func RegisterRoutes(router *httprouter.Router) {
+func RegisterRoutes(router *httptreemux.TreeMux) {
 	router.GET("/_hc", health)
 
 	registerUser(router)
 }
 
 func health(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	view.RenderBlankResponse(w, r)
+	views.RenderBlankResponse(w, r)
 }

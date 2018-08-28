@@ -30,21 +30,21 @@ func buildUser(user *models.User) UserView {
 	}
 }
 
-func RenderUser(w http.ResponseWriter, r *http.Request, user *models.User) UserView {
+func RenderUser(w http.ResponseWriter, r *http.Request, user *models.User) {
 	RenderResponse(w, r, buildUser(user))
 }
 
-func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) []UserView {
+func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
 	userViews := make([]UserView, len(users))
 	for i, user := range users {
-		userViews[i] = RenderUser(user)
+		userViews[i] = buildUser(user)
 	}
 	RenderResponse(w, r, userViews)
 }
 
-func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) AccountView {
+func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) {
 	accountView := AccountView{
-		UserView:  RenderUser(user),
+		UserView:  buildUser(user),
 		SessionId: user.SessionId,
 	}
 	RenderResponse(w, r, accountView)

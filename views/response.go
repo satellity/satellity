@@ -15,7 +15,7 @@ func RenderResponse(w http.ResponseWriter, r *http.Request, data interface{}) {
 	session.Render(r.Context()).JSON(w, http.StatusOK, ResponseView{Data: data})
 }
 
-func RenderErrorResponse(w http.ResponseView, r *http.Request, err error) {
+func RenderErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
 	sessionError, ok := err.(session.Error)
 	if !ok {
 		sessionError = session.ServerError(r.Context(), err)

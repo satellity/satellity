@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"context"
+	"log"
+
+	"github.com/godiscourse/godiscourse/durable"
+)
 
 func main() {
-	fmt.Println("Hello World")
+	db := durable.OpenDatabaseClient(context.Background())
+	defer db.Close()
+
+	if err := startHttp(db); err != nil {
+		log.Panicln(err)
+	}
 }

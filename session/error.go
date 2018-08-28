@@ -59,6 +59,11 @@ func ServerError(ctx context.Context, err error) Error {
 	return createError(ctx, http.StatusInternalServerError, http.StatusInternalServerError, description, err)
 }
 
+func NotFoundError(ctx context.Context) Error {
+	description := http.StatusText(http.StatusNotFound)
+	return createError(ctx, http.StatusAccepted, http.StatusNotFound, description, nil)
+}
+
 func createError(ctx context.Context, status, code int, description string, err error) Error {
 	pc, file, line, _ := runtime.Caller(2)
 	funcName := runtime.FuncForPC(pc).Name()

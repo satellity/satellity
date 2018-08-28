@@ -3,12 +3,12 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/dimfeld/httptreemux"
 )
 
 type userImpl struct{}
 
-func registerUser(router *httprouter.Router) {
+func registerUser(router *httptreemux.TreeMux) {
 	impl := &userImpl{}
 	router.POST("/users", impl.create)
 }
