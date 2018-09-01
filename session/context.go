@@ -17,6 +17,7 @@ const (
 	keyRender            contextValueKey = 3
 	keyRemoteAddress     contextValueKey = 11
 	keyAuthorizationInfo contextValueKey = 12
+	keyRequestBody       contextValueKey = 13
 )
 
 func Database(ctx context.Context) *pg.DB {
@@ -44,4 +45,13 @@ func Render(ctx context.Context) *render.Render {
 
 func WithRender(ctx context.Context, r *render.Render) context.Context {
 	return context.WithValue(ctx, keyRender, r)
+}
+
+func RequestBody(ctx context.Context) string {
+	v, _ := ctx.Value(keyRequestBody).(string)
+	return v
+}
+
+func WithRequestBody(ctx context.Context, body string) context.Context {
+	return context.WithValue(ctx, keyRequestBody, body)
 }

@@ -8,10 +8,10 @@ import (
 	"github.com/unrolled/render"
 )
 
-func Context(handler http.Handler, db *pg.DB, rend *render.Render) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := session.WithDatabase(r.Context(), db)
-		ctx = session.WithRender(ctx, rend)
-		handler.ServeHTTP(w, r.WithContext(ctx))
+func Context(handler http.Handler, db *pg.DB, r *render.Render) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		ctx := session.WithDatabase(req.Context(), db)
+		ctx = session.WithRender(ctx, r)
+		handler.ServeHTTP(w, req.WithContext(ctx))
 	})
 }

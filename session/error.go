@@ -24,6 +24,11 @@ func (sessionError Error) Error() string {
 	return string(str)
 }
 
+func BadRequestError(ctx context.Context) Error {
+	description := "The request body can’t be pasred as valid data."
+	return createError(ctx, http.StatusAccepted, http.StatusBadRequest, description, nil)
+}
+
 func TransactionError(ctx context.Context, err error) Error {
 	description := http.StatusText(http.StatusInternalServerError)
 	return createError(ctx, http.StatusInternalServerError, 10001, description, err)
