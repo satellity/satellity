@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -79,4 +80,11 @@ func TestUserCRUD(t *testing.T) {
 	new, err = AuthenticateUser(ctx, ss)
 	assert.Nil(err)
 	assert.NotNil(new)
+}
+
+func createTestUser(ctx context.Context, email, username, password string) *User {
+	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	public, _ := x509.MarshalPKIXPublicKey(priv.Public())
+	user, _ := CreateUser(ctx, email, username, "nickname", password, hex.EncodeToString(public))
+	return user
 }
