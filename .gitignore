@@ -1,2 +1,7 @@
 godiscourse
 config.go
+
+# for web
+node_modules
+dist
+.cache
