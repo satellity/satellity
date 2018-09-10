@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"database/sql"
+	"strings"
 	"time"
 
 	"github.com/go-pg/pg"
@@ -38,6 +39,12 @@ type Topic struct {
 }
 
 func (user *User) CreateTopic(ctx context.Context, title, body, categoryId string) (*Topic, error) {
+	title := strings.TrimSpace(title)
+	body := strings.TrimSpace(body)
+	if len(title) < 1 {
+		return nil, session.BadDataError(ctx)
+	}
+
 	t := time.Now()
 	topic := &Topic{
 		TopicId:   uuid.NewV4().String(),
@@ -47,7 +54,6 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryId strin
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
-
 	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
 		category, err := findCategory(ctx, tx, categoryId)
 		if err != nil {

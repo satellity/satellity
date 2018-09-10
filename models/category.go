@@ -40,6 +40,9 @@ type Category struct {
 func CreateCategory(ctx context.Context, name, description string) (*Category, error) {
 	name = strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
+	if len(name) < 1 {
+		return session.BadDataError(ctx)
+	}
 
 	t := time.Now()
 	category := &Category{
