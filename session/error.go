@@ -24,6 +24,11 @@ func (sessionError Error) Error() string {
 	return string(str)
 }
 
+func AuthorizationError(ctx context.Context) Error {
+	description := "Unauthorized, maybe invalid token."
+	return createError(ctx, http.StatusAccepted, 401, description, nil)
+}
+
 func BadRequestError(ctx context.Context) Error {
 	description := "The request body can’t be pasred as valid data."
 	return createError(ctx, http.StatusAccepted, http.StatusBadRequest, description, nil)

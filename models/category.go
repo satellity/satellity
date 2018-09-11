@@ -41,7 +41,7 @@ func CreateCategory(ctx context.Context, name, description string) (*Category, e
 	name = strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(name) < 1 {
-		return session.BadDataError(ctx)
+		return nil, session.BadDataError(ctx)
 	}
 
 	t := time.Now()

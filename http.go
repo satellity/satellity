@@ -20,7 +20,8 @@ func startHttp(db *pg.DB) error {
 	controllers.RegisterHanders(router)
 	controllers.RegisterRoutes(router)
 
-	handler := middleware.Context(router, db, render.New())
+	handler := middleware.Authenticate(router)
+	handler = middleware.Context(handler, db, render.New())
 	handler = middleware.State(handler)
 	handler = middleware.Logger(handler, durable.NewLogger())
 	handler = handlers.ProxyHeaders(handler)

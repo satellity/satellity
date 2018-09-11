@@ -39,8 +39,8 @@ type Topic struct {
 }
 
 func (user *User) CreateTopic(ctx context.Context, title, body, categoryId string) (*Topic, error) {
-	title := strings.TrimSpace(title)
-	body := strings.TrimSpace(body)
+	title = strings.TrimSpace(title)
+	body = strings.TrimSpace(body)
 	if len(title) < 1 {
 		return nil, session.BadDataError(ctx)
 	}
