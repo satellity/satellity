@@ -1,12 +1,26 @@
 {
-  "name": "godiscourse",
+  "name": "GoDiscourse",
   "version": "1.0.0",
   "description": "A go version discourse like forum",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "parcel index.html"
   },
   "keywords": [],
   "author": "jadeydi",
-  "license": "ISC"
+  "license": "BSD",
+  "dependencies": {
+    "normalize.css": "^8.0.0",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "node-sass": "^4.9.3",
+    "parcel-bundler": "^1.10.1"
+  }
 }

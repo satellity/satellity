@@ -23,10 +23,10 @@ const (
 
 func teardownTestContext(ctx context.Context) {
 	tables := []string{
-		drop_users_DDL,
-		drop_sessions_DDL,
-		drop_categories_DDL,
 		drop_topics_DDL,
+		drop_categories_DDL,
+		drop_sessions_DDL,
+		drop_users_DDL,
 	}
 	for _, q := range tables {
 		session.Database(ctx).Exec(q)
