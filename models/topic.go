@@ -80,8 +80,21 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryId strin
 }
 
 func ReadTopic(ctx context.Context, id string) (*Topic, error) {
+	var topic *Topic
+	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+		var err error
+		topic, err = findTopic(ctx, tx, id)
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topic, nil
+}
+
+func findTopic(ctx context.Context, tx *pg.Tx, id string) (*Topic, error) {
 	topic := &Topic{TopicId: id}
-	if err := session.Database(ctx).Model(topic).Column(topicCols...).WherePK().Select(); err == pg.ErrNoRows {
+	if err := tx.Model(topic).Column(topicCols...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, session.TransactionError(ctx, err)
