@@ -10,17 +10,22 @@
   "author": "jadeydi",
   "license": "BSD",
   "dependencies": {
+    "animate.css": "^3.7.0",
+    "axios": "^0.18.0",
     "normalize.css": "^8.0.0",
+    "purecss": "^1.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.3.1",
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "node-sass": "^4.9.3",
-    "parcel-bundler": "^1.10.1"
+    "parcel-bundler": "^1.10.1",
+    "stylelint": "^9.6.0"
   }
 }

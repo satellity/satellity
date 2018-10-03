@@ -1,10 +1,13 @@
 import './node_modules/normalize.css/normalize.css';
+import './node_modules/@fortawesome/fontawesome-free/css/all.css';
+import './node_modules/purecss/build/pure.css';
 import './index.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
-import About from './about.js';
 import NoMatch from './notfound.js';
+import About from './about.js';
+import SignIn from './account/sign_in.js';
 import Home from './home/index.js';
 
 ReactDOM.render((
@@ -12,6 +15,7 @@ ReactDOM.render((
     <div>
       <Switch>
         <Route path='/' exact component={Home} />
+        <Route path='/sign_in' component={SignIn} />
         <Route path='/about' component={About} />
         <Route component={NoMatch} />
       </Switch>

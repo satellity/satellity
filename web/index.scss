@@ -1,3 +1,22 @@
 html {
   font-size: 16px;
 }
+
+html, body {
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* Pure css Custom Begin */
+.pure-form {
+  input {
+    border-radius: 0;
+  }
+}
+.pure-button {
+  border-radius: 0;
+}
+/* Pure css Custom End */

@@ -1,0 +1,27 @@
+.sign_in.layout {
+  text-align: center;
+  #layout-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .brand {
+    margin: 0 0 2rem;
+    a {
+      border-radius: .2rem;
+      background-color: rgba(0, 0, 0, 8);
+      color: white;
+      display: inline-block;
+      font-size: 18px;
+      padding: .5rem;
+    }
+  }
+  .slogan {
+    margin: 0 0 2rem;
+  }
+  .button {
+    background: rgb(223, 117, 20);
+    color: white;
+  }
+}
