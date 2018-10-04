@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Home from './home.js';
+import User from './user.js';
 
 axios.defaults.baseURL = 'https://localhost:4000';
 if (process.env.NODE_ENV === 'development') {
@@ -9,6 +10,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 function API() {
   this.home = new Home(this);
+  this.user = new User(this);
 }
 
 export default API;

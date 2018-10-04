@@ -1,6 +1,6 @@
 import './sign_in.scss';
 import React, { Component } from 'react';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 class SignIn extends Component {
   constructor(props) {
@@ -11,20 +11,24 @@ class SignIn extends Component {
   }
 
   render() {
+    let githubClientId = '';
+    if (process.env.NODE_ENV === 'development') {
+      githubClientId = '03e10a9b62b4533e65b5';
+    }
     return (
-      <SignInView />
+      <SignInView client_id={githubClientId} />
     );
   }
 }
 
-const SignInView = (match) => (
+const SignInView = (props, match) => (
   <div>
-    <h1 className="brand"><Link to="/">GD</Link></h1>
-    <div className="slogan">
+    <h1 className='brand'><Link to='/'>GD</Link></h1>
+    <div className='slogan'>
       A discourse like forum.
     </div>
     <div>
-      <a href="javascript:;" className="button-warning pure-button button">Sign in with GitHub</a>
+      <a href={`https://github.com/login/oauth/authorize?client_id=${props.client_id}`} className='button-warning pure-button button'>Sign in with GitHub</a>
     </div>
   </div>
 );

@@ -8,6 +8,7 @@ import (
 )
 
 type UserView struct {
+	Type      string    `json:"type"`
 	UserId    string    `json:"user_id"`
 	Username  string    `json:"username"`
 	Nickname  string    `json:"nickname"`
@@ -22,6 +23,7 @@ type AccountView struct {
 
 func buildUser(user *models.User) UserView {
 	return UserView{
+		Type:      "user",
 		UserId:    user.UserId,
 		Username:  user.Username,
 		Nickname:  user.Nickname,

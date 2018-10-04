@@ -45,6 +45,7 @@ type User struct {
 	UpdatedAt         time.Time      `sql:"updated_at"`
 
 	SessionId string `sql:"-"`
+	IsNew     bool   `sql:"-"`
 }
 
 var userCols = []string{"user_id", "email", "username", "nickname", "encrypted_password", "github_id", "created_at", "updated_at"}

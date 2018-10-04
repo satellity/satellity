@@ -36,23 +36,25 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	if user != nil {
-		return user, nil
+	if user == nil {
+		t := time.Now()
+		user = &User{
+			UserId:    uuid.NewV4().String(),
+			Email:     sql.NullString{data.Email, true},
+			Username:  fmt.Sprintf("GH_%s", data.Login),
+			Nickname:  data.Name,
+			GithubId:  sql.NullString{data.NodeId, true},
+			CreatedAt: t,
+			UpdatedAt: t,
+			IsNew:     true,
+		}
 	}
 
-	t := time.Now()
-	user = &User{
-		UserId:    uuid.NewV4().String(),
-		Email:     sql.NullString{data.Email, true},
-		Username:  fmt.Sprintf("GH_%s", data.Login),
-		Nickname:  data.Name,
-		GithubId:  sql.NullString{data.NodeId, true},
-		CreatedAt: t,
-		UpdatedAt: t,
-	}
 	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
-		if err := tx.Insert(user); err != nil {
-			return err
+		if user.IsNew {
+			if err := tx.Insert(user); err != nil {
+				return err
+			}
 		}
 		sess, err := user.addSession(ctx, tx, sessionSecret)
 		if err != nil {
@@ -69,11 +71,15 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 
 func fetchAccessToken(ctx context.Context, code string) (string, error) {
 	client := external.HttpClient()
+	client = &http.Client{Timeout: 5 * time.Second}
 	data, err := json.Marshal(map[string]interface{}{
 		"client_id":     config.GithubClientId,
 		"client_secret": config.GithubClientSecret,
 		"code":          code,
 	})
+	if err != nil {
+		return "", err
+	}
 	req, err := http.NewRequest("POST", "https://github.com/login/oauth/access_token", bytes.NewReader(data))
 	if err != nil {
 		return "", err
@@ -96,6 +102,7 @@ func fetchAccessToken(ctx context.Context, code string) (string, error) {
 
 func fetchOauthUser(ctx context.Context, accessToken string) (*GithubUser, error) {
 	client := external.HttpClient()
+	client = &http.Client{Timeout: 5 * time.Second}
 	req, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
 		return nil, err

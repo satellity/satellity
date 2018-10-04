@@ -6,5 +6,5 @@ import (
 )
 
 func HttpClient() *http.Client {
-	return &http.Client{Timeout: 10 * time.Second}
+	return &http.Client{Timeout: 5 * time.Second}
 }

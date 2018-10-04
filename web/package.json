@@ -12,12 +12,17 @@
   "dependencies": {
     "animate.css": "^3.7.0",
     "axios": "^0.18.0",
+    "js-cookie": "^2.2.0",
+    "jsrsasign": "^8.0.12",
+    "moment": "^2.22.2",
+    "node-forge": "^0.7.6",
     "normalize.css": "^8.0.0",
     "purecss": "^1.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-router": "^4.3.1",
-    "react-router-dom": "^4.3.1"
+    "react-router-dom": "^4.3.1",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.3.1",

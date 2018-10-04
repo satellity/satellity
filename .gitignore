@@ -1,5 +1,6 @@
 godiscourse
 config.go
+dev.cfg
 
 # web
 node_modules
