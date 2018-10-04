@@ -54,7 +54,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 	} else if user == nil {
 		return nil, session.IdentityNonExistError(ctx)
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword.String), []byte(password)); err != nil {
 		return nil, session.InvalidPasswordError(ctx)
 	}
 

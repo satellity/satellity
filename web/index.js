@@ -4,7 +4,7 @@ import './node_modules/purecss/build/pure.css';
 import './index.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
 import NoMatch from './notfound.js';
 import About from './about.js';
 import SignIn from './account/sign_in.js';

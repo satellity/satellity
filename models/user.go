@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"crypto/x509"
+	"database/sql"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -19,10 +20,11 @@ import (
 const users_DDL = `
 CREATE TABLE IF NOT EXISTS users (
 	user_id               VARCHAR(36) PRIMARY KEY,
-	email                 VARCHAR(512) NOT NULL,
+	email                 VARCHAR(512),
 	username              VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
 	nickname              VARCHAR(64) NOT NULL DEFAULT '',
-	encrypted_password    VARCHAR(1024) NOT NULL,
+	encrypted_password    VARCHAR(1024),
+	github_id             VARCHAR(1024) UNIQUE,
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
@@ -33,18 +35,19 @@ CREATE INDEX ON users (created_at);
 `
 
 type User struct {
-	UserId            string    `sql:"user_id,pk"`
-	Email             string    `sql:"email"`
-	Username          string    `sql:"username"`
-	Nickname          string    `sql:"nickname"`
-	EncryptedPassword string    `sql:"encrypted_password"`
-	CreatedAt         time.Time `sql:"created_at"`
-	UpdatedAt         time.Time `sql:"updated_at"`
+	UserId            string         `sql:"user_id,pk"`
+	Email             sql.NullString `sql:"email"`
+	Username          string         `sql:"username"`
+	Nickname          string         `sql:"nickname"`
+	EncryptedPassword sql.NullString `sql:"encrypted_password"`
+	GithubId          sql.NullString `sql:"github_id"`
+	CreatedAt         time.Time      `sql:"created_at"`
+	UpdatedAt         time.Time      `sql:"updated_at"`
 
 	SessionId string `sql:"-"`
 }
 
-var userCols = []string{"user_id", "email", "username", "nickname", "encrypted_password", "created_at", "updated_at"}
+var userCols = []string{"user_id", "email", "username", "nickname", "encrypted_password", "github_id", "created_at", "updated_at"}
 
 func CreateUser(ctx context.Context, email, username, nickname, password string, sessionSecret string) (*User, error) {
 	t := time.Now()
@@ -62,11 +65,15 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 		return nil, session.BadDataError(ctx)
 	}
 
+	email = strings.TrimSpace(email)
 	if err := validateEmailFormat(ctx, email); err != nil {
 		return nil, err
 	}
 	if nickname == "" {
 		nickname = username
+	}
+	if len(password) < 8 || len(password) > 64 {
+		return nil, session.BadDataError(ctx)
 	}
 	password, err = validateAndEncryptPassword(ctx, password)
 	if err != nil {
@@ -75,18 +82,13 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 
 	user := &User{
 		UserId:            uuid.NewV4().String(),
-		Email:             email,
+		Email:             sql.NullString{email, true},
 		Username:          username,
 		Nickname:          nickname,
-		EncryptedPassword: password,
+		EncryptedPassword: sql.NullString{password, true},
 		CreatedAt:         t,
 		UpdatedAt:         t,
 	}
-	tx, err := session.Database(ctx).Begin()
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	defer tx.Rollback()
 	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
 		if err := tx.Insert(user); err != nil {
 			return err

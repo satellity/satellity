@@ -21,6 +21,7 @@ func startHttp(db *pg.DB) error {
 	controllers.RegisterRoutes(router)
 
 	handler := middleware.Authenticate(router)
+	handler = middleware.Constraint(handler)
 	handler = middleware.Context(handler, db, render.New())
 	handler = middleware.State(handler)
 	handler = middleware.Logger(handler, durable.NewLogger())

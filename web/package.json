@@ -4,7 +4,7 @@
   "description": "A go version discourse like forum",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel index.html"
+    "dev": "NODE_ENV=development parcel index.html"
   },
   "keywords": [],
   "author": "jadeydi",

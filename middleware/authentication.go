@@ -12,7 +12,8 @@ import (
 )
 
 var whitelist = map[string]string{
-	"POST": "^/users$",
+	"GET":  "^/_hc$",
+	"POST": "^/oauth",
 }
 
 type contextValueKey int

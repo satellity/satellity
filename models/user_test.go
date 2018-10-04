@@ -44,7 +44,7 @@ func TestUserCRUD(t *testing.T) {
 	assert.NotNil(new)
 	assert.Equal(user.Username, new.Username)
 	assert.Equal(user.Nickname, new.Nickname)
-	err = bcrypt.CompareHashAndPassword([]byte(new.EncryptedPassword), []byte("password"))
+	err = bcrypt.CompareHashAndPassword([]byte(new.EncryptedPassword.String), []byte("password"))
 	assert.Nil(err)
 	new, err = FindUserByUsernameOrEmail(ctx, "None")
 	assert.Nil(err)
