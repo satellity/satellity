@@ -15,7 +15,7 @@ User.prototype = {
     var ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
     var pub = ec.generateKeyPairHex().ecpubhex;
     var priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
-    // Why use 3059301306072a8648ce3d020106082a8648ce3d030107034200
+    // TODO Why use 3059301306072a8648ce3d020106082a8648ce3d030107034200
     const params = {'session_secret': '3059301306072a8648ce3d020106082a8648ce3d030107034200' + pub, 'code': code};
     axios.post('/oauth/github', params).then(function(resp) {
       // TODO handle resp error
@@ -24,6 +24,7 @@ User.prototype = {
         window.localStorage.setItem('token', priv);
         window.localStorage.setItem('uid', data.user_id);
         window.localStorage.setItem('sid', data.session_id);
+        window.localStorage.setItem('user', JSON.stringify(data));
       }
       if (typeof callback === 'function') {
         callback(resp);
@@ -31,7 +32,7 @@ User.prototype = {
     });
   },
 
-  ecdsa: function () {
+  ecdsa: function() {
     var priv = window.localStorage.getItem('token');
     var pwd = Cookies.get('sid');
     if (!priv || !pwd) {
@@ -41,7 +42,7 @@ User.prototype = {
     return KJUR.KEYUTIL.getPEM(ec, 'PKCS1PRV');
   },
 
-  token: function (method, uri, body) {
+  token: function(method, uri, body) {
     var priv = window.localStorage.getItem('token');
     var pwd = Cookies.get('sid');
     if (!priv || !pwd) {
@@ -54,7 +55,7 @@ User.prototype = {
     return this.sign(uid, sid, priv, method, uri, body);
   },
 
-  sign: function (uid, sid, privateKey, method, uri, body) {
+  sign: function(uid, sid, privateKey, method, uri, body) {
     if (typeof body !== 'string') { body = ""; }
 
     let expire = moment.utc().add(1, 'minutes').unix();
@@ -80,8 +81,16 @@ User.prototype = {
     return KJUR.jws.JWS.sign('ES256', sHeader, sPayload, privateKey, pwd);
   },
 
-  clear: function () {
+  clear: function() {
     window.localStorage.clear();
+  },
+
+  me: function() {
+    const user = window.localStorage.getItem('user');
+    if (user === undefined || user === null) {
+      return {};
+    }
+    return JSON.parse(user);
   }
 }
 

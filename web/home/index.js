@@ -11,10 +11,6 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    const api = new API();
-    api.home.index(function (resp) {
-      console.info(resp);
-    });
   }
 
   render() {

@@ -10,6 +10,7 @@ import (
 type UserView struct {
 	Type      string    `json:"type"`
 	UserId    string    `json:"user_id"`
+	Email     string    `json:"email"`
 	Username  string    `json:"username"`
 	Nickname  string    `json:"nickname"`
 	CreatedAt time.Time `json:"created_at"`
@@ -25,6 +26,7 @@ func buildUser(user *models.User) UserView {
 	return UserView{
 		Type:      "user",
 		UserId:    user.UserId,
+		Email:     user.Email.String,
 		Username:  user.Username,
 		Nickname:  user.Nickname,
 		CreatedAt: user.CreatedAt,
