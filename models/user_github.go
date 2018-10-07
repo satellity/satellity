@@ -40,18 +40,20 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		t := time.Now()
 		user = &User{
 			UserId:    uuid.NewV4().String(),
-			Email:     sql.NullString{data.Email, true},
 			Username:  fmt.Sprintf("GH_%s", data.Login),
 			Nickname:  data.Name,
 			GithubId:  sql.NullString{data.NodeId, true},
 			CreatedAt: t,
 			UpdatedAt: t,
-			IsNew:     true,
+			isNew:     true,
+		}
+		if data.Email != "" {
+			user.Email = sql.NullString{data.Email, true}
 		}
 	}
 
 	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
-		if user.IsNew {
+		if user.isNew {
 			if err := tx.Insert(user); err != nil {
 				return err
 			}
@@ -71,7 +73,6 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 
 func fetchAccessToken(ctx context.Context, code string) (string, error) {
 	client := external.HttpClient()
-	client = &http.Client{Timeout: 5 * time.Second}
 	data, err := json.Marshal(map[string]interface{}{
 		"client_id":     config.GithubClientId,
 		"client_secret": config.GithubClientSecret,
@@ -102,7 +103,6 @@ func fetchAccessToken(ctx context.Context, code string) (string, error) {
 
 func fetchOauthUser(ctx context.Context, accessToken string) (*GithubUser, error) {
 	client := external.HttpClient()
-	client = &http.Client{Timeout: 5 * time.Second}
 	req, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,38 @@ func fetchOauthUser(ctx context.Context, accessToken string) (*GithubUser, error
 	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
 		return nil, err
 	}
+	email, err := featchUserEmail(ctx, accessToken)
+	if err != nil {
+		return nil, err
+	}
+	user.Email = email
 	return &user, nil
+}
+
+func featchUserEmail(ctx context.Context, accessToken string) (string, error) {
+	client := external.HttpClient()
+	req, err := http.NewRequest("GET", "https://api.github.com/user/public_emails", nil)
+	if err != nil {
+		return "", err
+	}
+	req.Close = true
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var emails []struct {
+		Email string `json:"email"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&emails); err != nil {
+		return "", err
+	}
+	if len(emails) == 0 {
+		return "", nil
+	}
+	return emails[0].Email, nil
 }
 
 func findUserByGithubId(ctx context.Context, id string) (*User, error) {

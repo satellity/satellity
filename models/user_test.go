@@ -62,6 +62,7 @@ func TestUserCRUD(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(new)
 	assert.Equal("username", user.Username)
+	assert.Equal("member", user.Role())
 
 	sess, err := readSession(ctx, new.UserId, new.SessionId)
 	assert.Nil(err)

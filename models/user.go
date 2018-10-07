@@ -12,6 +12,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-pg/pg"
+	"github.com/godiscourse/godiscourse/config"
 	"github.com/godiscourse/godiscourse/session"
 	"github.com/godiscourse/godiscourse/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -45,7 +46,7 @@ type User struct {
 	UpdatedAt         time.Time      `sql:"updated_at"`
 
 	SessionId string `sql:"-"`
-	IsNew     bool   `sql:"-"`
+	isNew     bool   `sql:"-"`
 }
 
 var userCols = []string{"user_id", "email", "username", "nickname", "encrypted_password", "github_id", "created_at", "updated_at"}
@@ -163,6 +164,13 @@ func FindUserByUsernameOrEmail(ctx context.Context, identity string) (*User, err
 		return nil, session.TransactionError(ctx, err)
 	}
 	return user, nil
+}
+
+func (user *User) Role() string {
+	if config.Operators[user.Email.String] {
+		return "admin"
+	}
+	return "member"
 }
 
 func findUserById(ctx context.Context, id string) (*User, error) {

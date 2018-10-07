@@ -28,7 +28,7 @@ const SignInView = (props, match) => (
       A discourse like forum.
     </div>
     <div>
-      <a href={`https://github.com/login/oauth/authorize?client_id=${props.client_id}`} className='button-warning pure-button button'>Sign in with GitHub</a>
+      <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${props.client_id}`} className='button-warning pure-button button'>Sign in with GitHub</a>
     </div>
   </div>
 );

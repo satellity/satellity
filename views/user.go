@@ -20,6 +20,7 @@ type UserView struct {
 type AccountView struct {
 	UserView
 	SessionId string `json:"session_id"`
+	Role      string `json:"role"`
 }
 
 func buildUser(user *models.User) UserView {
@@ -50,6 +51,7 @@ func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) {
 	accountView := AccountView{
 		UserView:  buildUser(user),
 		SessionId: user.SessionId,
+		Role:      user.Role(),
 	}
 	RenderResponse(w, r, accountView)
 }
