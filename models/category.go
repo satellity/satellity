@@ -18,14 +18,16 @@ CREATE TABLE IF NOT EXISTS categories (
 	description           VARCHAR(512) NOT NULL,
 	topics_count          INTEGER NOT NULL DEFAULT 0,
 	last_topic_id         VARCHAR(36),
+	position              INTEGER NOT NULL DEFAULT 0,
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX ON categories (name);
+CREATE INDEX ON categories (position);
 `
 
-var categoryCols = []string{"category_id", "name", "description", "topics_count", "last_topic_id", "created_at", "updated_at"}
+var categoryCols = []string{"category_id", "name", "description", "topics_count", "last_topic_id", "position", "created_at", "updated_at"}
 
 type Category struct {
 	CategoryId  string         `sql:"category_id,pk"`
@@ -33,6 +35,7 @@ type Category struct {
 	Description string         `sql:"description"`
 	TopicsCount int            `sql:"topics_count"`
 	LastTopicId sql.NullString `sql:"last_topic_id"`
+	Position    int            `sql:"position"`
 	CreatedAt   time.Time      `sql:"created_at"`
 	UpdatedAt   time.Time      `sql:"updated_at"`
 }

@@ -15,8 +15,7 @@ type userRequest struct {
 	SessionSecret string `json:"session_secret"`
 }
 
-type userImpl struct {
-}
+type userImpl struct{}
 
 func registerUser(router *httptreemux.TreeMux) {
 	impl := &userImpl{}
