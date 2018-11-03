@@ -29,17 +29,19 @@ CREATE INDEX ON categories (position);
 
 var categoryCols = []string{"category_id", "name", "description", "topics_count", "last_topic_id", "position", "created_at", "updated_at"}
 
+// Category is used to categorize topics.
 type Category struct {
-	CategoryId  string         `sql:"category_id,pk"`
+	CategoryID  string         `sql:"category_id,pk"`
 	Name        string         `sql:"name"`
 	Description string         `sql:"description"`
 	TopicsCount int            `sql:"topics_count"`
-	LastTopicId sql.NullString `sql:"last_topic_id"`
+	LastTopicID sql.NullString `sql:"last_topic_id"`
 	Position    int            `sql:"position"`
 	CreatedAt   time.Time      `sql:"created_at"`
 	UpdatedAt   time.Time      `sql:"updated_at"`
 }
 
+// CreateCategory create a new category.
 func CreateCategory(ctx context.Context, name, description string) (*Category, error) {
 	name = strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
@@ -49,10 +51,10 @@ func CreateCategory(ctx context.Context, name, description string) (*Category, e
 
 	t := time.Now()
 	category := &Category{
-		CategoryId:  uuid.NewV4().String(),
+		CategoryID:  uuid.NewV4().String(),
 		Name:        name,
 		Description: description,
-		LastTopicId: sql.NullString{"", false},
+		LastTopicID: sql.NullString{"", false},
 		CreatedAt:   t,
 		UpdatedAt:   t,
 	}
@@ -63,6 +65,7 @@ func CreateCategory(ctx context.Context, name, description string) (*Category, e
 	return category, nil
 }
 
+// ReadCategory read a category by ID (uuid).
 func ReadCategory(ctx context.Context, id string) (*Category, error) {
 	var category *Category
 	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
@@ -77,7 +80,7 @@ func ReadCategory(ctx context.Context, id string) (*Category, error) {
 }
 
 func findCategory(ctx context.Context, tx *pg.Tx, id string) (*Category, error) {
-	category := &Category{CategoryId: id}
+	category := &Category{CategoryID: id}
 	if err := tx.Model(category).Column(categoryCols...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {

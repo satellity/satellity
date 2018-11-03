@@ -62,8 +62,8 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryId strin
 		if category == nil {
 			return session.BadDataError(ctx)
 		}
-		topic.CategoryId = category.CategoryId
-		category.LastTopicId = sql.NullString{topic.TopicId, true}
+		topic.CategoryId = category.CategoryID
+		category.LastTopicID = sql.NullString{topic.TopicId, true}
 		category.TopicsCount += 1
 		if err := tx.Insert(topic); err != nil {
 			return err

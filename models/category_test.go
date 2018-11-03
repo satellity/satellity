@@ -16,10 +16,10 @@ func TestCategoryCRUD(t *testing.T) {
 	category, err := CreateCategory(ctx, "name", "Description")
 	assert.NotNil(category)
 	assert.Nil(err)
-	new, err := ReadCategory(ctx, category.CategoryId)
+	new, err := ReadCategory(ctx, category.CategoryID)
 	assert.NotNil(new)
 	assert.Nil(err)
 	assert.Equal("name", category.Name)
 	assert.Equal(0, category.TopicsCount)
-	assert.False(category.LastTopicId.Valid)
+	assert.False(category.LastTopicID.Valid)
 }
