@@ -11,7 +11,7 @@ import (
 	"github.com/godiscourse/godiscourse/uuid"
 )
 
-const categories_DDL = `
+const categoriesDDL = `
 CREATE TABLE IF NOT EXISTS categories (
 	category_id           VARCHAR(36) PRIMARY KEY,
 	name                  VARCHAR(36) NOT NULL,

@@ -18,7 +18,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const users_DDL = `
+const usersDDL = `
 CREATE TABLE IF NOT EXISTS users (
 	user_id               VARCHAR(36) PRIMARY KEY,
 	email                 VARCHAR(512),

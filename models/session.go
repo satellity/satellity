@@ -13,7 +13,7 @@ import (
 	"github.com/godiscourse/godiscourse/uuid"
 )
 
-const sessions_DDL = `
+const sessionsDDL = `
 CREATE TABLE IF NOT EXISTS sessions (
 	session_id            VARCHAR(36) PRIMARY KEY,
 	user_id               VARCHAR(36) NOT NULL,
