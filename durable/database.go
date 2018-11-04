@@ -8,6 +8,7 @@ import (
 	"github.com/godiscourse/godiscourse/config"
 )
 
+// OpenDatabaseClient generate a database client
 func OpenDatabaseClient(ctx context.Context) *pg.DB {
 	db := pg.Connect(&pg.Options{
 		Addr:     fmt.Sprintf("%s:%d", config.DatabaseHost, config.DatabasePort),

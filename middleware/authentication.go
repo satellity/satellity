@@ -22,11 +22,13 @@ type contextValueKey int
 
 const keyCurrentUser contextValueKey = 1000
 
+// CurrentUser read the user from r.Context
 func CurrentUser(r *http.Request) *models.User {
 	user, _ := r.Context().Value(keyCurrentUser).(*models.User)
 	return user
 }
 
+// Authenticate handle routes by user's role
 func Authenticate(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("Authorization")

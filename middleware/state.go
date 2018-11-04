@@ -10,6 +10,7 @@ import (
 	"github.com/godiscourse/godiscourse/views"
 )
 
+// State output states of request, e.g.: r.Method, r.URL etc.
 func State(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()

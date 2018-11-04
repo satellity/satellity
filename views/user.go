@@ -7,9 +7,10 @@ import (
 	"github.com/godiscourse/godiscourse/models"
 )
 
+// UserView is the response body of user
 type UserView struct {
 	Type      string    `json:"type"`
-	UserId    string    `json:"user_id"`
+	UserID    string    `json:"user_id"`
 	Email     string    `json:"email"`
 	Username  string    `json:"username"`
 	Nickname  string    `json:"nickname"`
@@ -17,16 +18,17 @@ type UserView struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// AccountView is the response body of a sign in user
 type AccountView struct {
 	UserView
-	SessionId string `json:"session_id"`
+	SessionID string `json:"session_id"`
 	Role      string `json:"role"`
 }
 
 func buildUser(user *models.User) UserView {
 	return UserView{
 		Type:      "user",
-		UserId:    user.UserId,
+		UserID:    user.UserID,
 		Email:     user.Email.String,
 		Username:  user.Username,
 		Nickname:  user.Nickname,
@@ -35,10 +37,12 @@ func buildUser(user *models.User) UserView {
 	}
 }
 
+// RenderUser response a user
 func RenderUser(w http.ResponseWriter, r *http.Request, user *models.User) {
 	RenderResponse(w, r, buildUser(user))
 }
 
+// RenderUsers response a bundle of users
 func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
 	userViews := make([]UserView, len(users))
 	for i, user := range users {
@@ -47,10 +51,11 @@ func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
 	RenderResponse(w, r, userViews)
 }
 
+// RenderAccount response
 func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) {
 	accountView := AccountView{
 		UserView:  buildUser(user),
-		SessionId: user.SessionId,
+		SessionID: user.SessionID,
 		Role:      user.Role(),
 	}
 	RenderResponse(w, r, accountView)

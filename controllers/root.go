@@ -8,6 +8,7 @@ import (
 	"github.com/godiscourse/godiscourse/views"
 )
 
+// RegisterRoutes register all routes
 func RegisterRoutes(router *httptreemux.TreeMux) {
 	router.GET("/_hc", health)
 

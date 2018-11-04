@@ -6,6 +6,7 @@ import (
 	"github.com/godiscourse/godiscourse/views"
 )
 
+// Constraint process OPTIONS request.
 func Constraint(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if origin := r.Header.Get("Origin"); origin != "" {

@@ -54,7 +54,7 @@ func CreateCategory(ctx context.Context, name, description string) (*Category, e
 		CategoryID:  uuid.NewV4().String(),
 		Name:        name,
 		Description: description,
-		LastTopicID: sql.NullString{"", false},
+		LastTopicID: sql.NullString{String: "", Valid: false},
 		CreatedAt:   t,
 		UpdatedAt:   t,
 	}

@@ -35,22 +35,24 @@ CREATE UNIQUE INDEX ON users ((LOWER(username)));
 CREATE INDEX ON users (created_at);
 `
 
+// User contains info of a register user
 type User struct {
-	UserId            string         `sql:"user_id,pk"`
+	UserID            string         `sql:"user_id,pk"`
 	Email             sql.NullString `sql:"email"`
 	Username          string         `sql:"username"`
 	Nickname          string         `sql:"nickname"`
 	EncryptedPassword sql.NullString `sql:"encrypted_password"`
-	GithubId          sql.NullString `sql:"github_id"`
+	GithubID          sql.NullString `sql:"github_id"`
 	CreatedAt         time.Time      `sql:"created_at"`
 	UpdatedAt         time.Time      `sql:"updated_at"`
 
-	SessionId string `sql:"-"`
+	SessionID string `sql:"-"`
 	isNew     bool   `sql:"-"`
 }
 
 var userCols = []string{"user_id", "email", "username", "nickname", "encrypted_password", "github_id", "created_at", "updated_at"}
 
+// CreateUser create a new user
 func CreateUser(ctx context.Context, email, username, nickname, password string, sessionSecret string) (*User, error) {
 	t := time.Now()
 	data, err := hex.DecodeString(sessionSecret)
@@ -83,11 +85,11 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 	}
 
 	user := &User{
-		UserId:            uuid.NewV4().String(),
-		Email:             sql.NullString{email, true},
+		UserID:            uuid.NewV4().String(),
+		Email:             sql.NullString{String: email, Valid: true},
 		Username:          username,
 		Nickname:          nickname,
-		EncryptedPassword: sql.NullString{password, true},
+		EncryptedPassword: sql.NullString{String: password, Valid: true},
 		CreatedAt:         t,
 		UpdatedAt:         t,
 	}
@@ -99,7 +101,7 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 		if err != nil {
 			return err
 		}
-		user.SessionId = sess.SessionId
+		user.SessionID = sess.SessionID
 		return nil
 	})
 	if err != nil {
@@ -108,6 +110,8 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 	return user, nil
 }
 
+// AuthenticateUser read a user by tokenString. tokenString is a jwt token, more
+// about jwt: https://github.com/dgrijalva/jwt-go
 func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 	var user *User
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -119,7 +123,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 			return nil, nil
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
-		u, err := findUserById(ctx, uid)
+		u, err := findUserByID(ctx, uid)
 		if err != nil {
 			return nil, err
 		} else if u == nil {
@@ -132,7 +136,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		} else if sess == nil {
 			return nil, nil
 		}
-		user.SessionId = sess.SessionId
+		user.SessionID = sess.SessionID
 		pkix, err := hex.DecodeString(sess.Secret)
 		if err != nil {
 			return nil, err
@@ -148,11 +152,13 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 	return user, nil
 }
 
-func FindUser(ctx context.Context, id string) (*User, error) {
-	return findUserById(ctx, id)
+// ReadUser read user by id.
+func ReadUser(ctx context.Context, id string) (*User, error) {
+	return findUserByID(ctx, id)
 }
 
-func FindUserByUsernameOrEmail(ctx context.Context, identity string) (*User, error) {
+// ReadUserByUsernameOrEmail read user by identity, which is an email or username.
+func ReadUserByUsernameOrEmail(ctx context.Context, identity string) (*User, error) {
 	user := &User{}
 	identity = strings.ToLower(strings.TrimSpace(identity))
 	if len(identity) < 3 {
@@ -166,6 +172,7 @@ func FindUserByUsernameOrEmail(ctx context.Context, identity string) (*User, err
 	return user, nil
 }
 
+// Role of an user, contains admin and member for now.
 func (user *User) Role() string {
 	if config.Operators[user.Email.String] {
 		return "admin"
@@ -173,8 +180,8 @@ func (user *User) Role() string {
 	return "member"
 }
 
-func findUserById(ctx context.Context, id string) (*User, error) {
-	user := &User{UserId: id}
+func findUserByID(ctx context.Context, id string) (*User, error) {
+	user := &User{UserID: id}
 	if err := session.Database(ctx).Model(user).Column(userCols...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {

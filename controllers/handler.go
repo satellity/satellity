@@ -8,6 +8,7 @@ import (
 	"github.com/godiscourse/godiscourse/views"
 )
 
+// RegisterHanders handle global responses: MethodNotAllowedHandler, NotFoundHandler, PanicHandler
 func RegisterHanders(router *httptreemux.TreeMux) {
 	router.MethodNotAllowedHandler = func(w http.ResponseWriter, r *http.Request, _ map[string]httptreemux.HandlerFunc) {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))

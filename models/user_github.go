@@ -16,13 +16,15 @@ import (
 	"github.com/godiscourse/godiscourse/uuid"
 )
 
+// GithubUser is the response body of github oauth.
 type GithubUser struct {
 	Login  string `json:"login"`
-	NodeId string `json:"node_id"`
+	NodeID string `json:"node_id"`
 	Name   string `json:"name"`
 	Email  string `json:"email"`
 }
 
+// CreateGithubUser create a github user.
 func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, error) {
 	token, err := fetchAccessToken(ctx, code)
 	if err != nil {
@@ -32,23 +34,23 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
 	}
-	user, err := findUserByGithubId(ctx, data.NodeId)
+	user, err := findUserByGithubId(ctx, data.NodeID)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	if user == nil {
 		t := time.Now()
 		user = &User{
-			UserId:    uuid.NewV4().String(),
+			UserID:    uuid.NewV4().String(),
 			Username:  fmt.Sprintf("GH_%s", data.Login),
 			Nickname:  data.Name,
-			GithubId:  sql.NullString{data.NodeId, true},
+			GithubID:  sql.NullString{String: data.NodeID, Valid: true},
 			CreatedAt: t,
 			UpdatedAt: t,
 			isNew:     true,
 		}
 		if data.Email != "" {
-			user.Email = sql.NullString{data.Email, true}
+			user.Email = sql.NullString{String: data.Email, Valid: true}
 		}
 	}
 
@@ -62,7 +64,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		if err != nil {
 			return err
 		}
-		user.SessionId = sess.SessionId
+		user.SessionID = sess.SessionID
 		return nil
 	})
 	if err != nil {
@@ -74,7 +76,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 func fetchAccessToken(ctx context.Context, code string) (string, error) {
 	client := external.HttpClient()
 	data, err := json.Marshal(map[string]interface{}{
-		"client_id":     config.GithubClientId,
+		"client_id":     config.GithubClientID,
 		"client_secret": config.GithubClientSecret,
 		"code":          code,
 	})

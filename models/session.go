@@ -25,15 +25,17 @@ CREATE INDEX ON sessions (user_id);
 CREATE INDEX ON sessions (created_at);
 `
 
+// Session contains user's current login infomation
 type Session struct {
-	SessionId string    `sql:"session_id,pk"`
-	UserId    string    `sql:"user_id"`
+	SessionID string    `sql:"session_id,pk"`
+	UserID    string    `sql:"user_id"`
 	Secret    string    `sql:"secret"`
 	CreatedAt time.Time `sql:"created_at"`
 }
 
 var sessionCols = []string{"session_id", "user_id", "secret", "created_at"}
 
+// CreateSession create a new user session
 func CreateSession(ctx context.Context, identity, password, sessionSecret string) (*User, error) {
 	data, err := hex.DecodeString(sessionSecret)
 	if err != nil {
@@ -49,7 +51,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 		return nil, session.BadDataError(ctx)
 	}
 
-	user, err := FindUserByUsernameOrEmail(ctx, identity)
+	user, err := ReadUserByUsernameOrEmail(ctx, identity)
 	if err != nil {
 		return nil, err
 	} else if user == nil {
@@ -64,7 +66,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 		if err != nil {
 			return err
 		}
-		user.SessionId = sess.SessionId
+		user.SessionID = sess.SessionID
 		return nil
 	})
 	if err != nil {
@@ -75,8 +77,8 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 
 func (user *User) addSession(ctx context.Context, tx *pg.Tx, secret string) (*Session, error) {
 	sess := &Session{
-		SessionId: uuid.NewV4().String(),
-		UserId:    user.UserId,
+		SessionID: uuid.NewV4().String(),
+		UserID:    user.UserID,
 		Secret:    secret,
 		CreatedAt: time.Now(),
 	}
@@ -88,13 +90,13 @@ func (user *User) addSession(ctx context.Context, tx *pg.Tx, secret string) (*Se
 }
 
 func readSession(ctx context.Context, uid, sid string) (*Session, error) {
-	sess := &Session{UserId: uid, SessionId: sid}
+	sess := &Session{UserID: uid, SessionID: sid}
 	if err := session.Database(ctx).Model(sess).Column(sessionCols...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	if sess.UserId != uid {
+	if sess.UserID != uid {
 		return nil, nil
 	}
 	return sess, nil

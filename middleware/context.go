@@ -8,6 +8,7 @@ import (
 	"github.com/unrolled/render"
 )
 
+// Context put database and request in r.Context
 func Context(handler http.Handler, db *pg.DB, r *render.Render) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := session.WithDatabase(req.Context(), db)

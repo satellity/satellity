@@ -9,6 +9,7 @@ import (
 	"runtime"
 )
 
+// Error is a custom error
 type Error struct {
 	Status      int    `json:"status"`
 	Code        int    `json:"code"`
@@ -24,51 +25,61 @@ func (sessionError Error) Error() string {
 	return string(str)
 }
 
+// AuthorizationError return 401 for unauthorized request
 func AuthorizationError(ctx context.Context) Error {
 	description := "Unauthorized, maybe invalid token."
 	return createError(ctx, http.StatusAccepted, 401, description, nil)
 }
 
+// BadRequestError means the request body is not a valid format.
 func BadRequestError(ctx context.Context) Error {
 	description := "The request body can’t be pasred as valid data."
 	return createError(ctx, http.StatusAccepted, http.StatusBadRequest, description, nil)
 }
 
+// TransactionError means there is something wrong on database.
 func TransactionError(ctx context.Context, err error) Error {
 	description := http.StatusText(http.StatusInternalServerError)
 	return createError(ctx, http.StatusInternalServerError, 10001, description, err)
 }
 
+// BadDataError means the request has invalid field.
 func BadDataError(ctx context.Context) Error {
 	description := "The request data has invalid field."
 	return createError(ctx, http.StatusAccepted, 10002, description, nil)
 }
 
+// InvalidEmailFormatError means the email is invalid.
 func InvalidEmailFormatError(ctx context.Context, email string) Error {
 	description := fmt.Sprintf("Invalid email format %s.", email)
 	return createError(ctx, http.StatusInternalServerError, 10010, description, nil)
 }
 
+// IdentityNonExistError means email or username is not existent.
 func IdentityNonExistError(ctx context.Context) Error {
 	description := "Email or Username is not exist."
 	return createError(ctx, http.StatusAccepted, 10011, description, nil)
 }
 
+// InvalidPasswordError means the password is invalid.
 func InvalidPasswordError(ctx context.Context) Error {
 	description := "Password invalid."
 	return createError(ctx, http.StatusAccepted, 10012, description, nil)
 }
 
+// PasswordTooSimpleError means the password is too simple.
 func PasswordTooSimpleError(ctx context.Context) Error {
 	description := "Password too simple, at least 8 characters required."
 	return createError(ctx, http.StatusAccepted, 10013, description, nil)
 }
 
+// ServerError means some server error are occurred.
 func ServerError(ctx context.Context, err error) Error {
 	description := http.StatusText(http.StatusInternalServerError)
 	return createError(ctx, http.StatusInternalServerError, http.StatusInternalServerError, description, err)
 }
 
+// NotFoundError means resource is not found.
 func NotFoundError(ctx context.Context) Error {
 	description := http.StatusText(http.StatusNotFound)
 	return createError(ctx, http.StatusAccepted, http.StatusNotFound, description, nil)

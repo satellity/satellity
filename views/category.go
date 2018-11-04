@@ -6,6 +6,7 @@ import (
 	"github.com/godiscourse/godiscourse/models"
 )
 
+// CategoryView is the response body of category
 type CategoryView struct {
 	Type        string `json:"type"`
 	Name        string `json:"name"`
@@ -20,6 +21,7 @@ func buildCategory(category *models.Category) CategoryView {
 	}
 }
 
+// RenderCategory response a category
 func RenderCategory(w http.ResponseWriter, r *http.Request, category *models.Category) {
 	RenderResponse(w, r, buildCategory(category))
 }

@@ -28,17 +28,19 @@ CREATE INDEX ON topics (user_id);
 
 var topicCols = []string{"topic_id", "title", "body", "category_id", "user_id", "created_at", "updated_at"}
 
+// Topic is what use talking about
 type Topic struct {
-	TopicId    string    `sql:"topic_id"`
+	TopicID    string    `sql:"topic_id"`
 	Title      string    `sql:"title"`
 	Body       string    `sql:"body"`
-	CategoryId string    `sql:"category_id"`
-	UserId     string    `sql:"user_id"`
+	CategoryID string    `sql:"category_id"`
+	UserID     string    `sql:"user_id"`
 	CreatedAt  time.Time `sql:"created_at"`
 	UpdatedAt  time.Time `sql:"updated_at"`
 }
 
-func (user *User) CreateTopic(ctx context.Context, title, body, categoryId string) (*Topic, error) {
+//CreateTopic create a new Topic
+func (user *User) CreateTopic(ctx context.Context, title, body, categoryID string) (*Topic, error) {
 	title = strings.TrimSpace(title)
 	body = strings.TrimSpace(body)
 	if len(title) < 1 {
@@ -47,24 +49,24 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryId strin
 
 	t := time.Now()
 	topic := &Topic{
-		TopicId:   uuid.NewV4().String(),
+		TopicID:   uuid.NewV4().String(),
 		Title:     title,
 		Body:      body,
-		UserId:    user.UserId,
+		UserID:    user.UserID,
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
 	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
-		category, err := findCategory(ctx, tx, categoryId)
+		category, err := findCategory(ctx, tx, categoryID)
 		if err != nil {
 			return err
 		}
 		if category == nil {
 			return session.BadDataError(ctx)
 		}
-		topic.CategoryId = category.CategoryID
-		category.LastTopicID = sql.NullString{topic.TopicId, true}
-		category.TopicsCount += 1
+		topic.CategoryID = category.CategoryID
+		category.LastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
+		category.TopicsCount++
 		if err := tx.Insert(topic); err != nil {
 			return err
 		}
@@ -79,6 +81,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryId strin
 	return topic, nil
 }
 
+//ReadTopic read a topic by ID
 func ReadTopic(ctx context.Context, id string) (*Topic, error) {
 	var topic *Topic
 	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
@@ -93,7 +96,7 @@ func ReadTopic(ctx context.Context, id string) (*Topic, error) {
 }
 
 func findTopic(ctx context.Context, tx *pg.Tx, id string) (*Topic, error) {
-	topic := &Topic{TopicId: id}
+	topic := &Topic{TopicID: id}
 	if err := tx.Model(topic).Column(topicCols...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {

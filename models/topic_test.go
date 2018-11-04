@@ -22,6 +22,6 @@ func TestTopicCRUD(t *testing.T) {
 	assert.NotNil(topic)
 	category, _ = ReadCategory(ctx, category.CategoryID)
 	assert.NotNil(category)
-	assert.Equal(topic.TopicId, category.LastTopicID.String)
+	assert.Equal(topic.TopicID, category.LastTopicID.String)
 	assert.Equal(1, category.TopicsCount)
 }

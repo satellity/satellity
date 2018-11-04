@@ -38,24 +38,24 @@ func TestUserCRUD(t *testing.T) {
 	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "password", hex.EncodeToString(public))
 	assert.Nil(err)
 	assert.NotNil(user)
-	assert.NotEqual("", user.SessionId)
-	new, err := FindUser(ctx, user.UserId)
+	assert.NotEqual("", user.SessionID)
+	new, err := ReadUser(ctx, user.UserID)
 	assert.Nil(err)
 	assert.NotNil(new)
 	assert.Equal(user.Username, new.Username)
 	assert.Equal(user.Nickname, new.Nickname)
 	err = bcrypt.CompareHashAndPassword([]byte(new.EncryptedPassword.String), []byte("password"))
 	assert.Nil(err)
-	new, err = FindUserByUsernameOrEmail(ctx, "None")
+	new, err = ReadUserByUsernameOrEmail(ctx, "None")
 	assert.Nil(err)
 	assert.Nil(new)
-	new, err = FindUserByUsernameOrEmail(ctx, "im.yuqlee@Gmail.com")
+	new, err = ReadUserByUsernameOrEmail(ctx, "im.yuqlee@Gmail.com")
 	assert.Nil(err)
 	assert.NotNil(new)
-	new, err = FindUserByUsernameOrEmail(ctx, "UserName")
+	new, err = ReadUserByUsernameOrEmail(ctx, "UserName")
 	assert.Nil(err)
 	assert.NotNil(new)
-	new, err = FindUserByUsernameOrEmail(ctx, "im.yuqlee@Gmail.com")
+	new, err = ReadUserByUsernameOrEmail(ctx, "im.yuqlee@Gmail.com")
 	assert.Nil(err)
 	assert.NotNil(new)
 	new, err = CreateSession(ctx, "im.yuqlee@Gmail.com", "password", hex.EncodeToString(public))
@@ -64,16 +64,16 @@ func TestUserCRUD(t *testing.T) {
 	assert.Equal("username", user.Username)
 	assert.Equal("member", user.Role())
 
-	sess, err := readSession(ctx, new.UserId, new.SessionId)
+	sess, err := readSession(ctx, new.UserID, new.SessionID)
 	assert.Nil(err)
 	assert.NotNil(sess)
-	sess, err = readSession(ctx, uuid.NewV4().String(), new.SessionId)
+	sess, err = readSession(ctx, uuid.NewV4().String(), new.SessionID)
 	assert.Nil(err)
 	assert.Nil(sess)
 
 	claims := &jwt.MapClaims{
-		"uid": new.UserId,
-		"sid": new.SessionId,
+		"uid": new.UserID,
+		"sid": new.SessionID,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
 	ss, err := token.SignedString(priv)
