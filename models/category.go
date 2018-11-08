@@ -50,11 +50,16 @@ func CreateCategory(ctx context.Context, name, description string) (*Category, e
 	}
 
 	t := time.Now()
+	count, err := categoryCount(ctx)
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
 	category := &Category{
 		CategoryID:  uuid.NewV4().String(),
 		Name:        name,
 		Description: description,
 		LastTopicID: sql.NullString{String: "", Valid: false},
+		Position:    count,
 		CreatedAt:   t,
 		UpdatedAt:   t,
 	}
@@ -87,4 +92,8 @@ func findCategory(ctx context.Context, tx *pg.Tx, id string) (*Category, error) 
 		return nil, err
 	}
 	return category, nil
+}
+
+func categoryCount(ctx context.Context) (int, error) {
+	return session.Database(ctx).Model(&Category{}).Count()
 }
