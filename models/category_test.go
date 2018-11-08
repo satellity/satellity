@@ -26,4 +26,7 @@ func TestCategoryCRUD(t *testing.T) {
 	assert.NotNil(category)
 	assert.Nil(err)
 	assert.Equal(1, category.Position)
+	categories, err := ReadCategories(ctx)
+	assert.Nil(err)
+	assert.Len(categories, 2)
 }

@@ -84,6 +84,15 @@ func ReadCategory(ctx context.Context, id string) (*Category, error) {
 	return category, nil
 }
 
+// ReadCategories read categories
+func ReadCategories(ctx context.Context) ([]*Category, error) {
+	var categories []*Category
+	if _, err := session.Database(ctx).Query(&categories, "SELECT * FROM categories ORDER BY position LIMIT 100"); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return categories, nil
+}
+
 func findCategory(ctx context.Context, tx *pg.Tx, id string) (*Category, error) {
 	category := &Category{CategoryID: id}
 	if err := tx.Model(category).Column(categoryCols...).WherePK().Select(); err == pg.ErrNoRows {
