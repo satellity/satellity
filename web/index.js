@@ -1,6 +1,6 @@
 import './node_modules/normalize.css/normalize.css';
+import './assets/css/h5bp.css';
 import './node_modules/@fortawesome/fontawesome-free/css/all.css';
-import './node_modules/purecss/build/pure.css';
 import './index.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
