@@ -1,25 +1,19 @@
 .sign_in.layout {
   text-align: center;
+
   #layout-container {
-    min-height: 80vh;
+    min-height: 60vh;
     display: flex;
     align-items: center;
     justify-content: center;
   }
+
   .brand {
-    margin: 0 0 2rem;
+    margin: 0 0 3rem;
+
     a {
-      border-radius: .2rem;
-      display: inline-block;
-      font-size: 18px;
-      padding: .5rem;
+      color: black;
+      font-size: 2rem;
     }
-  }
-  .slogan {
-    margin: 0 0 2rem;
-  }
-  .button {
-    background: rgb(223, 117, 20);
-    color: white;
   }
 }
