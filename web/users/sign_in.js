@@ -11,6 +11,7 @@ class SignIn extends Component {
   }
 
   render() {
+    // TODO replace with production githubClientId
     let githubClientId = '';
     if (process.env.NODE_ENV === 'development') {
       githubClientId = '03e10a9b62b4533e65b5';
@@ -23,12 +24,12 @@ class SignIn extends Component {
 
 const SignInView = (props, match) => (
   <div>
-    <h1 className='brand'><Link to='/'>GD</Link></h1>
+    <h1 className='brand'><Link to='/'>Fun Yeah</Link></h1>
     <div className='slogan'>
-      A discourse like forum.
+      A discourse like forum. For Fun Yeah.
     </div>
     <div>
-      <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${props.client_id}`} className='button-warning pure-button button'>Sign in with GitHub</a>
+      <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${props.client_id}`} className='btn primary'>Sign in with GitHub</a>
     </div>
   </div>
 );
