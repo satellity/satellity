@@ -24,7 +24,7 @@ User.prototype = {
         window.localStorage.setItem('token', priv);
         window.localStorage.setItem('uid', data.user_id);
         window.localStorage.setItem('sid', data.session_id);
-        window.localStorage.setItem('user', JSON.stringify(data));
+        window.localStorage.setItem('user', btoa(JSON.stringify(data)));
       }
       if (typeof callback === 'function') {
         callback(resp);
@@ -90,7 +90,7 @@ User.prototype = {
     if (user === undefined || user === null) {
       return {};
     }
-    return JSON.parse(user);
+    return JSON.parse(atob(user));
   }
 }
 
