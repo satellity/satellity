@@ -91,6 +91,11 @@ User.prototype = {
       return {};
     }
     return JSON.parse(atob(user));
+  },
+
+  isAdmin: function() {
+    const user = this.me();
+    return user.role === 'admin';
   }
 }
 
