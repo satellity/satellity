@@ -6,6 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
 import MainRoute from './components/main.js';
+import AdminRoute from './components/admin.js';
 import NoMatch from './notfound.js';
 import About from './about.js';
 import SignIn from './users/sign_in.js';
@@ -21,6 +22,7 @@ ReactDOM.render((
         <MainRoute path='/about' component={About} />
         <Route path='/sign_in' component={SignIn} />
         <Route path='/oauth/callback' component={Oauth} />
+        <Route path='/admin' component={AdminRoute} />
         <Route component={NoMatch} />
       </Switch>
     </div>
