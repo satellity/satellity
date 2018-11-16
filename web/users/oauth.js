@@ -1,4 +1,4 @@
-import LoadingPage from '../components/loading_page.js';
+import LoadingPage from '../loading/loading_page.js';
 import URLUtils from '../components/url.js';
 import React, { Component } from 'react';
 import API from '../api/index.js';
