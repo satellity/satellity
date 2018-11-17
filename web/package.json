@@ -17,7 +17,6 @@
     "moment": "^2.22.2",
     "node-forge": "^0.7.6",
     "normalize.css": "^8.0.0",
-    "purecss": "^1.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-router": "^4.3.1",
