@@ -10,9 +10,6 @@ class Home extends Component {
     document.body.classList.add('home', 'layout');
   }
 
-  componentDidMount() {
-  }
-
   render() {
     return (
       <HomeView />

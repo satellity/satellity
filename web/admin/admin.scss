@@ -1,7 +1,55 @@
+$color-light-background: #ECF0F5;
+$color-dark-background: #25476A;
+
 .admin.layout {
+  background-color: $color-light-background;
   header {
+    background-color: $color-dark-background;
+    color: white;
+    text-align: right;
+    padding: 1.6rem;
     a {
-      margin-right: 1.6rem;
+      color: white;
+      margin-left: 1.6rem;
+    }
+    .brand {
+      float: left;
     }
   }
+  .wrapper {
+    max-width: 96%;
+    margin: 0 auto;
+    width: 64rem;
+    padding: 1.6rem 0;
+  }
+  .container {
+    position: relative;
+    &:before {
+      content: '';
+      display: block;
+      background-color: $color-dark-background;
+      width: 100%;
+      height: 10rem;
+      position: absolute;
+      z-index: -1;
+    }
+  }
+  .welcome {
+    font-weight: normal;
+    font-size: 1.6rem;
+    color: white;
+    margin-bottom: 1.6rem;
+    .new {
+      padding: 0 .6rem;
+      color: white;
+      text-decoration: underline;
+    }
+  }
+  .panel {
+    background: white;
+    box-sizing: border-box;
+    padding: 1.6rem;
+  }
+
+  /* Category */
 }

@@ -21,10 +21,10 @@ User.prototype = {
         return Promise.reject(resp.error);
       }
       if (resp.data) {
-        const data = resp.data.data;
+        const data = resp.data;
+        Cookies.set('sid', data.session_id, { expires: 365 });
         window.localStorage.setItem('token', priv);
         window.localStorage.setItem('uid', data.user_id);
-        window.localStorage.setItem('sid', data.session_id);
         window.localStorage.setItem('user', btoa(JSON.stringify(data)));
       }
       if (typeof callback === 'function') {
@@ -52,7 +52,7 @@ User.prototype = {
     Cookies.set('sid', pwd);
 
     var uid = window.localStorage.getItem('uid');
-    var sid = window.localStorage.getItem('sid');
+    var sid = pwd;
     return this.sign(uid, sid, priv, method, uri, body);
   },
 

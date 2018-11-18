@@ -5,7 +5,12 @@ function Category(api) {
 }
 
 Category.prototype = {
-  index: function() {
+  adminIndex: function(callback) {
+    this.api.request('get', '/admin/categories', {}, (resp) => {
+      if (typeof callback === 'function') {
+        callback(resp.data);
+      }
+    });
   }
 }
 

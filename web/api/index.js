@@ -18,21 +18,26 @@ function API() {
 
 API.prototype = {
   request: function(method, url, data, callback, errCallback) {
+    const self = this;
     axios({
       method: method,
       url: url,
+      headers: {'Authorization': 'Bearer ' + self.user.token(method, url, data)},
       data: data
     })
-      .then(function(resp) {
-        callback(resp);
+      .then((resp) => {
+        if (resp.data.error) {
+          return Promise.reject(resp.data.error);
+        }
+        callback(resp.data);
       })
-      .catch(function(error) {
+      .catch((error) => {
         if (errCallback === 'function') {
           errCallback(error)
           return
         }
         if (error.code === 401) {
-          window.history.pushState(null, null, '/');
+          window.location.href = '/sign_in';
           return
         }
         // TODO

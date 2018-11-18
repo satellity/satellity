@@ -1,23 +1,7 @@
 header.header.navi {
   padding: .6rem;
-  border-bottom: 1px solid black;
-  .brand {
-    background: black;
-    border-radius: .2rem;
-    color: white;
-    display: inline-block;
-    padding: .6rem;
-  }
   .actions {
     float: right;
     line-height: 2.2rem
   }
-}
-
-.container {
-  box-sizing: border-box;
-  margin: 0 auto;
-  width: 64rem;
-  max-width: 96%;
-  padding: 1rem 2rem;
 }
