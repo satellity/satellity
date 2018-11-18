@@ -38,4 +38,11 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 }
 
 func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	categories, err := models.ReadCategories(r.Context())
+	if err != nil {
+		views.RenderErrorResponse(w, r, err)
+		return
+	}
+
+	views.RenderCategories(w, r, categories)
 }

@@ -10,7 +10,7 @@ class AdminCategory extends Component {
 
   componentDidMount() {
     this.api.category.adminIndex(function(resp) {
-      console.info(resp.data);
+      console.info(resp);
     });
   }
 

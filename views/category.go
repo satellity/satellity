@@ -25,3 +25,11 @@ func buildCategory(category *models.Category) CategoryView {
 func RenderCategory(w http.ResponseWriter, r *http.Request, category *models.Category) {
 	RenderResponse(w, r, buildCategory(category))
 }
+
+func RenderCategories(w http.ResponseWriter, r *http.Request, categories []*models.Category) {
+	views := make([]CategoryView, len(categories))
+	for i, c := range categories {
+		views[i] = buildCategory(c)
+	}
+	RenderResponse(w, r, views)
+}

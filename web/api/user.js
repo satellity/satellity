@@ -22,9 +22,10 @@ User.prototype = {
       }
       if (resp.data) {
         const data = resp.data;
-        Cookies.set('sid', data.session_id, { expires: 365 });
+        Cookies.set('sid', pwd, { expires: 365 });
         window.localStorage.setItem('token', priv);
         window.localStorage.setItem('uid', data.user_id);
+        window.localStorage.setItem('sid', data.session_id);
         window.localStorage.setItem('user', btoa(JSON.stringify(data)));
       }
       if (typeof callback === 'function') {
@@ -52,7 +53,7 @@ User.prototype = {
     Cookies.set('sid', pwd);
 
     var uid = window.localStorage.getItem('uid');
-    var sid = pwd;
+    var sid = window.localStorage.getItem('sid');
     return this.sign(uid, sid, priv, method, uri, body);
   },
 

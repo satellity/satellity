@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS categories (
 	description           VARCHAR(512) NOT NULL,
 	topics_count          INTEGER NOT NULL DEFAULT 0,
 	last_topic_id         VARCHAR(36),
+	position              INTEGER NOT NULL DEFAULT 0,
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
