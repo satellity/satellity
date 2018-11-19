@@ -1,3 +1,5 @@
+import './index.scss';
+import Typed from 'typed.js';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
@@ -10,6 +12,18 @@ class Home extends Component {
     document.body.classList.add('home', 'layout');
   }
 
+  componentDidMount() {
+    const options = {
+      strings: ['Welcome, this is FunYeah', 'A discourse-like forum in Go', 'Welcome, FunYeah!'],
+      typeSpeed: 100,
+      backSpeed: 50
+    };
+    this.typed = new Typed('.welcome', options);
+  }
+
+  componentWillUnmount() {
+  }
+
   render() {
     return (
       <HomeView />
@@ -18,9 +32,7 @@ class Home extends Component {
 }
 
 const HomeView = (match) => (
-  <div>
-    <div>Home</div>
-    <Link to='/about'>About</Link>
+  <div className='welcome' >
   </div>
 );
 

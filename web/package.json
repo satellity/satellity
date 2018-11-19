@@ -21,6 +21,7 @@
     "react-dom": "^16.5.2",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
+    "typed.js": "^2.0.9",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
