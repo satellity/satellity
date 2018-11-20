@@ -24,7 +24,7 @@ class SignIn extends Component {
 
 const SignInView = (props, match) => (
   <div>
-    <h1 className='brand'><Link to='/'>FunYeah</Link></h1>
+    <h1 className='brand'><Link to='/'>Suntin</Link></h1>
     <div>
       <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${props.client_id}`} className='btn primary'>Sign in with GitHub</a>
     </div>

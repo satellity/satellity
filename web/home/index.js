@@ -14,7 +14,7 @@ class Home extends Component {
 
   componentDidMount() {
     const options = {
-      strings: ['Welcome, this is FunYeah', 'A discourse-like forum in Go', 'Welcome, FunYeah!'],
+      strings: ['Welcome, this is Suntin', 'A discourse-like forum in Go', 'Welcome, Suntin!'],
       typeSpeed: 100,
       backSpeed: 50
     };
@@ -32,7 +32,8 @@ class Home extends Component {
 }
 
 const HomeView = (match) => (
-  <div className='welcome' >
+  <div className='container'>
+    <span className='welcome'></span>
   </div>
 );
 

@@ -1,5 +1,10 @@
 .home.layout {
   font-size: 3rem;
   text-align: center;
-  line-height: 80vh;
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+  }
 }
