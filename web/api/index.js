@@ -3,8 +3,7 @@ import Home from './home.js';
 import User from './user.js';
 import Category from './category.js';
 
-// TODO should replace with funyeah.com
-axios.defaults.baseURL = 'https://localhost:4000';
+axios.defaults.baseURL = 'http://api.suntin.com';
 if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = 'http://localhost:4000';
 }
