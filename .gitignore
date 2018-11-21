@@ -1,6 +1,7 @@
 godiscourse
 config.go
 dev.cfg
+production.cfg
 scripts
 
 # web

@@ -11,8 +11,7 @@ class SignIn extends Component {
   }
 
   render() {
-    // TODO replace with production githubClientId
-    let githubClientId = '';
+    let githubClientId = '71905afbd6e4541ad62b';
     if (process.env.NODE_ENV === 'development') {
       githubClientId = '03e10a9b62b4533e65b5';
     }
