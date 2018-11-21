@@ -13,8 +13,14 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    this.api = new API();
+    const user = this.api.user.me();
+    let guest = 'Suntin';
+    if (user.nickname) {
+      guest = user.nickname;
+    }
     const options = {
-      strings: ['Welcome, this is Suntin', 'A discourse-like forum in Go', 'Welcome, Suntin!'],
+      strings: ['Hello, this is Suntin', 'A discourse-like forum in Go', `Welcome, ${guest}!`],
       typeSpeed: 100,
       backSpeed: 50
     };
