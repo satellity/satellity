@@ -18,8 +18,7 @@ class AdminCategory extends Component {
     return (
       <div>
         <h1 className='welcome'>
-          It is used to categorize topics.
-          <Link to='/admin/categories/new' className='new'>Create New Category</Link>
+          Create a new category
         </h1>
         <div className='panel'>
         </div>

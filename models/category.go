@@ -34,9 +34,9 @@ type Category struct {
 	CategoryID  string         `sql:"category_id,pk"`
 	Name        string         `sql:"name"`
 	Description string         `sql:"description"`
-	TopicsCount int            `sql:"topics_count"`
+	TopicsCount int            `sql:"topics_count,notnull"`
 	LastTopicID sql.NullString `sql:"last_topic_id"`
-	Position    int            `sql:"position"`
+	Position    int            `sql:"position,notnull"`
 	CreatedAt   time.Time      `sql:"created_at"`
 	UpdatedAt   time.Time      `sql:"updated_at"`
 }
@@ -65,6 +65,35 @@ func CreateCategory(ctx context.Context, name, description string) (*Category, e
 	}
 
 	if err := session.Database(ctx).Insert(category); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return category, nil
+}
+
+// UpdateCategory update a category
+func UpdateCategory(ctx context.Context, id, name, description string) (*Category, error) {
+	name = strings.TrimSpace(name)
+	description = strings.TrimSpace(description)
+	if len(name) < 1 && len(description) < 1 {
+		return nil, session.BadDataError(ctx)
+	}
+	var category *Category
+	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+		var err error
+		category, err = findCategory(ctx, tx, id)
+		if err != nil {
+			return err
+		}
+		if len(name) > 0 {
+			category.Name = name
+		}
+		if len(description) > 0 {
+			category.Description = description
+		}
+		category.UpdatedAt = time.Now()
+		return tx.Update(category)
+	})
+	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return category, nil
