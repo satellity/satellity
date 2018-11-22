@@ -3,7 +3,7 @@ import Home from './home.js';
 import User from './user.js';
 import Category from './category.js';
 
-axios.defaults.baseURL = 'http://api.suntin.com';
+axios.defaults.baseURL = 'https://api.suntin.com';
 if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = 'http://localhost:4000';
 }
