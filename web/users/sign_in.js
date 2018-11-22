@@ -16,7 +16,7 @@ class SignIn extends Component {
       githubClientId = '03e10a9b62b4533e65b5';
     }
     return (
-      <SignInView client_id={githubClientId} />
+      <SignInView clientId={githubClientId} />
     );
   }
 }
@@ -25,7 +25,7 @@ const SignInView = (props, match) => (
   <div>
     <h1 className='brand'><Link to='/'>Suntin</Link></h1>
     <div>
-      <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${props.client_id}`} className='btn primary'>Sign in with GitHub</a>
+      <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${props.clientId}`} className='btn primary'>Sign in with GitHub</a>
     </div>
   </div>
 );

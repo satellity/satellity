@@ -16,16 +16,20 @@ class AdminCategory extends Component {
 
   render() {
     return (
-      <div>
-        <h1 className='welcome'>
-          It is used to categorize topics.
-          <Link to='/admin/categories/new' className='new'>Create New Category</Link>
-        </h1>
-        <div className='panel'>
-        </div>
-      </div>
+      <CategoryIndex />
     )
   }
 }
+
+const CategoryIndex = () => (
+  <div>
+    <h1 className='welcome'>
+      It is used to categorize topics.
+      <Link to='/admin/categories/new' className='new'>Create New Category</Link>
+    </h1>
+    <div className='panel'>
+    </div>
+  </div>
+)
 
 export default AdminCategory;

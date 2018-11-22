@@ -1,0 +1,43 @@
+@import './constant.scss';
+
+textarea,
+input[type] {
+  box-sizing: border-box;
+  box-shadow: none;
+  border: 1px solid #ccc;
+  border-radius: 0.1rem;
+  font-size: 1rem;
+  outline-style: none;
+  margin-bottom: 1rem;
+  padding: .6rem .3rem;
+  transition: all 0.30s ease-in-out;
+  width: 100%;
+  &:focus {
+    box-shadow: 0 0 5px $color-main-background-dark;
+    border: 1px solid $color-main-background-dark;
+  }
+}
+
+textarea {
+  height: 12rem;
+}
+
+.action {
+  text-align: center;
+  input[type='submit'] {
+    width: 30rem;
+    max-width: 100%;
+    border: 1px solid $color-main-background-dark;
+    background: $color-main-background-dark;
+    color: white;
+    opacity: 0.6;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+label {
+  display: block;
+  margin-bottom: .3rem;
+}
