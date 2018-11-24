@@ -18,15 +18,18 @@ CREATE TABLE IF NOT EXISTS topics (
 	body                  TEXT NOT NULL,
 	category_id           VARCHAR(36) NOT NULL,
 	user_id               VARCHAR(36) NOT NULL,
+	score                 INTEGER NOT NULL DEFAULT 0,
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX ON topics (category_id);
 CREATE INDEX ON topics (user_id);
+CREATE INDEX ON topics (category_id);
+CREATE INDEX ON topics (created_at DESC);
+CREATE INDEX ON topics (score, created_at DESC);
 `
 
-var topicCols = []string{"topic_id", "title", "body", "category_id", "user_id", "created_at", "updated_at"}
+var topicCols = []string{"topic_id", "title", "body", "category_id", "user_id", "score", "created_at", "updated_at"}
 
 // Topic is what use talking about
 type Topic struct {
@@ -35,6 +38,7 @@ type Topic struct {
 	Body       string    `sql:"body"`
 	CategoryID string    `sql:"category_id"`
 	UserID     string    `sql:"user_id"`
+	Score      int       `sql:"score"`
 	CreatedAt  time.Time `sql:"created_at"`
 	UpdatedAt  time.Time `sql:"updated_at"`
 }

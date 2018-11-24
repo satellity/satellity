@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS categories (
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX ON categories (name);
 CREATE INDEX ON categories (position);
 `
 

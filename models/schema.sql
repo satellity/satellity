@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS categories (
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX ON categories (name);
+CREATE INDEX ON categories (position);
 
 
 CREATE TABLE IF NOT EXISTS topics (
@@ -45,9 +45,12 @@ CREATE TABLE IF NOT EXISTS topics (
 	body                  TEXT NOT NULL,
 	category_id           VARCHAR(36) NOT NULL,
 	user_id               VARCHAR(36) NOT NULL,
+	score                 INTEGER NOT NULL DEFAULT 0,
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX ON topics (category_id);
 CREATE INDEX ON topics (user_id);
+CREATE INDEX ON topics (category_id);
+CREATE INDEX ON topics (created_at DESC);
+CREATE INDEX ON topics (score, created_at DESC);
