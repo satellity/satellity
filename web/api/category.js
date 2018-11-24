@@ -8,27 +8,24 @@ Category.prototype = {
   adminIndex: function(callback) {
     this.api.request('get', '/admin/categories', {}, (resp) => {
       if (typeof callback === 'function') {
-        callback(resp.data);
+        callback(resp);
       }
-      // TODO
     });
   },
 
   create: function(params, callback) {
     this.api.request('post', '/admin/categories', params, (resp) => {
       if (typeof callback === 'function') {
-        callback(resp.data);
+        callback(resp);
       }
-      // TODO
     })
   },
 
   show: function(id, callback) {
     this.api.request('get', `/admin/categories/${id}`, {}, (resp) => {
       if (typeof callback === 'function') {
-        callback(resp.data);
+        callback(resp);
       }
-      // TODO
     })
   }
 }

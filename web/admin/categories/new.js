@@ -22,7 +22,7 @@ class AdminCategoryNew extends Component {
   handleSubmit(e) {
     e.preventDefault();
     const history = this.props.history;
-    this.api.category.create(this.state, function(resp) {
+    this.api.category.create(this.state, (resp) => {
       // TODO
       if (resp.error) {
         return
@@ -39,7 +39,7 @@ class AdminCategoryNew extends Component {
 }
 
 const CategoryNew = ({onSubmit, onChange, state}) => (
-  <div>
+  <div class='admin categories'>
     <h1 className='welcome'>
       Create a new category
     </h1>

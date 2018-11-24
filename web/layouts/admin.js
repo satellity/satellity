@@ -26,7 +26,7 @@ class AdminRoute extends Component {
     return (
       <div>
         <header className='header navi'>
-          <Link to='/' className='brand'>{this.state.site}</Link>
+          <Link to='/' className='brand'>Back to {this.state.site}</Link>
           <Link to='/admin'>Dashboard</Link>
           <Link to='/admin/categories'>Categories</Link>
         </header>

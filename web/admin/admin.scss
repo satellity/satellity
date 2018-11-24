@@ -3,6 +3,11 @@ $color-dark-background: #25476A;
 
 .admin.layout {
   background-color: $color-light-background;
+  ul, ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
   header {
     background-color: $color-dark-background;
     color: white;
@@ -51,6 +56,4 @@ $color-dark-background: #25476A;
     box-sizing: border-box;
     padding: 1.6rem;
   }
-
-  /* Category */
 }

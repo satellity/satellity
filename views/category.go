@@ -10,6 +10,7 @@ import (
 // CategoryView is the response body of category
 type CategoryView struct {
 	Type        string    `json:"type"`
+	CategoryID  string    `json:"category_id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	TopicsCount int       `json:"topics_count"`
@@ -22,6 +23,7 @@ type CategoryView struct {
 func buildCategory(category *models.Category) CategoryView {
 	return CategoryView{
 		Type:        "category",
+		CategoryID:  category.CategoryID,
 		Name:        category.Name,
 		Description: category.Description,
 		TopicsCount: category.TopicsCount,

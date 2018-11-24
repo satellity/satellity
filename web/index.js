@@ -13,6 +13,9 @@ import SignIn from './users/sign_in.js';
 import Oauth from './users/oauth.js';
 import Home from './home/index.js';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faEdit, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
+library.add(faEdit, faTrashAlt);
 
 ReactDOM.render((
   <Router>
