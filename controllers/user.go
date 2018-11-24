@@ -19,6 +19,7 @@ type userImpl struct{}
 
 func registerUser(router *httptreemux.TreeMux) {
 	impl := &userImpl{}
+
 	router.POST("/oauth/:provider", impl.oauth)
 }
 

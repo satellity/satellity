@@ -5,7 +5,7 @@ import constants from '../components/constants.js';
 import Index from '../admin/index.js';
 import Categories from '../admin/categories/index.js';
 import CategoriesNew from '../admin/categories/new.js';
-import About from '../about.js';
+import CategoriesEdit from '../admin/categories/edit.js';
 import API from '../api/index.js';
 
 class AdminRoute extends Component {
@@ -34,8 +34,8 @@ class AdminRoute extends Component {
           <div className='wrapper'>
             <Route exact path={`${match.url}`} component={Index} />
             <Route exact path={`${match.url}/categories`} component={Categories} />
-            <Route path={`${match.url}/categories/new`} component={CategoriesNew} />
-            <Route path={`${match.url}/about`} component={About} />
+            <Route exact path={`${match.url}/categories/new`} component={CategoriesNew} />
+            <Route path={`${match.url}/categories/:id/edit`} component={CategoriesEdit} />
           </div>
         </div>
       </div>

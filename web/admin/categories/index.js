@@ -38,8 +38,9 @@ const CategoryIndex = (props) => {
           <div>
             {category.name}
             <span className='actions'>
-              <FontAwesomeIcon icon={['far', 'edit']} />
-              <FontAwesomeIcon icon={['far', 'trash-alt']} />
+              <Link to={`/admin/categories/${category.category_id}/edit`}>
+                <FontAwesomeIcon icon={['far', 'edit']} />
+              </Link>
             </span>
           </div>
           <p className='description'>

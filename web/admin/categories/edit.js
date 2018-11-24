@@ -2,13 +2,21 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../../api/index.js';
 
-class AdminCategoryNew extends Component {
+class AdminCategoryEdit extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
+    this.id = props.match.params.id;
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.state = {name: '', position: '', description: ''};
+    this.state = {type: 'category', name: '', position: '', description: ''};
+  }
+
+  componentDidMount() {
+    const self = this;
+    this.api.category.show(self.id, (resp) => {
+      self.setState(resp.data);
+    });
   }
 
   handleChange(e) {
@@ -22,22 +30,22 @@ class AdminCategoryNew extends Component {
   handleSubmit(e) {
     e.preventDefault();
     const history = this.props.history;
-    this.api.category.create(this.state, (resp) => {
+    this.api.category.update(this.id, this.state, () => {
       history.push('/admin/categories');
-    })
+    });
   }
 
   render() {
     return (
-      <CategoryNew onSubmit={this.handleSubmit} onChange={this.handleChange} state={this.state} />
+      <CategoryEdit onSubmit={this.handleSubmit} onChange={this.handleChange} state={this.state} />
     )
   }
 }
 
-const CategoryNew = ({onSubmit, onChange, state}) => (
+const CategoryEdit = ({onSubmit, onChange, state}) => (
   <div class='admin categories'>
     <h1 className='welcome'>
-      Create a new category
+      Edit a special category
     </h1>
     <div className='panel'>
       <form onSubmit={(e) => onSubmit(e)}>
@@ -61,4 +69,4 @@ const CategoryNew = ({onSubmit, onChange, state}) => (
   </div>
 )
 
-export default AdminCategoryNew;
+export default AdminCategoryEdit;

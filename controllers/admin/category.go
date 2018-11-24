@@ -20,6 +20,7 @@ type categoryRequest struct {
 
 func registerAdminCategory(router *httptreemux.TreeMux) {
 	impl := &adminCategoryImpl{}
+
 	router.POST("/admin/categories", impl.create)
 	router.GET("/admin/categories", impl.index)
 	router.POST("/admin/categories/:id", impl.update)
