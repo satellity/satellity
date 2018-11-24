@@ -10,7 +10,26 @@ Category.prototype = {
       if (typeof callback === 'function') {
         callback(resp.data);
       }
+      // TODO
     });
+  },
+
+  create: function(params, callback) {
+    this.api.request('post', '/admin/categories', params, (resp) => {
+      if (typeof callback === 'function') {
+        callback(resp.data);
+      }
+      // TODO
+    })
+  },
+
+  show: function(id, callback) {
+    this.api.request('get', `/admin/categories/${id}`, {}, (resp) => {
+      if (typeof callback === 'function') {
+        callback(resp.data);
+      }
+      // TODO
+    })
   }
 }
 

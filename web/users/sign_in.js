@@ -13,7 +13,7 @@ class SignIn extends Component {
   render() {
     let githubClientId = '71905afbd6e4541ad62b';
     if (process.env.NODE_ENV === 'development') {
-      githubClientId = '03e10a9b62b4533e65b5';
+      githubClientId = 'b9b78f343f3a5b0d7c99';
     }
     return (
       <SignInView clientId={githubClientId} />

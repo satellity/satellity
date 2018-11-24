@@ -21,8 +21,14 @@ class AdminCategoryNew extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    // TODO
-    console.info(this.state);
+    const history = this.props.history;
+    this.api.category.create(this.state, function(resp) {
+      // TODO
+      if (resp.error) {
+        return
+      }
+      history.push('/admin/categories');
+    })
   }
 
   render() {

@@ -25,6 +25,7 @@ API.prototype = {
       data: data
     })
       .then((resp) => {
+        console.log(resp.data);
         if (resp.data.error) {
           return Promise.reject(resp.data.error);
         }
@@ -36,8 +37,17 @@ API.prototype = {
           return
         }
         if (error.code === 401) {
+          self.user.clear();
           window.location.href = '/sign_in';
           return
+        }
+        if (error.response) {
+          let data = error.response.data.error;
+          // TODO should handle 500 server error
+          if (data.code === 500) {
+            window.location.href = '/';
+            return
+          }
         }
         // TODO
         console.info(error);

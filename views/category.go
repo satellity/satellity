@@ -2,15 +2,21 @@ package views
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/godiscourse/godiscourse/models"
 )
 
 // CategoryView is the response body of category
 type CategoryView struct {
-	Type        string `json:"type"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Type        string    `json:"type"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	TopicsCount int       `json:"topics_count"`
+	LastTopicID string    `json:"last_topic_id"`
+	Position    int       `json:"position"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 func buildCategory(category *models.Category) CategoryView {
@@ -18,6 +24,11 @@ func buildCategory(category *models.Category) CategoryView {
 		Type:        "category",
 		Name:        category.Name,
 		Description: category.Description,
+		TopicsCount: category.TopicsCount,
+		LastTopicID: category.LastTopicID.String,
+		Position:    category.Position,
+		CreatedAt:   category.CreatedAt,
+		UpdatedAt:   category.UpdatedAt,
 	}
 }
 
@@ -26,6 +37,7 @@ func RenderCategory(w http.ResponseWriter, r *http.Request, category *models.Cat
 	RenderResponse(w, r, buildCategory(category))
 }
 
+// RenderCategories response sevaral categories
 func RenderCategories(w http.ResponseWriter, r *http.Request, categories []*models.Category) {
 	views := make([]CategoryView, len(categories))
 	for i, c := range categories {

@@ -100,6 +100,9 @@ func fetchAccessToken(ctx context.Context, code string) (string, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		return "", err
 	}
+	if body["error"] != "" {
+		return "", session.ServerError(ctx, fmt.Errorf("%v", body))
+	}
 	return body["access_token"], nil
 }
 

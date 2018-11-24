@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"runtime"
+
+	"github.com/go-errors/errors"
 )
 
 // Error is a custom error
@@ -95,6 +97,7 @@ func createError(ctx context.Context, status, code int, description string, err 
 		} else {
 			trace = trace + "\n" + err.Error()
 		}
+		trace = trace + "\n" + errors.Wrap(err, 1).ErrorStack()
 	}
 
 	if ctx != nil {
