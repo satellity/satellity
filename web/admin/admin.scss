@@ -8,6 +8,12 @@ $color-dark-background: #25476A;
     padding: 0;
     margin: 0;
   }
+  a {
+    transition: all 0.2s ease-in-out;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
   header {
     background-color: $color-dark-background;
     color: white;
