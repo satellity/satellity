@@ -6,6 +6,7 @@ const MainRoute = ({component: Component, ...rest}) => {
   return (
     <Route {...rest} render={matchProps => (
       <div>
+        <Header />
         <div className='container'>
           <Component {...matchProps} />
         </div>
@@ -13,5 +14,15 @@ const MainRoute = ({component: Component, ...rest}) => {
     )} />
   )
 };
+
+const Header = () => {
+  return (
+    <header className='app header'>
+      <Link to='/' className='brand'>
+        SUNTIN
+      </Link>
+    </header>
+  )
+}
 
 export default MainRoute;

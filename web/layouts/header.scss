@@ -1,7 +1,9 @@
-header.header.navi {
-  padding: .6rem;
-  .actions {
-    float: right;
-    line-height: 2.2rem
-  }
+$border-light-color: rgba(225, 225, 225, 0.8);
+
+header.app.header {
+  box-sizing: border-box;
+  border-bottom: 1px solid $border-light-color;
+  font-size: 1.2rem;
+  padding: 1rem;
+  text-align: left;
 }

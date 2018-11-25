@@ -21,8 +21,11 @@ ReactDOM.render((
   <Router>
     <div>
       <Switch>
-        <MainRoute path='/' exact component={Home} />
+        <MainRoute exact path='/' component={Home} />
         <MainRoute path='/about' component={About} />
+        <MainRoute exact path='/topics/new' component={About} />
+        <MainRoute path='/topics/:id/edit' component={About} />
+        <MainRoute path='/topics/:id' component={About} />
         <Route path='/sign_in' component={SignIn} />
         <Route path='/oauth/callback' component={Oauth} />
         <Route path='/admin' component={AdminRoute} />

@@ -7,7 +7,7 @@ class AdminIndex extends Component {
 
   render() {
     return (
-      <h1 class='welcome'>
+      <h1 className='welcome'>
         This is the Dashboard for Fun Yeah.
       </h1>
     )
