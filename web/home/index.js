@@ -27,9 +27,6 @@ class Home extends Component {
     this.typed = new Typed('.welcome', options);
   }
 
-  componentWillUnmount() {
-  }
-
   render() {
     return (
       <HomeView />
@@ -41,6 +38,6 @@ const HomeView = (match) => (
   <div className='container'>
     <span className='welcome'></span>
   </div>
-)
+);
 
 export default Home;

@@ -15,6 +15,9 @@ header.app.header {
   }
   .brand {
     float: left;
+    &:after {
+      display: none;
+    }
   }
   .logo {
     float: left;
@@ -22,4 +25,15 @@ header.app.header {
     height: 1.6rem;
     margin-right: 0.3rem;
   }
+  .navi {
+    font-size: 1rem;
+  }
+}
+
+.app.container {
+  background: white;
+  box-sizing: border-box;
+  max-width: 64rem;
+  margin: 1rem auto;
+  padding: 1rem;
 }

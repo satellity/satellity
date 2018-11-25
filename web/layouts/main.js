@@ -9,7 +9,7 @@ const MainRoute = ({component: Component, ...rest}) => {
     <Route {...rest} render={matchProps => (
       <div>
         <Header />
-        <div className='container'>
+        <div className='app container'>
           <Component {...matchProps} />
         </div>
       </div>
@@ -19,9 +19,9 @@ const MainRoute = ({component: Component, ...rest}) => {
 
 const Header = () => {
   const user = new API().user;
-  let link = (<Link to='/sign_in'> SignIn </Link>);
+  let link = (<Link to='/sign_in' className='navi'> SignIn </Link>);
   if (user.loggedIn()) {
-    link = (<Link to='/sign_in'> {user.me().nickname} </Link>);
+    link = (<Link to='/sign_in' className='navi'> {user.me().nickname} </Link>);
   }
   return (
     <header className='app header'>
