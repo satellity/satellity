@@ -1,9 +1,25 @@
 $border-light-color: rgba(225, 225, 225, 0.8);
 
 header.app.header {
+  background: white;
   box-sizing: border-box;
   border-bottom: 1px solid $border-light-color;
   font-size: 1.2rem;
   padding: 1rem;
-  text-align: left;
+  text-align: right;
+  line-height: 1.8rem;
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+  .brand {
+    float: left;
+  }
+  .logo {
+    float: left;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-right: 0.3rem;
+  }
 }

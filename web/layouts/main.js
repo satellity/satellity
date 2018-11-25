@@ -1,6 +1,8 @@
 import './header.scss';
 import React from 'react';
 import { Route, Link } from 'react-router-dom';
+import logoURL from '../assets/images/logo.png';
+import API from '../api/index.js'
 
 const MainRoute = ({component: Component, ...rest}) => {
   return (
@@ -16,11 +18,18 @@ const MainRoute = ({component: Component, ...rest}) => {
 };
 
 const Header = () => {
+  const user = new API().user;
+  let link = (<Link to='/sign_in'> SignIn </Link>);
+  if (user.loggedIn()) {
+    link = (<Link to='/sign_in'> {user.me().nickname} </Link>);
+  }
   return (
     <header className='app header'>
       <Link to='/' className='brand'>
+        <img src={logoURL} className='logo' alt=''/>
         SUNTIN
       </Link>
+      {link}
     </header>
   )
 }
