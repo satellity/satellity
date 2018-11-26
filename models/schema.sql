@@ -53,4 +53,5 @@ CREATE TABLE IF NOT EXISTS topics (
 CREATE INDEX ON topics (user_id);
 CREATE INDEX ON topics (category_id);
 CREATE INDEX ON topics (created_at DESC);
+CREATE INDEX ON topics (user_id, created_at DESC);
 CREATE INDEX ON topics (score, created_at DESC);

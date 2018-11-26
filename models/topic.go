@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS topics (
 CREATE INDEX ON topics (user_id);
 CREATE INDEX ON topics (category_id);
 CREATE INDEX ON topics (created_at DESC);
+CREATE INDEX ON topics (user_id, created_at DESC);
 CREATE INDEX ON topics (score, created_at DESC);
 `
 
@@ -107,4 +108,28 @@ func findTopic(ctx context.Context, tx *pg.Tx, id string) (*Topic, error) {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topic, nil
+}
+
+// ReadTopics read all topics, parameters: offset default time.Now()
+func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	var topics []*Topic
+	if _, err := session.Database(ctx).Query(&topics, "SELECT * FROM topics WHERE created_at<? ORDER BY created_at DESC LIMIT 50", offset); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topics, nil
+}
+
+// ReadTopics read user's topics, parameters: offset default time.Now()
+func (current *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	var topics []*Topic
+	if _, err := session.Database(ctx).Query(&topics, "SELECT * FROM topics WHERE user_id=? AND created_at<? ORDER BY created_at DESC LIMIT 50", current.UserID, offset); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topics, nil
 }
