@@ -1,23 +1,45 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"time"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/godiscourse/godiscourse/middleware"
 	"github.com/godiscourse/godiscourse/models"
+	"github.com/godiscourse/godiscourse/session"
 	"github.com/godiscourse/godiscourse/views"
 )
+
+type topicRequet struct {
+	Title      string `json:"title"`
+	Body       string `json:"body"`
+	CategoryID string `json:"category_id"`
+}
 
 type topicImpl struct{}
 
 func registerTopic(router *httptreemux.TreeMux) {
 	impl := &topicImpl{}
 
+	router.POST("/topics", impl.create)
 	router.GET("/topics/:id", impl.show)
 	router.GET("/topics", impl.index)
 	router.GET("/user/topics", impl.topics)
+}
+
+func (impl *topicImpl) create(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	var body topicRequet
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
+		return
+	}
+	if topic, err := middleware.CurrentUser(r).CreateTopic(r.Context(), body.Title, body.Body, body.CategoryID); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderTopic(w, r, topic)
+	}
 }
 
 func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {

@@ -11,9 +11,10 @@ import (
 	"github.com/godiscourse/godiscourse/views"
 )
 
-var whitelist = map[string]string{
-	"GET":  "^/_hc$",
-	"POST": "^/oauth",
+var whitelist = [][2]string{
+	{"GET", "^/_hc$"},
+	{"POST", "^/oauth"},
+	{"GET", "^/topics"},
 }
 
 var userWhitelist = map[string]string{}
@@ -54,11 +55,11 @@ func Authenticate(handler http.Handler) http.Handler {
 }
 
 func handleUnauthorized(handler http.Handler, w http.ResponseWriter, r *http.Request) {
-	for k, v := range whitelist {
-		if k != r.Method {
+	for _, pp := range whitelist {
+		if pp[0] != r.Method {
 			continue
 		}
-		if matched, _ := regexp.MatchString(v, strings.ToLower(r.URL.Path)); matched {
+		if matched, _ := regexp.MatchString(pp[1], strings.ToLower(r.URL.Path)); matched {
 			handler.ServeHTTP(w, r)
 			return
 		}
