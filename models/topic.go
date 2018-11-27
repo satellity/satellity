@@ -90,7 +90,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 	return topic, nil
 }
 
-// UpdateTopic update a Topic by ID
+// UpdateTopic update a Topic by ID, TODO maybe update categoryID also
 func (user *User) UpdateTopic(ctx context.Context, id, title, body string) (*Topic, error) {
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
 	if len(title) < MinimumTitleSize && len(body) < MinimumBodySize {

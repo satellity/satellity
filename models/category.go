@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/session"
 	"github.com/godiscourse/godiscourse/uuid"
 )
@@ -48,7 +49,6 @@ func CreateCategory(ctx context.Context, name, description string) (*Category, e
 		return nil, session.BadDataError(ctx)
 	}
 
-	t := time.Now()
 	count, err := categoryCount(ctx)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
@@ -59,8 +59,6 @@ func CreateCategory(ctx context.Context, name, description string) (*Category, e
 		Description: description,
 		LastTopicID: sql.NullString{String: "", Valid: false},
 		Position:    count,
-		CreatedAt:   t,
-		UpdatedAt:   t,
 	}
 
 	if err := session.Database(ctx).Insert(category); err != nil {
@@ -89,7 +87,6 @@ func UpdateCategory(ctx context.Context, id, name, description string) (*Categor
 		if len(description) > 0 {
 			category.Description = description
 		}
-		category.UpdatedAt = time.Now()
 		return tx.Update(category)
 	})
 	if err != nil {
@@ -133,4 +130,17 @@ func findCategory(ctx context.Context, tx *pg.Tx, id string) (*Category, error) 
 
 func categoryCount(ctx context.Context) (int, error) {
 	return session.Database(ctx).Model(&Category{}).Count()
+}
+
+// BeforeInsert hook insert
+func (c *Category) BeforeInsert(db orm.DB) error {
+	c.CreatedAt = time.Now()
+	c.UpdatedAt = c.CreatedAt
+	return nil
+}
+
+// BeforeUpdate hook update
+func (c *Category) BeforeUpdate(db orm.DB) error {
+	c.UpdatedAt = time.Now()
+	return nil
 }
