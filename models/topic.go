@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS topics (
 	topic_id              VARCHAR(36) PRIMARY KEY,
 	title                 VARCHAR(512) NOT NULL,
 	body                  TEXT NOT NULL,
+	comments_count        INTEGER NOT NULL DEFAULT 0,
 	category_id           VARCHAR(36) NOT NULL,
 	user_id               VARCHAR(36) NOT NULL,
 	score                 INTEGER NOT NULL DEFAULT 0,
@@ -37,18 +38,19 @@ CREATE INDEX ON topics (user_id, created_at DESC);
 CREATE INDEX ON topics (score, created_at DESC);
 `
 
-var topicCols = []string{"topic_id", "title", "body", "category_id", "user_id", "score", "created_at", "updated_at"}
+var topicCols = []string{"topic_id", "title", "body", "comments_count", "category_id", "user_id", "score", "created_at", "updated_at"}
 
 // Topic is what use talking about
 type Topic struct {
-	TopicID    string    `sql:"topic_id,pk"`
-	Title      string    `sql:"title"`
-	Body       string    `sql:"body"`
-	CategoryID string    `sql:"category_id"`
-	UserID     string    `sql:"user_id"`
-	Score      int       `sql:"score,notnull"`
-	CreatedAt  time.Time `sql:"created_at"`
-	UpdatedAt  time.Time `sql:"updated_at"`
+	TopicID       string    `sql:"topic_id,pk"`
+	Title         string    `sql:"title"`
+	Body          string    `sql:"body"`
+	CommentsCount int       `sql:"comments_count,notnull"`
+	CategoryID    string    `sql:"category_id"`
+	UserID        string    `sql:"user_id"`
+	Score         int       `sql:"score,notnull"`
+	CreatedAt     time.Time `sql:"created_at"`
+	UpdatedAt     time.Time `sql:"updated_at"`
 }
 
 //CreateTopic create a new Topic

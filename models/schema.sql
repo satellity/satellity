@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS topics (
 	topic_id              VARCHAR(36) PRIMARY KEY,
 	title                 VARCHAR(512) NOT NULL,
 	body                  TEXT NOT NULL,
+	comments_count        INTEGER NOT NULL DEFAULT 0,
 	category_id           VARCHAR(36) NOT NULL,
 	user_id               VARCHAR(36) NOT NULL,
 	score                 INTEGER NOT NULL DEFAULT 0,
@@ -55,3 +56,18 @@ CREATE INDEX ON topics (category_id);
 CREATE INDEX ON topics (created_at DESC);
 CREATE INDEX ON topics (user_id, created_at DESC);
 CREATE INDEX ON topics (score, created_at DESC);
+
+
+CREATE TABLE IF NOT EXISTS comments (
+  comment_id            VARCHAR(36) PRIMARY KEY,
+  body                  TEXT NOT NULL,
+  topic_id              VARCHAR(36) NOT NULL REFERENCES topics ON DELETE CASCADE,
+  user_id               VARCHAR(36) NOT NULL,
+  score                 INTEGER NOT NULL DEFAULT 0,
+  created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX ON comments (topic_id, created_at);
+CREATE INDEX ON comments (user_id, created_at);
+CREATE INDEX ON comments (score, created_at);
