@@ -17,7 +17,7 @@ func TestCommentCRUD(t *testing.T) {
 
 	user := createTestUser(ctx, "im.yuqlee@gmail.com", "username", "password")
 	assert.NotNil(user)
-	category, _ := CreateCategory(ctx, "name", "Description")
+	category, _ := CreateCategory(ctx, "name", "Description", 0)
 	assert.NotNil(category)
 	topic, _ := user.CreateTopic(ctx, "title", "body", category.CategoryID)
 	assert.NotNil(topic)

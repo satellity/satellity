@@ -42,23 +42,25 @@ type Category struct {
 }
 
 // CreateCategory create a new category.
-func CreateCategory(ctx context.Context, name, description string) (*Category, error) {
+func CreateCategory(ctx context.Context, name, description string, position int) (*Category, error) {
 	name = strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(name) < 1 {
 		return nil, session.BadDataError(ctx)
 	}
 
-	count, err := categoryCount(ctx)
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
 	category := &Category{
 		CategoryID:  uuid.NewV4().String(),
 		Name:        name,
 		Description: description,
 		LastTopicID: sql.NullString{String: "", Valid: false},
-		Position:    count,
+	}
+	if position == 0 {
+		count, err := categoryCount(ctx)
+		if err != nil {
+			return nil, session.TransactionError(ctx, err)
+		}
+		category.Position = count
 	}
 
 	if err := session.Database(ctx).Insert(category); err != nil {
@@ -68,7 +70,7 @@ func CreateCategory(ctx context.Context, name, description string) (*Category, e
 }
 
 // UpdateCategory update a category
-func UpdateCategory(ctx context.Context, id, name, description string) (*Category, error) {
+func UpdateCategory(ctx context.Context, id, name, description string, position int) (*Category, error) {
 	name = strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(name) < 1 && len(description) < 1 {
@@ -86,6 +88,9 @@ func UpdateCategory(ctx context.Context, id, name, description string) (*Categor
 		}
 		if len(description) > 0 {
 			category.Description = description
+		}
+		if position > 0 {
+			category.Position = position
 		}
 		return tx.Update(category)
 	})

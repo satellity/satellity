@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 
 CREATE INDEX ON sessions (user_id);
-CREATE INDEX ON sessions (created_at);
 
 
 CREATE TABLE IF NOT EXISTS categories (
