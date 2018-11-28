@@ -55,7 +55,7 @@ CREATE INDEX ON topics (user_id);
 CREATE INDEX ON topics (category_id);
 CREATE INDEX ON topics (created_at DESC);
 CREATE INDEX ON topics (user_id, created_at DESC);
-CREATE INDEX ON topics (score, created_at DESC);
+CREATE INDEX ON topics (score DESC, created_at DESC);
 
 
 CREATE TABLE IF NOT EXISTS comments (
@@ -70,4 +70,4 @@ CREATE TABLE IF NOT EXISTS comments (
 
 CREATE INDEX ON comments (topic_id, created_at);
 CREATE INDEX ON comments (user_id, created_at);
-CREATE INDEX ON comments (score, created_at);
+CREATE INDEX ON comments (score DESC, created_at);

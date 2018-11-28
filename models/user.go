@@ -180,6 +180,10 @@ func (user *User) Role() string {
 	return "member"
 }
 
+func (user *User) isAdmin() bool {
+	return user.Role() == "admin"
+}
+
 func findUserByID(ctx context.Context, id string) (*User, error) {
 	user := &User{UserID: id}
 	if err := session.Database(ctx).Model(user).Column(userCols...).WherePK().Select(); err == pg.ErrNoRows {

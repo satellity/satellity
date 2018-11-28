@@ -35,7 +35,7 @@ CREATE INDEX ON topics (user_id);
 CREATE INDEX ON topics (category_id);
 CREATE INDEX ON topics (created_at DESC);
 CREATE INDEX ON topics (user_id, created_at DESC);
-CREATE INDEX ON topics (score, created_at DESC);
+CREATE INDEX ON topics (score DESC, created_at DESC);
 `
 
 var topicCols = []string{"topic_id", "title", "body", "comments_count", "category_id", "user_id", "score", "created_at", "updated_at"}
@@ -107,7 +107,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body string) (*Top
 			return err
 		} else if topic == nil {
 			return session.NotFoundError(ctx)
-		} else if topic.UserID != user.UserID {
+		} else if topic.UserID != user.UserID && !user.isAdmin() {
 			return session.AuthorizationError(ctx)
 		}
 		if title != "" {
@@ -146,7 +146,7 @@ func findTopic(ctx context.Context, tx *pg.Tx, id string) (*Topic, error) {
 	if err := tx.Model(topic).Column(topicCols...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
 	}
 	return topic, nil
 }
