@@ -14,8 +14,8 @@ import (
 
 // Topic related CONST
 const (
-	MinimumTitleSize = 3
-	MinimumBodySize  = 3
+	minTitleSize = 3
+	minBodySize  = 3
 )
 
 const topicsDDL = `
@@ -57,7 +57,7 @@ type Topic struct {
 func (user *User) CreateTopic(ctx context.Context, title, body, categoryID string) (*Topic, error) {
 	title = strings.TrimSpace(title)
 	body = strings.TrimSpace(body)
-	if len(title) < MinimumTitleSize {
+	if len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
 	}
 
@@ -95,7 +95,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 // UpdateTopic update a Topic by ID, TODO maybe update categoryID also
 func (user *User) UpdateTopic(ctx context.Context, id, title, body string) (*Topic, error) {
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
-	if len(title) < MinimumTitleSize && len(body) < MinimumBodySize {
+	if len(title) < minTitleSize && len(body) < minBodySize {
 		return nil, session.BadDataError(ctx)
 	}
 

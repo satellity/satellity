@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	minimumCommentBodySize = 6
+	minCommentBodySize = 6
 )
 
 const commentsDDL = `
@@ -47,7 +47,7 @@ type Comment struct {
 // CreateComment create a new comment
 func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Comment, error) {
 	body = strings.TrimSpace(body)
-	if len(body) < minimumCommentBodySize {
+	if len(body) < minCommentBodySize {
 		return nil, session.BadDataError(ctx)
 	}
 	c := &Comment{
@@ -80,7 +80,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 // UpdateComment update the comment by id
 func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment, error) {
 	body = strings.TrimSpace(body)
-	if len(body) < minimumCommentBodySize {
+	if len(body) < minCommentBodySize {
 		return nil, session.BadDataError(ctx)
 	}
 	var comment *Comment
