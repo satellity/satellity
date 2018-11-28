@@ -97,7 +97,7 @@ User.prototype = {
 
   loggedIn: function() {
     const user = this.me();
-    return user.user_id !== '' || user.username !== '' || user.nickname === '';
+    return user.user_id !== undefined || user.username !== undefined || user.nickname !== undefined;
   },
 
   isAdmin: function() {
