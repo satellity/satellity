@@ -51,6 +51,8 @@ type Topic struct {
 	Score         int       `sql:"score,notnull"`
 	CreatedAt     time.Time `sql:"created_at"`
 	UpdatedAt     time.Time `sql:"updated_at"`
+
+	User *User
 }
 
 //CreateTopic create a new Topic
@@ -157,7 +159,7 @@ func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 		offset = time.Now()
 	}
 	var topics []*Topic
-	if _, err := session.Database(ctx).Query(&topics, "SELECT * FROM topics WHERE created_at<? ORDER BY created_at DESC LIMIT 50", offset); err != nil {
+	if err := session.Database(ctx).Model(&topics).Relation("User").Where("topic.created_at<?", offset).Order("topic.created_at DESC").Limit(50).Select(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil

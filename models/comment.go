@@ -42,6 +42,8 @@ type Comment struct {
 	Score     int       `sql:"score,notnull"`
 	CreatedAt time.Time `sql:"created_at"`
 	UpdatedAt time.Time `sql:"updated_at"`
+
+	User *User
 }
 
 // CreateComment create a new comment
@@ -112,7 +114,7 @@ func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comm
 		offset = time.Now()
 	}
 	var comments []*Comment
-	if _, err := session.Database(ctx).Query(&comments, "SELECT * FROM comments WHERE topic_id=? AND created_at<? ORDER BY created_at DESC LIMIT 50", topic.TopicID, offset); err != nil {
+	if err := session.Database(ctx).Model(&comments).Relation("User").Where("comment.topic_id=? AND comment.created_at<?", topic.TopicID, offset).Order("comment.created_at DESC").Limit(50).Select(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return comments, nil
