@@ -11,14 +11,14 @@ import API from '../api/index.js';
 class AdminRoute extends Component {
   constructor(props) {
     super(props);
-    if (!new API().user.isAdmin()) {
-      props.history.push('/');
-      return
-    }
     this.state = {site: constants.site}
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
     document.body.classList.add('admin', 'layout');
+    if (!new API().user.isAdmin()) {
+      props.history.push('/');
+      return
+    }
   }
 
   render() {
