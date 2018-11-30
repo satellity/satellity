@@ -43,15 +43,15 @@ const CategoryNew = ({onSubmit, onChange, state}) => (
       <form onSubmit={(e) => onSubmit(e)}>
         <div>
           <label name='name'>Name *</label>
-        <input type='text' name='name' value={state.name} autoComplete='off' onChange={(e) => onChange(e)}/>
+          <input type='text' name='name' value={state.name} autoComplete='off' onChange={(e) => onChange(e)} />
         </div>
         <div>
           <label name='position'>Position</label>
-          <input type='number' name='position' value={state.position} autoComplete='off' onChange={(e) => onChange(e)}/>
+          <input type='number' name='position' value={state.position} autoComplete='off' onChange={(e) => onChange(e)} />
         </div>
         <div>
-          <label name='name'>Description *</label>
-          <textarea type='text' name='description' value={state.description} onChange={(e) => onChange(e)}/>
+          <label name='description'>Description *</label>
+          <textarea type='text' name='description' value={state.description} onChange={(e) => onChange(e)} />
         </div>
         <div className='action'>
           <input type='submit' value='SUBMIT' />

@@ -14,6 +14,14 @@ Category.prototype = {
     });
   },
 
+  index: function(callback) {
+    this.api.request('get', '/categories', {}, (resp) => {
+      if (typeof callback === 'function') {
+        callback(resp);
+      }
+    });
+  },
+
   create: function(params, callback) {
     this.api.request('post', '/admin/categories', params, (resp) => {
       if (typeof callback === 'function') {

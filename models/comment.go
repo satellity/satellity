@@ -108,6 +108,16 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 	return comment, nil
 }
 
+func (user *User) ReadComment(ctx context.Context, id string) (*Comment, error) {
+	comment := &Comment{CommentID: id}
+	if err := session.Database(ctx).Model(comment).Column(commentColumns...).WherePK().Select(); err == pg.ErrNoRows {
+		return nil, session.NotFoundError(ctx)
+	} else if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return comment, nil
+}
+
 // ReadComments read comments by topicID, parameters: offset
 func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
 	if offset.IsZero() {

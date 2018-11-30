@@ -17,7 +17,6 @@ class AdminRoute extends Component {
     document.body.classList.add('admin', 'layout');
     if (!new API().user.isAdmin()) {
       props.history.push('/');
-      return
     }
   }
 

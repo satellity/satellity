@@ -23,6 +23,7 @@ func registerComment(router *httptreemux.TreeMux) {
 	impl := &commentImpl{}
 
 	router.POST("/comments", impl.create)
+	router.POST("/comments/:id", impl.update)
 	router.GET("/topics/:id/comments", impl.comments)
 }
 
@@ -33,6 +34,19 @@ func (impl *commentImpl) create(w http.ResponseWriter, r *http.Request, _ map[st
 		return
 	}
 	if comment, err := middleware.CurrentUser(r).CreateComment(r.Context(), body.TopicID, body.Body); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderComment(w, r, comment)
+	}
+}
+
+func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	var body commentRequest
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
+		return
+	}
+	if comment, err := middleware.CurrentUser(r).CreateComment(r.Context(), params["id"], body.Body); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComment(w, r, comment)
