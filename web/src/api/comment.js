@@ -11,7 +11,7 @@ Comment.prototype = {
         callback(resp);
       }
     });
-  }
+  },
 
   create: function(params, callback) {
     this.api.request('post', '/comments', params, (resp) => {
@@ -19,7 +19,7 @@ Comment.prototype = {
         callback(resp);
       }
     });
-  }
+  },
 
   update: function(id, params, callback) {
     this.api.request('post', `/comments/${id}`, params, (resp) => {
@@ -27,7 +27,7 @@ Comment.prototype = {
         callback(resp);
       }
     });
-  }
+  },
 
   show: function(id, callback) {
     this.api.request('get', `/comments/${id}`, {}, (resp) => {
@@ -35,7 +35,7 @@ Comment.prototype = {
         callback(resp);
       }
     });
-  }
+  },
 }
 
 export default Comment;

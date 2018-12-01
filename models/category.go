@@ -54,6 +54,7 @@ func CreateCategory(ctx context.Context, name, description string, position int)
 		Name:        name,
 		Description: description,
 		LastTopicID: sql.NullString{String: "", Valid: false},
+		Position:    position,
 	}
 	if position == 0 {
 		count, err := categoryCount(ctx)

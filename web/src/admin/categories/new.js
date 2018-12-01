@@ -35,7 +35,7 @@ class AdminCategoryNew extends Component {
 }
 
 const CategoryNew = ({onSubmit, onChange, state}) => (
-  <div class='admin categories'>
+  <div className='admin categories'>
     <h1 className='welcome'>
       Create a new category
     </h1>
@@ -47,7 +47,7 @@ const CategoryNew = ({onSubmit, onChange, state}) => (
         </div>
         <div>
           <label name='position'>Position</label>
-          <input type='number' name='position' value={state.position} autoComplete='off' onChange={(e) => onChange(e)} />
+          <input type='number' name='position' value={state.position} pattern="[0-9]{10}" autoComplete='off' onChange={(e) => onChange(e)} />
         </div>
         <div>
           <label name='description'>Description *</label>

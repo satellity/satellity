@@ -23,6 +23,11 @@ Category.prototype = {
   },
 
   create: function(params, callback) {
+    // TODO maybe have better choice
+    if (params['position'] === '') {
+      params['position'] = 0;
+    }
+    params['position'] = parseInt(params['position']);
     this.api.request('post', '/admin/categories', params, (resp) => {
       if (typeof callback === 'function') {
         callback(resp);
@@ -31,6 +36,10 @@ Category.prototype = {
   },
 
   update: function(id, params, callback) {
+    if (params['position'] === '') {
+      params['position'] = 0;
+    }
+    params['position'] = parseInt(params['position']);
     this.api.request('post', `/admin/categories/${id}`, params, (resp) => {
       if (typeof callback === 'function') {
         callback(resp);

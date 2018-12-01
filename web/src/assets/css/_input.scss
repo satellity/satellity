@@ -23,7 +23,6 @@ textarea {
 }
 
 .action {
-  text-align: center;
   input[type='submit'] {
     width: 30rem;
     max-width: 100%;
@@ -40,4 +39,28 @@ textarea {
 label {
   display: block;
   margin-bottom: .3rem;
+}
+
+.select {
+  border: 1px solid #ccc;
+  border-radius: 0.1rem;
+  margin-bottom: 1rem;
+  position: relative;
+  width: 30rem;
+  max-width: 100%;
+  select {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    border-radius: 0.1rem;
+    background: white;
+    width: 100%;
+    outline: none;
+    padding: .625rem .3rem;
+    transition: all 0.30s ease-in-out;
+    &:focus {
+      box-shadow: 0 0 5px $color-main-background-dark;
+      border: 1px solid $color-main-background-dark;
+    }
+  }
 }

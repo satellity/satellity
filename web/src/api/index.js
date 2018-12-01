@@ -2,6 +2,8 @@ import axios from 'axios';
 import Home from './home.js';
 import User from './user.js';
 import Category from './category.js';
+import Topic from './topic.js';
+import Comment from './comment.js';
 
 axios.defaults.baseURL = 'https://api.suntin.com';
 if (process.env.NODE_ENV === 'development') {
@@ -13,6 +15,8 @@ function API() {
   this.home = new Home(this);
   this.user = new User(this);
   this.category = new Category(this);
+  this.topic = new Topic(this);
+  this.comment = new Comment(this);
 }
 
 API.prototype = {

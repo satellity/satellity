@@ -13,6 +13,7 @@ func RegisterRoutes(router *httptreemux.TreeMux) {
 	router.GET("/_hc", health)
 
 	registerUser(router)
+	registerCategory(router)
 	registerTopic(router)
 	admin.RegisterAdminRoutes(router)
 }
