@@ -1,4 +1,5 @@
 import './header.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Route, Link } from 'react-router-dom';
 import logoURL from '../assets/images/logo.png';
@@ -30,6 +31,9 @@ const Header = () => {
       <Link to='/' className='brand'>
         <img src={logoURL} className='logo' alt=''/>
         SUNTIN
+      </Link>
+      <Link to='/topics/new' className='navi'>
+        <FontAwesomeIcon icon={['fa', 'plus']} />
       </Link>
       {link}
     </header>

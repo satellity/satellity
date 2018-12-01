@@ -16,7 +16,8 @@ import Home from './home/index.js';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEdit, faTrashAlt, faComment} from '@fortawesome/free-regular-svg-icons';
-library.add(faEdit, faTrashAlt, faComment);
+import { faPlus} from '@fortawesome/free-solid-svg-icons';
+library.add(faEdit, faTrashAlt, faComment, faPlus);
 
 ReactDOM.render((
   <Router>

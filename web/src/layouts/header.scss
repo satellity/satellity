@@ -28,6 +28,10 @@ header.app.header {
   }
   .navi {
     font-size: 1rem;
+    margin-right: .6rem;
+    &:after {
+      display: none;
+    }
   }
 }
 
