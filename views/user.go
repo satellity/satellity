@@ -1,7 +1,10 @@
 package views
 
 import (
+	"crypto/md5"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/godiscourse/godiscourse/models"
@@ -11,9 +14,8 @@ import (
 type UserView struct {
 	Type      string    `json:"type"`
 	UserID    string    `json:"user_id"`
-	Email     string    `json:"email"`
-	Username  string    `json:"username"`
 	Nickname  string    `json:"nickname"`
+	AvatarURL string    `json:"avatar_url"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -21,6 +23,8 @@ type UserView struct {
 // AccountView is the response body of a sign in user
 type AccountView struct {
 	UserView
+	Username  string `json:"username"`
+	Email     string `json:"email"`
 	SessionID string `json:"session_id"`
 	Role      string `json:"role"`
 }
@@ -29,9 +33,8 @@ func buildUser(user *models.User) UserView {
 	return UserView{
 		Type:      "user",
 		UserID:    user.UserID,
-		Email:     user.Email.String,
-		Username:  user.Username,
 		Nickname:  user.Name(),
+		AvatarURL: fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=180&d=wavatar", md5.Sum([]byte(strings.ToLower(user.Email.String)))),
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
@@ -55,6 +58,8 @@ func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
 func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) {
 	accountView := AccountView{
 		UserView:  buildUser(user),
+		Username:  user.Username,
+		Email:     user.Email.String,
 		SessionID: user.SessionID,
 		Role:      user.Role(),
 	}

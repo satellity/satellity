@@ -9,18 +9,18 @@ import (
 
 // CommentView is the response body of comment
 type CommentView struct {
-	CommentID string      `json:"comment_id,pk"`
-	Body      string      `json:"body"`
-	TopicID   string      `json:"topic_id"`
-	UserID    string      `json:"user_id"`
-	Score     int         `json:"score,notnull"`
-	CreatedAt time.Time   `json:"created_at"`
-	UpdatedAt time.Time   `json:"updated_at"`
-	User      models.User `json:"user"`
+	CommentID string    `json:"comment_id,pk"`
+	Body      string    `json:"body"`
+	TopicID   string    `json:"topic_id"`
+	UserID    string    `json:"user_id"`
+	Score     int       `json:"score,notnull"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	User      UserView  `json:"user"`
 }
 
 func buildComment(comment *models.Comment) CommentView {
-	return CommentView{
+	view := CommentView{
 		CommentID: comment.CommentID,
 		Body:      comment.Body,
 		TopicID:   comment.TopicID,
@@ -29,6 +29,10 @@ func buildComment(comment *models.Comment) CommentView {
 		CreatedAt: comment.CreatedAt,
 		UpdatedAt: comment.UpdatedAt,
 	}
+	if comment.User != nil {
+		view.User = buildUser(comment.User)
+	}
+	return view
 }
 
 // RenderComment response a comment

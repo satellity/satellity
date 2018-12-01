@@ -51,7 +51,8 @@ type Topic struct {
 	CreatedAt     time.Time `sql:"created_at"`
 	UpdatedAt     time.Time `sql:"updated_at"`
 
-	User *User
+	User     *User
+	Category *Category
 }
 
 //CreateTopic create a new Topic
@@ -158,7 +159,7 @@ func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 		offset = time.Now()
 	}
 	var topics []*Topic
-	if err := session.Database(ctx).Model(&topics).Relation("User").Where("topic.created_at<?", offset).Order("topic.created_at DESC").Limit(50).Select(); err != nil {
+	if err := session.Database(ctx).Model(&topics).Relation("User").Relation("Category").Where("topic.created_at<?", offset).Order("topic.created_at DESC").Limit(50).Select(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil

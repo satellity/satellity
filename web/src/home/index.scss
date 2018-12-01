@@ -1,10 +1,30 @@
 .home.layout {
-  font-size: 3rem;
-  text-align: center;
-  .container {
+  .topic.item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    height: 80vh;
+    .avatar {
+      border-radius: 4rem;
+      width: 4rem;
+      height: 4rem;
+    }
+    .detail {
+      color: #aaa;
+      flex-grow: 1;
+      padding-left: 1.2rem;
+      h2 {
+        color: #333;
+        font-weight: normal;
+        font-size: 1.2rem;
+        margin: 0 0 .6rem;
+      }
+      svg {
+        margin-right: 0.3rem;
+      }
+      .comment {
+        color: #aaa;
+        font-size: 1rem;
+        float: right;
+      }
+    }
   }
 }

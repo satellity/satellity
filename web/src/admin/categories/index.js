@@ -1,8 +1,8 @@
 import './index.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../../api/index.js';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 class AdminCategory extends Component {
   constructor(props) {
@@ -13,11 +13,6 @@ class AdminCategory extends Component {
 
   componentDidMount() {
     this.api.category.adminIndex((resp) => {
-      if (resp.error) {
-        // TODO
-        return
-      }
-
       this.setState({categories: resp.data});
     });
   }
