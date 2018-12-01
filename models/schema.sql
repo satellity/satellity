@@ -50,10 +50,9 @@ CREATE TABLE IF NOT EXISTS topics (
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX ON topics (user_id);
-CREATE INDEX ON topics (category_id);
 CREATE INDEX ON topics (created_at DESC);
 CREATE INDEX ON topics (user_id, created_at DESC);
+CREATE INDEX ON topics (category_id, created_at DESC);
 CREATE INDEX ON topics (score DESC, created_at DESC);
 
 
