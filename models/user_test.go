@@ -63,13 +63,6 @@ func TestUserCRUD(t *testing.T) {
 	assert.NotNil(new)
 	assert.Equal("username", user.Username)
 	assert.Equal("member", user.Role())
-	err = new.UpdateProfile(ctx, "Jason")
-	assert.Nil(err)
-	assert.Equal("Jason", new.Name())
-	new, err = ReadUserByUsernameOrEmail(ctx, "UserName")
-	assert.Nil(err)
-	assert.NotNil(new)
-	assert.Equal("Jason", new.Name())
 
 	sess, err := readSession(ctx, new.UserID, new.SessionID)
 	assert.Nil(err)
@@ -88,6 +81,13 @@ func TestUserCRUD(t *testing.T) {
 	new, err = AuthenticateUser(ctx, ss)
 	assert.Nil(err)
 	assert.NotNil(new)
+	err = new.UpdateProfile(ctx, "Jason")
+	assert.Nil(err)
+	assert.Equal("Jason", new.Name())
+	new, err = ReadUserByUsernameOrEmail(ctx, "UserName")
+	assert.Nil(err)
+	assert.NotNil(new)
+	assert.Equal("Jason", new.Name())
 }
 
 func createTestUser(ctx context.Context, email, username, password string) *User {
