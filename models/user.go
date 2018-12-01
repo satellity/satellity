@@ -113,6 +113,7 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 	return user, nil
 }
 
+// UpdateProfile update user's profile
 func (user *User) UpdateProfile(ctx context.Context, nickname string) error {
 	nickname = strings.TrimSpace(nickname)
 	if len(nickname) == 0 {

@@ -25,7 +25,7 @@ API.prototype = {
       data: data
     })
       .then((resp) => {
-        console.log(resp.data);
+        // TODO process errors
         if (resp.data.error) {
           return Promise.reject(resp.data.error);
         }

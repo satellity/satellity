@@ -16,16 +16,25 @@ User.prototype = {
     var priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
     // TODO Why use 3059301306072a8648ce3d020106082a8648ce3d030107034200
     const params = {'session_secret': '3059301306072a8648ce3d020106082a8648ce3d030107034200' + pub, 'code': code};
-    this.api.request('post', '/oauth/github', params, function(resp) {
-      if (resp.error) {
-        return Promise.reject(resp.error);
-      }
+    this.api.request('post', '/oauth/github', params, (resp) => {
       if (resp.data) {
         const data = resp.data;
         Cookies.set('sid', pwd, { expires: 365 });
         window.localStorage.setItem('token', priv);
         window.localStorage.setItem('uid', data.user_id);
         window.localStorage.setItem('sid', data.session_id);
+        window.localStorage.setItem('user', btoa(JSON.stringify(data)));
+      }
+      if (typeof callback === 'function') {
+        callback(resp);
+      }
+    });
+  },
+
+  update: function(params, callback) {
+    this.api.request('post', '/me', params, (resp) => {
+      if (resp.data) {
+        const data = resp.data;
         window.localStorage.setItem('user', btoa(JSON.stringify(data)));
       }
       if (typeof callback === 'function') {
