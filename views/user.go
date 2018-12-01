@@ -31,7 +31,7 @@ func buildUser(user *models.User) UserView {
 		UserID:    user.UserID,
 		Email:     user.Email.String,
 		Username:  user.Username,
-		Nickname:  user.Nickname,
+		Nickname:  user.Name(),
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}

@@ -50,7 +50,7 @@ type User struct {
 	isNew     bool   `sql:"-"`
 }
 
-var userCols = []string{"user_id", "email", "username", "nickname", "encrypted_password", "github_id", "created_at", "updated_at"}
+var userColumns = []string{"user_id", "email", "username", "nickname", "encrypted_password", "github_id", "created_at", "updated_at"}
 
 // CreateUser create a new user
 func CreateUser(ctx context.Context, email, username, nickname, password string, sessionSecret string) (*User, error) {
@@ -164,7 +164,7 @@ func ReadUserByUsernameOrEmail(ctx context.Context, identity string) (*User, err
 	if len(identity) < 3 {
 		return nil, nil
 	}
-	if err := session.Database(ctx).Model(user).Column(userCols...).Where("username = ? OR email = ?", identity, identity).Select(); err == pg.ErrNoRows {
+	if err := session.Database(ctx).Model(user).Column(userColumns...).Where("username = ? OR email = ?", identity, identity).Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, session.TransactionError(ctx, err)
@@ -180,13 +180,20 @@ func (user *User) Role() string {
 	return "member"
 }
 
+func (user *User) Name() string {
+	if user.Nickname != "" {
+		return user.Nickname
+	}
+	return user.Username
+}
+
 func (user *User) isAdmin() bool {
 	return user.Role() == "admin"
 }
 
 func findUserByID(ctx context.Context, id string) (*User, error) {
 	user := &User{UserID: id}
-	if err := session.Database(ctx).Model(user).Column(userCols...).WherePK().Select(); err == pg.ErrNoRows {
+	if err := session.Database(ctx).Model(user).Column(userColumns...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, session.TransactionError(ctx, err)

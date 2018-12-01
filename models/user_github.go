@@ -160,7 +160,7 @@ func featchUserEmail(ctx context.Context, accessToken string) (string, error) {
 
 func findUserByGithubId(ctx context.Context, id string) (*User, error) {
 	user := &User{}
-	if err := session.Database(ctx).Model(user).Column(userCols...).Where("github_id = ?", id).Select(); err == pg.ErrNoRows {
+	if err := session.Database(ctx).Model(user).Column(userColumns...).Where("github_id = ?", id).Select(); err == pg.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
