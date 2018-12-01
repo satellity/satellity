@@ -12,6 +12,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/config"
 	"github.com/godiscourse/godiscourse/session"
 	"github.com/godiscourse/godiscourse/uuid"
@@ -54,7 +55,6 @@ var userColumns = []string{"user_id", "email", "username", "nickname", "encrypte
 
 // CreateUser create a new user
 func CreateUser(ctx context.Context, email, username, nickname, password string, sessionSecret string) (*User, error) {
-	t := time.Now()
 	data, err := hex.DecodeString(sessionSecret)
 	if err != nil {
 		return nil, session.BadDataError(ctx)
@@ -90,8 +90,6 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 		Username:          username,
 		Nickname:          nickname,
 		EncryptedPassword: sql.NullString{String: password, Valid: true},
-		CreatedAt:         t,
-		UpdatedAt:         t,
 	}
 	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
 		if err := tx.Insert(user); err != nil {
@@ -211,4 +209,17 @@ func validateAndEncryptPassword(ctx context.Context, password string) (string, e
 		return password, session.ServerError(ctx, err)
 	}
 	return string(hashedPassword), nil
+}
+
+// BeforeInsert hook insert
+func (user *User) BeforeInsert(db orm.DB) error {
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = user.CreatedAt
+	return nil
+}
+
+// BeforeUpdate hook update
+func (user *User) BeforeUpdate(db orm.DB) error {
+	user.UpdatedAt = time.Now()
+	return nil
 }

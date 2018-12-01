@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/config"
@@ -39,15 +38,12 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		return nil, session.TransactionError(ctx, err)
 	}
 	if user == nil {
-		t := time.Now()
 		user = &User{
-			UserID:    uuid.NewV4().String(),
-			Username:  fmt.Sprintf("GH_%s", data.Login),
-			Nickname:  data.Name,
-			GithubID:  sql.NullString{String: data.NodeID, Valid: true},
-			CreatedAt: t,
-			UpdatedAt: t,
-			isNew:     true,
+			UserID:   uuid.NewV4().String(),
+			Username: fmt.Sprintf("GH_%s", data.Login),
+			Nickname: data.Name,
+			GithubID: sql.NullString{String: data.NodeID, Valid: true},
+			isNew:    true,
 		}
 		if data.Email != "" {
 			user.Email = sql.NullString{String: data.Email, Valid: true}
