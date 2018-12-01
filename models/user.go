@@ -196,6 +196,7 @@ func (user *User) Role() string {
 	return "member"
 }
 
+// Name is nickname or username
 func (user *User) Name() string {
 	if user.Nickname != "" {
 		return user.Nickname
