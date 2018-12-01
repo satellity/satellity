@@ -73,6 +73,11 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 	if err := validateEmailFormat(ctx, email); err != nil {
 		return nil, err
 	}
+	username = strings.TrimSpace(username)
+	if len(username) < 3 {
+		return nil, session.BadDataError(ctx)
+	}
+	nickname = strings.TrimSpace(nickname)
 	if nickname == "" {
 		nickname = username
 	}
@@ -106,6 +111,18 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 		return nil, session.TransactionError(ctx, err)
 	}
 	return user, nil
+}
+
+func (user *User) UpdateProfile(ctx context.Context, nickname string) error {
+	nickname = strings.TrimSpace(nickname)
+	if len(nickname) == 0 {
+		return nil
+	}
+	user.Nickname = nickname
+	if err := session.Database(ctx).Update(user); err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
 }
 
 // AuthenticateUser read a user by tokenString. tokenString is a jwt token, more
