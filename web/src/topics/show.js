@@ -36,7 +36,6 @@ class TopicShow extends Component {
 }
 
 const View = ({state}) => {
-  console.info(style);
   var editAction = '';
   if (state.is_author) {
     editAction = (
