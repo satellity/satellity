@@ -1,5 +1,6 @@
 @import './constant.scss';
 
+:global {
 textarea,
 input[type] {
   box-sizing: border-box;
@@ -63,4 +64,5 @@ label {
       border: 1px solid $color-main-background-dark;
     }
   }
+}
 }

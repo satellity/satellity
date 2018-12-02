@@ -1,5 +1,6 @@
 @import '../assets/css/constant.scss';
 
+:global {
 .lds-ring {
   display: inline-block;
   position: relative;
@@ -43,4 +44,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
 }

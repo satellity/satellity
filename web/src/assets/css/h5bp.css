@@ -10,6 +10,7 @@
    Base styles: opinionated defaults
    ========================================================================== */
 
+:global {
 html {
     color: #222;
     font-size: 1em;
@@ -284,4 +285,5 @@ textarea {
     h3 {
         page-break-after: avoid;
     }
+}
 }

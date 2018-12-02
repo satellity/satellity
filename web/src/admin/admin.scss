@@ -1,6 +1,7 @@
 $color-light-background: #ECF0F5;
 $color-dark-background: #25476A;
 
+:global {
 .admin.layout {
   background-color: $color-light-background;
   ul, ol {
@@ -63,4 +64,5 @@ $color-dark-background: #25476A;
     box-sizing: border-box;
     padding: 1.6rem;
   }
+}
 }

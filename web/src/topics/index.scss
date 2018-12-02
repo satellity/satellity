@@ -1,12 +1,9 @@
+:global {
 .topic.layout {
   .app.container {
     padding: 0;
   }
-  .topic.header {
-    background: #EEE;
-    box-sizing: border-box;
-    font-size: 1rem;
-    padding: 1rem;
+  .topic.show {
     h1 {
       font-size: 1.2rem;
       font-weight: normal;
@@ -22,9 +19,10 @@
       font-size: .875rem;
       color: #aaa;
     }
+    .body {
+      box-sizing: border-box;
+      padding: 1rem;
+    }
   }
-  .topic.body {
-    box-sizing: border-box;
-    padding: 1rem;
-  }
+}
 }

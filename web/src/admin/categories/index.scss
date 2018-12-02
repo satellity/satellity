@@ -1,5 +1,6 @@
 $color-dark-background: #25476A;
 
+:global {
 .admin.layout {
   .admin.categories {
     .category.item {
@@ -35,4 +36,5 @@ $color-dark-background: #25476A;
       margin-right: .8rem;
     }
   }
+}
 }

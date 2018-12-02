@@ -4,6 +4,7 @@
 
 $color-dark-background: #25476A;
 
+:global {
 html, body {
   color: #333;
   font-family: Roboto Mono, Maven Pro,sans-serif;
@@ -44,4 +45,16 @@ ul, ol {
   li {
     padding: 0.6rem 0;
   }
+}
+
+div.wrapper {
+  margin: 0 auto;
+  width: 80px;
+  max-width: 96%;
+}
+
+div.section {
+  box-sizing: border-box;
+  padding: 0.8rem;
+}
 }

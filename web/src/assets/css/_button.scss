@@ -1,5 +1,6 @@
 @import './constant.scss';
 
+:global {
 .btn {
   border-radius: 0.2rem;
   color: white;
@@ -14,4 +15,5 @@
   &:hover {
     opacity: 0.8;
   }
+}
 }

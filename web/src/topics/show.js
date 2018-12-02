@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import API from '../api/index.js';
+import style from './style.css';
 
 class TopicShow extends Component {
   constructor(props) {
@@ -35,6 +36,7 @@ class TopicShow extends Component {
 }
 
 const View = ({state}) => {
+  console.info(style);
   var editAction = '';
   if (state.is_author) {
     editAction = (
@@ -44,8 +46,8 @@ const View = ({state}) => {
     )
   }
   return (
-    <div>
-      <header className='topic header'>
+    <div className='topic show'>
+      <header className={style.header}>
         <h1>
           {state.title}
           {editAction}
@@ -55,7 +57,7 @@ const View = ({state}) => {
           {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />
         </div>
       </header>
-      <div className='topic body'>
+      <div className='body'>
         {state.body}
       </div>
     </div>

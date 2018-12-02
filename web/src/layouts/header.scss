@@ -1,6 +1,7 @@
 $border-light-color: rgba(225, 225, 225, 0.8);
 $color-dark-background: #25476A;
 
+:global {
 header.app.header {
   background: white;
   box-sizing: border-box;
@@ -43,4 +44,5 @@ header.app.header {
   max-width: 96%;
   margin: 1rem auto;
   padding: 1rem;
+}
 }
