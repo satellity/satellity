@@ -3,10 +3,12 @@
     padding: 0;
   }
   .topic.header {
-    background: #FAFAFA;
+    background: #EEE;
     box-sizing: border-box;
+    font-size: 1rem;
     padding: 1rem;
     h1 {
+      font-size: 1.2rem;
       font-weight: normal;
       margin: 0 0 1rem;
     }
@@ -15,6 +17,10 @@
       float: right;
       width: 3.6rem;
       height: 3.6rem;
+    }
+    .info {
+      font-size: .875rem;
+      color: #aaa;
     }
   }
   .topic.body {

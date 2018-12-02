@@ -1,4 +1,5 @@
 import './index.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
@@ -9,7 +10,7 @@ class TopicShow extends Component {
     super(props);
     this.api = new API();
     this.state = {
-      topic_id: '', title: '', body: '', comments_count: 0, created_at: '',
+      topic_id: '', title: '', body: '', comments_count: 0, created_at: '', user_id: '', is_author: false,
       user: {user_id: '', nickname: ''},
       category: {category_id: '', name: ''}
     };
@@ -19,8 +20,9 @@ class TopicShow extends Component {
   }
 
   componentDidMount() {
+    const user = this.api.user.me();
     this.api.topic.show(this.props.match.params.id, (resp) => {
-      console.info(resp.data);
+      resp.data.is_author = resp.data.user.user_id === user.user_id;
       this.setState(resp.data);
     });
   }
@@ -33,14 +35,23 @@ class TopicShow extends Component {
 }
 
 const View = ({state}) => {
+  var editAction = '';
+  if (state.is_author) {
+    editAction = (
+      <Link to={`/topics/${state.topic_id}/edit`}>
+        <FontAwesomeIcon icon={['far', 'edit']} />
+      </Link>
+    )
+  }
   return (
     <div>
       <header className='topic header'>
         <h1>
           {state.title}
+          {editAction}
           <img src={state.user.avatar_url} className='avatar' />
         </h1>
-        <div>
+        <div className='info'>
           {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />
         </div>
       </header>
