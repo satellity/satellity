@@ -19,13 +19,12 @@ class TopicNew extends Component {
   }
 
   componentDidMount() {
-    const self = this;
     this.api.category.index((resp) => {
       let category_id = '';
       if (resp.data.length > 0) {
         category_id = resp.data[0].category_id;
       }
-      self.setState({categories: resp.data, category_id: category_id});
+      this.setState({categories: resp.data, category_id: category_id});
     });
   }
 

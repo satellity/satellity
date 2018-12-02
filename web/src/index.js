@@ -10,9 +10,10 @@ import AdminRoute from './layouts/admin.js';
 import NoMatch from './notfound.js';
 import Oauth from './users/oauth.js';
 import SignIn from './users/sign_in.js';
-import TopicNew from './topics/new.js';
-import About from './about.js';
 import Home from './home/index.js';
+import About from './about.js';
+import TopicNew from './topics/new.js';
+import TopicShow from './topics/show.js';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEdit, faTrashAlt, faComment} from '@fortawesome/free-regular-svg-icons';
@@ -27,7 +28,7 @@ ReactDOM.render((
         <MainRoute path='/about' component={About} />
         <MainRoute exact path='/topics/new' component={TopicNew} />
         <MainRoute path='/topics/:id/edit' component={About} />
-        <MainRoute path='/topics/:id' component={About} />
+        <MainRoute path='/topics/:id' component={TopicShow} />
         <Route path='/sign_in' component={SignIn} />
         <Route path='/oauth/callback' component={Oauth} />
         <Route path='/admin' component={AdminRoute} />

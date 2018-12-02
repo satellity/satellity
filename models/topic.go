@@ -131,13 +131,10 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body string) (*Top
 
 //ReadTopic read a topic by ID
 func ReadTopic(ctx context.Context, id string) (*Topic, error) {
-	var topic *Topic
-	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
-		var err error
-		topic, err = findTopic(ctx, tx, id)
-		return err
-	})
-	if err != nil {
+	topic := &Topic{TopicID: id}
+	if err := session.Database(ctx).Model(topic).Relation("User").Relation("Category").WherePK().Select(); err == pg.ErrNoRows {
+		return nil, session.NotFoundError(ctx)
+	} else if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topic, nil

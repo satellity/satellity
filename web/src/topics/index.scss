@@ -1,0 +1,24 @@
+.topic.layout {
+  .app.container {
+    padding: 0;
+  }
+  .topic.header {
+    background: #FAFAFA;
+    box-sizing: border-box;
+    padding: 1rem;
+    h1 {
+      font-weight: normal;
+      margin: 0 0 1rem;
+    }
+    .avatar {
+      border-radius: 3.6rem;
+      float: right;
+      width: 3.6rem;
+      height: 3.6rem;
+    }
+  }
+  .topic.body {
+    box-sizing: border-box;
+    padding: 1rem;
+  }
+}
