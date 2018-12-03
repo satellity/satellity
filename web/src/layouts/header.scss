@@ -1,8 +1,7 @@
 $border-light-color: rgba(225, 225, 225, 0.8);
 $color-dark-background: #25476A;
 
-:global {
-header.app.header {
+.header {
   background: white;
   box-sizing: border-box;
   border-bottom: 1px solid $border-light-color;
@@ -15,34 +14,31 @@ header.app.header {
     display: block;
     clear: both;
   }
-  .brand {
-    float: left;
-    &:after {
-      display: none;
-    }
+}
+.brand {
+  float: left;
+  &:after {
+    display: none;
   }
-  .logo {
-    float: left;
-    width: 1.6rem;
-    height: 1.6rem;
-    margin-right: 0.3rem;
-  }
-  .navi {
-    font-size: 1rem;
-    margin-right: .6rem;
-    &:after {
-      display: none;
-    }
+}
+.logo {
+  float: left;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: 0.3rem;
+}
+.navi {
+  font-size: 1rem;
+  margin-right: .6rem;
+  &:after {
+    display: none;
   }
 }
 
-.app.container {
-  background: white;
-  box-sizing: border-box;
-  border-top: 3px solid $color-dark-background;
-  width: 80rem;
-  max-width: 96%;
-  margin: 1rem auto;
-  padding: 1rem;
-}
+:global {
+  .app.container {
+    background: white;
+    border-top: 3px solid $color-dark-background;
+    margin-top: 1rem;
+  }
 }

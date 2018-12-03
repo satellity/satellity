@@ -1,4 +1,5 @@
 import './header.scss';
+import style from './header.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Route, Link } from 'react-router-dom';
@@ -10,7 +11,7 @@ const MainRoute = ({component: Component, ...rest}) => {
     <Route {...rest} render={matchProps => (
       <div>
         <Header />
-        <div className='app container'>
+        <div className='wrapper section app container'>
           <Component {...matchProps} />
         </div>
       </div>
@@ -20,19 +21,19 @@ const MainRoute = ({component: Component, ...rest}) => {
 
 const Header = () => {
   const user = new API().user;
-  let link = (<Link to='/sign_in' className='navi'> SignIn </Link>);
+  let link = (<Link to='/sign_in' className={style.navi}> SignIn </Link>);
   if (user.loggedIn()) {
     link = (
-      <Link to='/sign_in' className='navi'> {user.me().nickname} </Link>
+      <Link to='/sign_in' className={style.navi}> {user.me().nickname} </Link>
     );
   }
   return (
-    <header className='app header'>
-      <Link to='/' className='brand'>
-        <img src={logoURL} className='logo' alt=''/>
+    <header className={style.header}>
+      <Link to='/' className={style.brand}>
+        <img src={logoURL} className={style.logo} alt='SUNTIN'/>
         SUNTIN
       </Link>
-      <Link to='/topics/new' className='navi'>
+      <Link to='/topics/new' className={style.navi}>
         <FontAwesomeIcon icon={['fa', 'plus']} />
       </Link>
       {link}
