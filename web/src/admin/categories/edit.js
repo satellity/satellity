@@ -43,9 +43,9 @@ class AdminCategoryEdit extends Component {
 }
 
 const CategoryEdit = ({onSubmit, onChange, state}) => (
-  <div className='admin categories'>
+  <div>
     <h1 className='welcome'>
-      Edit a special category
+      Edit a category
     </h1>
     <div className='panel'>
       <form onSubmit={(e) => onSubmit(e)}>

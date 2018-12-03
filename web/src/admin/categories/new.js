@@ -35,7 +35,7 @@ class AdminCategoryNew extends Component {
 }
 
 const CategoryNew = ({onSubmit, onChange, state}) => (
-  <div className='admin categories'>
+  <div>
     <h1 className='welcome'>
       Create a new category
     </h1>

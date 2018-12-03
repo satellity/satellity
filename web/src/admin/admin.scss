@@ -27,7 +27,7 @@ $color-dark-background: #25476A;
       float: left;
     }
   }
-  .container {
+  .bg-container {
     position: relative;
     &:before {
       content: '';
@@ -40,10 +40,11 @@ $color-dark-background: #25476A;
     }
   }
   .welcome {
+    color: white;
     font-weight: normal;
     font-size: 1.2rem;
-    color: white;
-    margin-bottom: 1.6rem;
+    margin: 0;
+    padding: 1.6rem 0;
     .new {
       padding: 0 .6rem;
       color: white;

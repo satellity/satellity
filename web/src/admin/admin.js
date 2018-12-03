@@ -29,8 +29,8 @@ class AdminRoute extends Component {
           <Link to='/admin' className='navi'>Dashboard</Link>
           <Link to='/admin/categories' className='navi'>Categories</Link>
         </header>
-        <div className='container'>
-          <div className='wrapper section'>
+        <div className='bg-container'>
+          <div className='wrapper'>
             <Route exact path={`${match.url}`} component={Index} />
             <Route exact path={`${match.url}/categories`} component={Categories} />
             <Route exact path={`${match.url}/categories/new`} component={CategoriesNew} />
