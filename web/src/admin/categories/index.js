@@ -1,4 +1,4 @@
-import './index.scss';
+import style from './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
@@ -27,18 +27,18 @@ class AdminCategory extends Component {
 const CategoryIndex = (props) => {
   const listCategories = props.categories.map((category) => {
     return (
-      <li className='category item' key={category.category_id}>
+      <li className={style.category} key={category.category_id}>
         <div>
-          <span className='position'>P{category.position}</span>
+          <span className={style.position}>P{category.position}</span>
           <div>
             {category.name}
-            <span className='actions'>
+            <span className={style.actions}>
               <Link to={`/admin/categories/${category.category_id}/edit`}>
                 <FontAwesomeIcon icon={['far', 'edit']} />
               </Link>
             </span>
           </div>
-          <p className='description'>
+          <p className={style.description}>
             {category.description}
           </p>
         </div>
@@ -47,7 +47,7 @@ const CategoryIndex = (props) => {
   });
 
   return (
-    <div className='admin categories'>
+    <div>
       <h1 className='welcome'>
         It is used to categorize topics. P+number is the position of the categories.
         <Link to='/admin/categories/new' className='new'>Create New Category</Link>

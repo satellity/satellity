@@ -4,37 +4,28 @@ $color-dark-background: #25476A;
 :global {
 .admin.layout {
   background-color: $color-light-background;
-  ul, ol {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
   a {
     color: $color-dark-background;
     transition: all 0.2s ease-in-out;
+    &:after {
+      display: none;
+    }
     &:hover {
       opacity: 0.8;
     }
   }
-  header {
+  header.header {
     background-color: $color-dark-background;
-    color: white;
     text-align: right;
     padding: 1.6rem;
-    a {
+    a.navi {
       color: white;
       margin-left: 1.6rem;
     }
     .brand {
+      color: white;
       float: left;
-      margin-left: 0;
     }
-  }
-  .wrapper {
-    max-width: 96%;
-    margin: 0 auto;
-    width: 64rem;
-    padding: 1.6rem 0;
   }
   .container {
     position: relative;
@@ -50,7 +41,7 @@ $color-dark-background: #25476A;
   }
   .welcome {
     font-weight: normal;
-    font-size: 1.6rem;
+    font-size: 1.2rem;
     color: white;
     margin-bottom: 1.6rem;
     .new {
@@ -62,7 +53,7 @@ $color-dark-background: #25476A;
   .panel {
     background: white;
     box-sizing: border-box;
-    padding: 1.6rem;
+    padding: .8rem;
   }
 }
 }

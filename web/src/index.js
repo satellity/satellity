@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
 import MainRoute from './layouts/main.js';
-import AdminRoute from './layouts/admin.js';
+import AdminRoute from './admin/admin.js';
 import NoMatch from './notfound.js';
 import Oauth from './users/oauth.js';
 import SignIn from './users/sign_in.js';
