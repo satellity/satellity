@@ -18,8 +18,7 @@ class About extends Component {
 
 const AboutView = () => (
   <div>
-    <div>About</div>
-    <Link to='/'>Home</Link>
+    We are a team of two developers who love programming.
   </div>
 );
 

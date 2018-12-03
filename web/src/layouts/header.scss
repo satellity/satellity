@@ -17,6 +17,10 @@ $color-dark-background: #25476A;
 }
 .brand {
   float: left;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    opacity: 0.8;
+  }
   &:after {
     display: none;
   }
@@ -30,6 +34,10 @@ $color-dark-background: #25476A;
 .navi {
   font-size: 1rem;
   margin-right: .6rem;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    opacity: 0.8;
+  }
   &:after {
     display: none;
   }
