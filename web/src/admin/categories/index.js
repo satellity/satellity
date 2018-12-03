@@ -49,7 +49,7 @@ const CategoryIndex = (props) => {
   return (
     <div>
       <h1 className='welcome'>
-        It is used to categorize topics. P+number is the position of the categories.
+        It is used to categorize topics. P+Num is the position of the categories.
         <Link to='/admin/categories/new' className='new'>Create New Category</Link>
       </h1>
       <div className='panel'>
