@@ -49,10 +49,17 @@ const HomeView = (props) => {
   });
 
   return (
-    <div className='container'>
-      <ul>
-        {topics}
-      </ul>
+    <div className='app container'>
+      <main className='section main'>
+        <ul>
+          {topics}
+        </ul>
+      </main>
+      <aside className='section aside'>
+        <div className='section site info'>
+          SUNTIN is an open source forum, get codes in <Link to='https://github.com/godiscourse/godiscourse'>Github</Link>.
+        </div>
+      </aside>
     </div>
   );
 }

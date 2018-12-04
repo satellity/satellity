@@ -42,11 +42,3 @@ $color-dark-background: #25476A;
     display: none;
   }
 }
-
-:global {
-  .app.container {
-    background: white;
-    border-top: 3px solid $color-dark-background;
-    margin-top: 1rem;
-  }
-}

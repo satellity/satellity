@@ -1,4 +1,3 @@
-import './header.scss';
 import style from './header.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
@@ -11,7 +10,7 @@ const MainRoute = ({component: Component, ...rest}) => {
     <Route {...rest} render={matchProps => (
       <div>
         <Header />
-        <div className='wrapper section app container'>
+        <div className='wrapper'>
           <Component {...matchProps} />
         </div>
       </div>

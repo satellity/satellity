@@ -11,7 +11,8 @@ html, body {
 }
 
 body {
-  background-color: #FAFAFA;
+  //  background-color: #FAFAFA;
+  line-height: 1.6rem;
 }
 
 a {
@@ -43,18 +44,35 @@ ul, ol {
   padding: 0;
   margin: 0;
   li {
-    padding: 0.6rem 0;
+    padding: 0.8rem 0;
   }
 }
 
-div.wrapper {
+.wrapper {
   margin: 0 auto;
   width: 80rem;
   max-width: 96%;
 }
 
-div.section {
+.section {
   box-sizing: border-box;
   padding: 0.8rem;
+}
+
+// TODO better choice?
+div.app.container {
+  display: flex;
+  margin-top: 2.4rem;
+  main.main {
+    flex-grow: 1;
+  }
+
+  aside.aside {
+    width: 20rem;
+  }
+
+  .site.info {
+    background-color: #f3f6f9;
+  }
 }
 }
