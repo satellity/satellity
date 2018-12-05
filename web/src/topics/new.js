@@ -61,7 +61,7 @@ const View = ({onSubmit, onChange, state}) => {
   });
 
   return (
-    <div>
+    <div className='section'>
       <h2>Create a new topic</h2>
       <form onSubmit={(e) => onSubmit(e)}>
         <div>

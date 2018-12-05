@@ -4,6 +4,7 @@
 .btn {
   border-radius: 0.2rem;
   color: white;
+  display: inline-block;
   transition: all 0.30s ease-in-out;
   &.primary {
     background: $color-main-highlight;

@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import API from '../api/index.js';
+import SiteWidget from '../components/site-widget.js';
 
 class Home extends Component {
   constructor(props) {
@@ -56,9 +57,7 @@ const HomeView = (props) => {
         </ul>
       </main>
       <aside className='section aside'>
-        <div className='section site info'>
-          SUNTIN is an open source forum, get codes in <Link to='https://github.com/godiscourse/godiscourse'>Github</Link>.
-        </div>
+        <SiteWidget />
       </aside>
     </div>
   );

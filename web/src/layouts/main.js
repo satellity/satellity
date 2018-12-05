@@ -1,4 +1,4 @@
-import style from './header.scss';
+import style from './main.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Route, Link } from 'react-router-dom';
@@ -20,9 +20,9 @@ const MainRoute = ({component: Component, ...rest}) => {
 
 const Header = () => {
   const user = new API().user;
-  let link = (<Link to='/sign_in' className={style.navi}> SignIn </Link>);
+  let profile = '';
   if (user.loggedIn()) {
-    link = (
+    profile = (
       <Link to='/sign_in' className={style.navi}> {user.me().nickname} </Link>
     );
   }
@@ -35,7 +35,7 @@ const Header = () => {
       <Link to='/topics/new' className={style.navi}>
         <FontAwesomeIcon icon={['fa', 'plus']} />
       </Link>
-      {link}
+      {profile}
     </header>
   )
 }

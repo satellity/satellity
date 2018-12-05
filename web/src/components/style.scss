@@ -1,0 +1,21 @@
+.widget {
+  background: #e57373;
+  color: white;
+  a {
+    color: white;
+    &:after {
+      background: white;
+    }
+  }
+}
+
+.sign_in {
+  margin-top: 1.6rem;
+  text-align: center;
+  a {
+    font-weight: bold;
+    &:after {
+      background: white;
+    }
+  }
+}
