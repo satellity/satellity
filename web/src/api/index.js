@@ -42,7 +42,12 @@ API.prototype = {
         }
         if (error.code === 401) {
           self.user.clear();
-          window.location.href = '/sign_in';
+          // TODO
+          let githubClientId = '71905afbd6e4541ad62b';
+          if (process.env.NODE_ENV === 'development') {
+            githubClientId = 'b9b78f343f3a5b0d7c99';
+          }
+          window.location.href = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${githubClientId}`;
           return
         }
         if (error.response) {

@@ -4,3 +4,24 @@
   font-size: 1rem;
   padding: 1rem;
 }
+.title {
+  font-size: 1.6rem;
+  font-weight: normal;
+  margin: 0 0 0.8rem;
+}
+.edit {
+  font-size: 1rem;
+  margin-left: 0.8rem;
+}
+.detail {
+  color: #667D99;
+}
+.avatar {
+  float: right;
+  border-radius: 3.6rem;
+  width: 3.6rem;
+  height: 3.6rem;
+}
+.body {
+  padding: 1.6rem 0;
+}

@@ -50,7 +50,7 @@ const HomeView = (props) => {
   });
 
   return (
-    <div className='app container'>
+    <div className='container'>
       <main className='section main'>
         <ul>
           {topics}

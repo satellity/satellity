@@ -23,7 +23,7 @@ const Header = () => {
   let profile = '';
   if (user.loggedIn()) {
     profile = (
-      <Link to='/sign_in' className={style.navi}> {user.me().nickname} </Link>
+      <Link to='/' className={style.navi}> {user.me().nickname} </Link>
     );
   }
   return (
