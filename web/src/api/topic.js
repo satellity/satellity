@@ -14,6 +14,7 @@ Topic.prototype = {
   },
 
   create: function(params, callback) {
+    const data = {title: params.title, body: params.body, category_id: params.category_id};
     this.api.request('post', '/topics', data, (resp) => {
       if (typeof callback === 'function') {
         callback(resp);
