@@ -59,7 +59,7 @@ const CategoryEdit = ({onSubmit, onChange, state}) => (
         </div>
         <div>
           <label name='name'>Description *</label>
-          <textarea type='text' name='description' value={state.description} onChange={(e) => onChange(e)}/>
+          <textarea type='text' name='description' value={state.description} onChange={(e) => onChange(e)} key='description'/>
         </div>
         <div className='action'>
           <input type='submit' value='SUBMIT' />
