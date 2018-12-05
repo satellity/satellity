@@ -28,7 +28,7 @@ class SiteWidget extends Component {
     }
     return (
       <div className={`section ${style.widget}`}>
-        SUNTIN is an open source forum written in Go, get codes in <Link to='https://github.com/godiscourse/godiscourse'>Github</Link>.
+        SUNTIN is an open source forum written in Go, get codes in <a href='https://github.com/godiscourse/godiscourse' target='blank'>Github</a>.
           {signIn}
       </div>
     )
