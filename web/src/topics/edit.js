@@ -62,7 +62,8 @@ const View = ({onSubmit, onChange, state}) => {
   });
 
   return (
-    <div>
+    <div className='container'>
+      <main className='section main'>
       <h2>Edit: {state.title}</h2>
       <form onSubmit={(e) => onSubmit(e)}>
         <div>
@@ -85,6 +86,9 @@ const View = ({onSubmit, onChange, state}) => {
           <input type='submit' value='SUBMIT' />
         </div>
       </form>
+      </main>
+      <aside className='section aside'>
+      </aside>
     </div>
   )
 };
