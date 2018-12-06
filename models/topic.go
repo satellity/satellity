@@ -42,11 +42,11 @@ var topicCols = []string{"topic_id", "title", "body", "comments_count", "categor
 // Topic is what use talking about
 type Topic struct {
 	TopicID       string    `sql:"topic_id,pk"`
-	Title         string    `sql:"title"`
-	Body          string    `sql:"body"`
+	Title         string    `sql:"title,notnull"`
+	Body          string    `sql:"body,notnull"`
 	CommentsCount int       `sql:"comments_count,notnull"`
-	CategoryID    string    `sql:"category_id"`
-	UserID        string    `sql:"user_id"`
+	CategoryID    string    `sql:"category_id,notnull"`
+	UserID        string    `sql:"user_id,notnull"`
 	Score         int       `sql:"score,notnull"`
 	CreatedAt     time.Time `sql:"created_at"`
 	UpdatedAt     time.Time `sql:"updated_at"`

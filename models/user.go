@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
 	email                 VARCHAR(512),
 	username              VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
 	nickname              VARCHAR(64) NOT NULL DEFAULT '',
+	biography             VARCHAR(2048) NOT NULL DEFAULT '',
 	encrypted_password    VARCHAR(1024),
 	github_id             VARCHAR(1024) UNIQUE,
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -40,8 +41,9 @@ CREATE INDEX ON users (created_at);
 type User struct {
 	UserID            string         `sql:"user_id,pk"`
 	Email             sql.NullString `sql:"email"`
-	Username          string         `sql:"username"`
-	Nickname          string         `sql:"nickname"`
+	Username          string         `sql:"username,notnull"`
+	Nickname          string         `sql:"nickname,notnull"`
+	Biography         string         `sql:"biography,notnull"`
 	EncryptedPassword sql.NullString `sql:"encrypted_password"`
 	GithubID          sql.NullString `sql:"github_id"`
 	CreatedAt         time.Time      `sql:"created_at"`
@@ -51,10 +53,10 @@ type User struct {
 	isNew     bool   `sql:"-"`
 }
 
-var userColumns = []string{"user_id", "email", "username", "nickname", "encrypted_password", "github_id", "created_at", "updated_at"}
+var userColumns = []string{"user_id", "email", "username", "nickname", "biography", "encrypted_password", "github_id", "created_at", "updated_at"}
 
 // CreateUser create a new user
-func CreateUser(ctx context.Context, email, username, nickname, password string, sessionSecret string) (*User, error) {
+func CreateUser(ctx context.Context, email, username, nickname, biography, password string, sessionSecret string) (*User, error) {
 	data, err := hex.DecodeString(sessionSecret)
 	if err != nil {
 		return nil, session.BadDataError(ctx)
@@ -94,6 +96,7 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 		Email:             sql.NullString{String: email, Valid: true},
 		Username:          username,
 		Nickname:          nickname,
+		Biography:         biography,
 		EncryptedPassword: sql.NullString{String: password, Valid: true},
 	}
 	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
@@ -114,12 +117,17 @@ func CreateUser(ctx context.Context, email, username, nickname, password string,
 }
 
 // UpdateProfile update user's profile
-func (user *User) UpdateProfile(ctx context.Context, nickname string) error {
-	nickname = strings.TrimSpace(nickname)
-	if len(nickname) == 0 {
+func (user *User) UpdateProfile(ctx context.Context, nickname, biography string) error {
+	nickname, biography = strings.TrimSpace(nickname), strings.TrimSpace(biography)
+	if len(nickname) == 0 && len(biography) == 0 {
 		return nil
 	}
-	user.Nickname = nickname
+	if nickname != "" {
+		user.Nickname = nickname
+	}
+	if biography != "" {
+		user.Biography = biography
+	}
 	if err := session.Database(ctx).Update(user); err != nil {
 		return session.TransactionError(ctx, err)
 	}

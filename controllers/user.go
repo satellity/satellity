@@ -15,6 +15,7 @@ type userRequest struct {
 	Code          string `json:"code"`
 	SessionSecret string `json:"session_secret"`
 	Nickname      string `json:"nickname"`
+	Biography     string `json:"biography"`
 }
 
 type userImpl struct{}
@@ -47,7 +48,7 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, params map[
 		return
 	}
 	current := middleware.CurrentUser(r)
-	err := current.UpdateProfile(r.Context(), body.Nickname)
+	err := current.UpdateProfile(r.Context(), body.Nickname, body.Biography)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
