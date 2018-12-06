@@ -11,6 +11,7 @@ import NoMatch from './notfound.js';
 import Oauth from './users/oauth.js';
 import Home from './home/index.js';
 import About from './about.js';
+import UserEdit from './users/edit.js';
 import TopicNew from './topics/new.js';
 import TopicEdit from './topics/edit.js';
 import TopicShow from './topics/show.js';
@@ -26,6 +27,7 @@ ReactDOM.render((
       <Switch>
         <MainRoute exact path='/' component={Home} />
         <MainRoute path='/about' component={About} />
+        <MainRoute exact path='/user/edit' component={UserEdit} />
         <MainRoute exact path='/topics/new' component={TopicNew} />
         <MainRoute path='/topics/:id/edit' component={TopicEdit} />
         <MainRoute path='/topics/:id' component={TopicShow} />

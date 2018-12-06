@@ -15,6 +15,7 @@ type UserView struct {
 	Type      string    `json:"type"`
 	UserID    string    `json:"user_id"`
 	Nickname  string    `json:"nickname"`
+	Biography string    `json:"biography"`
 	AvatarURL string    `json:"avatar_url"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -34,6 +35,7 @@ func buildUser(user *models.User) UserView {
 		Type:      "user",
 		UserID:    user.UserID,
 		Nickname:  user.Name(),
+		Biography: user.Biography,
 		AvatarURL: fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=180&d=wavatar", md5.Sum([]byte(strings.ToLower(user.Email.String)))),
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,

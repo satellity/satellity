@@ -66,11 +66,11 @@ const View = ({onSubmit, onChange, state}) => {
         <h2>Create a new topic</h2>
         <form onSubmit={(e) => onSubmit(e)}>
           <div>
-            <label name='name'>Title *</label>
+            <label name='title'>Title *</label>
             <input type='text' name='title' value={state.title} autoComplete='off' onChange={(e) => onChange(e)} />
           </div>
           <div>
-            <label name='name'>Category</label>
+            <label name='category'>Category</label>
             <div className='select'>
               <select name='category_id' value={state.category_id} onChange={(e) => onChange(e)}>
                 {categories}
