@@ -65,11 +65,22 @@ div.container {
   margin-top: 2.4rem;
   main.main {
     flex-grow: 1;
-    max-width: 60rem;
+    width: 60rem;
+    max-width: 100%;
   }
 
   aside.aside {
+    flex-shrink: 0;
     width: 20rem;
+  }
+}
+
+@media only screen and (max-width: 64rem) {
+  div.container {
+    display: block;
+    aside.aside {
+      width: 100%;
+    }
   }
 }
 }
