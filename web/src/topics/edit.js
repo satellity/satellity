@@ -1,4 +1,3 @@
-import './index.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
