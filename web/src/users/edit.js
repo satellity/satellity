@@ -30,7 +30,7 @@ class UserEdit extends Component {
   handleSubmit(e) {
     e.preventDefault();
     const history = this.props.history;
-    const data = {title: this.state.nickname, biography: this.state.biography};
+    const data = {nickname: this.state.nickname, biography: this.state.biography};
     this.api.user.update(data, (resp) => {
       history.push('/');
     });
