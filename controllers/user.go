@@ -25,6 +25,7 @@ func registerUser(router *httptreemux.TreeMux) {
 
 	router.POST("/oauth/:provider", impl.oauth)
 	router.POST("/me", impl.update)
+	router.GET("/me", impl.show)
 }
 
 func (impl *userImpl) oauth(w http.ResponseWriter, r *http.Request, params map[string]string) {
@@ -41,7 +42,7 @@ func (impl *userImpl) oauth(w http.ResponseWriter, r *http.Request, params map[s
 	views.RenderAccount(w, r, user)
 }
 
-func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, params map[string]string) {
+func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	var body userRequest
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
@@ -54,4 +55,8 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, params map[
 		return
 	}
 	views.RenderAccount(w, r, current)
+}
+
+func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	views.RenderAccount(w, r, middleware.CurrentUser(r))
 }

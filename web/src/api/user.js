@@ -43,6 +43,18 @@ User.prototype = {
     });
   },
 
+  show: function(callback) {
+    this.api.request('get', '/me', {}, (resp) => {
+      if (resp.data) {
+        const data = resp.data;
+        window.localStorage.setItem('user', btoa(JSON.stringify(data)));
+      }
+      if (typeof callback === 'function') {
+        callback(resp);
+      }
+    });
+  },
+
   ecdsa: function() {
     var priv = window.localStorage.getItem('token');
     var pwd = Cookies.get('sid');

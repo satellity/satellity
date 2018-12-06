@@ -6,7 +6,8 @@ class UserEdit extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
-    this.state = {nickname: '', biography: ''}
+    const user = this.api.user.me();
+    this.state = {nickname: user.nickname, biography: user.biography};
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     if (!this.api.user.loggedIn()) {
@@ -15,8 +16,10 @@ class UserEdit extends Component {
   }
 
   componentDidMount() {
-    const user = this.api.user.me();
-    this.setState({nickname: user.nickname, biography: user.biography});
+    this.api.user.show((resp) => {
+      const user = resp.data;
+      this.setState({nickname: user.nickname, biography: user.biography});
+    });
   }
 
   handleChange(e) {
