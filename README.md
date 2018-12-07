@@ -16,4 +16,4 @@ Godiscourse is a 100% open source, free, go back-end discourse like forum, build
 
 ## License
 
-Released under the BSD license:
+Released under the MIT license:

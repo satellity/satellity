@@ -1,0 +1,51 @@
+:global {
+article.md {
+  word-wrap: break-word;
+  h1 {
+    padding-bottom: 0.3rem;
+    font-size: 2rem;
+    border-bottom: 1px solid #eaecef;
+  }
+  h2 {
+    padding-bottom: 0.3rem;
+    font-size: 1.5rem;
+    border-bottom: 1px solid #eaecef;
+  }
+  h3 {
+    font-size: 1.25em;
+  }
+  h4 {
+    font-size: 1rem;
+  }
+  h5 {
+    font-size: 0.875rem;
+  }
+  h6 {
+    font-size: 0.85rem;
+    color: #6a737d;
+  }
+  p,
+  blockquote,
+  ul,
+  ol,
+  dl,
+  table,
+  pre {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  li {
+    margin-top: 0;
+    padding-top: 0;
+    word-wrap: break-word;
+  }
+
+  li>p {
+    margin-top: 1rem;
+  }
+
+  li+li {
+    margin-top: 0.25rem;
+  }
+}
+}

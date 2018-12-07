@@ -1,6 +1,7 @@
 @import './assets/fonts/index.scss';
 @import './assets/css/button.scss';
 @import './assets/css/input.scss';
+@import './assets/css/markdown.scss';
 
 $color-dark-background: #25476A;
 
@@ -9,11 +10,9 @@ html, body {
   color: #333;
   font-family: Roboto Mono, Maven Pro,sans-serif;
 }
-
 body {
   line-height: 1.6rem;
 }
-
 a {
   color: #333;
   position: relative;
@@ -37,7 +36,6 @@ a {
     }
   }
 }
-
 ul, ol {
   list-style: none;
   padding: 0;
@@ -46,18 +44,15 @@ ul, ol {
     padding: 0.8rem 0;
   }
 }
-
 .wrapper {
   margin: 0 auto;
   width: 80rem;
   max-width: 96%;
 }
-
 .section {
   box-sizing: border-box;
   padding: 0.8rem;
 }
-
 // TODO better choice?
 div.container {
   display: flex;

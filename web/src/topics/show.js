@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
+import showdown from 'showdown';
 import API from '../api/index.js';
 import style from './style.css';
 import SiteWidget from '../components/site-widget.js';
@@ -10,6 +11,7 @@ class TopicShow extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
+    this.converter = new showdown.Converter();
     this.state = {
       topic_id: '', title: '', body: '', comments_count: 0, created_at: '', user_id: '', is_author: false,
       user: {user_id: '', nickname: ''},
@@ -24,6 +26,7 @@ class TopicShow extends Component {
     const user = this.api.user.me();
     this.api.topic.show(this.props.match.params.id, (resp) => {
       resp.data.is_author = resp.data.user.user_id === user.user_id;
+      resp.data.body = this.converter.makeHtml(resp.data.body);
       this.setState(resp.data);
     });
   }
@@ -57,8 +60,7 @@ const View = ({state}) => {
             {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />
           </div>
         </header>
-        <article className={style.body}>
-          {state.body}
+        <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
         </article>
       </main>
       <aside className='section aside'>
