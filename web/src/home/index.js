@@ -37,11 +37,11 @@ const HomeView = (props) => {
         <img src={topic.user.avatar_url} className='avatar' />
         <div className='detail'>
           <h2>
-            <Link to={`/topics/${topic.topic_id}`}>{topic.title}</Link>
             <span className='comment'>
               <FontAwesomeIcon icon={['far', 'comment']} />
               {topic.comments_count}
             </span>
+            <Link to={`/topics/${topic.topic_id}`}>{topic.title}</Link>
           </h2>
           <span className='category'>{topic.category.name}</span> • {topic.user.nickname} • <TimeAgo date={topic.created_at} />
         </div>

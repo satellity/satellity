@@ -49,9 +49,9 @@ const View = ({state}) => {
       <main className='section main'>
         <header className={style.header}>
           <h1 className={style.title}>
+            <img src={state.user.avatar_url} className={style.avatar} />
             {state.title}
             {editAction}
-            <img src={state.user.avatar_url} className={style.avatar} />
           </h1>
           <div className={style.detail}>
             {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />

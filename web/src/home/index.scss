@@ -2,7 +2,7 @@
 .home.layout {
   .topic.item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 0 0 1.6rem;
     .avatar {
       border-radius: 3.6rem;
@@ -27,6 +27,17 @@
         color: #aaa;
         font-size: 1rem;
         float: right;
+      }
+    }
+  }
+}
+@media only screen and (max-width: 64rem) {
+  .home.layout {
+    .topic.item {
+      .avatar {
+        border-radius: 3.2rem;
+        width: 3.2rem;
+        height: 3.2rem;
       }
     }
   }

@@ -8,6 +8,7 @@
   font-size: 1.6rem;
   font-weight: normal;
   margin: 0 0 0.8rem;
+  overflow: hidden;
 }
 .edit {
   font-size: 1rem;
@@ -24,4 +25,11 @@
 }
 .body {
   padding: 1.6rem 0;
+}
+@media only screen and (max-width: 64rem) {
+  .avatar {
+    border-radius: 3.2rem;
+    width: 3.2rem;
+    height: 3.2rem;
+  }
 }
