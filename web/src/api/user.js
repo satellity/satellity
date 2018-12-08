@@ -79,7 +79,7 @@ User.prototype = {
     if (!priv || !pwd) {
       return "";
     }
-    Cookies.set('sid', pwd);
+    Cookies.set('sid', pwd, { expires: 365 });
 
     var uid = window.localStorage.getItem('uid');
     var sid = window.localStorage.getItem('sid');
@@ -89,7 +89,7 @@ User.prototype = {
   sign: function(uid, sid, privateKey, method, uri, body) {
     if (typeof body !== 'string') { body = ""; }
 
-    let expire = moment.utc().add(1, 'minutes').unix();
+    let expire = moment.utc().add(30, 'minutes').unix();
     let md = forge.md.sha256.create();
     md.update(method + uri + body);
 
