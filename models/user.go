@@ -176,6 +176,17 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 	return user, nil
 }
 
+func ReadUsers(ctx context.Context, offset time.Time) ([]*User, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	var users []*User
+	if err := session.Database(ctx).Model(&users).Where("created_at<?", offset).Order("created_at DESC").Limit(50).Select(); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return users, nil
+}
+
 // ReadUser read user by id.
 func ReadUser(ctx context.Context, id string) (*User, error) {
 	return findUserByID(ctx, id)

@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"testing"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/godiscourse/godiscourse/session"
@@ -88,6 +89,9 @@ func TestUserCRUD(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(new)
 	assert.Equal("Jason", new.Name())
+	users, err := ReadUsers(ctx, time.Time{})
+	assert.Nil(err)
+	assert.Len(users, 1)
 }
 
 func createTestUser(ctx context.Context, email, username, password string) *User {
