@@ -120,11 +120,8 @@ func (user *User) ReadComment(ctx context.Context, id string) (*Comment, error) 
 
 // ReadComments read comments by topicID, parameters: offset
 func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
-	if offset.IsZero() {
-		offset = time.Now()
-	}
 	var comments []*Comment
-	if err := session.Database(ctx).Model(&comments).Relation("User").Where("comment.topic_id=? AND comment.created_at<?", topic.TopicID, offset).Order("comment.created_at DESC").Limit(50).Select(); err != nil {
+	if err := session.Database(ctx).Model(&comments).Relation("User").Where("comment.topic_id=? AND comment.created_at>?", topic.TopicID, offset).Order("comment.created_at").Limit(50).Select(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return comments, nil

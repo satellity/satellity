@@ -27,7 +27,6 @@ func registerTopic(router *httptreemux.TreeMux) {
 	router.POST("/topics/:id", impl.update)
 	router.GET("/topics", impl.index)
 	router.GET("/topics/:id", impl.show)
-	router.GET("/topics/:id/comments", impl.comments)
 	router.GET("/user/topics", impl.topics)
 }
 
@@ -62,14 +61,6 @@ func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[s
 		views.RenderErrorResponse(w, r, err)
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else {
-		views.RenderTopic(w, r, topic)
-	}
-}
-
-func (impl *topicImpl) comments(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if topic, err := models.ReadTopic(r.Context(), params["id"]); err != nil {
-		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopic(w, r, topic)
 	}

@@ -6,6 +6,8 @@ import showdown from 'showdown';
 import API from '../api/index.js';
 import style from './style.css';
 import SiteWidget from '../components/site-widget.js';
+import CommentIndex from '../comments/index.js';
+import CommentNew from '../comments/new.js';
 
 class TopicShow extends Component {
   constructor(props) {
@@ -13,7 +15,7 @@ class TopicShow extends Component {
     this.api = new API();
     this.converter = new showdown.Converter();
     this.state = {
-      topic_id: '', title: '', body: '', comments_count: 0, created_at: '', user_id: '', is_author: false,
+      topic_id: props.match.params.id, title: '', body: '', comments_count: 0, created_at: '', user_id: '', is_author: false,
       user: {user_id: '', nickname: ''},
       category: {category_id: '', name: ''}
     };
@@ -62,6 +64,8 @@ const View = ({state}) => {
         </header>
         <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
         </article>
+        <CommentIndex topicId={state.topic_id} />
+        <CommentNew topicId={state.topic_id} />
       </main>
       <aside className='section aside'>
         <SiteWidget />
