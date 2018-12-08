@@ -20,7 +20,7 @@ $color-dark-background: #25476A;
     padding: 1.6rem;
     a.navi {
       color: white;
-      margin-left: 1.6rem;
+      margin-left: 0.8rem;
     }
     .brand {
       color: white;
@@ -55,6 +55,12 @@ $color-dark-background: #25476A;
     background: white;
     box-sizing: border-box;
     padding: .8rem;
+  }
+
+  @media only screen and (max-width: 64rem) {
+    .only-pc {
+      display: none;
+    }
   }
 }
 }

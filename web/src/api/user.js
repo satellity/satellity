@@ -55,6 +55,14 @@ User.prototype = {
     });
   },
 
+  adminIndex: function(callback) {
+    this.api.request('get', '/admin/users', {}, (resp) => {
+      if (typeof callback === 'function') {
+        callback(resp);
+      }
+    });
+  },
+
   ecdsa: function() {
     var priv = window.localStorage.getItem('token');
     var pwd = Cookies.get('sid');

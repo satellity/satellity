@@ -47,6 +47,14 @@ Topic.prototype = {
       }
     });
   },
+
+  adminIndex: function(callback) {
+    this.api.request('get', '/admin/topics', {}, (resp) => {
+      if (typeof callback === 'function') {
+        callback(resp);
+      }
+    });
+  },
 }
 
 export default Topic;
