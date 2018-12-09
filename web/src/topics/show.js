@@ -6,7 +6,7 @@ import showdown from 'showdown';
 import API from '../api/index.js';
 import style from './style.css';
 import SiteWidget from '../components/site-widget.js';
-import CommentIndex from '../comments/index.js';
+import CommentList from '../comments/index.js';
 import CommentNew from '../comments/new.js';
 
 class TopicShow extends Component {
@@ -64,7 +64,7 @@ const View = ({state}) => {
         </header>
         <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
         </article>
-        <CommentIndex topicId={state.topic_id} />
+        <CommentList topicId={state.topic_id} />
         <CommentNew topicId={state.topic_id} />
       </main>
       <aside className='section aside'>

@@ -51,6 +51,7 @@ const View = (props) => {
 
   return (
     <div>
+      <h3>Comments</h3>
       <ul>
         {comments}
       </ul>
