@@ -29,8 +29,8 @@ const Header = () => {
   return (
     <header className={style.header}>
       <Link to='/' className={style.brand}>
-        <img src={logoURL} className={style.logo} alt='SUNTIN'/>
-        SUNTIN
+        <img src={logoURL} className={style.logo} alt='GoDiscourse'/>
+        GoDiscourse
       </Link>
       <Link to='/topics/new' className={style.navi}>
         <FontAwesomeIcon icon={['fa', 'plus']} />

@@ -1,3 +1,3 @@
 export default {
-  site: 'SUNTIN',
+  site: 'GoDiscourse',
 };

@@ -5,7 +5,7 @@ import Category from './category.js';
 import Topic from './topic.js';
 import Comment from './comment.js';
 
-axios.defaults.baseURL = 'https://api.suntin.com';
+axios.defaults.baseURL = 'https://api.godiscourse.com';
 if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = 'http://localhost:4000';
 }
