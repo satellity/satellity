@@ -1,8 +1,13 @@
+/* show page */
+.content {
+  background: white;
+  box-sizing: border-box;
+}
 .header {
   background: #EEE;
   box-sizing: border-box;
   font-size: 1rem;
-  padding: 1rem;
+  padding: .8rem;
 }
 .title {
   font-size: 1.6rem;
@@ -24,7 +29,13 @@
   height: 3.6rem;
 }
 .body {
-  padding: 1.6rem 0;
+  padding: 1.6rem .8rem;
+}
+/* new & edit page */
+.form {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
 }
 @media only screen and (max-width: 64rem) {
   .avatar {

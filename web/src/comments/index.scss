@@ -1,14 +1,27 @@
+/* comment list */
+.comments {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+}
 .profile {
   display: flex;
 }
 .avatar {
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: 3.2rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 2.4rem;
 }
 .detail {
   padding-left: 0.8rem;
 }
 .time {
   opacity: 0.6;
+}
+/*new & edit*/
+.form {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+  margin-top: .8rem;
 }

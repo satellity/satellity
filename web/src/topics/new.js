@@ -1,3 +1,4 @@
+import style from './style.css';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
@@ -63,28 +64,30 @@ const View = ({onSubmit, onChange, state}) => {
   return (
     <div className='container'>
       <main className='section main'>
-        <h2>Create a new topic</h2>
-        <form onSubmit={(e) => onSubmit(e)}>
-          <div>
-            <label name='title'>Title *</label>
-            <input type='text' name='title' value={state.title} autoComplete='off' onChange={(e) => onChange(e)} />
-          </div>
-          <div>
-            <label name='category'>Category</label>
-            <div className='select'>
-              <select name='category_id' value={state.category_id} onChange={(e) => onChange(e)}>
-                {categories}
-              </select>
+        <div className={style.form}>
+          <h2>Create a new topic</h2>
+          <form onSubmit={(e) => onSubmit(e)}>
+            <div>
+              <label name='title'>Title *</label>
+              <input type='text' name='title' value={state.title} autoComplete='off' onChange={(e) => onChange(e)} />
             </div>
-          </div>
-          <div>
-            <label name='body'>Body *</label>
-            <textarea type='text' name='body' value={state.body} onChange={(e) => onChange(e)} />
-          </div>
-          <div className='action'>
-            <input type='submit' value='SUBMIT' />
-          </div>
-        </form>
+            <div>
+              <label name='category'>Category</label>
+              <div className='select'>
+                <select name='category_id' value={state.category_id} onChange={(e) => onChange(e)}>
+                  {categories}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label name='body'>Body *</label>
+              <textarea type='text' name='body' value={state.body} onChange={(e) => onChange(e)} />
+            </div>
+            <div className='action'>
+              <input type='submit' value='SUBMIT' />
+            </div>
+          </form>
+        </div>
       </main>
       <aside className='section aside'>
       </aside>

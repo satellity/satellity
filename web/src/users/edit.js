@@ -1,3 +1,4 @@
+import style from './index.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
@@ -58,20 +59,22 @@ const View = ({onSubmit, onChange, state}) => {
   return (
     <div className='container'>
       <main className='section main'>
-        <h2>Update Profile</h2>
-        <form onSubmit={(e) => onSubmit(e)}>
-          <div>
-            <label name='nickname'>Nickname</label>
-            <input type='text' name='nickname' value={state.nickname} autoComplete='off' onChange={(e) => onChange(e)} />
-          </div>
-          <div>
-            <label name='biography'>Biography</label>
-            <textarea type='text' name='biography' value={state.biography} onChange={(e) => onChange(e)} />
-          </div>
-          <div className='action'>
-            <input type='submit' value='SUBMIT' />
-          </div>
-        </form>
+        <div className={style.profile}>
+          <h2>Update Profile</h2>
+          <form onSubmit={(e) => onSubmit(e)}>
+            <div>
+              <label name='nickname'>Nickname</label>
+              <input type='text' name='nickname' value={state.nickname} autoComplete='off' onChange={(e) => onChange(e)} />
+            </div>
+            <div>
+              <label name='biography'>Biography</label>
+              <textarea type='text' name='biography' value={state.biography} onChange={(e) => onChange(e)} />
+            </div>
+            <div className='action'>
+              <input type='submit' value='SUBMIT' />
+            </div>
+          </form>
+        </div>
       </main>
       <aside className='section aside'>
       </aside>

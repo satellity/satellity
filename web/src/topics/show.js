@@ -52,18 +52,20 @@ const View = ({state}) => {
   return (
     <div className='container'>
       <main className='section main'>
-        <header className={style.header}>
-          <h1 className={style.title}>
-            <img src={state.user.avatar_url} className={style.avatar} />
-            {state.title}
-            {editAction}
-          </h1>
-          <div className={style.detail}>
-            {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />
-          </div>
-        </header>
-        <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
-        </article>
+        <div className={style.content}>
+          <header className={style.header}>
+            <h1 className={style.title}>
+              <img src={state.user.avatar_url} className={style.avatar} />
+              {state.title}
+              {editAction}
+            </h1>
+            <div className={style.detail}>
+              {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />
+            </div>
+          </header>
+          <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
+          </article>
+        </div>
         <CommentList topicId={state.topic_id} />
         <CommentNew topicId={state.topic_id} />
       </main>
