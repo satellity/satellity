@@ -1,19 +1,21 @@
 .widget {
-  background: #e57373;
-  color: white;
+  background: white;
   a {
-    color: white;
+    color: rgba(218, 40, 16, 0.8);
     &:after {
-      background: white;
+      background: rgba(218, 40, 16, 0.8);
     }
   }
 }
-
 .sign_in {
   margin-top: 1.6rem;
   text-align: center;
   a {
-    font-weight: bold;
+    background: rgba(218, 40, 16, 0.8);
+    box-sizing: border-box;
+    color: white;
+    display: block;
+    padding: 0.4rem 0.8rem;
     &:after {
       background: white;
     }
