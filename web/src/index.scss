@@ -53,7 +53,7 @@ ul, ol {
 .wrapper {
   margin: 0 auto;
   width: 80rem;
-  max-width: 96%;
+  max-width: 100%;
 }
 .section {
   box-sizing: border-box;
@@ -62,7 +62,7 @@ ul, ol {
 // TODO better choice?
 div.container {
   display: flex;
-  margin-top: 2.4rem;
+  margin-top: 1.6rem;
   main.main {
     flex-grow: 1;
     width: 60rem;

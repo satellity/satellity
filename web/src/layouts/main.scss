@@ -1,8 +1,12 @@
 $border-light-color: rgba(225, 225, 225, 0.8);
 $color-dark-background: #25476A;
 
+.container {
+  min-height: 100vh;
+  background: #F4F5F5;
+}
 .header {
-  background: white;
+  background-image: linear-gradient(90deg, rgba(218, 40, 16, 0.6), rgba(218, 40, 16, 0.8));
   box-sizing: border-box;
   border-bottom: 1px solid $border-light-color;
   font-size: 1.2rem;
@@ -16,6 +20,7 @@ $color-dark-background: #25476A;
   }
 }
 .brand {
+  color: white;
   float: left;
   transition: all 0.2s ease-in-out;
   &:hover {
@@ -32,6 +37,7 @@ $color-dark-background: #25476A;
   margin-right: 0.3rem;
 }
 .navi {
+  color: white;
   font-size: 1rem;
   margin-right: .6rem;
   transition: all 0.2s ease-in-out;

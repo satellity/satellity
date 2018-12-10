@@ -8,7 +8,7 @@ import API from '../api/index.js'
 const MainRoute = ({component: Component, ...rest}) => {
   return (
     <Route {...rest} render={matchProps => (
-      <div>
+      <div className={style.container}>
         <Header />
         <div className='wrapper'>
           <Component {...matchProps} />

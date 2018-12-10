@@ -1,32 +1,37 @@
 :global {
 .home.layout {
+  .topics {
+    background: white;
+    padding: 0.8rem;
+  }
   .topic.item {
+    border-bottom: 1px solid #F4F5F5;
     display: flex;
     align-items: flex-start;
-    padding: 0 0 1.6rem;
+    padding: .8rem 0 .8rem;
     .avatar {
-      border-radius: 3.6rem;
-      width: 3.6rem;
-      height: 3.6rem;
+      border-radius: 3.2rem;
+      width: 3.2rem;
+      height: 3.2rem;
     }
     .detail {
-      color: #aaa;
+      color: #B4C4D1;
       flex-grow: 1;
       font-size: .875rem;
-      padding-left: 1.2rem;
+      padding-left: 0.4rem;
       h2 {
-        color: #333;
         font-weight: normal;
         font-size: 1.2rem;
-        margin: 0 0 .6rem;
+        margin: 0;
       }
       svg {
-        margin-right: 0.3rem;
+        margin-right: 0.2rem;
       }
       .comment {
-        color: #aaa;
+        color: #B4C4D1;
         font-size: 1rem;
         float: right;
+        margin-left: 0.4rem;
       }
     }
   }
@@ -35,9 +40,9 @@
   .home.layout {
     .topic.item {
       .avatar {
-        border-radius: 3.2rem;
-        width: 3.2rem;
-        height: 3.2rem;
+        border-radius: 2.4rem;
+        width: 2.4rem;
+        height: 2.4rem;
       }
     }
   }
