@@ -17,6 +17,12 @@ input[type] {
     box-shadow: 0 0 5px $color-main-background-dark;
     border: 1px solid $color-main-background-dark;
   }
+  &.info {
+    &:focus {
+      box-shadow: 0 0 5px rgba(218, 40, 16, 0.8);
+      border: 1px solid rgba(218, 40, 16, 0.8);
+    }
+  }
 }
 
 textarea {
@@ -30,6 +36,10 @@ textarea {
     border: 1px solid $color-main-background-dark;
     background: $color-main-background-dark;
     color: white;
+    &.info {
+      border: 1px solid rgba(218, 40, 16, 0.8);
+      background: rgba(218, 40, 16, 0.8);
+    }
     &:hover {
       opacity: 0.8;
     }
@@ -61,6 +71,12 @@ label {
     &:focus {
       box-shadow: 0 0 5px $color-main-background-dark;
       border: 1px solid $color-main-background-dark;
+    }
+    &.info {
+      &:focus {
+        border: 1px solid rgba(218, 40, 16, 0.8);
+        box-shadow: 0 0 5px rgba(218, 40, 16, 0.8);
+      }
     }
   }
 }

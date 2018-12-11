@@ -6,9 +6,12 @@
   color: white;
   display: inline-block;
   transition: all 0.30s ease-in-out;
+  padding: 0.75rem 1.5rem;
   &.primary {
     background: $color-main-highlight;
-    padding: 0.75rem 1.5rem;
+  }
+  &.info {
+    background: rgba(218, 40, 16, 0.8);
   }
   &:after {
     display: none;

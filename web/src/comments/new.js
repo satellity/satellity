@@ -43,10 +43,10 @@ const View = ({onSubmit, onChange, state}) => {
       <form onSubmit={(e) => onSubmit(e)}>
         <input type='hidden' name='topic_id' defaultValue={state.topic_id} />
         <div>
-          <textarea type='text' name='body' placeholder='Say something ...' value={state.body} onChange={(e) => onChange(e)} />
+          <textarea className='info' type='text' name='body' placeholder='Say something ...' value={state.body} onChange={(e) => onChange(e)} />
         </div>
         <div className='action'>
-          <input type='submit' value='SUBMIT' />
+          <input type='submit' value='SUBMIT' className='info' />
         </div>
       </form>
     </div>

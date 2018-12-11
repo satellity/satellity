@@ -64,14 +64,14 @@ const View = ({onSubmit, onChange, state}) => {
           <form onSubmit={(e) => onSubmit(e)}>
             <div>
               <label name='nickname'>Nickname</label>
-              <input type='text' name='nickname' value={state.nickname} autoComplete='off' onChange={(e) => onChange(e)} />
+              <input className='info' type='text' name='nickname' value={state.nickname} autoComplete='off' onChange={(e) => onChange(e)} />
             </div>
             <div>
               <label name='biography'>Biography</label>
-              <textarea type='text' name='biography' value={state.biography} onChange={(e) => onChange(e)} />
+              <textarea className='info' type='text' name='biography' value={state.biography} onChange={(e) => onChange(e)} />
             </div>
             <div className='action'>
-              <input type='submit' value='SUBMIT' />
+              <input className='info' type='submit' value='SUBMIT' />
             </div>
           </form>
         </div>

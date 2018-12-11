@@ -69,22 +69,22 @@ const View = ({onSubmit, onChange, state}) => {
           <form onSubmit={(e) => onSubmit(e)}>
             <div>
               <label name='title'>Title *</label>
-              <input type='text' name='title' value={state.title} autoComplete='off' onChange={(e) => onChange(e)} />
+              <input className='info' type='text' name='title' value={state.title} autoComplete='off' onChange={(e) => onChange(e)} />
             </div>
             <div>
               <label name='category'>Category</label>
               <div className='select'>
-                <select name='category_id' value={state.category_id} onChange={(e) => onChange(e)}>
+                <select className='info' name='category_id' value={state.category_id} onChange={(e) => onChange(e)}>
                   {categories}
                 </select>
               </div>
             </div>
             <div>
               <label name='body'>Body *</label>
-              <textarea type='text' name='body' value={state.body} onChange={(e) => onChange(e)} />
+              <textarea className='info' type='text' name='body' value={state.body} onChange={(e) => onChange(e)} />
             </div>
             <div className='action'>
-              <input type='submit' value='SUBMIT' />
+              <input className='info' type='submit' value='SUBMIT' />
             </div>
           </form>
         </div>
