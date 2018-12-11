@@ -1,3 +1,4 @@
+@import '../assets/css/constant.scss';
 $color-light-background: #ECF0F5;
 $color-dark-background: #25476A;
 
@@ -14,6 +15,13 @@ $color-dark-background: #25476A;
       opacity: 0.8;
     }
   }
+  textarea,
+  input[type] {
+    &:focus {
+      box-shadow: 0 0 5px $color-main-background-dark;
+      border: 1px solid $color-main-background-dark;
+    }
+  }
   header.header {
     background-color: $color-dark-background;
     text-align: right;
@@ -25,6 +33,20 @@ $color-dark-background: #25476A;
     .brand {
       color: white;
       float: left;
+    }
+  }
+  .action {
+    input[type='submit'] {
+      border: 1px solid $color-main-background-dark;
+      background: $color-main-background-dark;
+    }
+  }
+  .select {
+    select {
+      &:focus {
+        box-shadow: 0 0 5px $color-main-background-dark;
+        border: 1px solid $color-main-background-dark;
+      }
     }
   }
   .bg-container {

@@ -14,14 +14,8 @@ input[type] {
   transition: all 0.30s ease-in-out;
   width: 100%;
   &:focus {
-    box-shadow: 0 0 5px $color-main-background-dark;
-    border: 1px solid $color-main-background-dark;
-  }
-  &.info {
-    &:focus {
-      box-shadow: 0 0 5px rgba(218, 40, 16, 0.8);
-      border: 1px solid rgba(218, 40, 16, 0.8);
-    }
+    box-shadow: 0 0 5px rgba(218, 40, 16, 0.8);
+    border: 1px solid rgba(218, 40, 16, 0.8);
   }
 }
 
@@ -31,15 +25,11 @@ textarea {
 
 .action {
   input[type='submit'] {
+    border: 1px solid rgba(218, 40, 16, 0.8);
+    background: rgba(218, 40, 16, 0.8);
     width: 30rem;
     max-width: 100%;
-    border: 1px solid $color-main-background-dark;
-    background: $color-main-background-dark;
     color: white;
-    &.info {
-      border: 1px solid rgba(218, 40, 16, 0.8);
-      background: rgba(218, 40, 16, 0.8);
-    }
     &:hover {
       opacity: 0.8;
     }
@@ -69,14 +59,8 @@ label {
     padding: .625rem .3rem;
     transition: all 0.30s ease-in-out;
     &:focus {
-      box-shadow: 0 0 5px $color-main-background-dark;
-      border: 1px solid $color-main-background-dark;
-    }
-    &.info {
-      &:focus {
-        border: 1px solid rgba(218, 40, 16, 0.8);
-        box-shadow: 0 0 5px rgba(218, 40, 16, 0.8);
-      }
+      border: 1px solid rgba(218, 40, 16, 0.8);
+      box-shadow: 0 0 5px rgba(218, 40, 16, 0.8);
     }
   }
 }
