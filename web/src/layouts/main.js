@@ -2,7 +2,7 @@ import style from './main.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Route, Link } from 'react-router-dom';
-import logoURL from '../assets/images/logo.png';
+import logoURL from '../assets/images/chat.svg';
 import API from '../api/index.js'
 
 const MainRoute = ({component: Component, ...rest}) => {
