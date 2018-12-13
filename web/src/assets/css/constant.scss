@@ -2,9 +2,15 @@ $font-main-content: 'Maven Pro', sans-serif;
 $font-main-title: 'Roboto', sans-serif;
 $font-main-mono: 'Roboto Mono', monospace;
 
-$color-main-background: #FFFFFF;
-$color-main-background-dark: #25476A;
-$color-main-foreground-dark: #000000;
-$color-main-foreground-light: #333333;
-$color-main-highlight: #DD4814;
-$color-main-hover-highlight: #DD4814;
+$color-main-dark: rgb(50, 50, 50);
+$color-main-grey: rgb(200, 200, 200);
+$color-main-light: rgb(240, 240, 240);
+
+// style for app front
+$color-main-red: rgb(218, 40, 16);
+$color-main-red-alpha: .8;
+$color-main-red-light-alpha: .2;
+
+// style for admin front
+$color-main-blue: rgb(37, 71, 106);
+$color-main-blue-alpha: .1;

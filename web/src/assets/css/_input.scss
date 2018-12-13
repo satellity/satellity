@@ -14,8 +14,8 @@ input[type] {
   transition: all 0.30s ease-in-out;
   width: 100%;
   &:focus {
-    box-shadow: 0 0 5px rgba(218, 40, 16, 0.8);
-    border: 1px solid rgba(218, 40, 16, 0.8);
+    box-shadow: 0 0 5px rgba($color-main-red, $color-main-red-alpha);
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
   }
 }
 
@@ -25,8 +25,8 @@ textarea {
 
 .action {
   input[type='submit'] {
-    border: 1px solid rgba(218, 40, 16, 0.8);
-    background: rgba(218, 40, 16, 0.8);
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+    background: rgba($color-main-red, $color-main-red-alpha);
     width: 30rem;
     max-width: 100%;
     color: white;
@@ -59,8 +59,8 @@ label {
     padding: .625rem .3rem;
     transition: all 0.30s ease-in-out;
     &:focus {
-      border: 1px solid rgba(218, 40, 16, 0.8);
-      box-shadow: 0 0 5px rgba(218, 40, 16, 0.8);
+      border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+      box-shadow: 0 0 5px rgba($color-main-red, $color-main-red-alpha);
     }
   }
 }

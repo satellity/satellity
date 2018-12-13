@@ -1,15 +1,17 @@
+@import './constant.scss';
+
 :global {
 article.md {
   word-wrap: break-word;
   h1 {
     padding-bottom: 0.3rem;
     font-size: 2rem;
-    border-bottom: 1px solid #eaecef;
+    border-bottom: 1px solid $color-main-light;
   }
   h2 {
     padding-bottom: 0.3rem;
     font-size: 1.5rem;
-    border-bottom: 1px solid #eaecef;
+    border-bottom: 1px solid $color-main-light;
   }
   h3 {
     font-size: 1.25em;
@@ -39,11 +41,9 @@ article.md {
     padding-top: 0;
     word-wrap: break-word;
   }
-
   li>p {
     margin-top: 1rem;
   }
-
   li+li {
     margin-top: 0.25rem;
   }

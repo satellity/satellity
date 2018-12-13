@@ -1,12 +1,10 @@
 @import '../assets/css/constant.scss';
-$color-light-background: #ECF0F5;
-$color-dark-background: #25476A;
 
 :global {
 .admin.layout {
-  background-color: $color-light-background;
+  background-color: rgba($color-main-blue, $color-main-blue-alpha);
   a {
-    color: $color-dark-background;
+    color: $color-main-blue;
     transition: all 0.2s ease-in-out;
     &:after {
       display: none;
@@ -18,12 +16,12 @@ $color-dark-background: #25476A;
   textarea,
   input[type] {
     &:focus {
-      box-shadow: 0 0 5px $color-main-background-dark;
-      border: 1px solid $color-main-background-dark;
+      box-shadow: 0 0 5px $color-main-blue;
+      border: 1px solid $color-main-blue;
     }
   }
   header.header {
-    background-color: $color-dark-background;
+    background-color: $color-main-blue;
     text-align: right;
     padding: 1.6rem;
     a.navi {
@@ -37,15 +35,15 @@ $color-dark-background: #25476A;
   }
   .action {
     input[type='submit'] {
-      border: 1px solid $color-main-background-dark;
-      background: $color-main-background-dark;
+      border: 1px solid $color-main-blue;
+      background: $color-main-blue;
     }
   }
   .select {
     select {
       &:focus {
-        box-shadow: 0 0 5px $color-main-background-dark;
-        border: 1px solid $color-main-background-dark;
+        box-shadow: 0 0 5px $color-main-blue;
+        border: 1px solid $color-main-blue;
       }
     }
   }
@@ -54,7 +52,7 @@ $color-dark-background: #25476A;
     &:before {
       content: '';
       display: block;
-      background-color: $color-dark-background;
+      background-color: $color-main-blue;
       width: 100%;
       height: 10rem;
       position: absolute;
