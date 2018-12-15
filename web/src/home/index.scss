@@ -1,50 +1,48 @@
-:global {
-.home.layout {
-  .topics {
-    background: white;
-    padding: 0.8rem;
-  }
-  .topic.item {
-    border-bottom: 1px solid #F4F5F5;
-    display: flex;
-    align-items: flex-start;
-    padding: .8rem 0 .8rem;
-    .avatar {
-      border-radius: 3.2rem;
-      width: 3.2rem;
-      height: 3.2rem;
-    }
-    .detail {
-      color: #B4C4D1;
-      flex-grow: 1;
-      font-size: .875rem;
-      padding-left: 0.8rem;
-      h2 {
-        font-weight: normal;
-        font-size: 1.2rem;
-        margin: 0;
-      }
-      svg {
-        margin-right: 0.2rem;
-      }
-      .comment {
-        color: #B4C4D1;
-        font-size: 1rem;
-        float: right;
-        margin-left: 0.4rem;
-      }
-    }
-  }
+@import '../assets/css/constant.scss';
+
+.topics {
+  background: white;
+  padding: 0.8rem;
 }
+.topic {
+  border-bottom: 1px solid #F4F5F5;
+  display: flex;
+  align-items: flex-start;
+  padding: .8rem 0 .8rem;
+}
+.avatar {
+  border-radius: 3.2rem;
+  width: 3.2rem;
+  height: 3.2rem;
+}
+.detail {
+  color: #B4C4D1;
+  flex-grow: 1;
+  font-size: .875rem;
+  padding-left: 0.8rem;
+}
+.title {
+  font-weight: normal;
+  font-size: 1.2rem;
+  margin: 0;
+  word-break: break-all;
+}
+.comment {
+  flex-shrink: 0;
+  text-align: center;
+  width: 3rem;
+}
+.count {
+  background: rgba($color-main-red, $color-main-red-alpha);
+  border-radius: 1.6rem;
+  color: white;
+  padding: .2rem .8rem;
+}
+
 @media only screen and (max-width: 64rem) {
-  .home.layout {
-    .topic.item {
-      .avatar {
-        border-radius: 2.4rem;
-        width: 2.4rem;
-        height: 2.4rem;
-      }
-    }
+  .avatar {
+    border-radius: 2.4rem;
+    width: 2.4rem;
+    height: 2.4rem;
   }
-}
 }

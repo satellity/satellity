@@ -1,9 +1,8 @@
+@import './assets/css/constant.scss';
 @import './assets/fonts/index.scss';
 @import './assets/css/button.scss';
 @import './assets/css/input.scss';
 @import './assets/css/markdown.scss';
-
-$color-dark-background: #25476A;
 
 :global {
 html, body {
@@ -23,7 +22,7 @@ a {
   &.soft {
     &:after {
       content: '';
-      background: $color-dark-background;
+      background: $color-main-red;
       border-radius: 2px;
       display: inline-block;
       width: 100%;

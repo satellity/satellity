@@ -1,4 +1,5 @@
 import './index.scss';
+import style from './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Typed from 'typed.js';
 import React, { Component } from 'react';
@@ -32,18 +33,21 @@ class Home extends Component {
 
 const HomeView = (props) => {
   const topics = props.state.topics.map((topic) => {
+    let comment = '';
+    if (topic.comments_count > 0) {
+      comment = <span className={style.count}> {topic.comments_count} </span>
+    }
     return (
-      <li className='topic item' key={topic.topic_id}>
-        <img src={topic.user.avatar_url} className='avatar' />
-        <div className='detail'>
-          <h2>
-            <span className='comment'>
-              <FontAwesomeIcon icon={['far', 'comment']} />
-              {topic.comments_count}
-            </span>
+      <li className={style.topic} key={topic.topic_id}>
+        <img src={topic.user.avatar_url} className={style.avatar} />
+        <div className={style.detail}>
+          <h2 className={style.title}>
             <Link to={`/topics/${topic.topic_id}`}>{topic.title}</Link>
           </h2>
-          <span className='category'>{topic.category.name}</span> • {topic.user.nickname} • <TimeAgo date={topic.created_at} />
+          <span>{topic.category.name}</span> • {topic.user.nickname} • <TimeAgo date={topic.created_at} />
+        </div>
+        <div className={style.comment}>
+          {comment}
         </div>
       </li>
     )
@@ -52,7 +56,7 @@ const HomeView = (props) => {
   return (
     <div className='container'>
       <main className='section main'>
-        <ul className='topics'>
+        <ul className={style.topics}>
           {topics}
         </ul>
       </main>
