@@ -43,6 +43,12 @@ func TestCommentCRUD(t *testing.T) {
 	comments, err = user.ReadComments(ctx, time.Time{})
 	assert.Nil(err)
 	assert.Len(comments, 1)
+	comment, err = user.CreateComment(ctx, topic.TopicID, "hello comment 01")
+	assert.Nil(err)
+	assert.NotNil(comment)
+	topic, _ = ReadTopic(ctx, topic.TopicID)
+	assert.NotNil(topic)
+	assert.Equal(2, topic.CommentsCount)
 
 	user = createTestUser(ctx, "im.jadeydi@gmail.com", "usernamex", "password")
 	assert.NotNil(user)
