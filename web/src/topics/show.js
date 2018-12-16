@@ -41,13 +41,17 @@ class TopicShow extends Component {
 }
 
 const View = ({state}) => {
-  var editAction = '';
+  let editAction = '';
   if (state.is_author) {
     editAction = (
       <Link to={`/topics/${state.topic_id}/edit`} className={style.edit}>
         <FontAwesomeIcon icon={['far', 'edit']} />
       </Link>
     )
+  }
+  let comments =  '';
+  if (state.comments_count > 0) {
+    comments = <CommentList topicId={state.topic_id} />
   }
   return (
     <div className='container'>
@@ -66,7 +70,7 @@ const View = ({state}) => {
           <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
           </article>
         </div>
-        <CommentList topicId={state.topic_id} />
+        {comments}
         <CommentNew topicId={state.topic_id} />
       </main>
       <aside className='section aside'>
