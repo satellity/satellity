@@ -12,6 +12,7 @@
 }
 .avatar {
   border-radius: 3.2rem;
+  flex-shrink: 0;
   width: 3.2rem;
   height: 3.2rem;
 }
@@ -28,6 +29,7 @@
   word-break: break-all;
 }
 .comment {
+  font-size: .8rem;
   flex-shrink: 0;
   text-align: center;
   width: 3rem;
