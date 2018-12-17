@@ -79,7 +79,11 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 		}
 		topic.CategoryID = category.CategoryID
 		category.LastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
-		category.TopicsCount++
+		count, err := topicsCountByCategory(ctx, tx, category.CategoryID)
+		if err != nil {
+			return err
+		}
+		category.TopicsCount = count + 1
 		if err := tx.Insert(topic); err != nil {
 			return err
 		}
@@ -172,6 +176,10 @@ func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, e
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
+}
+
+func topicsCountByCategory(ctx context.Context, tx *pg.Tx, id string) (int, error) {
+	return tx.Model(&Topic{}).Where("category_id=?", id).Count()
 }
 
 // BeforeInsert hook insert

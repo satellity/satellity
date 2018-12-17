@@ -64,7 +64,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		} else if topic == nil {
 			return session.NotFoundError(ctx)
 		}
-		count, err := commentCountByTopic(ctx, tx, topicID)
+		count, err := commentsCountByTopic(ctx, tx, topicID)
 		if err != nil {
 			return err
 		}
@@ -153,8 +153,8 @@ func findComment(ctx context.Context, tx *pg.Tx, id string) (*Comment, error) {
 	return comment, nil
 }
 
-func commentCountByTopic(ctx context.Context, tx *pg.Tx, id string) (int, error) {
-	return tx.Model(&Comment{}).Where("topic_id = ?", id).Count()
+func commentsCountByTopic(ctx context.Context, tx *pg.Tx, id string) (int, error) {
+	return tx.Model(&Comment{}).Where("topic_id=?", id).Count()
 }
 
 // BeforeInsert hook insert

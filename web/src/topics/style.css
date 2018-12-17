@@ -14,12 +14,13 @@
   font-weight: normal;
   margin: 0 0 0.8rem;
   overflow: hidden;
+  word-break: break-all;
 }
 .edit {
   font-size: 1rem;
   margin-left: 0.8rem;
 }
-.detail {
+.info {
   color: #667D99;
 }
 .avatar {
