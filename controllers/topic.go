@@ -27,7 +27,6 @@ func registerTopic(router *httptreemux.TreeMux) {
 	router.POST("/topics/:id", impl.update)
 	router.GET("/topics", impl.index)
 	router.GET("/topics/:id", impl.show)
-	router.GET("/user/topics", impl.topics)
 }
 
 func (impl *topicImpl) create(w http.ResponseWriter, r *http.Request, _ map[string]string) {
@@ -69,15 +68,6 @@ func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[s
 func (impl *topicImpl) index(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
 	if topics, err := models.ReadTopics(r.Context(), offset); err != nil {
-		views.RenderErrorResponse(w, r, err)
-	} else {
-		views.RenderTopics(w, r, topics)
-	}
-}
-
-func (impl *topicImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	if topics, err := middleware.CurrentUser(r).ReadTopics(r.Context(), offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

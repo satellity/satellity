@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/godiscourse/godiscourse/middleware"
@@ -26,6 +27,7 @@ func registerUser(router *httptreemux.TreeMux) {
 	router.POST("/oauth/:provider", impl.oauth)
 	router.POST("/me", impl.update)
 	router.GET("/me", impl.show)
+	router.GET("/users/:id/topics", impl.topics)
 }
 
 func (impl *userImpl) oauth(w http.ResponseWriter, r *http.Request, params map[string]string) {
@@ -59,4 +61,18 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 
 func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	views.RenderAccount(w, r, middleware.CurrentUser(r))
+}
+
+func (impl *userImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
+	user, err := models.ReadUser(r.Context(), params["id"])
+	if err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else if user == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
+	} else if topics, err := middleware.CurrentUser(r).ReadTopics(r.Context(), offset); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderTopics(w, r, topics)
+	}
 }

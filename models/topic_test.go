@@ -35,6 +35,9 @@ func TestTopicCRUD(t *testing.T) {
 	topics, err = user.ReadTopics(ctx, time.Time{})
 	assert.Nil(err)
 	assert.Len(topics, 1)
+	topics, err = category.ReadTopics(ctx, time.Time{})
+	assert.Nil(err)
+	assert.Len(topics, 1)
 
 	user = createTestUser(ctx, "im.jadeydi@gmail.com", "usernamex", "password")
 	assert.NotNil(user)

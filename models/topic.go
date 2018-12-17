@@ -178,6 +178,17 @@ func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, e
 	return topics, nil
 }
 
+func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	var topics []*Topic
+	if _, err := session.Database(ctx).Query(&topics, "SELECT * FROM topics WHERE category_id=? AND created_at<? ORDER BY created_at DESC LIMIT 50", category.CategoryID, offset); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topics, nil
+}
+
 func topicsCountByCategory(ctx context.Context, tx *pg.Tx, id string) (int, error) {
 	return tx.Model(&Topic{}).Where("category_id=?", id).Count()
 }
