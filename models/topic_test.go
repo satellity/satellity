@@ -63,7 +63,7 @@ func TestTopicCRUD(t *testing.T) {
 	new, err := user.UpdateTopic(ctx, uuid.Must(uuid.NewV4()).String(), "hell", "orld")
 	assert.NotNil(err)
 	assert.Nil(new)
-	u := &User{UserID: uuid.NewV4().String()}
+	u := &User{UserID: uuid.Must(uuid.NewV4()).String()}
 	new, err = u.UpdateTopic(ctx, topic.TopicID, "hell", "orld")
 	assert.NotNil(err)
 	assert.Nil(new)
