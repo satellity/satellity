@@ -8,7 +8,7 @@ import (
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/session"
-	"github.com/godiscourse/godiscourse/uuid"
+	"github.com/satori/go.uuid"
 )
 
 const (
@@ -53,7 +53,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		return nil, session.BadDataError(ctx)
 	}
 	c := &Comment{
-		CommentID: uuid.NewV4().String(),
+		CommentID: uuid.Must(uuid.NewV4()).String(),
 		Body:      body,
 		UserID:    user.UserID,
 	}

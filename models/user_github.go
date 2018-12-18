@@ -12,7 +12,7 @@ import (
 	"github.com/godiscourse/godiscourse/config"
 	"github.com/godiscourse/godiscourse/external"
 	"github.com/godiscourse/godiscourse/session"
-	"github.com/godiscourse/godiscourse/uuid"
+	"github.com/satori/go.uuid"
 )
 
 // GithubUser is the response body of github oauth.
@@ -39,7 +39,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 	}
 	if user == nil {
 		user = &User{
-			UserID:   uuid.NewV4().String(),
+			UserID:   uuid.Must(uuid.NewV4()).String(),
 			Username: fmt.Sprintf("GH_%s", data.Login),
 			Nickname: data.Name,
 			GithubID: sql.NullString{String: data.NodeID, Valid: true},

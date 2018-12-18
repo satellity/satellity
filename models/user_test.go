@@ -12,7 +12,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/godiscourse/godiscourse/session"
-	"github.com/godiscourse/godiscourse/uuid"
+	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -68,7 +68,7 @@ func TestUserCRUD(t *testing.T) {
 	sess, err := readSession(ctx, new.UserID, new.SessionID)
 	assert.Nil(err)
 	assert.NotNil(sess)
-	sess, err = readSession(ctx, uuid.NewV4().String(), new.SessionID)
+	sess, err = readSession(ctx, uuid.Must(uuid.NewV4()).String(), new.SessionID)
 	assert.Nil(err)
 	assert.Nil(sess)
 

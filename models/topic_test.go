@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/godiscourse/godiscourse/session"
-	"github.com/godiscourse/godiscourse/uuid"
+	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -60,7 +60,7 @@ func TestTopicCRUD(t *testing.T) {
 	assert.NotNil(topic)
 	assert.Equal("hell", topic.Title)
 	assert.Equal("orld orld", topic.Body)
-	new, err := user.UpdateTopic(ctx, uuid.NewV4().String(), "hell", "orld")
+	new, err := user.UpdateTopic(ctx, uuid.Must(uuid.NewV4()).String(), "hell", "orld")
 	assert.NotNil(err)
 	assert.Nil(new)
 	u := &User{UserID: uuid.NewV4().String()}

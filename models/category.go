@@ -9,7 +9,7 @@ import (
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/session"
-	"github.com/godiscourse/godiscourse/uuid"
+	"github.com/satori/go.uuid"
 )
 
 const categoriesDDL = `
@@ -50,7 +50,7 @@ func CreateCategory(ctx context.Context, name, description string, position int)
 	}
 
 	category := &Category{
-		CategoryID:  uuid.NewV4().String(),
+		CategoryID:  uuid.Must(uuid.NewV4()).String(),
 		Name:        name,
 		Description: description,
 		LastTopicID: sql.NullString{String: "", Valid: false},

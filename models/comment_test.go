@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/godiscourse/godiscourse/session"
-	"github.com/godiscourse/godiscourse/uuid"
+	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +21,7 @@ func TestCommentCRUD(t *testing.T) {
 	assert.NotNil(category)
 	topic, _ := user.CreateTopic(ctx, "title", "body", category.CategoryID)
 	assert.NotNil(topic)
-	comment, err := user.CreateComment(ctx, uuid.NewV4().String(), "hello comment")
+	comment, err := user.CreateComment(ctx, uuid.Must(uuid.NewV4()).String(), "hello comment")
 	assert.NotNil(err)
 	assert.Nil(comment)
 	comment, err = user.CreateComment(ctx, topic.TopicID, "hello comment")

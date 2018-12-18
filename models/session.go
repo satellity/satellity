@@ -10,7 +10,7 @@ import (
 	"github.com/btcsuite/golangcrypto/bcrypt"
 	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/session"
-	"github.com/godiscourse/godiscourse/uuid"
+	"github.com/satori/go.uuid"
 )
 
 const sessionsDDL = `
@@ -76,7 +76,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 
 func (user *User) addSession(ctx context.Context, tx *pg.Tx, secret string) (*Session, error) {
 	sess := &Session{
-		SessionID: uuid.NewV4().String(),
+		SessionID: uuid.Must(uuid.NewV4()).String(),
 		UserID:    user.UserID,
 		Secret:    secret,
 		CreatedAt: time.Now(),

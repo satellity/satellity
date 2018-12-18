@@ -9,7 +9,7 @@ import (
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/session"
-	"github.com/godiscourse/godiscourse/uuid"
+	"github.com/satori/go.uuid"
 )
 
 // Topic related CONST
@@ -64,7 +64,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 	}
 
 	topic := &Topic{
-		TopicID: uuid.NewV4().String(),
+		TopicID: uuid.Must(uuid.NewV4()).String(),
 		Title:   title,
 		Body:    body,
 		UserID:  user.UserID,

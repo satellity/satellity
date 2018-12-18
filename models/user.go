@@ -15,7 +15,7 @@ import (
 	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/config"
 	"github.com/godiscourse/godiscourse/session"
-	"github.com/godiscourse/godiscourse/uuid"
+	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -92,7 +92,7 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 	}
 
 	user := &User{
-		UserID:            uuid.NewV4().String(),
+		UserID:            uuid.Must(uuid.NewV4()).String(),
 		Email:             sql.NullString{String: email, Valid: true},
 		Username:          username,
 		Nickname:          nickname,
