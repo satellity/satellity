@@ -9,10 +9,10 @@ Godiscourse is a 100% open source, free, go back-end discourse like forum, build
 
 ## Usage
 
-1. Copy `config/test.cfg` to `config/config.go`.
+1. `cd ./api`, copy `config/test.cfg` to `config/config.go`.
 2. Prepare database, you can find database schema in `models/schema.sql`, find the database config in `config/config.cfg`.
-3. Run back-end `go build` and `./godiscourse`.
-4. All front-end is under `web` directory, install dependence `npm install`, start service `npm run dev`.
+3. Run back-end `go build` and `./api`.
+4. All front-end is under `web` directory, `cd web` install dependence `npm install`, start service `npm run dev`.
 
 ## License
 
