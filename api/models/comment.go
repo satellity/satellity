@@ -143,6 +143,36 @@ func (user *User) ReadComments(ctx context.Context, offset time.Time) ([]*Commen
 	return comments, nil
 }
 
+func (user *User) DeleteComment(ctx context.Context, id string) error {
+	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+		comment, err := findComment(ctx, tx, id)
+		if err != nil {
+			return err
+		}
+		if !user.isAdmin() && user.UserID != comment.UserID {
+			return session.ForbiddenError(ctx)
+		}
+		topic, err := findTopic(ctx, tx, comment.TopicID)
+		if err != nil {
+			return err
+		}
+		count, err := commentsCountByTopic(ctx, tx, comment.TopicID)
+		if err != nil {
+			return err
+		}
+		topic.CommentsCount = count - 1
+		tx.Update(topic)
+		return tx.Delete(comment)
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return err
+		}
+		return session.TransactionError(ctx, err)
+	}
+	return nil
+}
+
 func findComment(ctx context.Context, tx *pg.Tx, id string) (*Comment, error) {
 	comment := &Comment{CommentID: id}
 	if err := tx.Model(comment).Column(commentColumns...).WherePK().Select(); err == pg.ErrNoRows {

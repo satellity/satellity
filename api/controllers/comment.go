@@ -24,6 +24,7 @@ func registerComment(router *httptreemux.TreeMux) {
 
 	router.POST("/comments", impl.create)
 	router.POST("/comments/:id", impl.update)
+	router.POST("/comments/:id/delete", impl.destory)
 	router.GET("/topics/:id/comments", impl.comments)
 }
 
@@ -50,6 +51,14 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComment(w, r, comment)
+	}
+}
+
+func (impl *commentImpl) destory(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	if err := middleware.CurrentUser(r).DeleteComment(r.Context(), params["id"]); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderBlankResponse(w, r)
 	}
 }
 

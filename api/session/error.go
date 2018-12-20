@@ -33,6 +33,12 @@ func AuthorizationError(ctx context.Context) Error {
 	return createError(ctx, http.StatusAccepted, 401, description, nil)
 }
 
+// AuthorizationError return 401 for unauthorized request
+func ForbiddenError(ctx context.Context) Error {
+	description := http.StatusText(http.StatusForbidden)
+	return createError(ctx, http.StatusAccepted, http.StatusForbidden, description, nil)
+}
+
 // BadRequestError means the request body is not a valid format.
 func BadRequestError(ctx context.Context) Error {
 	description := "The request body can’t be pasred as valid data."
