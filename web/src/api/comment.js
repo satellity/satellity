@@ -36,6 +36,14 @@ Comment.prototype = {
       }
     });
   },
+
+  delete: function(id, callback) {
+    this.api.request('post', `/comments/${id}/delete`, {}, (resp) => {
+      if (typeof callback === 'function') {
+        callback(resp);
+      }
+    });
+  }
 }
 
 export default Comment;

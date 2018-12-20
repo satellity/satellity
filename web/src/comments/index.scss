@@ -2,7 +2,10 @@
 .comments {
   background: white;
   box-sizing: border-box;
-  padding: .8rem;
+  padding: 0 .8rem .8rem;
+}
+.comment {
+  border-bottom: 1px solid rgb(240, 240, 240);
 }
 .profile {
   display: flex;

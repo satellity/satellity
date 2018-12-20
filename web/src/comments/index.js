@@ -33,7 +33,7 @@ class CommentIndex extends Component {
 const View = (props) => {
   const comments = props.state.comments.map((comment) => {
     return (
-      <li key={comment.comment_id}>
+      <li className={style.comment} key={comment.comment_id}>
         <div className={style.profile}>
           <img src={comment.user.avatar_url} alt={comment.user.nickname} className={style.avatar} />
           <div className={style.detail}>

@@ -47,5 +47,8 @@ article.md {
   li+li {
     margin-top: 0.25rem;
   }
+  p:last-child {
+    margin-bottom: 0;
+  }
 }
 }
