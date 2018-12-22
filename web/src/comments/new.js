@@ -22,7 +22,8 @@ class CommentNew extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    this.api.comment.create(this.state, () => {
+    this.api.comment.create(this.state, (resp) => {
+      this.props.handleSubmit(resp.data);
       this.setState({body: ''});
     });
   }

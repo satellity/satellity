@@ -7,7 +7,6 @@ import API from '../api/index.js';
 import style from './style.css';
 import SiteWidget from '../components/site-widget.js';
 import CommentList from '../comments/index.js';
-import CommentNew from '../comments/new.js';
 
 class TopicShow extends Component {
   constructor(props) {
@@ -49,10 +48,6 @@ const View = ({state}) => {
       </Link>
     )
   }
-  let comments =  '';
-  if (state.comments_count > 0) {
-    comments = <CommentList topicId={state.topic_id} />
-  }
   return (
     <div className='container'>
       <main className='section main'>
@@ -70,8 +65,7 @@ const View = ({state}) => {
           <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
           </article>
         </div>
-        {comments}
-        <CommentNew topicId={state.topic_id} />
+        {state.title !== "" && <CommentList topicId={state.topic_id} commentsCount={state.comments_count} />}
       </main>
       <aside className='section aside'>
         <SiteWidget />

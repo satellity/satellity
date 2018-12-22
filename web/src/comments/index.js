@@ -3,16 +3,18 @@ import style from './index.scss';
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
-import API from '../api/index.js';
 import showdown from 'showdown';
+import API from '../api/index.js';
+import CommentNew from './new.js';
 
 class CommentIndex extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
     this.converter = new showdown.Converter();
-    this.state = {comments: []};
+    this.state = {comments: [], comments_count: props.commentsCount};
     this.handleClick = this.handleClick.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
@@ -32,12 +34,23 @@ class CommentIndex extends Component {
     })
   }
 
+  handleSubmit(comment) {
+    let newComments = this.state.comments.slice();
+    newComments.push(comment);
+    this.setState({comments: newComments, comments_count: newComments.length});
+  }
+
   render() {
     return (
-      <View api={this.api}
-        state={this.state}
-        user={this.api.user.me()}
-        handleClick={this.handleClick}/>
+      <div>
+        {this.state.comments_count > 0 && <View api={this.api}
+          state={this.state}
+          user={this.api.user.me()}
+          handleClick={this.handleClick} />}
+          <CommentNew
+            topicId={this.props.topicId}
+            handleSubmit={this.handleSubmit} />
+      </div>
     )
   }
 }
@@ -70,7 +83,7 @@ const View = (props) => {
 
   return (
     <div>
-      <h3>Comments</h3>
+      <h3>{props.state.comments_count} Comments</h3>
       <ul className={style.comments}>
         {comments}
       </ul>
