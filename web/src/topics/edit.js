@@ -80,8 +80,8 @@ const View = ({onSubmit, onChange, state}) => {
               </div>
             </div>
             <div>
-              <label name='body'>Body *</label>
-              <textarea type='text' name='body' minLength='3' required value={state.body} onChange={(e) => onChange(e)} />
+              <label name='body'>Body</label>
+              <textarea type='text' name='body' value={state.body} onChange={(e) => onChange(e)} />
             </div>
             <div className='action'>
               <input type='submit' value='SUBMIT' />
