@@ -80,6 +80,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		}
 		return nil, session.TransactionError(ctx, err)
 	}
+	c.User = user
 	return c, nil
 }
 
