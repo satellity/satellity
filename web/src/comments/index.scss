@@ -6,6 +6,11 @@
 }
 .comment {
   border-bottom: 1px solid rgb(240, 240, 240);
+  &:hover {
+    .delete {
+      display: inline-block;
+    }
+  }
 }
 .profile {
   display: flex;
@@ -16,9 +21,17 @@
   border-radius: 2.4rem;
 }
 .detail {
+  flex-grow: 1;
+  line-height: 1rem;
   padding-left: 0.8rem;
 }
 .time {
+  opacity: 0.6;
+  margin: .4rem 0;
+}
+.delete {
+  cursor: pointer;
+  display: none;
   opacity: 0.6;
 }
 /*new & edit*/

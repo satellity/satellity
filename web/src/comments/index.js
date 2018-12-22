@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import style from './index.scss';
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
@@ -11,6 +12,7 @@ class CommentIndex extends Component {
     this.api = new API();
     this.converter = new showdown.Converter();
     this.state = {comments: []};
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
@@ -23,15 +25,31 @@ class CommentIndex extends Component {
     });
   }
 
+  handleClick(id) {
+    this.api.comment.delete(id, () => {
+      let comments = this.state.comments.filter(comment => comment.comment_id !== id);
+      this.setState({comments: comments});
+    })
+  }
+
   render() {
     return (
-      <View state={this.state} />
+      <View api={this.api}
+        state={this.state}
+        user={this.api.user.me()}
+        handleClick={this.handleClick}/>
     )
   }
 }
 
 const View = (props) => {
   const comments = props.state.comments.map((comment) => {
+    let delAction = '';
+    if (props.user.user_id === comment.user_id) {
+      delAction = (
+        <FontAwesomeIcon icon={['far', 'trash-alt']} className={style.delete} onClick={() => props.handleClick(comment.comment_id)} />
+      )
+    }
     return (
       <li className={style.comment} key={comment.comment_id}>
         <div className={style.profile}>
@@ -42,6 +60,7 @@ const View = (props) => {
               <TimeAgo date={comment.created_at} />
             </div>
           </div>
+          {delAction}
         </div>
         <article className='md' dangerouslySetInnerHTML={{__html: comment.body}}>
         </article>
