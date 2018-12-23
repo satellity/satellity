@@ -48,7 +48,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	if topic, err := middleware.CurrentUser(r).UpdateTopic(r.Context(), params["id"], body.Title, body.Body); err != nil {
+	if topic, err := middleware.CurrentUser(r).UpdateTopic(r.Context(), params["id"], body.Title, body.Body, body.CategoryID); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopic(w, r, topic)

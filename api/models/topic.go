@@ -50,8 +50,8 @@ type Topic struct {
 	CreatedAt     time.Time `sql:"created_at"`
 	UpdatedAt     time.Time `sql:"updated_at"`
 
-	User     *User
-	Category *Category
+	User     *User     `sql:"-"`
+	Category *Category `sql:"-"`
 }
 
 //CreateTopic create a new Topic
@@ -98,13 +98,14 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 }
 
 // UpdateTopic update a Topic by ID, TODO maybe update categoryID also
-func (user *User) UpdateTopic(ctx context.Context, id, title, body string) (*Topic, error) {
+func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID string) (*Topic, error) {
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
 	if title != "" && len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
 	}
 
 	var topic *Topic
+	var prevCategoryID string
 	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
@@ -121,6 +122,18 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body string) (*Top
 		if body != "" {
 			topic.Body = body
 		}
+		if categoryID != "" && topic.CategoryID != categoryID {
+			prevCategoryID = topic.CategoryID
+			category, err := findCategory(ctx, tx, categoryID)
+			if err != nil {
+				return err
+			} else if category == nil {
+				return session.NotFoundError(ctx)
+			}
+			topic.CategoryID = category.CategoryID
+			topic.Category = category
+		}
+		topic.User = user
 		return tx.Update(topic)
 	})
 	if err != nil {
@@ -128,6 +141,10 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body string) (*Top
 			return nil, err
 		}
 		return nil, session.TransactionError(ctx, err)
+	}
+	if prevCategoryID != "" {
+		go ElevateCategory(ctx, prevCategoryID)
+		go ElevateCategory(ctx, topic.CategoryID)
 	}
 	return topic, nil
 }
@@ -177,6 +194,7 @@ func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, e
 	return topics, nil
 }
 
+// ReadTopics read topics by CategoryID order by created_at DESC
 func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 	if offset.IsZero() {
 		offset = time.Now()
@@ -186,6 +204,14 @@ func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
+}
+
+func (category *Category) lastTopic(ctx context.Context, tx *pg.Tx) (*Topic, error) {
+	var topic Topic
+	if err := tx.Model(&topic).Where("category_id=?", category.CategoryID).Order("created_at DESC").Limit(1).Select(); err != nil {
+		return nil, err
+	}
+	return &topic, nil
 }
 
 func topicsCountByCategory(ctx context.Context, tx *pg.Tx, id string) (int, error) {

@@ -124,6 +124,46 @@ func ReadCategories(ctx context.Context) ([]*Category, error) {
 	return categories, nil
 }
 
+// ElevateCategory update category's info, e.g.: LastTopicID, TopicsCount
+func ElevateCategory(ctx context.Context, id string) (*Category, error) {
+	var category *Category
+	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+		var err error
+		category, err = findCategory(ctx, tx, id)
+		if err != nil {
+			return err
+		} else if category == nil {
+			return session.NotFoundError(ctx)
+		}
+		topic, err := category.lastTopic(ctx, tx)
+		if err != nil {
+			return err
+		} else if topic == nil {
+			category.LastTopicID = sql.NullString{String: "", Valid: false}
+			category.TopicsCount = 0
+		} else {
+			if category.LastTopicID.String != topic.TopicID {
+				category.LastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
+			}
+		}
+		if !category.LastTopicID.Valid {
+			count, err := topicsCountByCategory(ctx, tx, category.CategoryID)
+			if err != nil {
+				return err
+			}
+			category.TopicsCount = count
+		}
+		return tx.Update(category)
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	return category, nil
+}
+
 func findCategory(ctx context.Context, tx *pg.Tx, id string) (*Category, error) {
 	category := &Category{CategoryID: id}
 	if err := tx.Model(category).Column(categoryCols...).WherePK().Select(); err == pg.ErrNoRows {
