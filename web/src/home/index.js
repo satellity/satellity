@@ -6,12 +6,14 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import API from '../api/index.js';
+import ColorUtils from '../components/color.js';
 import SiteWidget from '../components/site-widget.js';
 
 class Home extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
+    this.color = new ColorUtils();
     this.state = {topics: []};
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
@@ -26,7 +28,7 @@ class Home extends Component {
 
   render() {
     return (
-      <HomeView state={this.state} />
+      <HomeView state={this.state} color={this.color} />
     );
   }
 }
@@ -35,7 +37,7 @@ const HomeView = (props) => {
   const topics = props.state.topics.map((topic) => {
     let comment = '';
     if (topic.comments_count > 0) {
-      comment = <span className={style.count}> {topic.comments_count} </span>
+      comment = <span className={style.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
     }
     return (
       <li className={style.topic} key={topic.topic_id}>
