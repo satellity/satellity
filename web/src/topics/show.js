@@ -62,8 +62,8 @@ const View = ({state}) => {
               {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />
             </div>
           </header>
-          <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
-          </article>
+          {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
+          </article>}
         </div>
         {state.title !== "" && <CommentList topicId={state.topic_id} commentsCount={state.comments_count} />}
       </main>
