@@ -47,4 +47,7 @@ $color-dark-background: #25476A;
   &:after {
     display: none;
   }
+  &:last-child {
+    margin-right: 0;
+  }
 }

@@ -1,5 +1,7 @@
 .widget {
   background: white;
+  box-sizing: border-box;
+  padding: .8rem;
   a {
     color: rgba(218, 40, 16, 0.8);
     &:after {
