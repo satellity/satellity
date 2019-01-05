@@ -17,7 +17,7 @@ class UserEdit extends Component {
   }
 
   componentDidMount() {
-    this.api.user.show((resp) => {
+    this.api.user.self((resp) => {
       const user = resp.data;
       this.setState({nickname: user.nickname, biography: user.biography});
     });

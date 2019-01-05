@@ -26,7 +26,8 @@ func registerUser(router *httptreemux.TreeMux) {
 
 	router.POST("/oauth/:provider", impl.oauth)
 	router.POST("/me", impl.update)
-	router.GET("/me", impl.show)
+	router.GET("/me", impl.self)
+	router.GET("/users/:id", impl.show)
 	router.GET("/users/:id/topics", impl.topics)
 }
 
@@ -59,8 +60,18 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 	views.RenderAccount(w, r, current)
 }
 
-func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+func (impl *userImpl) self(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	views.RenderAccount(w, r, middleware.CurrentUser(r))
+}
+
+func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	if user, err := models.ReadUser(r.Context(), params["id"]); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else if user == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
+	} else {
+		views.RenderUser(w, r, user)
+	}
 }
 
 func (impl *userImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {

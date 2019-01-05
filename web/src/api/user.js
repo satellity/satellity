@@ -43,12 +43,31 @@ User.prototype = {
     });
   },
 
-  show: function(callback) {
+  self: function(callback) {
     this.api.request('get', '/me', {}, (resp) => {
       if (resp.data) {
         const data = resp.data;
         window.localStorage.setItem('user', btoa(JSON.stringify(data)));
       }
+      if (typeof callback === 'function') {
+        callback(resp);
+      }
+    });
+  },
+
+  show: function(id, callback) {
+    this.api.request('get', `/users/${id}`, {}, (resp) => {
+      if (resp.data) {
+        const data = resp.data;
+        if (typeof callback === 'function') {
+          callback(resp);
+        }
+      }
+    });
+  },
+
+  topics: function(id, callback) {
+    this.api.request('get', `/users/${id}/topics`, {}, (resp) => {
       if (typeof callback === 'function') {
         callback(resp);
       }

@@ -188,8 +188,11 @@ func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, e
 		offset = time.Now()
 	}
 	var topics []*Topic
-	if _, err := session.Database(ctx).Query(&topics, "SELECT * FROM topics WHERE user_id=? AND created_at<? ORDER BY created_at DESC LIMIT 50", user.UserID, offset); err != nil {
+	if err := session.Database(ctx).Model(&topics).Relation("Category").Where("topic.user_id=? AND topic.created_at<?", user.UserID, offset).Order("topic.created_at DESC").Limit(50).Select(); err != nil {
 		return nil, session.TransactionError(ctx, err)
+	}
+	for _, topic := range topics {
+		topic.User = user
 	}
 	return topics, nil
 }

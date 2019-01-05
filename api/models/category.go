@@ -146,7 +146,7 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 				category.LastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
 			}
 		}
-		if !category.LastTopicID.Valid {
+		if category.LastTopicID.Valid {
 			count, err := topicsCountByCategory(ctx, tx, category.CategoryID)
 			if err != nil {
 				return err

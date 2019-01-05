@@ -1,5 +1,59 @@
+@import '../assets/css/constant.scss';
+
 .profile {
   background: white;
   box-sizing: border-box;
   padding: .8rem;
+}
+
+/* topics */
+.user {
+  padding: 1.6rem 0 0 .8rem;
+  display: flex;
+  align-items: flex-start;
+}
+.avatar {
+  border-radius: 3.6rem;
+  flex-shrink: 0;
+  width: 3.6rem;
+  height: 3.6rem;
+}
+.info {
+  padding-left: .8rem;
+  h1 {
+    font-size: 1.6rem;
+    margin: 0 0 .8rem;
+  }
+}
+.topics {
+  background: white;
+  padding: .8rem;
+}
+.topic {
+  border-bottom: 1px solid #F4F5F5;
+  display: flex;
+  align-items: flex-start;
+}
+.topic_title {
+  font-weight: normal;
+  font-size: 1.2rem;
+  margin: 0;
+  word-break: break-all;
+}
+.topic_detail {
+  color: #B4C4D1;
+  flex-grow: 1;
+  font-size: .875rem;
+}
+.topic_comment {
+  font-size: .8rem;
+  flex-shrink: 0;
+  text-align: center;
+  width: 3rem;
+}
+.comments_count {
+  background: rgba($color-main-red, $color-main-red-alpha);
+  border-radius: 1.6rem;
+  color: white;
+  padding: .2rem .8rem;
 }
