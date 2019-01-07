@@ -29,10 +29,12 @@
   word-break: break-all;
 }
 .comment {
+  box-sizing: border-box;
   font-size: .8rem;
   flex-shrink: 0;
-  text-align: center;
-  width: 3rem;
+  text-align: right;
+  min-width: 3rem;
+  padding-left: 1.6rem;
 }
 .count {
   background: rgba($color-main-red, $color-main-red-alpha);

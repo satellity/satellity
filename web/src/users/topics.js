@@ -33,7 +33,11 @@ const View = (props) => {
   const topics = props.state.topics.map((topic) => {
     let comment = '';
     if (topic.comments_count > 0) {
-      comment = <span className={style.comments_count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
+      comment = (
+        <div className={style.topic_comment}>
+          <span className={style.comments_count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
+        </div>
+      )
     }
     return (
       <li className={style.topic} key={topic.topic_id}>
@@ -45,9 +49,7 @@ const View = (props) => {
           </h2>
           <span>{topic.category.name}</span> • <TimeAgo date={topic.created_at} />
         </div>
-        <div className={style.topic_comment}>
-          {comment}
-        </div>
+        {comment}
       </li>
     )
   });

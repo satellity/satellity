@@ -37,7 +37,11 @@ const HomeView = (props) => {
   const topics = props.state.topics.map((topic) => {
     let comment = '';
     if (topic.comments_count > 0) {
-      comment = <span className={style.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
+      comment = (
+        <div className={style.comment}>
+          <span className={style.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
+        </div>
+      )
     }
     return (
       <li className={style.topic} key={topic.topic_id}>
@@ -48,9 +52,7 @@ const HomeView = (props) => {
           </h2>
           <span>{topic.category.name}</span> • {topic.user.nickname} • <TimeAgo date={topic.created_at} />
         </div>
-        <div className={style.comment}>
-          {comment}
-        </div>
+        {comment}
       </li>
     )
   });
