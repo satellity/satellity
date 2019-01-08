@@ -1,4 +1,5 @@
 import style from './index.scss';
+import topicStyle from '../styles/topic_item.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
@@ -34,20 +35,20 @@ const View = (props) => {
     let comment = '';
     if (topic.comments_count > 0) {
       comment = (
-        <span className={style.comments_count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
+        <span className={topicStyle.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
       )
     }
     return (
-      <li className={style.topic} key={topic.topic_id}>
-        <div className={style.topic_detail}>
-          <h2 className={style.topic_title}>
+      <li className={topicStyle.topic} key={topic.topic_id}>
+        <div className={topicStyle.detail + ' ' + topicStyle.no_avatar}>
+          <h2 className={topicStyle.title}>
             <Link to={`/topics/${topic.topic_id}`}>
               {topic.title}
             </Link>
           </h2>
           <span>{topic.category.name}</span> • <TimeAgo date={topic.created_at} />
         </div>
-        <div className={style.topic_comment}>
+        <div className={topicStyle.comment}>
           {comment}
         </div>
       </li>

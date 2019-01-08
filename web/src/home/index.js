@@ -1,4 +1,5 @@
 import style from './index.scss';
+import topicStyle from '../styles/topic_item.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Typed from 'typed.js';
 import React, { Component } from 'react';
@@ -37,19 +38,19 @@ const HomeView = (props) => {
     let comment = '';
     if (topic.comments_count > 0) {
       comment = (
-        <span className={style.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
+        <span className={topicStyle.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
       )
     }
     return (
-      <li className={style.topic} key={topic.topic_id}>
-        <img src={topic.user.avatar_url} className={style.avatar} />
-        <div className={style.detail}>
-          <h2 className={style.title}>
+      <li className={topicStyle.topic} key={topic.topic_id}>
+        <img src={topic.user.avatar_url} className={topicStyle.avatar} />
+        <div className={topicStyle.detail}>
+          <h2 className={topicStyle.title}>
             <Link to={`/topics/${topic.topic_id}`}>{topic.title}</Link>
           </h2>
           <span>{topic.category.name}</span> • {topic.user.nickname} • <TimeAgo date={topic.created_at} />
         </div>
-        <div className={style.comment}>
+        <div className={topicStyle.comment}>
           {comment}
         </div>
       </li>
