@@ -34,9 +34,7 @@ const View = (props) => {
     let comment = '';
     if (topic.comments_count > 0) {
       comment = (
-        <div className={style.topic_comment}>
-          <span className={style.comments_count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
-        </div>
+        <span className={style.comments_count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
       )
     }
     return (
@@ -49,7 +47,9 @@ const View = (props) => {
           </h2>
           <span>{topic.category.name}</span> • <TimeAgo date={topic.created_at} />
         </div>
-        {comment}
+        <div className={style.topic_comment}>
+          {comment}
+        </div>
       </li>
     )
   });

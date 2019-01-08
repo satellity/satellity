@@ -1,4 +1,3 @@
-import './index.scss';
 import style from './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Typed from 'typed.js';
@@ -38,9 +37,7 @@ const HomeView = (props) => {
     let comment = '';
     if (topic.comments_count > 0) {
       comment = (
-        <div className={style.comment}>
-          <span className={style.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
-        </div>
+        <span className={style.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
       )
     }
     return (
@@ -52,7 +49,9 @@ const HomeView = (props) => {
           </h2>
           <span>{topic.category.name}</span> • {topic.user.nickname} • <TimeAgo date={topic.created_at} />
         </div>
-        {comment}
+        <div className={style.comment}>
+          {comment}
+        </div>
       </li>
     )
   });
