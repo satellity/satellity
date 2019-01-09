@@ -1,4 +1,6 @@
 import style from './style.css';
+import "simplemde/dist/simplemde.min.css";
+import SimpleMDE from 'react-simplemde-editor';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
@@ -9,6 +11,7 @@ class TopicNew extends Component {
     this.api = new API();
     this.state = {title: '', category_id: '', body: '', categories: []};
     this.handleChange = this.handleChange.bind(this);
+    this.handleBodyChange = this.handleBodyChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
@@ -37,6 +40,10 @@ class TopicNew extends Component {
     });
   }
 
+  handleBodyChange(value) {
+    this.setState({body: value});
+  }
+
   handleSubmit(e) {
     e.preventDefault();
     const history = this.props.history;
@@ -48,13 +55,13 @@ class TopicNew extends Component {
 
   render() {
     return (
-      <View onSubmit={this.handleSubmit} onChange={this.handleChange} state={this.state} />
+      <View onSubmit={this.handleSubmit} onChange={this.handleChange} onBodyChange={this.handleBodyChange} state={this.state} />
     )
   }
 }
 
 // TODO jsx editor format
-const View = ({onSubmit, onChange, state}) => {
+const View = ({onSubmit, onChange, onBodyChange, state}) => {
   const categories = state.categories.map((c) => {
     return (
       <option value={c.category_id} key={c.category_id}>{c.name}</option>
@@ -80,8 +87,11 @@ const View = ({onSubmit, onChange, state}) => {
               </div>
             </div>
             <div>
-              <label name='body'>Body</label>
-              <textarea type='text' name='body' value={state.body} onChange={(e) => onChange(e)} />
+              <SimpleMDE
+                className={""}
+                value={state.body}
+                onChange={onBodyChange}
+              />
             </div>
             <div className='action'>
               <input type='submit' value='SUBMIT' />
