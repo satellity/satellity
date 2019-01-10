@@ -53,6 +53,14 @@ Category.prototype = {
         callback(resp);
       }
     });
+  },
+
+  topics: function(id, callback) {
+    this.api.request('get', `/categories/${id}/topics`, {}, (resp) => {
+      if (typeof callback === 'function') {
+        callback(resp);
+      }
+    });
   }
 }
 

@@ -14,21 +14,38 @@ class Home extends Component {
     super(props);
     this.api = new API();
     this.color = new ColorUtils();
-    this.state = {topics: []};
+    this.state = {topics: [], categories: [], category: 'lastest'};
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
     document.body.classList.add('home', 'layout');
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
     this.api.topic.index((resp) => {
       this.setState({topics: resp.data});
     });
+    this.api.category.index((resp) => {
+      this.setState({categories: resp.data});
+    });
+  }
+
+  handleClick(id) {
+    this.setState({category: id});
+    if (id === 'lastest') {
+      this.api.topic.index((resp) => {
+        this.setState({topics: resp.data});
+      });
+      return
+    }
+    this.api.category.topics(id, (resp) => {
+      this.setState({topics: resp.data});
+    });
   }
 
   render() {
     return (
-      <HomeView state={this.state} color={this.color} />
+      <HomeView state={this.state} color={this.color} handleClick={this.handleClick} />
     );
   }
 }
@@ -57,9 +74,25 @@ const HomeView = (props) => {
     )
   });
 
+  const categories = props.state.categories.map((category) => {
+    return (
+      <Link
+        to="/"
+        className={`${style.node} ${props.state.category === category.category_id ? style.current : ''}`}
+        onClick={() => props.handleClick(category.category_id)}
+        key={category.category_id}>{category.name}</Link>
+    )
+  });
+
   return (
     <div className='container'>
       <main className='section main'>
+        <div className={style.nodes}>
+          <Link to='/'
+            className={`${style.node} ${props.state.category === 'lastest' ? style.current : ''}`}
+            onClick={() => props.handleClick('lastest')}>Lastest</Link>
+          {categories}
+        </div>
         <ul className={style.topics}>
           {topics}
         </ul>
