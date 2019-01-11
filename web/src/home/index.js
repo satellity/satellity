@@ -30,7 +30,8 @@ class Home extends Component {
     });
   }
 
-  handleClick(id) {
+  handleClick(id, e) {
+    e.preventDefault();
     this.setState({category: id});
     if (id === 'latest') {
       this.api.topic.index((resp) => {
@@ -79,7 +80,7 @@ const HomeView = (props) => {
       <Link
         to="/"
         className={`${style.node} ${props.state.category === category.category_id ? style.current : ''}`}
-        onClick={() => props.handleClick(category.category_id)}
+        onClick={(e) => props.handleClick(category.category_id, e)}
         key={category.category_id}>{category.name}</Link>
     )
   });
@@ -90,7 +91,7 @@ const HomeView = (props) => {
         <div className={style.nodes}>
           <Link to='/'
             className={`${style.node} ${props.state.category === 'latest' ? style.current : ''}`}
-            onClick={() => props.handleClick('latest')}>Latest</Link>
+            onClick={(e) => props.handleClick('latest', e)}>Latest</Link>
           {categories}
         </div>
         <ul className={style.topics}>
