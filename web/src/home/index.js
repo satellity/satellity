@@ -14,7 +14,12 @@ class Home extends Component {
     super(props);
     this.api = new API();
     this.color = new ColorUtils();
-    this.state = {topics: [], categories: [], category: 'latest'};
+    let categories = [];
+    let d = window.localStorage.getItem('categories');
+    if (!d) {
+      categories = JSON.parse(d);
+    }
+    this.state = {topics: [], categories: categories, category: 'latest'};
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
     document.body.classList.add('home', 'layout');
