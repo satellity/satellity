@@ -16,8 +16,8 @@ class Home extends Component {
     this.color = new ColorUtils();
     let categories = [];
     let d = window.localStorage.getItem('categories');
-    if (!d) {
-      categories = JSON.parse(d);
+    if (d !== null && d !== undefined && d !== '') {
+      categories = JSON.parse(atob(d));
     }
     this.state = {topics: [], categories: categories, category: 'latest'};
     const classes = document.body.classList.values();
