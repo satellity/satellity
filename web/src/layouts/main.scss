@@ -29,6 +29,9 @@ $color-dark-background: #25476A;
     display: none;
   }
 }
+.mobile {
+  display: none;
+}
 .logo {
   float: left;
   width: 1.6rem;
@@ -48,5 +51,17 @@ $color-dark-background: #25476A;
   }
   &:last-child {
     margin-right: 0;
+  }
+}
+
+@media only screen and (max-width: 64rem) {
+  .header {
+    padding: .8rem;
+  }
+  .pc {
+    display: none;
+  }
+  .mobile {
+    display: inline-block;
   }
 }

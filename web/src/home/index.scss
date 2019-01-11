@@ -17,3 +17,10 @@
   background: white;
   padding: 0.8rem;
 }
+@media only screen and (max-width: 64rem) {
+  .node {
+    font-size: 1rem;
+    padding: .8rem .6rem .4rem;
+    margin-right: .2rem;
+  }
+}

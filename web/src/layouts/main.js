@@ -30,7 +30,8 @@ const Header = () => {
     <header className={style.header}>
       <Link to='/' className={style.brand}>
         <img src={logoURL} className={style.logo} alt='GoDiscourse'/>
-        GoDiscourse
+        <span className={style.pc}>GoDiscourse</span>
+        <span className={style.mobile}>GD</span>
       </Link>
       <Link to='/topics/new' className={style.navi}>
         <FontAwesomeIcon icon={['fa', 'plus']} />
