@@ -14,7 +14,7 @@ class Home extends Component {
     super(props);
     this.api = new API();
     this.color = new ColorUtils();
-    this.state = {topics: [], categories: [], category: 'lastest'};
+    this.state = {topics: [], categories: [], category: 'latest'};
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
     document.body.classList.add('home', 'layout');
@@ -32,7 +32,7 @@ class Home extends Component {
 
   handleClick(id) {
     this.setState({category: id});
-    if (id === 'lastest') {
+    if (id === 'latest') {
       this.api.topic.index((resp) => {
         this.setState({topics: resp.data});
       });
@@ -89,8 +89,8 @@ const HomeView = (props) => {
       <main className='section main'>
         <div className={style.nodes}>
           <Link to='/'
-            className={`${style.node} ${props.state.category === 'lastest' ? style.current : ''}`}
-            onClick={() => props.handleClick('lastest')}>Lastest</Link>
+            className={`${style.node} ${props.state.category === 'latest' ? style.current : ''}`}
+            onClick={() => props.handleClick('latest')}>Latest</Link>
           {categories}
         </div>
         <ul className={style.topics}>

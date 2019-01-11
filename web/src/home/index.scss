@@ -1,11 +1,16 @@
+@import '../assets/css/constant.scss';
+
 .nodes {
   background: white;
+  padding-bottom: 0.8rem;
 }
 .node {
-  padding: .8rem .8rem;
-  margin-right: .8rem;
-  &.current {
-    text-decoration: underline;
+  font-size: 1.2rem;
+  display: inline-block;
+  padding: .8rem .8rem .4rem;
+  margin-right: .4rem;
+  &:hover, &.current {
+    border-bottom: 3px solid $color-main-red;
   }
 }
 .topics {
