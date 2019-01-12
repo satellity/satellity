@@ -1,4 +1,8 @@
 /* show page */
+.loading {
+  background: #EEE;
+  text-align: center;
+}
 .content {
   background: white;
   box-sizing: border-box;
