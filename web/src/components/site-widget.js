@@ -27,9 +27,11 @@ class SiteWidget extends Component {
       )
     }
     return (
-      <div className={`${style.widget}`}>
-        GoDiscourse is an open source community written in Go, get codes in <a href='https://github.com/godiscourse/godiscourse' target='blank' className='soft'>Github</a>.
-          {signIn}
+      <div>
+        <div className={`${style.widget}`}>
+          GoDiscourse is an open source community written in Go, get codes in <a href='https://github.com/godiscourse/godiscourse' target='blank' className='soft'>Github</a>.
+        </div>
+        {signIn}
       </div>
     )
   }

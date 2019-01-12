@@ -15,6 +15,7 @@ var whitelist = [][2]string{
 	{"GET", "^/_hc$"},
 	{"POST", "^/oauth"},
 	{"GET", "^/topics"},
+	{"GET", "^/categories"},
 }
 
 var userWhitelist = map[string]string{}
