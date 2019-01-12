@@ -8,6 +8,7 @@ import TimeAgo from 'react-timeago';
 import API from '../api/index.js';
 import ColorUtils from '../components/color.js';
 import SiteWidget from '../components/site-widget.js';
+import LoadingView from '../loading/loading.js';
 
 class Home extends Component {
   constructor(props) {
@@ -19,7 +20,7 @@ class Home extends Component {
     if (d !== null && d !== undefined && d !== '') {
       categories = JSON.parse(atob(d));
     }
-    this.state = {topics: [], categories: categories, category: 'latest'};
+    this.state = {topics: [], categories: categories, category: 'latest', loading: true};
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
     document.body.classList.add('home', 'layout');
@@ -28,7 +29,7 @@ class Home extends Component {
 
   componentDidMount() {
     this.api.topic.index((resp) => {
-      this.setState({topics: resp.data});
+      this.setState({topics: resp.data, loading: false});
     });
     this.api.category.index((resp) => {
       this.setState({categories: resp.data});
@@ -37,15 +38,15 @@ class Home extends Component {
 
   handleClick(id, e) {
     e.preventDefault();
-    this.setState({category: id});
+    this.setState({category: id, loading: true});
     if (id === 'latest') {
       this.api.topic.index((resp) => {
-        this.setState({topics: resp.data});
+        this.setState({topics: resp.data, loading: false});
       });
       return
     }
     this.api.category.topics(id, (resp) => {
-      this.setState({topics: resp.data});
+      this.setState({topics: resp.data, loading: false});
     });
   }
 
@@ -90,6 +91,12 @@ const HomeView = (props) => {
     )
   });
 
+  const loadingView = (
+    <div className={style.loading}>
+      <LoadingView style='md-ring'/>
+    </div>
+  )
+
   return (
     <div className='container'>
       <main className='section main'>
@@ -99,6 +106,7 @@ const HomeView = (props) => {
             onClick={(e) => props.handleClick('latest', e)}>Latest</Link>
           {categories}
         </div>
+        {props.state.loading && loadingView}
         <ul className={style.topics}>
           {topics}
         </ul>
