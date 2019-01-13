@@ -42,6 +42,13 @@
 .body {
   padding: 1.6rem .8rem;
 }
+.rules {
+  background-color: white;
+  padding: .8rem;
+}
+.rule {
+  padding-top: 0;
+}
 /* new & edit page */
 .form {
   background: white;
