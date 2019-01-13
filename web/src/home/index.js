@@ -15,6 +15,7 @@ class Home extends Component {
     super(props);
     this.api = new API();
     this.color = new ColorUtils();
+    this.params = new URLSearchParams(props.location.search);
     let categories = [];
     let d = window.localStorage.getItem('categories');
     if (d !== null && d !== undefined && d !== '') {
@@ -28,11 +29,23 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    this.api.topic.index((resp) => {
-      this.setState({topics: resp.data, loading: false});
-    });
     this.api.category.index((resp) => {
       this.setState({categories: resp.data});
+    });
+    const category = this.params.get("c");
+    if (category !== null && category !== undefined) {
+      for (let i=0; i< this.state.categories.length; i++) {
+        let c = this.state.categories[i];
+        if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
+          this.api.category.topics(c.category_id, (resp) => {
+            this.setState({category: c.category_id, topics: resp.data, loading: false});
+          });
+          return
+        }
+      }
+    }
+    this.api.topic.index((resp) => {
+      this.setState({topics: resp.data, loading: false});
     });
   }
 
