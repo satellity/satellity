@@ -1,7 +1,13 @@
 /* show page */
+.form_loading {
+  background: white;
+  text-align: center;
+  padding: .8rem 0 0;
+}
 .loading {
   background: #EEE;
   text-align: center;
+  padding: .8rem 0;
 }
 .content {
   background: white;

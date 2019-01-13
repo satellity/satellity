@@ -14,7 +14,6 @@ import About from './about.js';
 import UserEdit from './users/edit.js';
 import UserTopics from './users/topics.js';
 import TopicNew from './topics/new.js';
-import TopicEdit from './topics/edit.js';
 import TopicShow from './topics/show.js';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -31,7 +30,7 @@ ReactDOM.render((
         <MainRoute exact path='/user/edit' component={UserEdit} />
         <MainRoute path='/users/:id/topics' component={UserTopics} />
         <MainRoute exact path='/topics/new' component={TopicNew} />
-        <MainRoute path='/topics/:id/edit' component={TopicEdit} />
+        <MainRoute path='/topics/:id/edit' component={TopicNew} />
         <MainRoute path='/topics/:id' component={TopicShow} />
         <Route path='/oauth/callback' component={Oauth} />
         <Route path='/admin' component={AdminRoute} />

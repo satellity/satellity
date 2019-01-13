@@ -4,12 +4,23 @@ import SimpleMDE from 'react-simplemde-editor';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
+import LoadingView from '../loading/loading.js';
+const validate = require('uuid-validate');
 
 class TopicNew extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
-    this.state = {title: '', category_id: '', body: '', categories: []};
+    let categories = [];
+    let d = window.localStorage.getItem('categories');
+    if (d !== null && d !== undefined && d !== '') {
+      categories = JSON.parse(atob(d));
+    }
+    let id = this.props.match.params.id;
+    if (id === null || id == undefined) {
+      id = ''
+    }
+    this.state = {topic_id: id, title: '', category_id: '', body: '', categories: categories, loading: true};
     this.handleChange = this.handleChange.bind(this);
     this.handleBodyChange = this.handleBodyChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -23,6 +34,14 @@ class TopicNew extends Component {
   }
 
   componentDidMount() {
+    if (validate(this.state.topic_id)) {
+      this.api.topic.show(this.props.match.params.id, (resp) => {
+        resp.data.loading = false;
+        this.setState(resp.data);
+      });
+    } else {
+      this.setState({loading: false});
+    }
     this.api.category.index((resp) => {
       let category_id = '';
       if (resp.data.length > 0) {
@@ -48,6 +67,12 @@ class TopicNew extends Component {
     e.preventDefault();
     const history = this.props.history;
     const data = {title: this.state.title, body: this.state.body, category_id: this.state.category_id};
+    if (validate(this.state.topic_id)) {
+      this.api.topic.update(this.state.topic_id, data, (resp) => {
+        history.push('/');
+      });
+      return
+    }
     this.api.topic.create(data, (resp) => {
       history.push('/');
     });
@@ -68,11 +93,23 @@ const View = ({onSubmit, onChange, onBodyChange, state}) => {
     )
   });
 
+  let title = <h2>Create a new topic</h2>;
+  if (validate(state.topic_id)) {
+    title = <h2>Edit: {state.title}</h2>
+  }
+
+  const loadingView = (
+    <div className={style.form_loading}>
+      <LoadingView style='md-ring'/>
+    </div>
+  )
+
   return (
     <div className='container'>
       <main className='section main'>
+        {state.loading && loadingView}
         <div className={style.form}>
-          <h2>Create a new topic</h2>
+          {title}
           <form onSubmit={(e) => onSubmit(e)}>
             <div>
               <label name='title'>Title *</label>
