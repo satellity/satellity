@@ -13,12 +13,18 @@ import (
 
 var whitelist = [][2]string{
 	{"GET", "^/_hc$"},
-	{"POST", "^/oauth"},
-	{"GET", "^/topics"},
 	{"GET", "^/categories"},
+	{"GET", "^/topics"},
+	{"GET", "^/users"},
+	{"POST", "^/oauth"},
 }
 
-var userWhitelist = map[string]string{}
+var userWhitelist = [][2]string{
+	{"GET", "^/me"},
+	{"POST", "^/comments"},
+	{"POST", "^/topics"},
+	{"POST", "^/me"},
+}
 
 type contextValueKey int
 
@@ -47,10 +53,11 @@ func Authenticate(handler http.Handler) http.Handler {
 			handleUnauthorized(handler, w, r)
 			return
 		}
-		if user.Role() != "admin" {
-			handleUserRouters(handler, w, r)
-		}
 		ctx := context.WithValue(r.Context(), keyCurrentUser, user)
+		if user.Role() != "admin" {
+			handleUserRouters(handler, w, r.WithContext(ctx))
+			return
+		}
 		handler.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -70,11 +77,11 @@ func handleUnauthorized(handler http.Handler, w http.ResponseWriter, r *http.Req
 }
 
 func handleUserRouters(handler http.Handler, w http.ResponseWriter, r *http.Request) {
-	for k, v := range userWhitelist {
-		if k != r.Method {
+	for _, pp := range userWhitelist {
+		if pp[0] != r.Method {
 			continue
 		}
-		if matched, _ := regexp.MatchString(v, strings.ToLower(r.URL.Path)); matched {
+		if matched, _ := regexp.MatchString(pp[1], strings.ToLower(r.URL.Path)); matched {
 			handler.ServeHTTP(w, r)
 			return
 		}
