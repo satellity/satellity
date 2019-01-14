@@ -54,12 +54,12 @@ class Home extends Component {
     this.setState({category: id, loading: true});
     if (id === 'latest') {
       this.api.topic.index((resp) => {
-        this.setState({topics: resp.data, loading: false});
+        this.setState({topics: resp.data, category: id, loading: false});
       });
       return
     }
     this.api.category.topics(id, (resp) => {
-      this.setState({topics: resp.data, loading: false});
+      this.setState({topics: resp.data, category: id, loading: false});
     });
   }
 
