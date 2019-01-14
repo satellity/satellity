@@ -43,11 +43,7 @@ API.prototype = {
         if (error.code === 401) {
           self.user.clear();
           // TODO
-          let githubClientId = '71905afbd6e4541ad62b';
-          if (process.env.NODE_ENV === 'development') {
-            githubClientId = 'b9b78f343f3a5b0d7c99';
-          }
-          window.location.href = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${githubClientId}`;
+          self.login();
           return
         }
         if (error.response) {
@@ -61,6 +57,14 @@ API.prototype = {
         // TODO
         console.info(error);
       })
+  },
+
+  login: function() {
+    let githubClientId = '71905afbd6e4541ad62b';
+    if (process.env.NODE_ENV === 'development') {
+      githubClientId = 'b9b78f343f3a5b0d7c99';
+    }
+    window.location.href = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${githubClientId}`;
   }
 }
 
