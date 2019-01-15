@@ -8,7 +8,7 @@ class UserEdit extends Component {
     super(props);
     this.api = new API();
     const user = this.api.user.me();
-    this.state = {nickname: user.nickname, biography: user.biography};
+    this.state = {nickname: user.nickname, biography: user.biography, submitting: false};
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     if (!this.api.user.loggedIn()) {
@@ -33,6 +33,10 @@ class UserEdit extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
+    if (this.state.submitting) {
+      return
+    }
+    this.setState({submitting: true});
     const history = this.props.history;
     const data = {nickname: this.state.nickname, biography: this.state.biography};
     this.api.user.update(data, (resp) => {

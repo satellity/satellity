@@ -20,7 +20,7 @@ class TopicNew extends Component {
     if (id === null || id == undefined) {
       id = ''
     }
-    this.state = {topic_id: id, title: '', category_id: '', body: '', categories: categories, loading: true};
+    this.state = {topic_id: id, title: '', category_id: '', body: '', categories: categories, loading: true, submitting: false};
     this.handleChange = this.handleChange.bind(this);
     this.handleBodyChange = this.handleBodyChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -65,6 +65,10 @@ class TopicNew extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
+    if (this.state.submitting) {
+      return
+    }
+    this.setState({submitting: true});
     const history = this.props.history;
     const data = {title: this.state.title, body: this.state.body, category_id: this.state.category_id};
     if (validate(this.state.topic_id)) {

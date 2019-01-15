@@ -9,7 +9,7 @@ class CommentNew extends Component {
     this.api = new API();
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.state = {topic_id: props.topicId, body: ''};
+    this.state = {topic_id: props.topicId, body: '', submitting: false};
   }
 
   handleChange(e) {
@@ -22,9 +22,13 @@ class CommentNew extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
+    if (this.state.submitting) {
+      return
+    }
+    this.setState({submitting: true});
     this.api.comment.create(this.state, (resp) => {
       this.props.handleSubmit(resp.data);
-      this.setState({body: ''});
+      this.setState({body: '', submitting: false});
     });
   }
 

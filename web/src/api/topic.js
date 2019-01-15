@@ -23,15 +23,6 @@ Topic.prototype = {
   },
 
   update: function(id, params, callback) {
-    const data = {title: params.title, body: params.body, category_id: params.category_id};
-    this.api.request('post', '/topics', data, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
-    });
-  },
-
-  update: function(id, params, callback) {
     const data = {title: params['title'], body: params['body'], category_id: params['category_id']};
     this.api.request('post', `/topics/${id}`, params, (resp) => {
       if (typeof callback === 'function') {
