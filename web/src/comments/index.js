@@ -14,6 +14,7 @@ class CommentIndex extends Component {
     this.converter = new showdown.Converter();
     this.state = {comments: [], comments_count: props.commentsCount};
     this.handleClick = this.handleClick.bind(this);
+    this.handleActionClick = this.handleActionClick.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -21,13 +22,26 @@ class CommentIndex extends Component {
     this.api.comment.index(this.props.topicId, (resp) => {
       let comments = resp.data.map((comment) => {
         comment.body = this.converter.makeHtml(comment.body);
+        comment.toggle = false;
         return comment
       });
       this.setState({comments: comments});
     });
   }
 
-  handleClick(id) {
+  handleActionClick(e, id) {
+    e.preventDefault();
+    let comments = this.state.comments.map((comment) => {
+      if (comment.comment_id === id) {
+        comment.toggle = !comment.toggle;
+      }
+      return comment
+    });
+    this.setState({comments: comments});
+  }
+
+  handleClick(e, id) {
+    e.preventDefault();
     this.api.comment.delete(id, () => {
       let comments = this.state.comments.filter(comment => comment.comment_id !== id);
       this.setState({comments: comments});
@@ -46,6 +60,7 @@ class CommentIndex extends Component {
         {this.state.comments_count > 0 && <View api={this.api}
           state={this.state}
           user={this.api.user.me()}
+          handleActionClick={this.handleActionClick}
           handleClick={this.handleClick} />}
           <CommentNew
             topicId={this.props.topicId}
@@ -60,7 +75,10 @@ const View = (props) => {
     let delAction = '';
     if (props.user.user_id === comment.user_id) {
       delAction = (
-        <FontAwesomeIcon icon={['far', 'trash-alt']} className={style.delete} onClick={() => props.handleClick(comment.comment_id)} />
+        <span className={style.station}>
+          <FontAwesomeIcon icon={['fas', 'ellipsis-v']} className={style.ellipsis} onClick={(e) => props.handleActionClick(e, comment.comment_id)} />
+          {comment.toggle && <div className={style.actions}><div onClick={(e) => props.handleClick(e, comment.comment_id)} >delete</div></div>}
+        </span>
       )
     }
     return (

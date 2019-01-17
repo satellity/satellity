@@ -6,11 +6,6 @@
 }
 .comment {
   border-bottom: 1px solid rgb(240, 240, 240);
-  &:hover {
-    .delete {
-      display: inline-block;
-    }
-  }
 }
 .profile {
   display: flex;
@@ -30,10 +25,36 @@
   opacity: 0.6;
   margin: .4rem 0;
 }
-.delete {
+.station {
+  position: relative;
+}
+.ellipsis {
   cursor: pointer;
-  display: none;
   opacity: 0.6;
+}
+.actions {
+  position: absolute;
+  background: #EEE;
+  top: 2rem;
+  right: -0.8rem;
+  &:before {
+    content:"\A";
+    width: 0;
+    height: 0;
+    border-left: .5rem solid transparent;
+    border-right: .5rem solid transparent;
+    border-bottom: .5rem solid #EEE;
+    position: absolute;
+    top: -.5rem;
+    right: 0.5rem;
+  }
+  div {
+    padding: 0 .8rem;
+    cursor: pointer;
+    &:hover {
+      background: #ccc;
+    }
+  }
 }
 /*new & edit*/
 .form {

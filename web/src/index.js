@@ -17,9 +17,9 @@ import TopicNew from './topics/new.js';
 import TopicShow from './topics/show.js';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEdit, faTrashAlt, faComment} from '@fortawesome/free-regular-svg-icons';
-import { faPlus} from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit, faTrashAlt, faComment, faPlus);
+import { faEdit, faTrashAlt, faComment } from '@fortawesome/free-regular-svg-icons';
+import { faPlus, faEllipsisV} from '@fortawesome/free-solid-svg-icons';
+library.add(faEdit, faTrashAlt, faComment, faPlus, faEllipsisV);
 
 ReactDOM.render((
   <Router>
