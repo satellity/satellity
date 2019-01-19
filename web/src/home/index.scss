@@ -5,16 +5,19 @@
   text-align: center;
 }
 .nodes {
-  background: white;
-  padding-bottom: 0.8rem;
+  background: $color-bg-light-grey;
+  padding: 0.8rem;
 }
 .node {
-  font-size: 1.2rem;
+  border-radius: .2rem;
   display: inline-block;
-  padding: .8rem .8rem .4rem;
+  font-size: 1rem;
+  padding: .2rem .8rem;
   margin-right: .4rem;
   &:hover, &.current {
-    border-bottom: 3px solid $color-main-red;
+    color: white;
+    background: $color-main-red;
+    //border-bottom: 3px solid $color-main-red;
   }
 }
 .topics {

@@ -16,7 +16,7 @@
   height: 3.2rem;
 }
 .detail {
-  color: #B4C4D1;
+  color: $color-font-light-grey;
   flex-grow: 1;
   font-size: .875rem;
   padding-left: 0.8rem;
@@ -26,7 +26,7 @@
 }
 .title {
   font-weight: normal;
-  font-size: 1.2rem;
+  font-size: 1.125rem;
   margin: 0;
   word-break: break-all;
 }

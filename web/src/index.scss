@@ -6,14 +6,14 @@
 
 :global {
 html, body {
-  color: #333;
+  color: $color-font-dark;
   font-family: Roboto Mono, Maven Pro,sans-serif;
 }
 body {
   line-height: 1.6rem;
 }
 a {
-  color: #333;
+  color: $color-font-dark;
   position: relative;
   text-decoration: none;
   &:hover {
