@@ -1,3 +1,5 @@
+@import '../assets/css/constant.scss';
+
 /* comment list */
 .comments {
   background: white;
@@ -30,13 +32,12 @@
 }
 .ellipsis {
   cursor: pointer;
-  opacity: 0.6;
 }
 .actions {
   position: absolute;
   background: #EEE;
   top: 2rem;
-  right: -0.8rem;
+  right: -0.6rem;
   &:before {
     content:"\A";
     width: 0;
@@ -46,7 +47,7 @@
     border-bottom: .5rem solid #EEE;
     position: absolute;
     top: -.5rem;
-    right: 0.5rem;
+    right: 0.3rem;
   }
   div {
     padding: 0 .8rem;

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
 import API from '../api/index.js';
-import style from './style.css';
+import style from './style.scss';
 import SiteWidget from '../components/site-widget.js';
 import CommentList from '../comments/index.js';
 import LoadingView from '../loading/loading.js';

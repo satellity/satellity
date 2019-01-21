@@ -1,3 +1,5 @@
+@import '../assets/css/constant.scss';
+
 /* show page */
 .form_loading {
   background: white;
@@ -5,7 +7,7 @@
   padding: .8rem 0 0;
 }
 .loading {
-  background: #EEE;
+  background: $color-bg-light-grey;
   text-align: center;
   padding: .8rem 0;
 }
@@ -14,14 +16,14 @@
   box-sizing: border-box;
 }
 .header {
-  background: #EEE;
+  background: $color-bg-light-grey;
   box-sizing: border-box;
   font-size: 1rem;
   padding: .8rem;
 }
 .title {
-  font-size: 1.6rem;
-  font-weight: normal;
+  font-size: 1.25rem;
+  font-weight: 600;
   margin: 0 0 0.8rem;
   word-break: break-all;
 }
@@ -30,7 +32,8 @@
   margin-left: 0.8rem;
 }
 .info {
-  color: #667D99;
+  font-size: .875rem;
+  color: $color-font-grey;
 }
 .avatar {
   float: right;
@@ -53,6 +56,13 @@
   background: white;
   box-sizing: border-box;
   padding: .8rem;
+}
+.topic_body {
+  border: 1px solid #ccc;
+  margin-bottom: 1rem;
+  padding: .6rem .3rem;
+  min-height: 12rem;
+  overflow: hidden;
 }
 @media only screen and (max-width: 64rem) {
   .avatar {

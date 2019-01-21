@@ -16,8 +16,7 @@
   margin-right: .4rem;
   &:hover, &.current {
     color: white;
-    background: $color-main-red;
-    //border-bottom: 3px solid $color-main-red;
+    background: rgba($color-main-red, 0.8);
   }
 }
 .topics {

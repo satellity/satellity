@@ -1,8 +1,8 @@
-import style from './style.css';
-import "simplemde/dist/simplemde.min.css";
-import SimpleMDE from 'react-simplemde-editor';
+import 'setimmediate';
+import style from './style.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Editor from 'rich-markdown-editor';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
 const validate = require('uuid-validate');
@@ -60,7 +60,7 @@ class TopicNew extends Component {
   }
 
   handleBodyChange(value) {
-    this.setState({body: value});
+    this.setState({body: value()});
   }
 
   handleSubmit(e) {
@@ -107,6 +107,10 @@ const View = ({onSubmit, onChange, onBodyChange, state}) => {
       <LoadingView style='md-ring'/>
     </div>
   )
+  const s = {
+    readOnly: false,
+    dark: false
+  };
 
   return (
     <div className='container'>
@@ -127,12 +131,16 @@ const View = ({onSubmit, onChange, onBodyChange, state}) => {
                 </select>
               </div>
             </div>
-            <div>
-              <SimpleMDE
-                className={""}
-                value={state.body}
+            <div className={style.topic_body}>
+              {!state.loading && <Editor
+                defaultValue={state.body}
                 onChange={onBodyChange}
-              />
+                placeholder='Write somthing or leave it blank...'
+                readOnly={s.readOnly}
+                dark={s.dark}
+                autoFocus
+                toc
+              />}
             </div>
             <div className='action'>
               <input type='submit' value='SUBMIT' />
