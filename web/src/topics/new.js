@@ -1,8 +1,10 @@
-import 'setimmediate';
+require('codemirror/lib/codemirror.css');
+require('codemirror/theme/xq-light.css');
+require('codemirror/mode/markdown/markdown.js');
 import style from './style.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import Editor from 'rich-markdown-editor';
+import {Controlled as CodeMirror} from 'react-codemirror2'
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
 const validate = require('uuid-validate');
@@ -59,8 +61,8 @@ class TopicNew extends Component {
     });
   }
 
-  handleBodyChange(value) {
-    this.setState({body: value()});
+  handleBodyChange(editor, data, value) {
+    this.setState({body: value});
   }
 
   handleSubmit(e) {
@@ -107,10 +109,6 @@ const View = ({onSubmit, onChange, onBodyChange, state}) => {
       <LoadingView style='md-ring'/>
     </div>
   )
-  const s = {
-    readOnly: false,
-    dark: false
-  };
 
   return (
     <div className='container'>
@@ -132,15 +130,16 @@ const View = ({onSubmit, onChange, onBodyChange, state}) => {
               </div>
             </div>
             <div className={style.topic_body}>
-              {!state.loading && <Editor
-                defaultValue={state.body}
-                onChange={onBodyChange}
-                placeholder='Write somthing or leave it blank...'
-                readOnly={s.readOnly}
-                dark={s.dark}
-                autoFocus
-                toc
-              />}
+              <CodeMirror
+                value={state.body}
+                options={{
+                  mode: 'markdown',
+                  theme: 'xq-light',
+                  lineNumbers: true,
+                  lineWrapping: true
+                }}
+                onBeforeChange={(editor, data, value) => onBodyChange(editor, data, value)}
+              />
             </div>
             <div className='action'>
               <input type='submit' value='SUBMIT' />
