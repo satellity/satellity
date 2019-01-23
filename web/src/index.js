@@ -5,6 +5,7 @@ import './index.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import showdown from 'showdown';
 import MainRoute from './layouts/main.js';
 import AdminRoute from './admin/admin.js';
 import NoMatch from './notfound.js';
@@ -20,6 +21,11 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEdit, faTrashAlt, faComment } from '@fortawesome/free-regular-svg-icons';
 import { faPlus, faEllipsisV} from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit, faTrashAlt, faComment, faPlus, faEllipsisV);
+
+showdown.setOption('customizedHeaderId', true);
+showdown.setOption('simplifiedAutoLink', true);
+showdown.setOption('strikethrough', true);
+showdown.setOption('simpleLineBreaks', true);
 
 ReactDOM.render((
   <Router>

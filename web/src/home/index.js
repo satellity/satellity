@@ -51,7 +51,7 @@ class Home extends Component {
 
   handleClick(id, e) {
     e.preventDefault();
-    this.setState({category: id, loading: true});
+    this.setState({loading: true});
     if (id === 'latest') {
       this.api.topic.index((resp) => {
         this.setState({topics: resp.data, category: id, loading: false});
