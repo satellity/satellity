@@ -34,6 +34,8 @@ class CommentIndex extends Component {
     let comments = this.state.comments.map((comment) => {
       if (comment.comment_id === id) {
         comment.toggle = !comment.toggle;
+      } else {
+        comment.toggle = false;
       }
       return comment
     });
