@@ -1,6 +1,6 @@
-## Introduce
+## GoDiscourse
 
-Godiscourse is a 100% open source, free, Golang back-end forum. The first code is `hello world`.
+GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo, please visit [https://live.godiscourse.com/](https://live.godiscourse.com/)
 
 ## Built With
 
