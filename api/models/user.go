@@ -167,10 +167,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		}
 		return x509.ParsePKIXPublicKey(pkix)
 	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	if !token.Valid {
+	if err != nil || !token.Valid {
 		return nil, nil
 	}
 	return user, nil

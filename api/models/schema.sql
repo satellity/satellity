@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
 	email                 VARCHAR(512),
 	username              VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
 	nickname              VARCHAR(64) NOT NULL DEFAULT '',
-	description           VARCHAR(2048) NOT NULL DEFAULT '',
+	biography             VARCHAR(2048) NOT NULL DEFAULT '',
 	encrypted_password    VARCHAR(1024),
 	github_id             VARCHAR(1024) UNIQUE,
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -28,7 +28,7 @@ CREATE INDEX ON sessions (user_id);
 CREATE TABLE IF NOT EXISTS categories (
 	category_id           VARCHAR(36) PRIMARY KEY,
 	name                  VARCHAR(36) NOT NULL,
-	biography             VARCHAR(512) NOT NULL,
+	description           VARCHAR(512) NOT NULL,
 	topics_count          INTEGER NOT NULL DEFAULT 0,
 	last_topic_id         VARCHAR(36),
 	position              INTEGER NOT NULL DEFAULT 0,

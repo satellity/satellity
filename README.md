@@ -1,18 +1,25 @@
 ## Introduce
 
-Godiscourse is a 100% open source, free, go back-end discourse like forum, build from `hello world`.
+Godiscourse is a 100% open source, free, Golang back-end forum. The first code is `hello world`.
 
-## Environment
+## Built With
 
-1. GO version go1.10.2 darwin/amd64
-2. postgres (PostgreSQL) 10.5
+1. Go version go1.10.2 darwin/amd64
+2. postgres (PostgreSQL) 11.1
+3. react ^16.7.0
 
-## Usage
+## Structure
 
-1. `cd ./api`, copy `config/test.cfg` to `config/config.go`.
-2. Prepare database, you can find database schema in `models/schema.sql`, find the database config in `config/config.cfg`.
-3. Run back-end `go build` and `./api`.
-4. All front-end is under `web` directory, `cd web` install dependence `npm install`, start service `npm run dev`.
+1. `api` is back-end service, which is Rails like structure.
+2. `web` is front-end service, contains React, Parcel and etc.
+
+## How to run it
+
+1. `cd ./api`, copy `config/test.cfg` to `config/config.go`. Replace config with yours.
+2. Prepare and start database, the database schema under `./api/models/schema.sql`, [how to install postgresql](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04).
+3. `cd ./web` and run `npm install` to prepare front-end.
+4. `cd path/to/api && go build && ./api` to start Golang server
+5. `cd path/to/web && npm run dev` to run front-end, and open `http://localhost:1234`
 
 ## License
 

@@ -8,8 +8,9 @@
     "build": "NODE_ENV=production parcel build index.html"
   },
   "keywords": [
+    "discourse",
     "forum",
-    "discourse"
+    "Golang"
   ],
   "author": "jadeydi",
   "license": "BSD",
