@@ -10,8 +10,8 @@ Godiscourse is a 100% open source, free, Golang back-end forum. The first code i
 
 ## Structure
 
-1. `api` is back-end service, which is Rails like structure.
-2. `web` is front-end service, contains React, Parcel and etc.
+1. `./api` is back-end service, which is Rails like structure.
+2. `./web` is front-end service, contains React, Parcel and etc.
 
 ## How to run it
 
