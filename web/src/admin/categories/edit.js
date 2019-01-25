@@ -9,7 +9,7 @@ class AdminCategoryEdit extends Component {
     this.id = props.match.params.id;
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.state = {type: 'category', name: '', position: '', description: ''};
+    this.state = {type: 'category', name: '', alias: '', position: '', description: ''};
   }
 
   componentDidMount() {
@@ -52,6 +52,10 @@ const CategoryEdit = ({onSubmit, onChange, state}) => (
         <div>
           <label name='name'>Name *</label>
         <input type='text' name='name' value={state.name} autoComplete='off' onChange={(e) => onChange(e)}/>
+        </div>
+        <div>
+          <label name='alias'>Alias *</label>
+        <input type='text' name='alias' value={state.alias} autoComplete='off' onChange={(e) => onChange(e)}/>
         </div>
         <div>
           <label name='position'>Position</label>

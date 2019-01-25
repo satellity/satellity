@@ -26,4 +26,4 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 5. `cd path/to/web && npm run dev` to run front-end, and open `http://localhost:1234`
 
 ## License
-Released under the MIT license
+Released under the [MIT](https://opensource.org/licenses/MIT) license

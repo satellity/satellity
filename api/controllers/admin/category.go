@@ -15,6 +15,7 @@ type adminCategoryImpl struct{}
 // TODO should add position
 type categoryRequest struct {
 	Name        string `json:"name"`
+	Alias       string `json:"alias"`
 	Description string `json:"description"`
 	Position    int    `json:"position"`
 }
@@ -34,7 +35,7 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	category, err := models.CreateCategory(r.Context(), body.Name, body.Description, body.Position)
+	category, err := models.CreateCategory(r.Context(), body.Name, body.Alias, body.Description, body.Position)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
@@ -58,7 +59,7 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	category, err := models.UpdateCategory(r.Context(), params["id"], body.Name, body.Description, body.Position)
+	category, err := models.UpdateCategory(r.Context(), params["id"], body.Name, body.Alias, body.Description, body.Position)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return

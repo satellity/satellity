@@ -17,7 +17,7 @@ func TestTopicCRUD(t *testing.T) {
 
 	user := createTestUser(ctx, "im.yuqlee@gmail.com", "username", "password")
 	assert.NotNil(user)
-	category, _ := CreateCategory(ctx, "name", "Description", 0)
+	category, _ := CreateCategory(ctx, "name", "alias", "Description", 0)
 	assert.NotNil(category)
 	topic, err := user.CreateTopic(ctx, "title", "body", category.CategoryID)
 	assert.Nil(err)
@@ -68,7 +68,7 @@ func TestTopicCRUD(t *testing.T) {
 	assert.NotNil(err)
 	assert.Nil(new)
 
-	newCategory, _ := CreateCategory(ctx, "new name", "New Description", 2)
+	newCategory, _ := CreateCategory(ctx, "new name", "new alias", "New Description", 2)
 	assert.NotNil(newCategory)
 	topic, err = user.UpdateTopic(ctx, topic.TopicID, "", "orld orld", newCategory.CategoryID)
 	assert.Nil(err)

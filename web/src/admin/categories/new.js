@@ -8,7 +8,7 @@ class AdminCategoryNew extends Component {
     this.api = new API();
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.state = {name: '', position: '', description: ''};
+    this.state = {name: '', alias: '', position: '', description: ''};
   }
 
   handleChange(e) {
@@ -44,6 +44,10 @@ const CategoryNew = ({onSubmit, onChange, state}) => (
         <div>
           <label name='name'>Name *</label>
           <input type='text' name='name' value={state.name} autoComplete='off' onChange={(e) => onChange(e)} />
+        </div>
+        <div>
+          <label name='alias'>Alias *</label>
+          <input type='text' name='alias' value={state.name} autoComplete='off' onChange={(e) => onChange(e)} />
         </div>
         <div>
           <label name='position'>Position</label>

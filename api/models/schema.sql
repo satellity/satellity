@@ -28,6 +28,7 @@ CREATE INDEX ON sessions (user_id);
 CREATE TABLE IF NOT EXISTS categories (
 	category_id           VARCHAR(36) PRIMARY KEY,
 	name                  VARCHAR(36) NOT NULL,
+	alias                 VARCHAR(36) NOT NULL,
 	description           VARCHAR(512) NOT NULL,
 	topics_count          INTEGER NOT NULL DEFAULT 0,
 	last_topic_id         VARCHAR(36),

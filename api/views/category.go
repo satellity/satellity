@@ -12,6 +12,7 @@ type CategoryView struct {
 	Type        string    `json:"type"`
 	CategoryID  string    `json:"category_id"`
 	Name        string    `json:"name"`
+	Alias       string    `json:"alias"`
 	Description string    `json:"description"`
 	TopicsCount int       `json:"topics_count"`
 	LastTopicID string    `json:"last_topic_id"`
@@ -25,6 +26,7 @@ func buildCategory(category *models.Category) CategoryView {
 		Type:        "category",
 		CategoryID:  category.CategoryID,
 		Name:        category.Name,
+		Alias:       category.Alias,
 		Description: category.Description,
 		TopicsCount: category.TopicsCount,
 		LastTopicID: category.LastTopicID.String,

@@ -16,6 +16,7 @@ const categoriesDDL = `
 CREATE TABLE IF NOT EXISTS categories (
 	category_id           VARCHAR(36) PRIMARY KEY,
 	name                  VARCHAR(36) NOT NULL,
+	alias                 VARCHAR(36) NOT NULL,
 	description           VARCHAR(512) NOT NULL,
 	topics_count          INTEGER NOT NULL DEFAULT 0,
 	last_topic_id         VARCHAR(36),
@@ -27,12 +28,13 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE INDEX ON categories (position);
 `
 
-var categoryCols = []string{"category_id", "name", "description", "topics_count", "last_topic_id", "position", "created_at", "updated_at"}
+var categoryCols = []string{"category_id", "name", "alias", "description", "topics_count", "last_topic_id", "position", "created_at", "updated_at"}
 
 // Category is used to categorize topics.
 type Category struct {
 	CategoryID  string         `sql:"category_id,pk"`
 	Name        string         `sql:"name"`
+	Alias       string         `sql:"alias"`
 	Description string         `sql:"description"`
 	TopicsCount int            `sql:"topics_count,notnull"`
 	LastTopicID sql.NullString `sql:"last_topic_id"`
@@ -42,16 +44,21 @@ type Category struct {
 }
 
 // CreateCategory create a new category.
-func CreateCategory(ctx context.Context, name, description string, position int) (*Category, error) {
+func CreateCategory(ctx context.Context, name, alias, description string, position int) (*Category, error) {
+	alias = strings.TrimSpace(alias)
 	name = strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(name) < 1 {
 		return nil, session.BadDataError(ctx)
 	}
+	if alias == "" {
+		alias = name
+	}
 
 	category := &Category{
 		CategoryID:  uuid.Must(uuid.NewV4()).String(),
 		Name:        name,
+		Alias:       alias,
 		Description: description,
 		LastTopicID: sql.NullString{String: "", Valid: false},
 		Position:    position,
@@ -71,10 +78,11 @@ func CreateCategory(ctx context.Context, name, description string, position int)
 }
 
 // UpdateCategory update a category
-func UpdateCategory(ctx context.Context, id, name, description string, position int) (*Category, error) {
+func UpdateCategory(ctx context.Context, id, name, alias, description string, position int) (*Category, error) {
+	alias = strings.TrimSpace(alias)
 	name = strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
-	if len(name) < 1 && len(description) < 1 {
+	if len(alias) < 1 && len(name) < 1 && len(description) < 1 {
 		return nil, session.BadDataError(ctx)
 	}
 	var category *Category
@@ -86,6 +94,9 @@ func UpdateCategory(ctx context.Context, id, name, description string, position 
 		}
 		if len(name) > 0 {
 			category.Name = name
+		}
+		if len(alias) > 0 {
+			category.Alias = alias
 		}
 		if len(description) > 0 {
 			category.Description = description
