@@ -1,3 +1,5 @@
+@import '../assets/css/constant.scss';
+
 .widget {
   background: white;
   box-sizing: border-box;
@@ -22,4 +24,10 @@
       background: white;
     }
   }
+}
+.copyright {
+  color: $color-font-light-grey;
+  font-family: America, sans-serif;
+  font-size: .875rem;
+  margin-top: 1.6rem;
 }
