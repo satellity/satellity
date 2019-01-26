@@ -35,7 +35,7 @@
 }
 .actions {
   position: absolute;
-  background: #EEE;
+  background: white;
   top: 2rem;
   right: -0.6rem;
   &:before {
@@ -44,18 +44,26 @@
     height: 0;
     border-left: .5rem solid transparent;
     border-right: .5rem solid transparent;
-    border-bottom: .5rem solid #EEE;
+    border-bottom: .5rem solid white;
     position: absolute;
     top: -.5rem;
     right: 0.3rem;
   }
   div {
-    padding: 0 .8rem;
+    padding: .4rem 1.6rem;
     cursor: pointer;
-    &:hover {
-      background: #ccc;
-    }
   }
+}
+.action {
+  box-shadow: 0 0 .8rem 0 $color-font-light-grey;
+  display: flex;
+  align-items: center;
+}
+.trash {
+  font-size: .875rem;
+}
+.delete {
+  padding-left: .4rem;
 }
 /*new & edit*/
 .form {

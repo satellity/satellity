@@ -79,7 +79,15 @@ const View = (props) => {
       delAction = (
         <span className={style.station}>
           <FontAwesomeIcon icon={['fas', 'ellipsis-v']} className={style.ellipsis} onClick={(e) => props.handleActionClick(e, comment.comment_id)} />
-          {comment.toggle && <div className={style.actions}><div onClick={(e) => props.handleClick(e, comment.comment_id)} >delete</div></div>}
+          {
+            comment.toggle &&
+            <div className={style.actions}>
+              <div onClick={(e) => props.handleClick(e, comment.comment_id)} className={style.action}>
+                <FontAwesomeIcon icon={['far', 'trash-alt']} className={style.trash} onClick={(e) => props.handleActionClick(e, comment.comment_id)} />
+                <span className={style.delete}>Delete</span>
+              </div>
+            </div>
+          }
         </span>
       )
     }
