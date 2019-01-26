@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../../api/index.js';
+import LoadingView from '../../loading/loading.js';
 
 class AdminCategoryNew extends Component {
   constructor(props) {
@@ -8,7 +9,7 @@ class AdminCategoryNew extends Component {
     this.api = new API();
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.state = {name: '', alias: '', position: '', description: ''};
+    this.state = {name: '', alias: '', position: '', description: '', submitting: false};
   }
 
   handleChange(e) {
@@ -21,9 +22,11 @@ class AdminCategoryNew extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
+    this.setState({submitting: true});
     const history = this.props.history;
     this.api.category.create(this.state, (resp) => {
       history.push('/admin/categories');
+    this.setState({submitting: false});
     })
   }
 
@@ -34,31 +37,34 @@ class AdminCategoryNew extends Component {
   }
 }
 
-const CategoryNew = ({onSubmit, onChange, state}) => (
+const CategoryNew = (props) => (
   <div>
     <h1 className='welcome'>
       Create a new category
     </h1>
     <div className='panel'>
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={(e) => props.onSubmit(e)}>
         <div>
           <label name='name'>Name *</label>
-          <input type='text' name='name' value={state.name} autoComplete='off' onChange={(e) => onChange(e)} />
+          <input type='text' name='name' value={props.state.name} autoComplete='off' onChange={(e) => props.onChange(e)}/>
         </div>
         <div>
           <label name='alias'>Alias *</label>
-          <input type='text' name='alias' value={state.name} autoComplete='off' onChange={(e) => onChange(e)} />
+          <input type='text' name='alias' value={props.state.alias} autoComplete='off' onChange={(e) => props.onChange(e)}/>
         </div>
         <div>
           <label name='position'>Position</label>
-          <input type='number' name='position' value={state.position} pattern="[0-9]{10}" autoComplete='off' onChange={(e) => onChange(e)} />
+          <input type='number' name='position' value={props.state.position} autoComplete='off' onChange={(e) => props.onChange(e)}/>
         </div>
         <div>
-          <label name='description'>Description *</label>
-          <textarea type='text' name='description' value={state.description} onChange={(e) => onChange(e)} key='description' />
+          <label name='name'>Description *</label>
+          <textarea type='text' name='description' value={props.state.description} onChange={(e) => props.onChange(e)} key='description'/>
         </div>
         <div className='action'>
-          <input type='submit' value='SUBMIT' />
+          <button className='btn submit blue' disabled={props.state.submitting}>
+            { props.state.submitting && <LoadingView style='sm-ring blank'/> }
+            &nbsp;SUBMIT
+          </button>
         </div>
       </form>
     </div>

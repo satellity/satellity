@@ -52,6 +52,7 @@ class CommentIndex extends Component {
 
   handleSubmit(comment) {
     let newComments = this.state.comments.slice();
+    comment.body = this.converter.makeHtml(comment.body);
     newComments.push(comment);
     this.setState({comments: newComments, comments_count: newComments.length});
   }

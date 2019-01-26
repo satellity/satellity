@@ -2,6 +2,7 @@ import style from './index.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
+import LoadingView from '../loading/loading.js';
 
 class UserEdit extends Component {
   constructor(props) {
@@ -40,6 +41,7 @@ class UserEdit extends Component {
     const history = this.props.history;
     const data = {nickname: this.state.nickname, biography: this.state.biography};
     this.api.user.update(data, (resp) => {
+      this.setState({submitting: false});
       history.push('/');
     });
   }
@@ -59,23 +61,26 @@ class UserEdit extends Component {
   }
 }
 
-const View = ({onSubmit, onChange, state}) => {
+const View = (props) => {
   return (
     <div className='container'>
       <main className='section main'>
         <div className={style.profile}>
           <h2>Update Profile</h2>
-          <form onSubmit={(e) => onSubmit(e)}>
+          <form onSubmit={(e) => props.onSubmit(e)}>
             <div>
               <label name='nickname'>Nickname</label>
-              <input type='text' name='nickname' value={state.nickname} autoComplete='off' onChange={(e) => onChange(e)} />
+              <input type='text' name='nickname' value={props.state.nickname} autoComplete='off' onChange={(e) => props.onChange(e)} />
             </div>
             <div>
               <label name='biography'>Biography</label>
-              <textarea type='text' name='biography' value={state.biography} onChange={(e) => onChange(e)} />
+              <textarea type='text' name='biography' value={props.state.biography} onChange={(e) => props.onChange(e)} />
             </div>
             <div className='action'>
-              <input type='submit' value='SUBMIT' />
+              <button className='btn submit' disabled={props.state.submitting}>
+                { props.state.submitting && <LoadingView style='sm-ring blank'/> }
+                &nbsp;SUBMIT
+              </button>
             </div>
           </form>
         </div>

@@ -80,11 +80,13 @@ class TopicNew extends Component {
     const data = {title: this.state.title, body: this.state.body, category_id: this.state.category_id};
     if (validate(this.state.topic_id)) {
       this.api.topic.update(this.state.topic_id, data, (resp) => {
+        this.setState({submitting: false});
         history.push('/');
       });
       return
     }
     this.api.topic.create(data, (resp) => {
+      this.setState({submitting: false});
       history.push('/');
     });
   }
@@ -142,7 +144,10 @@ const View = (props) => {
               />
             </div>
             <div className='action'>
-              <input type='submit' value='SUBMIT' />
+              <button className='btn submit' disabled={props.state.submitting}>
+                { props.state.submitting && <LoadingView style='sm-ring blank'/> }
+                &nbsp;SUBMIT
+              </button>
             </div>
           </form>
         </div>

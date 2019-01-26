@@ -38,6 +38,7 @@
   background: white;
   top: 2rem;
   right: -0.6rem;
+  z-index: 99;
   &:before {
     content:"\A";
     width: 0;
@@ -50,7 +51,7 @@
     right: 0.3rem;
   }
   div {
-    padding: .4rem 1.6rem;
+    padding: .4rem .8rem;
     cursor: pointer;
   }
 }

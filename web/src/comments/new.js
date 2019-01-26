@@ -2,6 +2,7 @@ import style from './/index.scss';
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
+import LoadingView from '../loading/loading.js';
 
 class CommentNew extends Component {
   constructor(props) {
@@ -42,16 +43,19 @@ class CommentNew extends Component {
   }
 }
 
-const View = ({onSubmit, onChange, state}) => {
+const View = (props) => {
   return (
     <div className={style.form}>
-      <form onSubmit={(e) => onSubmit(e)}>
-        <input type='hidden' name='topic_id' defaultValue={state.topic_id} />
+      <form onSubmit={(e) => props.onSubmit(e)}>
+        <input type='hidden' name='topic_id' defaultValue={props.state.topic_id} />
         <div>
-          <textarea type='text' name='body' minLength='3' required placeholder='Say something ...' value={state.body} onChange={(e) => onChange(e)} />
+          <textarea type='text' name='body' minLength='3' required placeholder='Say something ...' value={props.state.body} onChange={(e) => props.onChange(e)} />
         </div>
         <div className='action'>
-          <input type='submit' value='SUBMIT' />
+          <button className='btn submit' disabled={props.state.submitting}>
+            { props.state.submitting && <LoadingView style='sm-ring blank'/> }
+            &nbsp;SUBMIT
+          </button>
         </div>
       </form>
     </div>

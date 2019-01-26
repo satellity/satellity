@@ -44,14 +44,15 @@
 .body {
   padding: 1.6rem .8rem;
 }
+/* new & edit page */
 .rules {
+  border-top: .3rem solid $color-main-purple;
   background-color: white;
   padding: .8rem;
 }
 .rule {
   padding-top: 0;
 }
-/* new & edit page */
 .form {
   background: white;
   box-sizing: border-box;

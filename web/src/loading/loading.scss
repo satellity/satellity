@@ -33,7 +33,7 @@
   border: 4px solid $color-main-red;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #dd4814 transparent transparent transparent;
+  border-color: $color-main-red transparent transparent transparent;
 }
 .lds-ring div:nth-child(1) {
   animation-delay: -0.45s;
@@ -50,5 +50,16 @@
 }
 .md-ring div {
   border-width: 3px;
+}
+.sm-ring {
+  width: 20px;
+  height: 20px;
+}
+.sm-ring div {
+  border-width: 2px;
+}
+.sm-ring.blank div {
+  border: 2px solid white;
+  border-color: white transparent transparent transparent;
 }
 }
