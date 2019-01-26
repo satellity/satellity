@@ -55,12 +55,31 @@
 .form {
   background: white;
   box-sizing: border-box;
+  cursor: pointer;
   padding: .8rem;
+}
+.categories {
+  margin-bottom: 1rem;
+}
+.category {
+  background: $color-bg-light-grey;
+  border-radius: .2rem;
+  display: inline-block;
+  padding: .2rem .8rem;
+  margin-right: .8rem;
+  &:hover {
+    background: rgba($color-main-red, $color-main-red-alpha);
+    color: white;
+  }
+}
+.categoryCurrent {
+  background: rgba($color-main-red, $color-main-red-alpha);
+  color: white;
 }
 .topic_body {
   border: 1px solid #ccc;
   margin-bottom: 1rem;
-  min-height: 12rem;
+  min-height: 16rem;
   overflow: hidden;
   pre {
     font-size: 1rem;

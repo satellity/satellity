@@ -24,6 +24,7 @@ class TopicNew extends Component {
     }
     this.state = {topic_id: id, title: '', category_id: '', body: '', categories: categories, loading: true, submitting: false};
     this.handleChange = this.handleChange.bind(this);
+    this.handleCategoryClick = this.handleCategoryClick.bind(this);
     this.handleBodyChange = this.handleBodyChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     const classes = document.body.classList.values();
@@ -45,8 +46,8 @@ class TopicNew extends Component {
       this.setState({loading: false});
     }
     this.api.category.index((resp) => {
-      let category_id = '';
-      if (resp.data.length > 0) {
+      let category_id = this.state.category_id;
+      if (category_id === '' && resp.data.length > 0) {
         category_id = resp.data[0].category_id;
       }
       this.setState({categories: resp.data, category_id: category_id});
@@ -59,6 +60,10 @@ class TopicNew extends Component {
     this.setState({
       [name]: target.value
     });
+  }
+
+  handleCategoryClick(e, value) {
+    this.setState({category_id: value});
   }
 
   handleBodyChange(editor, data, value) {
@@ -86,22 +91,22 @@ class TopicNew extends Component {
 
   render() {
     return (
-      <View onSubmit={this.handleSubmit} onChange={this.handleChange} onBodyChange={this.handleBodyChange} state={this.state} />
+      <View onSubmit={this.handleSubmit} onChange={this.handleChange} onBodyChange={this.handleBodyChange} onCategoryClick={this.handleCategoryClick} state={this.state} />
     )
   }
 }
 
 // TODO jsx editor format
-const View = ({onSubmit, onChange, onBodyChange, state}) => {
-  const categories = state.categories.map((c) => {
+const View = (props) => {
+  const categories = props.state.categories.map((c) => {
     return (
-      <option value={c.category_id} key={c.category_id}>{c.name}</option>
+      <span key={c.category_id} className={`${style.category} ${c.category_id === props.state.category_id ? style.categoryCurrent : ''}`} onClick={(e) => props.onCategoryClick(e, c.category_id)}>{c.alias}</span>
     )
   });
 
   let title = <h2>Create a new topic</h2>;
-  if (validate(state.topic_id)) {
-    title = <h2>Edit: {state.title}</h2>
+  if (validate(props.state.topic_id)) {
+    title = <h2>Edit: {props.state.title}</h2>
   }
 
   const loadingView = (
@@ -113,32 +118,27 @@ const View = ({onSubmit, onChange, onBodyChange, state}) => {
   return (
     <div className='container'>
       <main className='section main'>
-        {state.loading && loadingView}
+        {props.state.loading && loadingView}
         <div className={style.form}>
           {title}
-          <form onSubmit={(e) => onSubmit(e)}>
-            <div>
-              <label name='title'>Title *</label>
-              <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' onChange={(e) => onChange(e)} />
+          <form onSubmit={(e) => props.onSubmit(e)}>
+            <div className={style.categories}>
+              {categories}
             </div>
             <div>
-              <label name='category'>Category</label>
-              <div className='select'>
-                <select name='category_id' value={state.category_id} onChange={(e) => onChange(e)}>
-                  {categories}
-                </select>
-              </div>
+              <input type='text' name='title' pattern='.{3,}' required value={props.state.title} autoComplete='off' placeholder='Title *' onChange={(e) => props.onChange(e)} />
             </div>
             <div className={style.topic_body}>
               <CodeMirror
-                value={state.body}
+                value={props.state.body}
                 options={{
                   mode: 'markdown',
                   theme: 'xq-light',
                   lineNumbers: true,
-                  lineWrapping: true
+                  lineWrapping: true,
+                  placeholder: 'Text (optional)'
                 }}
-                onBeforeChange={(editor, data, value) => onBodyChange(editor, data, value)}
+                onBeforeChange={(editor, data, value) => props.onBodyChange(editor, data, value)}
               />
             </div>
             <div className='action'>
