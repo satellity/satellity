@@ -17,7 +17,7 @@ Category.prototype = {
   index: function(callback) {
     this.api.request('get', '/categories', {}, (resp) => {
       let categories = resp.data.map((o) => {
-        return {category_id: o.category_id, name: o.name}
+        return {category_id: o.category_id, name: o.name, alias: o.alias}
       });
       window.localStorage.setItem('categories', btoa(JSON.stringify(categories)));
       if (typeof callback === 'function') {

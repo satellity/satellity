@@ -19,9 +19,6 @@ class TopicShow extends Component {
       user: {user_id: '', nickname: ''},
       category: {category_id: '', name: ''}
     };
-    const classes = document.body.classList.values();
-    document.body.classList.remove(...classes);
-    document.body.classList.add('topic', 'layout');
   }
 
   componentDidMount() {

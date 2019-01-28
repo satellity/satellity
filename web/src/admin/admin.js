@@ -14,9 +14,6 @@ class AdminRoute extends Component {
   constructor(props) {
     super(props);
     this.state = {site: constants.site};
-    const classes = document.body.classList.values();
-    document.body.classList.remove(...classes);
-    document.body.classList.add('admin', 'layout');
     if (!new API().user.isAdmin()) {
       props.history.push('/');
     }
@@ -25,7 +22,7 @@ class AdminRoute extends Component {
   render() {
     const match = this.props.match;
     return (
-      <div>
+      <div className='admin layout'>
         <header className='header'>
           <Link to='/' className='brand'> &larr; <span class='only-pc'>Back to {this.state.site}</span></Link>
           <Link to='/admin' className='navi'>Dashboard</Link>

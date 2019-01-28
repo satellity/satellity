@@ -27,9 +27,6 @@ class TopicNew extends Component {
     this.handleCategoryClick = this.handleCategoryClick.bind(this);
     this.handleBodyChange = this.handleBodyChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    const classes = document.body.classList.values();
-    document.body.classList.remove(...classes);
-    document.body.classList.add('topic', 'layout');
     // TODO handle authentication
     if (!this.api.user.loggedIn()) {
       props.history.push('/');

@@ -22,9 +22,6 @@ class Home extends Component {
       categories = JSON.parse(atob(d));
     }
     this.state = {topics: [], categories: categories, category: 'latest', loading: true};
-    const classes = document.body.classList.values();
-    document.body.classList.remove(...classes);
-    document.body.classList.add('home', 'layout');
     this.handleClick = this.handleClick.bind(this);
   }
 

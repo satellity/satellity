@@ -3,6 +3,7 @@
 :global {
 .admin.layout {
   background-color: rgba($color-main-blue, $color-main-blue-alpha);
+  min-height: 100vh;
   a {
     color: $color-main-blue;
     transition: all 0.2s ease-in-out;
