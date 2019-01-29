@@ -3,6 +3,8 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
+  padding: 0 1.6rem;
+  box-sizing: border-box;
   &:after {
     content: '404';
     color: rgb(247, 247, 247);
