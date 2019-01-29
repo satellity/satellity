@@ -10,7 +10,7 @@ const NoMatch = ({ location }) => {
   return (
     <div className={style.container}>
       <h3 className={style.body}>
-         LOL! NO MATCH FOR <span>{location.pathname.slice(0, 13)}</span>
+         LOL! NO MATCH FOR <span className={style.path}>{location.pathname.slice(0, 13)}</span>
         <div className={style.action}>
           <Link to='/'>Back to homepage</Link>
         </div>

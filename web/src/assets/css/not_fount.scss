@@ -18,6 +18,11 @@
   font-weight: normal;
   font-size: 1.6rem;
 }
+.path {
+  display: inline-block;
+  max-width: 17rem;
+  text-overflow: ellipsis;
+}
 .action {
   margin-top: 1rem;
   font-size: 1.2rem;
