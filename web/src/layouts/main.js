@@ -6,6 +6,10 @@ import logoURL from '../assets/images/chat.svg';
 import API from '../api/index.js'
 
 const MainRoute = ({component: Component, ...rest}) => {
+  const classes = document.body.classList.values();
+  document.body.classList.remove(...classes);
+  document.body.classList.add('main', 'layout');
+
   return (
     <Route {...rest} render={matchProps => (
       <div className={style.container}>

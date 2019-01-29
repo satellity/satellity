@@ -13,6 +13,9 @@ import API from '../api/index.js';
 class AdminRoute extends Component {
   constructor(props) {
     super(props);
+    const classes = document.body.classList.values();
+    document.body.classList.remove(...classes);
+    document.body.classList.add('admin', 'layout');
     this.state = {site: constants.site};
     if (!new API().user.isAdmin()) {
       props.history.push('/');
@@ -22,7 +25,7 @@ class AdminRoute extends Component {
   render() {
     const match = this.props.match;
     return (
-      <div className='admin layout'>
+      <div>
         <header className='header'>
           <Link to='/' className='brand'> &larr; <span class='only-pc'>Back to {this.state.site}</span></Link>
           <Link to='/admin' className='navi'>Dashboard</Link>

@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  &:after {
+    content: '404';
+    color: rgb(247, 247, 247);
+    font-size: 27rem;
+    position: absolute;
+    z-index: -1;
+  }
+}
+.body {
+  margin-top: -7rem;
+  font-weight: normal;
+  font-size: 1.6rem;
+}
+.action {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}
