@@ -1,0 +1,27 @@
+@import '../assets/css/constant.scss';
+
+.profile {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+  text-align: center;
+}
+.avatar {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 8rem;
+  margin-bottom: .8rem;
+}
+.name {
+  font-weight: bold;
+  font-size: 1.125rem;
+  margin-bottom: .8rem;
+}
+.created {
+  color: $color-font-light-grey;
+}
+.topics {
+  background: white;
+  padding: .8rem;
+  box-sizing: border-box;
+}

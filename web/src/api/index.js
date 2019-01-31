@@ -28,35 +28,39 @@ API.prototype = {
       headers: {'Authorization': 'Bearer ' + self.user.token(method, url, data)},
       data: data
     })
-      .then((resp) => {
-        // TODO process errors
-        if (resp.data.error) {
-          return Promise.reject(resp.data.error);
-        }
-        callback(resp.data);
-      })
-      .catch((error) => {
-        if (errCallback === 'function') {
-          errCallback(error)
-          return
-        }
-        if (error.code === 401) {
-          self.user.clear();
-          // TODO
-          self.login();
-          return
-        }
-        if (error.response) {
-          let data = error.response.data.error;
-          // TODO should handle 500 server error
-          if (data.code === 500) {
-            window.location.href = '/';
-            return
-          }
-        }
+    .then((resp) => {
+      // TODO process errors
+      if (resp.data.error) {
+        return Promise.reject(resp.data.error);
+      }
+      callback(resp.data);
+    })
+    .catch((error) => {
+      if (errCallback === 'function') {
+        errCallback(error)
+        return
+      }
+      if (error.code === 401) {
+        self.user.clear();
         // TODO
-        console.info(error);
-      })
+        self.login();
+        return
+      }
+      if (error.code === 404) {
+        window.location.href = '/404'
+        return
+      }
+      if (error.response) {
+        let data = error.response.data.error;
+        // TODO should handle 500 server error
+        if (data.code === 500) {
+          window.location.href = '/';
+          return
+        }
+      }
+      // TODO
+      console.info(error);
+    })
   },
 
   login: function() {

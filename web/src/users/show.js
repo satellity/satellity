@@ -1,32 +1,35 @@
-import style from './index.scss';
+import style from './show.scss';
 import topicStyle from '../styles/topic_item.scss';
+import moment from 'moment';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import API from '../api/index.js';
 import ColorUtils from '../components/color.js';
 
-class UserTopics extends Component {
+class UserShow extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
-    const user = this.api.user.me();
     this.color = new ColorUtils();
-    this.state = {user: {user_id: '', nickname: '', biography: '', avatar_url: '', created_at: ''}, topics: []};
+    this.state = {user: {user_id: props.match.params.id, nickname: '', biography: '', avatar_url: '', created_at: ''}, topics: []}
   }
 
   componentDidMount() {
-    const id = this.props.match.params["id"];
-    this.api.user.show(id, (resp) => {
-      this.setState({user: resp.data});
+    this.api.user.show(this.state.user.user_id, (resp) => {
+      let user = resp.data;
+      user.created_at = moment(user.created_at).format('l');
+      this.setState({user: user});
     });
-    this.api.user.topics(id, (resp) => {
+    this.api.user.topics(this.state.user.user_id, (resp) => {
       this.setState({topics: resp.data});
     });
   }
 
   render() {
-    return <View state={this.state} color={this.color} />
+    return (
+      <View state={this.state} color={this.color} />
+    )
   }
 }
 
@@ -56,30 +59,25 @@ const View = (props) => {
   });
 
   return (
-    <div>
-      <div className={style.user}>
-        <img src={props.state.user.avatar_url} className={style.avatar} />
-        <div className={style.info}>
-          <h1>
+    <div className='container'>
+      <aside className='section aside'>
+        <div className={style.profile}>
+          <img src={props.state.user.avatar_url} className={style.avatar} />
+          <div className={style.name}>
             {props.state.user.nickname}
-          </h1>
-          <div>
-            {props.state.user.biography}
+          </div>
+          <div className={style.created}>
+            Joined {props.state.user.created_at}
           </div>
         </div>
-      </div>
-
-      <div className='container'>
-        <main className='section main'>
-          <ul className={style.topics}>
-            {topics}
-          </ul>
-        </main>
-        <aside className='section aside'>
-        </aside>
-      </div>
+      </aside>
+      <main className='section main'>
+        <ul className={style.topics}>
+          {topics}
+        </ul>
+      </main>
     </div>
   )
-}
+};
 
-export default UserTopics;
+export default UserShow;
