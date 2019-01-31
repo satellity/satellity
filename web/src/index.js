@@ -13,7 +13,6 @@ import Oauth from './users/oauth.js';
 import Home from './home/index.js';
 import UserEdit from './users/edit.js';
 import UserShow from './users/show.js';
-import UserTopics from './users/topics.js';
 import TopicNew from './topics/new.js';
 import TopicShow from './topics/show.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -32,7 +31,6 @@ ReactDOM.render((
       <Switch>
         <MainRoute exact path='/' component={Home} />
         <MainRoute exact path='/user/edit' component={UserEdit} />
-        <MainRoute path='/users/:id/topics' component={UserTopics} />
         <MainRoute path='/users/:id' component={UserShow} />
         <MainRoute exact path='/topics/new' component={TopicNew} />
         <MainRoute path='/topics/:id/edit' component={TopicNew} />
