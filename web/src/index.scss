@@ -61,6 +61,12 @@ img {
   box-sizing: border-box;
   padding: 0.8rem;
 }
+.editor {
+  min-height: 24rem;
+  .CodeMirror {
+    height: 24rem;
+  }
+}
 // TODO better choice?
 div.container {
   display: flex;

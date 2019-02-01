@@ -77,10 +77,16 @@
   background: rgba($color-main-red, $color-main-red-alpha);
   color: white;
 }
+.preview {
+  text-align: right;
+}
+.preview_body {
+  padding: .6rem .3rem;
+}
 .topic_body {
   border: 1px solid #ccc;
   margin-bottom: 1rem;
-  min-height: 16rem;
+  min-height: 24rem;
   overflow: hidden;
   pre {
     font-size: 1rem;

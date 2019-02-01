@@ -16,9 +16,9 @@ import UserShow from './users/show.js';
 import TopicNew from './topics/new.js';
 import TopicShow from './topics/show.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEdit, faTrashAlt, faComment } from '@fortawesome/free-regular-svg-icons';
-import { faPlus, faEllipsisV} from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit, faTrashAlt, faComment, faPlus, faEllipsisV);
+import { faComment, faEdit, faEye, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
+import { faEllipsisV, faPlus } from '@fortawesome/free-solid-svg-icons';
+library.add(faComment, faEdit, faEye, faTrashAlt, faEllipsisV, faPlus);
 
 showdown.setOption('customizedHeaderId', true);
 showdown.setOption('simplifiedAutoLink', true);

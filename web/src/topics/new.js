@@ -5,6 +5,8 @@ import style from './style.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import {Controlled as CodeMirror} from 'react-codemirror2'
+import showdown from 'showdown';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
 const validate = require('uuid-validate');
@@ -13,6 +15,7 @@ class TopicNew extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
+    this.converter = new showdown.Converter();
     let categories = [];
     let d = window.localStorage.getItem('categories');
     if (d !== null && d !== undefined && d !== '') {
@@ -22,11 +25,12 @@ class TopicNew extends Component {
     if (id === null || id == undefined) {
       id = ''
     }
-    this.state = {topic_id: id, title: '', category_id: '', body: '', categories: categories, loading: true, submitting: false};
+    this.state = {topic_id: id, title: '', category_id: '', body: '', body_html: '', categories: categories, preview: false, loading: true, submitting: false};
     this.handleChange = this.handleChange.bind(this);
     this.handleCategoryClick = this.handleCategoryClick.bind(this);
     this.handleBodyChange = this.handleBodyChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handlePreview = this.handlePreview.bind(this);
     // TODO handle authentication
     if (!this.api.user.loggedIn()) {
       props.history.push('/');
@@ -60,11 +64,17 @@ class TopicNew extends Component {
   }
 
   handleCategoryClick(e, value) {
+    e.preventDefault();
     this.setState({category_id: value});
   }
 
   handleBodyChange(editor, data, value) {
     this.setState({body: value});
+  }
+
+  handlePreview(e) {
+    e.preventDefault();
+    this.setState({body_html: this.converter.makeHtml(this.state.body), preview: !this.state.preview});
   }
 
   handleSubmit(e) {
@@ -90,7 +100,13 @@ class TopicNew extends Component {
 
   render() {
     return (
-      <View onSubmit={this.handleSubmit} onChange={this.handleChange} onBodyChange={this.handleBodyChange} onCategoryClick={this.handleCategoryClick} state={this.state} />
+      <View
+        onSubmit={this.handleSubmit}
+        onChange={this.handleChange}
+        onBodyChange={this.handleBodyChange}
+        onCategoryClick={this.handleCategoryClick}
+        onPreview={this.handlePreview}
+        state={this.state} />
     )
   }
 }
@@ -127,8 +143,10 @@ const View = (props) => {
             <div>
               <input type='text' name='title' pattern='.{3,}' required value={props.state.title} autoComplete='off' placeholder='Title *' onChange={(e) => props.onChange(e)} />
             </div>
+            <div className={style.preview}> <FontAwesomeIcon icon={['far', 'eye']} onClick={(e) => props.onPreview(e)} /> </div>
             <div className={style.topic_body}>
-              <CodeMirror
+              {!props.state.preview && <CodeMirror
+                className='editor'
                 value={props.state.body}
                 options={{
                   mode: 'markdown',
@@ -138,7 +156,9 @@ const View = (props) => {
                   placeholder: 'Text (optional)'
                 }}
                 onBeforeChange={(editor, data, value) => props.onBodyChange(editor, data, value)}
-              />
+              />}
+              {props.state.preview && <article className={`md ${style.preview_body}`} dangerouslySetInnerHTML={{__html: props.state.body_html}}>
+              </article>}
             </div>
             <div className='action'>
               <button className='btn submit' disabled={props.state.submitting}>
