@@ -80,6 +80,12 @@
 .preview {
   text-align: right;
 }
+.eye {
+  color: rgba($color-main-dark, .8);
+  &:hover {
+    color: $color-main-dark;
+  }
+}
 .preview_body {
   padding: .6rem .3rem;
 }

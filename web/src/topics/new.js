@@ -143,7 +143,7 @@ const View = (props) => {
             <div>
               <input type='text' name='title' pattern='.{3,}' required value={props.state.title} autoComplete='off' placeholder='Title *' onChange={(e) => props.onChange(e)} />
             </div>
-            <div className={style.preview}> <FontAwesomeIcon icon={['far', 'eye']} onClick={(e) => props.onPreview(e)} /> </div>
+            <div className={style.preview}> <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={(e) => props.onPreview(e)} /> </div>
             <div className={style.topic_body}>
               {!props.state.preview && <CodeMirror
                 className='editor'
