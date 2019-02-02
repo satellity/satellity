@@ -2,7 +2,7 @@
 GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo, please visit [https://live.godiscourse.com/](https://live.godiscourse.com/)
 
 ## Built With
-1. Go version go1.10.2 darwin/amd64
+1. Go version go1.11.4 darwin/amd64
 2. postgres (PostgreSQL) 11.1
 3. react ^16.7.0
 
