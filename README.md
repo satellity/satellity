@@ -7,12 +7,13 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 3. react ^16.7.0
 
 ## Features
-1. REST API back-end written in Go
+1. REST API back-end written in Golang
 2. React-based frontend
 3. PostgreSQL, one of the best open source, flexible database 
 4. Social login (OAuth 2.0) only support Github now
 5. JSON Web Tokens (JWT) are used for user authentication in the API
 6. Markdown supported topic and comment
+7. Model tested
 
 ## Structure
 1. `./api` is back-end service, which is Rails like structure.
