@@ -12,7 +12,6 @@ import (
 
 type adminCategoryImpl struct{}
 
-// TODO should add position
 type categoryRequest struct {
 	Name        string `json:"name"`
 	Alias       string `json:"alias"`
