@@ -79,9 +79,6 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 
 // UpdateCategory update a category's attributes
 func UpdateCategory(ctx context.Context, id, name, alias, description string, position int) (*Category, error) {
-	if _, err := uuid.FromString(id); err != nil {
-		return nil, session.BadDataError(ctx)
-	}
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(alias) < 1 && len(name) < 1 {
@@ -94,6 +91,8 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 		category, err = findCategory(ctx, tx, id)
 		if err != nil {
 			return err
+		} else if category == nil {
+			return session.BadDataError(ctx)
 		}
 		if len(name) > 0 {
 			category.Name = name
@@ -108,6 +107,9 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 		return tx.Update(category)
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return category, nil
@@ -115,9 +117,6 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 
 // ReadCategory read a category by ID (uuid).
 func ReadCategory(ctx context.Context, id string) (*Category, error) {
-	if _, err := uuid.FromString(id); err != nil {
-		return nil, nil
-	}
 	var category *Category
 	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
 		var err error
@@ -184,6 +183,9 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 }
 
 func findCategory(ctx context.Context, tx *pg.Tx, id string) (*Category, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
 	category := &Category{CategoryID: id}
 	if err := tx.Model(category).Column(categoryCols...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
