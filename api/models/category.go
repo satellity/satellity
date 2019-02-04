@@ -12,11 +12,12 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+// topics_count should use pg int64
 const categoriesDDL = `
 CREATE TABLE IF NOT EXISTS categories (
 	category_id           VARCHAR(36) PRIMARY KEY,
 	name                  VARCHAR(36) NOT NULL,
-	alias                 VARCHAR(36) NOT NULL,
+	alias                 VARCHAR(128) NOT NULL,
 	description           VARCHAR(512) NOT NULL,
 	topics_count          INTEGER NOT NULL DEFAULT 0,
 	last_topic_id         VARCHAR(36),
@@ -33,9 +34,9 @@ var categoryCols = []string{"category_id", "name", "alias", "description", "topi
 // Category is used to categorize topics.
 type Category struct {
 	CategoryID  string         `sql:"category_id,pk"`
-	Name        string         `sql:"name"`
-	Alias       string         `sql:"alias"`
-	Description string         `sql:"description"`
+	Name        string         `sql:"name,notnull"`
+	Alias       string         `sql:"alias,notnull"`
+	Description string         `sql:"description,notnull"`
 	TopicsCount int            `sql:"topics_count,notnull"`
 	LastTopicID sql.NullString `sql:"last_topic_id"`
 	Position    int            `sql:"position,notnull"`
@@ -45,8 +46,7 @@ type Category struct {
 
 // CreateCategory create a new category.
 func CreateCategory(ctx context.Context, name, alias, description string, position int) (*Category, error) {
-	alias = strings.TrimSpace(alias)
-	name = strings.TrimSpace(name)
+	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(name) < 1 {
 		return nil, session.BadDataError(ctx)
@@ -77,14 +77,17 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 	return category, nil
 }
 
-// UpdateCategory update a category
+// UpdateCategory update a category's attributes
 func UpdateCategory(ctx context.Context, id, name, alias, description string, position int) (*Category, error) {
-	alias = strings.TrimSpace(alias)
-	name = strings.TrimSpace(name)
-	description = strings.TrimSpace(description)
-	if len(alias) < 1 && len(name) < 1 && len(description) < 1 {
+	if _, err := uuid.FromString(id); err != nil {
 		return nil, session.BadDataError(ctx)
 	}
+	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
+	description = strings.TrimSpace(description)
+	if len(alias) < 1 && len(name) < 1 {
+		return nil, session.BadDataError(ctx)
+	}
+
 	var category *Category
 	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
 		var err error
@@ -101,9 +104,7 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 		if len(description) > 0 {
 			category.Description = description
 		}
-		if position > 0 {
-			category.Position = position
-		}
+		category.Position = position
 		return tx.Update(category)
 	})
 	if err != nil {
@@ -114,6 +115,9 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 
 // ReadCategory read a category by ID (uuid).
 func ReadCategory(ctx context.Context, id string) (*Category, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
 	var category *Category
 	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
 		var err error
@@ -126,7 +130,7 @@ func ReadCategory(ctx context.Context, id string) (*Category, error) {
 	return category, nil
 }
 
-// ReadCategories read categories
+// ReadCategories read categories order by position
 func ReadCategories(ctx context.Context) ([]*Category, error) {
 	var categories []*Category
 	if _, err := session.Database(ctx).Query(&categories, "SELECT * FROM categories ORDER BY position LIMIT 100"); err != nil {
@@ -137,6 +141,9 @@ func ReadCategories(ctx context.Context) ([]*Category, error) {
 
 // ElevateCategory update category's info, e.g.: LastTopicID, TopicsCount
 func ElevateCategory(ctx context.Context, id string) (*Category, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
 	var category *Category
 	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
 		var err error
@@ -149,14 +156,15 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 		topic, err := category.lastTopic(ctx, tx)
 		if err != nil {
 			return err
-		} else if topic == nil {
-			category.LastTopicID = sql.NullString{String: "", Valid: false}
-			category.TopicsCount = 0
-		} else {
-			if category.LastTopicID.String != topic.TopicID {
-				category.LastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
-			}
 		}
+		var lastTopicId = sql.NullString{String: "", Valid: false}
+		if topic != nil {
+			lastTopicId = sql.NullString{String: topic.TopicID, Valid: true}
+		}
+		if category.LastTopicID.String != lastTopicId.String {
+			category.LastTopicID = lastTopicId
+		}
+		category.TopicsCount = 0
 		if category.LastTopicID.Valid {
 			count, err := topicsCountByCategory(ctx, tx, category.CategoryID)
 			if err != nil {

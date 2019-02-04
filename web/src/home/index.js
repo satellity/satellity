@@ -97,7 +97,7 @@ const HomeView = (props) => {
         to="/"
         className={`${style.node} ${props.state.category === category.category_id ? style.current : ''}`}
         onClick={(e) => props.handleClick(category.category_id, e)}
-        key={category.category_id}>{category.name}</Link>
+        key={category.category_id}>{category.alias}</Link>
     )
   });
 
