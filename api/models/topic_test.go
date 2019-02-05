@@ -1,9 +1,11 @@
 package models
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -85,4 +87,14 @@ func TestTopicCRUD(t *testing.T) {
 	assert.Equal(1, category.TopicsCount)
 	newCategory, _ = ReadCategory(ctx, newCategory.CategoryID)
 	assert.Equal(1, newCategory.TopicsCount)
+}
+
+func readTestTopic(ctx context.Context, id string) (*Topic, error) {
+	topic := &Topic{TopicID: id}
+	if err := session.Database(ctx).Model(topic).Relation("User").Relation("Category").WherePK().Select(); err == pg.ErrNoRows {
+		return nil, session.NotFoundError(ctx)
+	} else if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topic, nil
 }

@@ -89,6 +89,12 @@ func (user *User) addSession(ctx context.Context, tx *pg.Tx, secret string) (*Se
 }
 
 func readSession(ctx context.Context, uid, sid string) (*Session, error) {
+	if _, err := uuid.FromString(uid); err != nil {
+		return nil, nil
+	}
+	if _, err := uuid.FromString(sid); err != nil {
+		return nil, nil
+	}
 	sess := &Session{UserID: uid, SessionID: sid}
 	if err := session.Database(ctx).Model(sess).Column(sessionCols...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil

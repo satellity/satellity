@@ -32,7 +32,7 @@ func TestCommentCRUD(t *testing.T) {
 	comment, err = readTestComment(ctx, comment.CommentID)
 	assert.Nil(err)
 	assert.NotNil(comment)
-	topic, _ = ReadTopic(ctx, topic.TopicID)
+	topic, _ = readTestTopic(ctx, topic.TopicID)
 	assert.NotNil(topic)
 	assert.Equal(1, topic.CommentsCount)
 	new, err := user.UpdateComment(ctx, comment.CommentID, "hello comment hello")

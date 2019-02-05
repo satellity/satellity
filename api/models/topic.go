@@ -56,8 +56,7 @@ type Topic struct {
 
 //CreateTopic create a new Topic
 func (user *User) CreateTopic(ctx context.Context, title, body, categoryID string) (*Topic, error) {
-	title = strings.TrimSpace(title)
-	body = strings.TrimSpace(body)
+	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
 	if len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
 	}
@@ -119,21 +118,18 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 		if title != "" {
 			topic.Title = title
 		}
-		if body != "" {
-			topic.Body = body
-		}
+		topic.Body = body
 		if categoryID != "" && topic.CategoryID != categoryID {
 			prevCategoryID = topic.CategoryID
 			category, err := findCategory(ctx, tx, categoryID)
 			if err != nil {
 				return err
 			} else if category == nil {
-				return session.NotFoundError(ctx)
+				return session.BadDataError(ctx)
 			}
 			topic.CategoryID = category.CategoryID
 			topic.Category = category
 		}
-		topic.User = user
 		return tx.Update(topic)
 	})
 	if err != nil {
@@ -146,6 +142,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 		go ElevateCategory(ctx, prevCategoryID)
 		go ElevateCategory(ctx, topic.CategoryID)
 	}
+	topic.User = user
 	return topic, nil
 }
 
@@ -161,6 +158,9 @@ func ReadTopic(ctx context.Context, id string) (*Topic, error) {
 }
 
 func findTopic(ctx context.Context, tx *pg.Tx, id string) (*Topic, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
 	topic := &Topic{TopicID: id}
 	if err := tx.Model(topic).Column(topicCols...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
