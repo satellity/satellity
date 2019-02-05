@@ -1,9 +1,11 @@
 package models
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -27,7 +29,7 @@ func TestCommentCRUD(t *testing.T) {
 	comment, err = user.CreateComment(ctx, topic.TopicID, "hello comment")
 	assert.Nil(err)
 	assert.NotNil(comment)
-	comment, err = user.ReadComment(ctx, comment.CommentID)
+	comment, err = readTestComment(ctx, comment.CommentID)
 	assert.Nil(err)
 	assert.NotNil(comment)
 	topic, _ = ReadTopic(ctx, topic.TopicID)
@@ -62,4 +64,14 @@ func TestCommentCRUD(t *testing.T) {
 	comments, err = user.ReadComments(ctx, time.Time{})
 	assert.Nil(err)
 	assert.Len(comments, 0)
+}
+
+func readTestComment(ctx context.Context, id string) (*Comment, error) {
+	comment := &Comment{CommentID: id}
+	if err := session.Database(ctx).Model(comment).Column(commentColumns...).WherePK().Select(); err == pg.ErrNoRows {
+		return nil, session.NotFoundError(ctx)
+	} else if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return comment, nil
 }

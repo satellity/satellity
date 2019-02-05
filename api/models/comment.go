@@ -113,16 +113,6 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 	return comment, nil
 }
 
-func (user *User) ReadComment(ctx context.Context, id string) (*Comment, error) {
-	comment := &Comment{CommentID: id}
-	if err := session.Database(ctx).Model(comment).Column(commentColumns...).WherePK().Select(); err == pg.ErrNoRows {
-		return nil, session.NotFoundError(ctx)
-	} else if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return comment, nil
-}
-
 // ReadComments read comments by topicID, parameters: offset
 func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
 	var comments []*Comment
@@ -149,6 +139,8 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 		comment, err := findComment(ctx, tx, id)
 		if err != nil {
 			return err
+		} else if comment == nil {
+			return nil
 		}
 		if !user.isAdmin() && user.UserID != comment.UserID {
 			return session.ForbiddenError(ctx)
@@ -156,6 +148,8 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 		topic, err := findTopic(ctx, tx, comment.TopicID)
 		if err != nil {
 			return err
+		} else if topic == nil {
+			return session.BadDataError(ctx)
 		}
 		count, err := commentsCountByTopic(ctx, tx, comment.TopicID)
 		if err != nil {
@@ -175,6 +169,9 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 }
 
 func findComment(ctx context.Context, tx *pg.Tx, id string) (*Comment, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
 	comment := &Comment{CommentID: id}
 	if err := tx.Model(comment).Column(commentColumns...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil
