@@ -225,6 +225,9 @@ func (user *User) isAdmin() bool {
 }
 
 func findUserByID(ctx context.Context, id string) (*User, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
 	user := &User{UserID: id}
 	if err := session.Database(ctx).Model(user).Column(userColumns...).WherePK().Select(); err == pg.ErrNoRows {
 		return nil, nil

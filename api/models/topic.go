@@ -214,7 +214,9 @@ func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*
 
 func (category *Category) lastTopic(ctx context.Context, tx *pg.Tx) (*Topic, error) {
 	var topic Topic
-	if err := tx.Model(&topic).Where("category_id=?", category.CategoryID).Order("created_at DESC").Limit(1).Select(); err != nil {
+	if err := tx.Model(&topic).Where("category_id=?", category.CategoryID).Order("created_at DESC").Limit(1).Select(); err == pg.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
 		return nil, err
 	}
 	return &topic, nil
