@@ -31,7 +31,7 @@ func TestCategoryCRUD(t *testing.T) {
 	}
 
 	for _, tc := range categoryCases {
-		t.Run(fmt.Sprintf("CreateCategory valid %s", tc.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf("category name %s", tc.name), func(t *testing.T) {
 			category, err := CreateCategory(ctx, tc.name, tc.alias, tc.description, 0)
 			if !tc.valid {
 				assert.NotNil(err)
