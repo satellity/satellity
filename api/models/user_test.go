@@ -7,6 +7,8 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/hex"
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -27,71 +29,90 @@ func TestUserCRUD(t *testing.T) {
 	assert.Nil(err)
 	public, err := x509.MarshalPKIXPublicKey(priv.Public())
 	assert.Nil(err)
-	user, err := CreateUser(ctx, "im.yuqlee@gmailabcefgh.com", "username", "nickname", "", "password", hex.EncodeToString(public))
-	assert.NotNil(err)
-	assert.Nil(user)
-	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "", "pass", hex.EncodeToString(public))
-	assert.NotNil(err)
-	assert.Nil(user)
-	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "", "    pass     ", hex.EncodeToString(public))
-	assert.NotNil(err)
-	assert.Nil(user)
-	user, err = CreateUser(ctx, "im.yuqlee@gmail.com", "username", "nickname", "", "password", hex.EncodeToString(public))
-	assert.Nil(err)
-	assert.NotNil(user)
-	assert.NotEqual("", user.SessionID)
-	new, err := ReadUser(ctx, user.UserID)
-	assert.Nil(err)
-	assert.NotNil(new)
-	assert.Equal(user.Username, new.Username)
-	assert.Equal(user.Nickname, new.Nickname)
-	err = bcrypt.CompareHashAndPassword([]byte(new.EncryptedPassword.String), []byte("password"))
-	assert.Nil(err)
-	new, err = ReadUserByUsernameOrEmail(ctx, "None")
-	assert.Nil(err)
-	assert.Nil(new)
-	new, err = ReadUserByUsernameOrEmail(ctx, "im.yuqlee@Gmail.com")
-	assert.Nil(err)
-	assert.NotNil(new)
-	new, err = ReadUserByUsernameOrEmail(ctx, "UserName")
-	assert.Nil(err)
-	assert.NotNil(new)
-	new, err = ReadUserByUsernameOrEmail(ctx, "im.yuqlee@Gmail.com")
-	assert.Nil(err)
-	assert.NotNil(new)
-	new, err = CreateSession(ctx, "im.yuqlee@Gmail.com", "password", hex.EncodeToString(public))
-	assert.Nil(err)
-	assert.NotNil(new)
-	assert.Equal("username", user.Username)
-	assert.Equal("member", user.Role())
 
-	sess, err := readSession(ctx, new.UserID, new.SessionID)
-	assert.Nil(err)
-	assert.NotNil(sess)
-	sess, err = readSession(ctx, uuid.Must(uuid.NewV4()).String(), new.SessionID)
-	assert.Nil(err)
-	assert.Nil(sess)
-
-	claims := &jwt.MapClaims{
-		"uid": new.UserID,
-		"sid": new.SessionID,
+	userCases := []struct {
+		email         string
+		username      string
+		nickname      string
+		biography     string
+		password      string
+		sessionSecret string
+		role          string
+		count         int
+		valid         bool
+	}{
+		{"im.yuqlee@gmailabcefgh.com", "username", "nickname", "", "password", hex.EncodeToString(public), "member", 0, false},
+		{"im.yuqlee@gmail.com", "username", "nickname", "", "pass", hex.EncodeToString(public), "member", 0, false},
+		{"im.yuqlee@gmail.com", "username", "nickname", "", "     pass     ", hex.EncodeToString(public), "member", 1, true},
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
-	ss, err := token.SignedString(priv)
-	assert.Nil(err)
-	new, err = AuthenticateUser(ctx, ss)
-	assert.Nil(err)
-	assert.NotNil(new)
-	err = new.UpdateProfile(ctx, "Jason", "")
-	assert.Nil(err)
-	assert.Equal("Jason", new.Name())
-	new, err = ReadUserByUsernameOrEmail(ctx, "UserName")
-	assert.Nil(err)
-	assert.NotNil(new)
-	assert.Equal("Jason", new.Name())
-	users, err := ReadUsers(ctx, time.Time{})
-	assert.Nil(err)
-	assert.Len(users, 1)
+
+	for _, tc := range userCases {
+		t.Run(fmt.Sprintf("user username %s", tc.username), func(t *testing.T) {
+			if !tc.valid {
+				user, err := CreateUser(ctx, tc.email, tc.username, tc.nickname, tc.biography, tc.password, tc.sessionSecret)
+				assert.NotNil(err)
+				assert.Nil(user)
+				return
+			}
+
+			user, err := CreateUser(ctx, tc.email, tc.username, tc.nickname, tc.biography, tc.password, tc.sessionSecret)
+			assert.Nil(err)
+			assert.NotNil(user)
+
+			new, err := ReadUser(ctx, user.UserID)
+			assert.Nil(err)
+			assert.NotNil(new)
+			assert.Equal(user.Username, new.Username)
+			assert.Equal(user.Nickname, new.Nickname)
+			err = bcrypt.CompareHashAndPassword([]byte(new.EncryptedPassword.String), []byte(tc.password))
+			assert.Nil(err)
+			new, err = ReadUserByUsernameOrEmail(ctx, "None")
+			assert.Nil(err)
+			assert.Nil(new)
+			new, err = ReadUserByUsernameOrEmail(ctx, tc.email)
+			assert.Nil(err)
+			assert.NotNil(new)
+			new, err = ReadUserByUsernameOrEmail(ctx, tc.username)
+			assert.Nil(err)
+			assert.NotNil(new)
+			new, err = ReadUserByUsernameOrEmail(ctx, strings.ToUpper(tc.email))
+			assert.Nil(err)
+			assert.NotNil(new)
+			new, err = CreateSession(ctx, tc.email, tc.password, hex.EncodeToString(public))
+			assert.Nil(err)
+			assert.NotNil(new)
+			assert.Equal(tc.username, user.Username)
+			assert.Equal(tc.role, user.Role())
+
+			sess, err := readSession(ctx, new.UserID, new.SessionID)
+			assert.Nil(err)
+			assert.NotNil(sess)
+			sess, err = readSession(ctx, uuid.Must(uuid.NewV4()).String(), new.SessionID)
+			assert.Nil(err)
+			assert.Nil(sess)
+
+			claims := &jwt.MapClaims{
+				"uid": new.UserID,
+				"sid": new.SessionID,
+			}
+			token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+			ss, err := token.SignedString(priv)
+			assert.Nil(err)
+			new, err = AuthenticateUser(ctx, ss)
+			assert.Nil(err)
+			assert.NotNil(new)
+			err = new.UpdateProfile(ctx, "Jason", "")
+			assert.Nil(err)
+			assert.Equal("Jason", new.Name())
+			new, err = ReadUserByUsernameOrEmail(ctx, tc.username)
+			assert.Nil(err)
+			assert.NotNil(new)
+			assert.Equal("Jason", new.Name())
+			users, err := ReadUsers(ctx, time.Time{})
+			assert.Nil(err)
+			assert.Len(users, tc.count)
+		})
+	}
 }
 
 func createTestUser(ctx context.Context, email, username, password string) *User {

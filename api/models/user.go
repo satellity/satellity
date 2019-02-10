@@ -83,9 +83,6 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 	if nickname == "" {
 		nickname = username
 	}
-	if len(password) < 8 || len(password) > 64 {
-		return nil, session.BadDataError(ctx)
-	}
 	password, err = validateAndEncryptPassword(ctx, password)
 	if err != nil {
 		return nil, err
@@ -238,9 +235,11 @@ func findUserByID(ctx context.Context, id string) (*User, error) {
 }
 
 func validateAndEncryptPassword(ctx context.Context, password string) (string, error) {
-	password = strings.TrimSpace(password)
 	if len(password) < 8 {
 		return password, session.PasswordTooSimpleError(ctx)
+	}
+	if len(password) > 64 {
+		return password, session.BadDataError(ctx)
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
