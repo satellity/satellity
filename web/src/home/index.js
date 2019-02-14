@@ -2,6 +2,7 @@ import style from './index.scss';
 import topicStyle from '../styles/topic_item.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Typed from 'typed.js';
+import Noty from 'noty';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';

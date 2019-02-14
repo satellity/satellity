@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Noty from 'noty';
 import Home from './home.js';
 import User from './user.js';
 import Category from './category.js';
@@ -29,7 +30,7 @@ API.prototype = {
       data: data
     })
     .then((resp) => {
-      // TODO process errors
+      // TODO https://github.com/axios/axios#handling-errors
       if (resp.data.error) {
         return Promise.reject(resp.data.error);
       }
@@ -40,6 +41,7 @@ API.prototype = {
         errCallback(error)
         return
       }
+      let text = error.message;
       if (error.code === 401) {
         self.user.clear();
         // TODO
@@ -58,8 +60,21 @@ API.prototype = {
           return
         }
       }
-      // TODO
-      console.info(error);
+      if (error.code) {
+        text = error.code;
+      }
+      new Noty({
+        type: 'error',
+        layout: 'topCenter',
+        theme: 'nest',
+        text: text,
+        timeout: 1000,
+        progressBar: false,
+        animation: {
+          open : 'noty_effects_open',
+          close: 'noty_effects_close'
+        }
+      }).show();
     })
   },
 

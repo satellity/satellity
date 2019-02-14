@@ -1,3 +1,5 @@
+import '../node_modules/noty/src/noty.scss';
+import '../node_modules/noty/src/themes/nest.scss';
 import '../node_modules/normalize.css/normalize.css';
 import '../node_modules/@fortawesome/fontawesome-free/css/all.css';
 import './assets/css/h5bp.css';

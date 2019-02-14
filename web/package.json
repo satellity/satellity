@@ -1,8 +1,13 @@
 {
   "name": "GoDiscourse",
   "version": "1.0.0",
-  "description": "A go version discourse like forum",
+  "description": "Yet another open source forum using Golang. https://live.godiscourse.com",
   "main": "index.js",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/godiscourse/godiscourse.git"
+  },
   "scripts": {
     "dev": "NODE_ENV=development parcel index.html",
     "build": "NODE_ENV=production parcel build index.html"
@@ -28,6 +33,7 @@
     "moment": "^2.22.2",
     "node-forge": "^0.7.6",
     "normalize.css": "^8.0.0",
+    "noty": "^3.2.0-beta",
     "react": "^16.7.0",
     "react-codemirror2": "^5.1.0",
     "react-dom": "^16.7.0",
