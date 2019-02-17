@@ -12,8 +12,8 @@ class AdminCategory extends Component {
   }
 
   componentDidMount() {
-    this.api.category.adminIndex((resp) => {
-      this.setState({categories: resp.data});
+    this.api.category.adminIndex().then((data) => {
+      this.setState({categories: data});
     });
   }
 

@@ -1,47 +1,35 @@
-import axios from 'axios';
+class Comment {
+  constructor(api) {
+    this.api = api;
+  }
 
-function Comment(api) {
-  this.api = api;
-}
-
-Comment.prototype = {
-  index: function(id, callback) {
-    this.api.request('get', `topics/${id}/comments`, {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  index(id) {
+    return this.api.axios.get(`/topics/${id}/comments`).then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  create: function(params, callback) {
-    this.api.request('post', '/comments', params, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  create(params) {
+    return this.api.axios.post('/comments').then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  update: function(id, params, callback) {
-    this.api.request('post', `/comments/${id}`, params, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  update(id, params) {
+    return this.api.axios.post(`/comments/${id}`, params).then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  show: function(id, callback) {
-    this.api.request('get', `/comments/${id}`, {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  show(id) {
+    return this.api.axios.get(`/comments/${id}`).then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  delete: function(id, callback) {
-    this.api.request('post', `/comments/${id}/delete`, {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  delete(id) {
+    return this.api.axios.post(`/comments/${id}/delete`).then((resp) => {
+      return resp;
     });
   }
 }

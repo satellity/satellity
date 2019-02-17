@@ -39,19 +39,19 @@ class TopicNew extends Component {
 
   componentDidMount() {
     if (validate(this.state.topic_id)) {
-      this.api.topic.show(this.props.match.params.id, (resp) => {
-        resp.data.loading = false;
-        this.setState(resp.data);
+      this.api.topic.show(this.props.match.params.id).then((data) => {
+        data.loading = false;
+        this.setState(data);
       });
     } else {
       this.setState({loading: false});
     }
-    this.api.category.index((resp) => {
+    this.api.category.index().then((data) => {
       let category_id = this.state.category_id;
-      if (category_id === '' && resp.data.length > 0) {
-        category_id = resp.data[0].category_id;
+      if (category_id === '' && data.length > 0) {
+        category_id = data[0].category_id;
       }
-      this.setState({categories: resp.data, category_id: category_id});
+      this.setState({categories: data, category_id: category_id});
     });
   }
 
@@ -86,13 +86,13 @@ class TopicNew extends Component {
     const history = this.props.history;
     const data = {title: this.state.title, body: this.state.body, category_id: this.state.category_id};
     if (validate(this.state.topic_id)) {
-      this.api.topic.update(this.state.topic_id, data, (resp) => {
+      this.api.topic.update(this.state.topic_id, data).then((data) => {
         this.setState({submitting: false});
         history.push('/');
       });
       return
     }
-    this.api.topic.create(data, (resp) => {
+    this.api.topic.create(data).then((data) => {
       this.setState({submitting: false});
       history.push('/');
     });

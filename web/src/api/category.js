@@ -1,70 +1,54 @@
-import axios from 'axios';
+class Category {
+  constructor(api) {
+    this.api = api;
+  }
 
-function Category(api) {
-  this.api = api;
-}
-
-// TODO should handle errors here
-Category.prototype = {
-  adminIndex: function(callback) {
-    this.api.request('get', '/admin/categories', {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
-    });
-  },
-
-  index: function(callback) {
-    this.api.request('get', '/categories', {}, (resp) => {
+  index() {
+    return this.api.axios.get('/categories').then((resp) => {
       let categories = resp.data.map((o) => {
         return {category_id: o.category_id, name: o.name, alias: o.alias}
       });
       window.localStorage.setItem('categories', btoa(JSON.stringify(categories)));
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+      return resp.data;
     });
-  },
+  }
 
-  create: function(params, callback) {
-    // TODO maybe have better choice
+  create(params) {
     if (params['position'] === '') {
       params['position'] = 0;
     }
     params['position'] = parseInt(params['position']);
-    this.api.request('post', '/admin/categories', params, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+    return this.api.axios.post('/admin/categories', params).then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  update: function(id, params, callback) {
+  update(id, params) {
     if (params['position'] === '') {
       params['position'] = 0;
     }
     params['position'] = parseInt(params['position']);
-    this.api.request('post', `/admin/categories/${id}`, params, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+    return this.api.axios.post(`/admin/categories/${id}`, params).then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  show: function(id, callback) {
-    this.api.request('get', `/admin/categories/${id}`, {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  show(id) {
+    return this.api.axios.get(`/admin/categories/${id}`).then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  topics: function(id, callback) {
-    this.api.request('get', `/categories/${id}/topics`, {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  topics(id) {
+    return this.api.axios.get(`/categories/${id}/topics`).then((resp) => {
+      return resp.data;
     });
+  }
+
+  adminIndex() {
+    return this.api.axios.get('/admin/categories').then((resp) => {
+      return resp.data;
+    })
   }
 }
 

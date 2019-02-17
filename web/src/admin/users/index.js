@@ -12,9 +12,8 @@ class AdminUser extends Component {
   }
 
   componentDidMount() {
-    this.api.user.adminIndex((resp) => {
-      console.info(resp.data);
-      this.setState({users: resp.data});
+    this.api.user.adminIndex().then((data) => {
+      this.setState({users: data});
     });
   }
 

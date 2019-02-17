@@ -1,156 +1,91 @@
-import forge from 'node-forge';
-import moment from 'moment';
 import KJUR from 'jsrsasign';
 import uuid from 'uuid/v4';
 import Cookies from 'js-cookie';
 
-function User(api) {
-  this.api = api;
-}
+class User {
+  constructor(api) {
+    this.api = api;
+    this.fixed_schema_header = '3059301306072a8648ce3d020106082a8648ce3d030107034200';
+  }
 
-User.prototype = {
-  signIn: function(code, callback) {
-    var pwd = uuid().toLowerCase();
-    var ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
-    var pub = ec.generateKeyPairHex().ecpubhex;
-    var priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
-    // TODO Why use 3059301306072a8648ce3d020106082a8648ce3d030107034200
-    const params = {'session_secret': '3059301306072a8648ce3d020106082a8648ce3d030107034200' + pub, 'code': code};
-    this.api.request('post', '/oauth/github', params, (resp) => {
-      if (resp.data) {
-        const data = resp.data;
-        Cookies.set('sid', pwd, { expires: 365 });
-        window.localStorage.setItem('token', priv);
-        window.localStorage.setItem('uid', data.user_id);
-        window.localStorage.setItem('sid', data.session_id);
-        window.localStorage.setItem('user', btoa(JSON.stringify(data)));
-      }
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
-    });
-  },
-
-  update: function(params, callback) {
-    this.api.request('post', '/me', params, (resp) => {
-      if (resp.data) {
-        const data = resp.data;
-        window.localStorage.setItem('user', btoa(JSON.stringify(data)));
-      }
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
-    });
-  },
-
-  self: function(callback) {
-    this.api.request('get', '/me', {}, (resp) => {
-      if (resp.data) {
-        const data = resp.data;
-        window.localStorage.setItem('user', btoa(JSON.stringify(data)));
-      }
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
-    });
-  },
-
-  show: function(id, callback) {
-    this.api.request('get', `/users/${id}`, {}, (resp) => {
-      if (resp.data) {
-        const data = resp.data;
-        if (typeof callback === 'function') {
-          callback(resp);
-        }
-      }
-    });
-  },
-
-  topics: function(id, callback) {
-    this.api.request('get', `/users/${id}/topics`, {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
-    });
-  },
-
-  adminIndex: function(callback) {
-    this.api.request('get', '/admin/users', {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
-    });
-  },
-
-  ecdsa: function() {
-    var priv = window.localStorage.getItem('token');
-    var pwd = Cookies.get('sid');
+  get ecdsa() {
+    let priv = window.localStorage.getItem('token');
+    let pwd = Cookies.get('sid');
     if (!priv || !pwd) {
       return "";
     }
-    var ec = KJUR.KEYUTIL.getKey(priv, pwd);
+    let ec = KJUR.KEYUTIL.getKey(priv, pwd);
     return KJUR.KEYUTIL.getPEM(ec, 'PKCS1PRV');
-  },
+  }
 
-  token: function(method, uri, body) {
-    var priv = window.localStorage.getItem('token');
-    var pwd = Cookies.get('sid');
-    if (!priv || !pwd) {
-      return "";
-    }
-    Cookies.set('sid', pwd, { expires: 365 });
+  signIn(code) {
+    let pwd = uuid().toLowerCase();
+    let ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
+    let pub = ec.generateKeyPairHex().ecpubhex;
+    let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
+    let params = {'session_secret': this.fixed_schema_header + pub, 'code': code};
+    return this.api.axios.post('/oauth/github', params).then((resp) => {
+      const data = resp.data;
+      Cookies.set('sid', pwd, { expires: 365 });
+      window.localStorage.setItem('token', priv);
+      window.localStorage.setItem('uid', data.user_id);
+      window.localStorage.setItem('sid', data.session_id);
+      window.localStorage.setItem('user', btoa(JSON.stringify(data)));
+      return data;
+    });
+  }
 
-    var uid = window.localStorage.getItem('uid');
-    var sid = window.localStorage.getItem('sid');
-    return this.sign(uid, sid, priv, method, uri, body);
-  },
+  update(params) {
+    return this.api.axios.post('/me', params).then((resp) => {
+      window.localStorage.setItem('user', btoa(JSON.stringify(resp.data)));
+      return resp.data;
+    });
+  }
 
-  sign: function(uid, sid, privateKey, method, uri, body) {
-    if (typeof body !== 'string') { body = ""; }
+  show(id) {
+    return this.api.axios.get(`/users/${id}`).then((resp) => {
+      return resp.data;
+    });
+  }
 
-    let expire = moment.utc().add(30, 'minutes').unix();
-    let md = forge.md.sha256.create();
-    md.update(method + uri + body);
+  me() {
+    return this.api.axios.get('/me').then((resp) => {
+      window.localStorage.setItem('user', btoa(JSON.stringify(resp.data)));
+      return resp.data;
+    })
+  }
 
-    var oHeader = {alg: 'ES256', typ: 'JWT'};
-    var oPayload = {
-      uid: uid,
-      sid: sid,
-      exp: expire,
-      jti: uuid(),
-      sig: md.digest().toHex()
-    };
-    var sHeader = JSON.stringify(oHeader);
-    var sPayload = JSON.stringify(oPayload);
-    var pwd = Cookies.get('sid');
-    try {
-      var k = KJUR.KEYUTIL.getKey(privateKey, pwd);
-    } catch (e) {
-      return '';
-    }
-    return KJUR.jws.JWS.sign('ES256', sHeader, sPayload, privateKey, pwd);
-  },
-
-  clear: function() {
-    window.localStorage.clear();
-  },
-
-  me: function() {
+  readMe() {
     const user = window.localStorage.getItem('user');
-    if (user === undefined || user === null) {
+    if (!user) {
       return {};
     }
     return JSON.parse(atob(user));
-  },
+  }
 
-  loggedIn: function() {
-    const user = this.me();
+  loggedIn() {
+    const user = this.readMe();
     return user.user_id !== undefined || user.username !== undefined || user.nickname !== undefined;
-  },
+  }
 
-  isAdmin: function() {
-    const user = this.me();
-    return user.role === 'admin';
+  isAdmin() {
+    return this.readMe().role === 'admin';
+  }
+
+  topics(id) {
+    return this.api.axios.get(`/users/${id}/topics`).then((resp) => {
+      return resp.data;
+    })
+  }
+
+  adminIndex() {
+    return this.api.axios.get('/admin/users').then((resp) => {
+      return resp.data;
+    })
+  }
+
+  clear() {
+    window.localStorage.clear();
   }
 }
 
