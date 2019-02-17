@@ -10,7 +10,7 @@ class Comment {
   }
 
   create(params) {
-    return this.api.axios.post('/comments').then((resp) => {
+    return this.api.axios.post('/comments', params).then((resp) => {
       return resp.data;
     });
   }
