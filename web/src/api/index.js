@@ -25,12 +25,55 @@ axios.interceptors.request.use(function(config) {
 });
 
 axios.interceptors.response.use(function(response) {
-  if (!!response.status && response.status === 200) {
+  if (!!response.status && (response.status >= 200 && response.status < 300)) {
     let data = response.data;
+    if (!!data.error) {
+      let error = data.error;
+      if (error.code === 401) {
+        let githubClientId = '71905afbd6e4541ad62b';
+        if (process.env.NODE_ENV === 'development') {
+          githubClientId = 'b9b78f343f3a5b0d7c99';
+        }
+        window.location.href = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${githubClientId}`;
+        return
+      } else if (error.code === 404) {
+        window.location.href = '/404'
+        return
+      }
+      new Noty({
+        type: 'error',
+        layout: 'topCenter',
+        theme: 'nest',
+        text: error.code,
+        timeout: 1000,
+        progressBar: false,
+        animation: {
+          open : 'noty_effects_open',
+          close: 'noty_effects_close'
+        }
+      }).show();
+      if (error.code === 500) {
+        window.location.href = '/';
+        return
+      }
+      return Promise.reject(error);
+    }
     return data;
   }
   return response
 }, function(error) {
+  new Noty({
+    type: 'error',
+    layout: 'topCenter',
+    theme: 'nest',
+    text: error.message,
+    timeout: 1000,
+    progressBar: false,
+    animation: {
+      open : 'noty_effects_open',
+      close: 'noty_effects_close'
+    }
+  }).show();
   return Promise.reject(error);
 });
 
