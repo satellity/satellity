@@ -43,6 +43,7 @@ axios.interceptors.response.use(function(response) {
       new Noty({
         type: 'error',
         layout: 'topCenter',
+        killer: true,
         theme: 'nest',
         text: error.code,
         timeout: 1000,
@@ -65,6 +66,7 @@ axios.interceptors.response.use(function(response) {
   new Noty({
     type: 'error',
     layout: 'topCenter',
+    killer: true,
     theme: 'nest',
     text: error.message,
     timeout: 1000,
