@@ -27,7 +27,7 @@ const Header = () => {
   let profile = '';
   if (user.loggedIn()) {
     profile = (
-      <Link to='/user/edit' className={style.navi}> {user.me().nickname} </Link>
+      <Link to='/user/edit' className={style.navi}> {user.readMe().nickname} </Link>
     );
   }
   return (

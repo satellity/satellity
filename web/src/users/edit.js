@@ -8,7 +8,7 @@ class UserEdit extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
-    const user = this.api.user.me();
+    const user = this.api.user.readMe();
     this.state = {nickname: user.nickname, biography: user.biography, submitting: false};
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -18,8 +18,7 @@ class UserEdit extends Component {
   }
 
   componentDidMount() {
-    this.api.user.self((resp) => {
-      const user = resp.data;
+    this.api.user.me().then((user) => {
       this.setState({nickname: user.nickname, biography: user.biography});
     });
   }
@@ -40,15 +39,14 @@ class UserEdit extends Component {
     this.setState({submitting: true});
     const history = this.props.history;
     const data = {nickname: this.state.nickname, biography: this.state.biography};
-    this.api.user.update(data, (resp) => {
+    this.api.user.update(data).then((user) => {
       this.setState({submitting: false});
       history.push('/');
     });
   }
 
   handleChange(e) {
-    const target = e.target;
-    const name = target.name;
+    const target = e.target, name = target.name;
     this.setState({
       [name]: target.value
     });

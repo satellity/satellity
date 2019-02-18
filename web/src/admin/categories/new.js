@@ -24,10 +24,10 @@ class AdminCategoryNew extends Component {
     e.preventDefault();
     this.setState({submitting: true});
     const history = this.props.history;
-    this.api.category.create(this.state, (resp) => {
+    this.api.category.create(this.state).then(() => {
       history.push('/admin/categories');
-    this.setState({submitting: false});
-    })
+      this.setState({submitting: false});
+    });
   }
 
   render() {

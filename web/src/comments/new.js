@@ -27,8 +27,8 @@ class CommentNew extends Component {
       return
     }
     this.setState({submitting: true});
-    this.api.comment.create(this.state, (resp) => {
-      this.props.handleSubmit(resp.data);
+    this.api.comment.create(this.state).then((data) => {
+      this.props.handleSubmit(data);
       this.setState({body: '', submitting: false});
     });
   }

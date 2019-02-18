@@ -22,12 +22,12 @@ class TopicShow extends Component {
   }
 
   componentDidMount() {
-    const user = this.api.user.me();
-    this.api.topic.show(this.props.match.params.id, (resp) => {
-      resp.data.loading = false;
-      resp.data.is_author = resp.data.user.user_id === user.user_id;
-      resp.data.body = this.converter.makeHtml(resp.data.body);
-      this.setState(resp.data);
+    const user = this.api.user.readMe();
+    this.api.topic.show(this.props.match.params.id).then((data) => {
+      data.loading = false;
+      data.is_author = data.user.user_id === user.user_id;
+      data.body = this.converter.makeHtml(data.body);
+      this.setState(data);
     });
   }
 

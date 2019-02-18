@@ -2,7 +2,6 @@ import style from './index.scss';
 import topicStyle from '../styles/topic_item.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Typed from 'typed.js';
-import Noty from 'noty';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
@@ -14,6 +13,7 @@ import LoadingView from '../loading/loading.js';
 class Home extends Component {
   constructor(props) {
     super(props);
+
     this.api = new API();
     this.color = new ColorUtils();
     this.params = new URLSearchParams(props.location.search);
@@ -27,23 +27,23 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    this.api.category.index((resp) => {
-      this.setState({categories: resp.data});
-    });
+    this.api.category.index().then((data) => {
+      this.setState({categories: data});
+    })
     const category = this.params.get("c");
-    if (category !== null && category !== undefined) {
+    if (!!category) {
       for (let i=0; i< this.state.categories.length; i++) {
         let c = this.state.categories[i];
         if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-          this.api.category.topics(c.category_id, (resp) => {
-            this.setState({category: c.category_id, topics: resp.data, loading: false});
+          this.api.category.topics(c.category_id).then((data) => {
+            this.setState({category: c.category_id, topics: data, loading: false});
           });
           return
         }
       }
     }
-    this.api.topic.index((resp) => {
-      this.setState({topics: resp.data, loading: false});
+    this.api.topic.index().then((data) => {
+      this.setState({topics: data, loading: false});
     });
   }
 
@@ -51,13 +51,13 @@ class Home extends Component {
     e.preventDefault();
     this.setState({loading: true});
     if (id === 'latest') {
-      this.api.topic.index((resp) => {
-        this.setState({topics: resp.data, category: id, loading: false});
+      this.api.topic.index().then((data) => {
+        this.setState({category: id, topics: data, loading: false});
       });
       return
     }
-    this.api.category.topics(id, (resp) => {
-      this.setState({topics: resp.data, category: id, loading: false});
+    this.api.category.topics(id).then((data) => {
+      this.setState({category: id, topics: data, loading: false});
     });
   }
 

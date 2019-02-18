@@ -16,13 +16,12 @@ class UserShow extends Component {
   }
 
   componentDidMount() {
-    this.api.user.show(this.state.user.user_id, (resp) => {
-      let user = resp.data;
+    this.api.user.show(this.state.user.user_id).then((user) => {
       user.created_at = moment(user.created_at).format('l');
       this.setState({user: user});
     });
-    this.api.user.topics(this.state.user.user_id, (resp) => {
-      this.setState({topics: resp.data});
+    this.api.user.topics(this.state.user.user_id).then((data) => {
+      this.setState({topics: data});
     });
   }
 

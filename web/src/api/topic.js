@@ -1,51 +1,39 @@
-import axios from 'axios';
+class Topic {
+  constructor(api) {
+    this.api = api;
+  }
 
-function Topic(api) {
-  this.api = api;
-}
-
-Topic.prototype = {
-  index: function(callback) {
-    this.api.request('get', '/topics', {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  index() {
+    return this.api.axios.get('/topics').then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  create: function(params, callback) {
+  create(params) {
     const data = {title: params.title, body: params.body, category_id: params.category_id};
-    this.api.request('post', '/topics', data, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+    return this.api.axios.post('/topics', data).then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  update: function(id, params, callback) {
-    const data = {title: params['title'], body: params['body'], category_id: params['category_id']};
-    this.api.request('post', `/topics/${id}`, params, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  update(id, params) {
+    const data = {title: params.title, body: params.body, category_id: params.category_id};
+    return this.api.axios.post(`/topics/${id}`, data).then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  show: function(id, callback) {
-    this.api.request('get', `/topics/${id}`, {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  show(id) {
+    return this.api.axios.get(`/topics/${id}`).then((resp) => {
+      return resp.data;
     });
-  },
+  }
 
-  adminIndex: function(callback) {
-    this.api.request('get', '/admin/topics', {}, (resp) => {
-      if (typeof callback === 'function') {
-        callback(resp);
-      }
+  adminIndex() {
+    return this.api.axios.get('/admin/topics').then((resp) => {
+      return resp.data;
     });
-  },
+  }
 }
 
 export default Topic;

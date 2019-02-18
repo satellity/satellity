@@ -19,8 +19,8 @@ class CommentIndex extends Component {
   }
 
   componentDidMount() {
-    this.api.comment.index(this.props.topicId, (resp) => {
-      let comments = resp.data.map((comment) => {
+    this.api.comment.index(this.props.topicId).then((data) => {
+      let comments = data.map((comment) => {
         comment.body = this.converter.makeHtml(comment.body);
         comment.toggle = false;
         return comment
@@ -44,7 +44,7 @@ class CommentIndex extends Component {
 
   handleClick(e, id) {
     e.preventDefault();
-    this.api.comment.delete(id, () => {
+    this.api.comment.delete(id).then(() => {
       let comments = this.state.comments.filter(comment => comment.comment_id !== id);
       this.setState({comments: comments});
     })
@@ -60,9 +60,9 @@ class CommentIndex extends Component {
   render() {
     return (
       <div>
-        {this.state.comments_count > 0 && <View api={this.api}
+        {this.state.comments_count > 0 && <View
           state={this.state}
-          user={this.api.user.me()}
+          user={this.api.user.readMe()}
           handleActionClick={this.handleActionClick}
           handleClick={this.handleClick} />}
           <CommentNew
