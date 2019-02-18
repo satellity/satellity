@@ -18,6 +18,7 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 ## Structure
 1. `./api` is back-end service, which is Rails like structure.
 2. `./web` is front-end service, contains React, Parcel and etc.
+2. `./deploy` contains example of deploy, nginx and systemd.
 
 ## Getting Started
 1. `cd ./api`, copy `config/test.cfg` to `config/config.go`. Replace config with yours.

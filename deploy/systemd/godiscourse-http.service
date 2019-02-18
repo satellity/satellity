@@ -1,0 +1,13 @@
+[Unit]
+Description=GoDiscourse HTTP API
+After=network.target
+
+[Service]
+User=user
+Type=simple
+ExecStart=/path/to/godiscourse
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
