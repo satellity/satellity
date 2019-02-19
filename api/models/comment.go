@@ -68,7 +68,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		if err != nil {
 			return err
 		}
-		topic.CommentsCount = count + 1
+		topic.CommentsCount = int64(count) + 1
 		c.TopicID = topic.TopicID
 		tx.Update(topic)
 		return tx.Insert(c)
@@ -155,7 +155,7 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 		if err != nil {
 			return err
 		}
-		topic.CommentsCount = count - 1
+		topic.CommentsCount = int64(count) - 1
 		tx.Update(topic)
 		return tx.Delete(comment)
 	})

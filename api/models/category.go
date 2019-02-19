@@ -37,15 +37,15 @@ type Category struct {
 	Name        string         `sql:"name,notnull"`
 	Alias       string         `sql:"alias,notnull"`
 	Description string         `sql:"description,notnull"`
-	TopicsCount int            `sql:"topics_count,notnull"`
+	TopicsCount int64          `sql:"topics_count,notnull"`
 	LastTopicID sql.NullString `sql:"last_topic_id"`
-	Position    int            `sql:"position,notnull"`
+	Position    int64          `sql:"position,notnull"`
 	CreatedAt   time.Time      `sql:"created_at"`
 	UpdatedAt   time.Time      `sql:"updated_at"`
 }
 
 // CreateCategory create a new category.
-func CreateCategory(ctx context.Context, name, alias, description string, position int) (*Category, error) {
+func CreateCategory(ctx context.Context, name, alias, description string, position int64) (*Category, error) {
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(name) < 1 {
@@ -68,7 +68,7 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 		if err != nil {
 			return nil, session.TransactionError(ctx, err)
 		}
-		category.Position = count
+		category.Position = int64(count)
 	}
 
 	if err := session.Database(ctx).Insert(category); err != nil {
@@ -78,7 +78,7 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 }
 
 // UpdateCategory update a category's attributes
-func UpdateCategory(ctx context.Context, id, name, alias, description string, position int) (*Category, error) {
+func UpdateCategory(ctx context.Context, id, name, alias, description string, position int64) (*Category, error) {
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(alias) < 1 && len(name) < 1 {
@@ -169,7 +169,7 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 			if err != nil {
 				return err
 			}
-			category.TopicsCount = count
+			category.TopicsCount = int64(count)
 		}
 		return tx.Update(category)
 	})

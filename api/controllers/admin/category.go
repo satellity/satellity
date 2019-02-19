@@ -16,7 +16,7 @@ type categoryRequest struct {
 	Name        string `json:"name"`
 	Alias       string `json:"alias"`
 	Description string `json:"description"`
-	Position    int    `json:"position"`
+	Position    int64  `json:"position"`
 }
 
 func registerAdminCategory(router *httptreemux.TreeMux) {

@@ -43,7 +43,7 @@ type Topic struct {
 	TopicID       string    `sql:"topic_id,pk"`
 	Title         string    `sql:"title,notnull"`
 	Body          string    `sql:"body,notnull"`
-	CommentsCount int       `sql:"comments_count,notnull"`
+	CommentsCount int64     `sql:"comments_count,notnull"`
 	CategoryID    string    `sql:"category_id,notnull"`
 	UserID        string    `sql:"user_id,notnull"`
 	Score         int       `sql:"score,notnull"`
@@ -81,7 +81,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 		if err != nil {
 			return err
 		}
-		category.TopicsCount = count + 1
+		category.TopicsCount = int64(count) + 1
 		if err := tx.Insert(topic); err != nil {
 			return err
 		}

@@ -16,7 +16,7 @@ type TopicView struct {
 	UserID        string       `json:"user_id"`
 	CategoryID    string       `json:"category_id"`
 	Score         int          `json:"score"`
-	CommentsCount int          `json:"comments_count"`
+	CommentsCount int64        `json:"comments_count"`
 	CreatedAt     time.Time    `json:"created_at"`
 	UpdatedAt     time.Time    `json:"updated_at"`
 	User          UserView     `json:"user"`

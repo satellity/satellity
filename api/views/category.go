@@ -7,16 +7,16 @@ import (
 	"github.com/godiscourse/godiscourse/api/models"
 )
 
-// CategoryView is the response body of category
+// CategoryView is the response body of a category
 type CategoryView struct {
 	Type        string    `json:"type"`
 	CategoryID  string    `json:"category_id"`
 	Name        string    `json:"name"`
 	Alias       string    `json:"alias"`
 	Description string    `json:"description"`
-	TopicsCount int       `json:"topics_count"`
+	TopicsCount int64     `json:"topics_count"`
 	LastTopicID string    `json:"last_topic_id"`
-	Position    int       `json:"position"`
+	Position    int64     `json:"position"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
