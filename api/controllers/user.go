@@ -26,7 +26,7 @@ func registerUser(router *httptreemux.TreeMux) {
 
 	router.POST("/oauth/:provider", impl.oauth)
 	router.POST("/me", impl.update)
-	router.GET("/me", impl.self)
+	router.GET("/me", impl.current)
 	router.GET("/users/:id", impl.show)
 	router.GET("/users/:id/topics", impl.topics)
 }
@@ -37,12 +37,11 @@ func (impl *userImpl) oauth(w http.ResponseWriter, r *http.Request, params map[s
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	user, err := models.CreateGithubUser(r.Context(), body.Code, body.SessionSecret)
-	if err != nil {
+	if user, err := models.CreateGithubUser(r.Context(), body.Code, body.SessionSecret); err != nil {
 		views.RenderErrorResponse(w, r, err)
-		return
+	} else {
+		views.RenderAccount(w, r, user)
 	}
-	views.RenderAccount(w, r, user)
 }
 
 func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[string]string) {
@@ -52,15 +51,14 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 		return
 	}
 	current := middleware.CurrentUser(r)
-	err := current.UpdateProfile(r.Context(), body.Nickname, body.Biography)
-	if err != nil {
+	if err := current.UpdateProfile(r.Context(), body.Nickname, body.Biography); err != nil {
 		views.RenderErrorResponse(w, r, err)
-		return
+	} else {
+		views.RenderAccount(w, r, current)
 	}
-	views.RenderAccount(w, r, current)
 }
 
-func (impl *userImpl) self(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+func (impl *userImpl) current(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	views.RenderAccount(w, r, middleware.CurrentUser(r))
 }
 
