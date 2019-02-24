@@ -17,13 +17,15 @@ class Home extends Component {
     this.api = new API();
     this.color = new ColorUtils();
     this.params = new URLSearchParams(props.location.search);
+    this.pagination = 50;
     let categories = [];
     let d = window.localStorage.getItem('categories');
     if (d !== null && d !== undefined && d !== '') {
       categories = JSON.parse(atob(d));
     }
-    this.state = {topics: [], categories: categories, category: 'latest', loading: true};
+    this.state = {topics: [], categories: categories, category: 'latest', loading: true, offset: ''};
     this.handleClick = this.handleClick.bind(this);
+    this.load = this.load.bind(this);
   }
 
   componentDidMount() {
@@ -31,39 +33,68 @@ class Home extends Component {
       this.setState({categories: data});
     })
     const category = this.params.get("c");
+    let request, id = 'latest';
     if (!!category) {
       for (let i=0; i< this.state.categories.length; i++) {
         let c = this.state.categories[i];
         if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-          this.api.category.topics(c.category_id).then((data) => {
-            this.setState({category: c.category_id, topics: data, loading: false});
-          });
-          return
+          id = c.category_id, request = this.api.category.topics(id);
+          break;
         }
       }
     }
-    this.api.topic.index().then((data) => {
-      this.setState({topics: data, loading: false});
+    if (id === 'latest') {
+      request = this.api.topic.index();
+    }
+    request.then((data) => {
+      let offset = '';
+      if (data.length > 3) {
+        offset = data[data.length-1].created_at;
+      }
+      this.setState({category: id, topics: data, loading: false, offset: offset});
     });
   }
 
   handleClick(id, e) {
     e.preventDefault();
-    this.setState({loading: true});
+    this.setState({loading: true, offset: ''});
+    let request;
     if (id === 'latest') {
-      this.api.topic.index().then((data) => {
-        this.setState({category: id, topics: data, loading: false});
-      });
-      return
+      request = this.api.topic.index();
+    } else {
+      request = this.api.category.topics(id)
     }
-    this.api.category.topics(id).then((data) => {
-      this.setState({category: id, topics: data, loading: false});
+    request.then((data) => {
+      let offset = '';
+      if (data.length == this.pagination) {
+        offset = data[data.length-1].created_at;
+      }
+      this.setState({category: id, topics: data, loading: false, offset: offset});
+    });
+  }
+
+  load(e) {
+    e.preventDefault();
+    let id = this.state.category;
+    let request;
+    if (id === 'latest') {
+      request = this.api.topic.index(this.state.offset);
+    } else {
+      request = this.api.category.topics(id, this.state.offset);
+    }
+    request.then((data) => {
+      let offset = '';
+      if (data.length === this.pagination) {
+        offset = data[data.length-1].created_at;
+      }
+      data = this.state.topics.concat(data);
+      this.setState({category: id, topics: data, loading: false, offset: offset});
     });
   }
 
   render() {
     return (
-      <HomeView state={this.state} color={this.color} handleClick={this.handleClick} />
+      <HomeView state={this.state} color={this.color} handleClick={this.handleClick} load={this.load} />
     );
   }
 }
@@ -121,6 +152,7 @@ const HomeView = (props) => {
         <ul className={style.topics}>
           {topics}
         </ul>
+        {props.state.offset !== '' && <div className={style.load}><a href='javascript:;' onClick={(e) => props.load(e)}>Load More</a></div>}
       </main>
       <aside className='section aside'>
         <SiteWidget />

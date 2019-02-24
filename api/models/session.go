@@ -7,10 +7,10 @@ import (
 	"encoding/hex"
 	"time"
 
-	"github.com/btcsuite/golangcrypto/bcrypt"
 	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const sessionsDDL = `

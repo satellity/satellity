@@ -3,8 +3,11 @@ class Topic {
     this.api = api;
   }
 
-  index() {
-    return this.api.axios.get('/topics').then((resp) => {
+  index(offset) {
+    if (!!offset) {
+      offset = offset.replace('+', '%2B')
+    }
+    return this.api.axios.get(`/topics?offset=${offset}`).then((resp) => {
       return resp.data;
     });
   }

@@ -39,8 +39,11 @@ class Category {
     });
   }
 
-  topics(id) {
-    return this.api.axios.get(`/categories/${id}/topics`).then((resp) => {
+  topics(id, offset) {
+    if (!!offset) {
+      offset = offset.replace('+', '%2B')
+    }
+    return this.api.axios.get(`/categories/${id}/topics?offset=${offset}`).then((resp) => {
       return resp.data;
     });
   }
