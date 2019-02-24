@@ -48,7 +48,7 @@ class Home extends Component {
     }
     request.then((data) => {
       let offset = '';
-      if (data.length > 3) {
+      if (data.length === this.pagination) {
         offset = data[data.length-1].created_at;
       }
       this.setState({category: id, topics: data, loading: false, offset: offset});
