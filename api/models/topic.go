@@ -15,6 +15,7 @@ import (
 // Topic related CONST
 const (
 	minTitleSize = 3
+	LIMIT        = 50
 )
 
 const topicsDDL = `
@@ -176,7 +177,7 @@ func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 		offset = time.Now()
 	}
 	var topics []*Topic
-	if err := session.Database(ctx).Model(&topics).Relation("User").Relation("Category").Where("topic.created_at<?", offset).Order("topic.created_at DESC").Limit(50).Select(); err != nil {
+	if err := session.Database(ctx).Model(&topics).Relation("User").Relation("Category").Where("topic.created_at<?", offset).Order("topic.created_at DESC").Limit(LIMIT).Select(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
@@ -188,7 +189,7 @@ func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, e
 		offset = time.Now()
 	}
 	var topics []*Topic
-	if err := session.Database(ctx).Model(&topics).Relation("Category").Where("topic.user_id=? AND topic.created_at<?", user.UserID, offset).Order("topic.created_at DESC").Limit(50).Select(); err != nil {
+	if err := session.Database(ctx).Model(&topics).Relation("Category").Where("topic.user_id=? AND topic.created_at<?", user.UserID, offset).Order("topic.created_at DESC").Limit(LIMIT).Select(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	for _, topic := range topics {
@@ -203,7 +204,7 @@ func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*
 		offset = time.Now()
 	}
 	var topics []*Topic
-	if err := session.Database(ctx).Model(&topics).Relation("User").Where("topic.category_id=? AND topic.created_at<?", category.CategoryID, offset).Order("topic.created_at DESC").Limit(50).Select(); err != nil {
+	if err := session.Database(ctx).Model(&topics).Relation("User").Where("topic.category_id=? AND topic.created_at<?", category.CategoryID, offset).Order("topic.created_at DESC").Limit(LIMIT).Select(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	for _, topic := range topics {
