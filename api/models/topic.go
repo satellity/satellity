@@ -94,6 +94,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 		}
 		return nil, session.TransactionError(ctx, err)
 	}
+	go upsertStatistic(ctx, "topics")
 	return topic, nil
 }
 
@@ -225,6 +226,10 @@ func (category *Category) lastTopic(ctx context.Context, tx *pg.Tx) (*Topic, err
 
 func topicsCountByCategory(ctx context.Context, tx *pg.Tx, id string) (int, error) {
 	return tx.Model(&Topic{}).Where("category_id=?", id).Count()
+}
+
+func topicsCount(ctx context.Context, tx *pg.Tx) (int, error) {
+	return tx.Model(&Topic{}).Count()
 }
 
 // BeforeInsert hook insert

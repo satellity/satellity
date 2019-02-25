@@ -50,7 +50,7 @@ func TestTopicCRUD(t *testing.T) {
 			category, _ = ReadCategory(ctx, category.CategoryID)
 			assert.NotNil(category)
 			assert.Equal(topic.TopicID, category.LastTopicID.String)
-			assert.Equal(tc.topicsCount, category.TopicsCount)
+			assert.Equal(int64(tc.topicsCount), category.TopicsCount)
 			topic, err = ReadTopic(ctx, topic.TopicID)
 			assert.Nil(err)
 			assert.NotNil(topic)

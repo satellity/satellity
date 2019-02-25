@@ -234,6 +234,10 @@ func findUserByID(ctx context.Context, id string) (*User, error) {
 	return user, nil
 }
 
+func usersCount(ctx context.Context, tx *pg.Tx) (int, error) {
+	return tx.Model(&User{}).Count()
+}
+
 func validateAndEncryptPassword(ctx context.Context, password string) (string, error) {
 	if len(password) < 8 {
 		return password, session.PasswordTooSimpleError(ctx)

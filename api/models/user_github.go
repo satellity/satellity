@@ -66,6 +66,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
+	go upsertStatistic(ctx, "users")
 	return user, nil
 }
 

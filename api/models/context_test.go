@@ -20,10 +20,12 @@ const (
 	dropCategoriesDDL = `DROP TABLE IF EXISTS categories;`
 	dropTopicsDDL     = `DROP TABLE IF EXISTS topics;`
 	dropCommentsDDL   = `DROP TABLE IF EXISTS comments;`
+	dropStatisticsDDL = `DROP TABLE IF EXISTS statistics;`
 )
 
 func teardownTestContext(ctx context.Context) {
 	tables := []string{
+		dropStatisticsDDL,
 		dropCommentsDDL,
 		dropTopicsDDL,
 		dropCategoriesDDL,
@@ -46,6 +48,7 @@ func setupTestContext() context.Context {
 		categoriesDDL,
 		topicsDDL,
 		commentsDDL,
+		statisticsDDL,
 	}
 	for _, q := range tables {
 		db.Exec(q)

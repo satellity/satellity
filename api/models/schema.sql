@@ -71,3 +71,12 @@ CREATE TABLE IF NOT EXISTS comments (
 CREATE INDEX ON comments (topic_id, created_at);
 CREATE INDEX ON comments (user_id, created_at);
 CREATE INDEX ON comments (score DESC, created_at);
+
+
+CREATE TABLE IF NOT EXISTS statistics (
+	statistic_id          VARCHAR(36) PRIMARY KEY,
+	name                  VARCHAR(512) NOT NULL,
+	count                 BIGINT NOT NULL DEFAULT 0,
+	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);

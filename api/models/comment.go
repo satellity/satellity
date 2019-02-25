@@ -81,6 +81,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		return nil, session.TransactionError(ctx, err)
 	}
 	c.User = user
+	go upsertStatistic(ctx, "comments")
 	return c, nil
 }
 
@@ -183,6 +184,10 @@ func findComment(ctx context.Context, tx *pg.Tx, id string) (*Comment, error) {
 
 func commentsCountByTopic(ctx context.Context, tx *pg.Tx, id string) (int, error) {
 	return tx.Model(&Comment{}).Where("topic_id=?", id).Count()
+}
+
+func commentsCount(ctx context.Context, tx *pg.Tx) (int, error) {
+	return tx.Model(&Comment{}).Count()
 }
 
 // BeforeInsert hook insert
