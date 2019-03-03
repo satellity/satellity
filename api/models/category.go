@@ -166,6 +166,18 @@ func ReadCategories(ctx context.Context) ([]*Category, error) {
 	return categories, nil
 }
 
+func readCategorySet(ctx context.Context) (map[string]*Category, error) {
+	categories, err := ReadCategories(ctx)
+	if err != nil {
+		return nil, err
+	}
+	set := make(map[string]*Category, 0)
+	for _, c := range categories {
+		set[c.CategoryID] = c
+	}
+	return set, nil
+}
+
 // ElevateCategory update category's info, e.g.: LastTopicID, TopicsCount
 func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 	if _, err := uuid.FromString(id); err != nil {

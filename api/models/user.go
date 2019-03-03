@@ -214,6 +214,39 @@ func ReadUsers(ctx context.Context, offset time.Time) ([]*User, error) {
 	return users, nil
 }
 
+func ReadUsersByIds(ctx context.Context, ids []string) ([]*User, error) {
+	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userCols, ","), strings.Join(ids, "','")))
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	defer rows.Close()
+
+	var users []*User
+	for rows.Next() {
+		user, err := userFromRows(rows)
+		if err != nil {
+			return nil, session.TransactionError(ctx, err)
+		}
+		users = append(users, user)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return users, nil
+}
+
+func readUserSet(ctx context.Context, ids []string) (map[string]*User, error) {
+	users, err := ReadUsersByIds(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	set := make(map[string]*User, 0)
+	for _, u := range users {
+		set[u.UserID] = u
+	}
+	return set, nil
+}
+
 // ReadUser read user by id.
 func ReadUser(ctx context.Context, id string) (*User, error) {
 	var user *User
