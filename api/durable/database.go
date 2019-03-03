@@ -2,19 +2,23 @@ package durable
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"log"
 
-	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/api/config"
+	_ "github.com/lib/pq"
 )
 
 // OpenDatabaseClient generate a database client
-func OpenDatabaseClient(ctx context.Context) *pg.DB {
-	db := pg.Connect(&pg.Options{
-		Addr:     fmt.Sprintf("%s:%d", config.DatabaseHost, config.DatabasePort),
-		User:     config.DatabaseUser,
-		Password: config.DatabasePassword,
-		Database: config.DatabaseName,
-	})
+func OpenDatabaseClient(ctx context.Context) *sql.DB {
+	connStr := fmt.Sprintf("host=%s port=%d user=%s password='%s' dbname=%s sslmode=disable", config.DatabaseHost, config.DatabasePort, config.DatabaseUser, config.DatabasePassword, config.DatabaseName)
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
 	return db
 }

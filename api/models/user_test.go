@@ -6,6 +6,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/x509"
+	"database/sql"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -84,10 +85,10 @@ func TestUserCRUD(t *testing.T) {
 			assert.Equal(tc.username, user.Username)
 			assert.Equal(tc.role, user.Role())
 
-			sess, err := readSession(ctx, new.UserID, new.SessionID)
+			sess, err := readTestSession(ctx, new.UserID, new.SessionID)
 			assert.Nil(err)
 			assert.NotNil(sess)
-			sess, err = readSession(ctx, uuid.Must(uuid.NewV4()).String(), new.SessionID)
+			sess, err = readTestSession(ctx, uuid.Must(uuid.NewV4()).String(), new.SessionID)
 			assert.Nil(err)
 			assert.Nil(sess)
 
@@ -120,4 +121,14 @@ func createTestUser(ctx context.Context, email, username, password string) *User
 	public, _ := x509.MarshalPKIXPublicKey(priv.Public())
 	user, _ := CreateUser(ctx, email, username, "nickname", "", password, hex.EncodeToString(public))
 	return user
+}
+
+func readTestSession(ctx context.Context, uid, sid string) (*Session, error) {
+	var s *Session
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		s, err = readSession(ctx, tx, uid, sid)
+		return err
+	})
+	return s, err
 }

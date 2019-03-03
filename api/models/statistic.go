@@ -3,16 +3,18 @@ package models
 import (
 	"context"
 	"crypto/md5"
+	"database/sql"
+	"fmt"
 	"io"
+	"strings"
 	"time"
 
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/api/session"
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 )
 
 const STATISTIC_ID = "540cbd3c-f4eb-479c-bcd8-b5629af57267"
+
 const statisticsDDL = `
 CREATE TABLE IF NOT EXISTS statistics (
 	statistic_id          VARCHAR(36) PRIMARY KEY,
@@ -33,14 +35,20 @@ type Statistic struct {
 
 var statisticColums = []string{"statistic_id", "name", "count", "created_at", "updated_at"}
 
+func (s *Statistic) values() []interface{} {
+	return []interface{}{s.StatisticID, s.Name, s.Count, s.CreatedAt, s.UpdatedAt}
+}
+
 func upsertStatistic(ctx context.Context, name string) (*Statistic, error) {
 	id, _ := generateStatisticId(STATISTIC_ID, name)
-	s, err := readStatistic(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
-		var count int
+	var s *Statistic
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		s, err = findStatistic(ctx, tx, id)
+		if err != nil {
+			return err
+		}
+		var count int64
 		switch name {
 		case "users":
 			count, err = usersCount(ctx, tx)
@@ -53,15 +61,18 @@ func upsertStatistic(ctx context.Context, name string) (*Statistic, error) {
 			return err
 		}
 		if s != nil {
-			s.Count = int64(count)
-			return tx.Update(s)
+			s.Count = count
+			_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE statistics SET count=$1 WHERE statistic_id=$2"), count, id)
+			return err
 		}
 		s = &Statistic{
 			StatisticID: id,
 			Name:        name,
 			Count:       int64(count),
 		}
-		return tx.Insert(s)
+		cols, params := prepareColumnsWithValues(statisticColums)
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...)
+		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
@@ -69,30 +80,34 @@ func upsertStatistic(ctx context.Context, name string) (*Statistic, error) {
 	return s, nil
 }
 
-func readStatistic(ctx context.Context, id string) (*Statistic, error) {
+func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	s := &Statistic{StatisticID: id}
-	if err := session.Database(ctx).Model(s).WherePK().Select(); err == pg.ErrNoRows {
+
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(statisticColums, ",")), id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
 		return nil, nil
-	} else if err != nil {
-		return nil, session.TransactionError(ctx, err)
+	}
+	s, err := StatisticFromRows(rows)
+	if err != nil {
+		return nil, err
 	}
 	return s, nil
 }
 
-// BeforeInsert hook insert
-func (s *Statistic) BeforeInsert(db orm.DB) error {
-	s.CreatedAt = time.Now()
-	s.UpdatedAt = s.CreatedAt
-	return nil
-}
-
-// BeforeUpdate hook update
-func (s *Statistic) BeforeUpdate(db orm.DB) error {
-	s.UpdatedAt = time.Now()
-	return nil
+func StatisticFromRows(rows *sql.Rows) (*Statistic, error) {
+	var s Statistic
+	err := rows.Scan(&s.StatisticID, &s.Name, &s.Count, &s.CreatedAt, &s.UpdatedAt)
+	return &s, err
 }
 
 func generateStatisticId(Id, name string) (string, error) {

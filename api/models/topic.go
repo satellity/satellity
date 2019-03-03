@@ -3,11 +3,10 @@ package models
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/satori/go.uuid"
 )
@@ -30,7 +29,6 @@ CREATE TABLE IF NOT EXISTS topics (
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
-
 CREATE INDEX ON topics (created_at DESC);
 CREATE INDEX ON topics (user_id, created_at DESC);
 CREATE INDEX ON topics (category_id, created_at DESC);
@@ -39,20 +37,24 @@ CREATE INDEX ON topics (score DESC, created_at DESC);
 
 var topicCols = []string{"topic_id", "title", "body", "comments_count", "category_id", "user_id", "score", "created_at", "updated_at"}
 
+func (t *Topic) values() []interface{} {
+	return []interface{}{t.TopicID, t.Title, t.Body, t.CommentsCount, t.CategoryID, t.UserID, t.Score, t.CreatedAt, t.UpdatedAt}
+}
+
 // Topic is what use talking about
 type Topic struct {
-	TopicID       string    `sql:"topic_id,pk"`
-	Title         string    `sql:"title,notnull"`
-	Body          string    `sql:"body,notnull"`
-	CommentsCount int64     `sql:"comments_count,notnull"`
-	CategoryID    string    `sql:"category_id,notnull"`
-	UserID        string    `sql:"user_id,notnull"`
-	Score         int       `sql:"score,notnull"`
-	CreatedAt     time.Time `sql:"created_at"`
-	UpdatedAt     time.Time `sql:"updated_at"`
+	TopicID       string
+	Title         string
+	Body          string
+	CommentsCount int64
+	CategoryID    string
+	UserID        string
+	Score         int
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 
-	User     *User     `sql:"-"`
-	Category *Category `sql:"-"`
+	User     *User
+	Category *Category
 }
 
 //CreateTopic create a new Topic
@@ -62,13 +64,17 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 		return nil, session.BadDataError(ctx)
 	}
 
+	t := time.Now()
 	topic := &Topic{
-		TopicID: uuid.Must(uuid.NewV4()).String(),
-		Title:   title,
-		Body:    body,
-		UserID:  user.UserID,
+		TopicID:   uuid.Must(uuid.NewV4()).String(),
+		Title:     title,
+		Body:      body,
+		UserID:    user.UserID,
+		CreatedAt: t,
+		UpdatedAt: t,
 	}
-	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
 		category, err := findCategory(ctx, tx, categoryID)
 		if err != nil {
 			return err
@@ -82,11 +88,16 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 		if err != nil {
 			return err
 		}
-		category.TopicsCount = int64(count) + 1
-		if err := tx.Insert(topic); err != nil {
+		category.TopicsCount, category.UpdatedAt = count+1, time.Now()
+		cols, params := prepareColumnsWithValues(topicCols)
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO topics(%s) VALUES (%s)", cols, params), topic.values()...)
+		if err != nil {
 			return err
 		}
-		return tx.Update(category)
+		ccols, cparams := prepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
+		cvals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", ccols, cparams, category.CategoryID), cvals...)
+		return err
 	})
 	if err != nil {
 		if _, ok := err.(session.Error); ok {
@@ -107,13 +118,13 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 
 	var topic *Topic
 	var prevCategoryID string
-	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
 		if err != nil {
 			return err
 		} else if topic == nil {
-			return session.NotFoundError(ctx)
+			return nil
 		} else if topic.UserID != user.UserID && !user.isAdmin() {
 			return session.AuthorizationError(ctx)
 		}
@@ -132,13 +143,15 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 			topic.CategoryID = category.CategoryID
 			topic.Category = category
 		}
-		return tx.Update(topic)
+		cols, params := prepareColumnsWithValues([]string{"title", "body", "category_id"})
+		vals := []interface{}{topic.Title, topic.Body, topic.CategoryID}
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), vals...)
+		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
+	} else if topic == nil {
+		return nil, session.NotFoundError(ctx)
 	}
 	if prevCategoryID != "" {
 		go ElevateCategory(ctx, prevCategoryID)
@@ -150,26 +163,39 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 
 //ReadTopic read a topic by ID
 func ReadTopic(ctx context.Context, id string) (*Topic, error) {
-	topic := &Topic{TopicID: id}
-	if err := session.Database(ctx).Model(topic).Relation("User").Relation("Category").WherePK().Select(); err == pg.ErrNoRows {
-		return nil, session.NotFoundError(ctx)
-	} else if err != nil {
+	var topic *Topic
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		topic, err = findTopic(ctx, tx, id)
+		return err
+	})
+	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topic, nil
 }
 
-func findTopic(ctx context.Context, tx *pg.Tx, id string) (*Topic, error) {
+func findTopic(ctx context.Context, tx *sql.Tx, id string) (*Topic, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	topic := &Topic{TopicID: id}
-	if err := tx.Model(topic).Column(topicCols...).WherePK().Select(); err == pg.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(topicCols, ",")), id)
+	if err != nil {
 		return nil, err
 	}
-	return topic, nil
+	defer rows.Close()
+
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	t, err := topicFromRows(rows)
+	if err != nil {
+		return nil, err
+	}
+	return t, nil
 }
 
 // ReadTopics read all topics, parameters: offset default time.Now()
@@ -178,7 +204,20 @@ func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 		offset = time.Now()
 	}
 	var topics []*Topic
-	if err := session.Database(ctx).Model(&topics).Relation("User").Relation("Category").Where("topic.created_at<?", offset).Order("topic.created_at DESC").Limit(LIMIT).Select(); err != nil {
+	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicCols, ",")), offset, LIMIT)
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		topic, err := topicFromRows(rows)
+		if err != nil {
+			return nil, session.TransactionError(ctx, err)
+		}
+		topics = append(topics, topic)
+	}
+	if err := rows.Err(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
@@ -190,11 +229,21 @@ func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, e
 		offset = time.Now()
 	}
 	var topics []*Topic
-	if err := session.Database(ctx).Model(&topics).Relation("Category").Where("topic.user_id=? AND topic.created_at<?", user.UserID, offset).Order("topic.created_at DESC").Limit(LIMIT).Select(); err != nil {
+	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicCols, ",")), user.UserID, offset, LIMIT)
+	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	for _, topic := range topics {
-		topic.User = user
+	defer rows.Close()
+
+	for rows.Next() {
+		topic, err := topicFromRows(rows)
+		if err != nil {
+			return nil, session.TransactionError(ctx, err)
+		}
+		topics = append(topics, topic)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
 }
@@ -205,42 +254,62 @@ func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*
 		offset = time.Now()
 	}
 	var topics []*Topic
-	if err := session.Database(ctx).Model(&topics).Relation("User").Where("topic.category_id=? AND topic.created_at<?", category.CategoryID, offset).Order("topic.created_at DESC").Limit(LIMIT).Select(); err != nil {
+	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicCols, ",")), category.CategoryID, offset, LIMIT)
+	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	for _, topic := range topics {
-		topic.Category = category
+	defer rows.Close()
+
+	for rows.Next() {
+		topic, err := topicFromRows(rows)
+		if err != nil {
+			return nil, session.TransactionError(ctx, err)
+		}
+		topics = append(topics, topic)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
 }
 
-func (category *Category) lastTopic(ctx context.Context, tx *pg.Tx) (*Topic, error) {
-	var topic Topic
-	if err := tx.Model(&topic).Where("category_id=?", category.CategoryID).Order("created_at DESC").Limit(1).Select(); err == pg.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
+func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, error) {
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(topicCols, ",")), category.CategoryID)
+	if err != nil {
 		return nil, err
 	}
-	return &topic, nil
+	defer rows.Close()
+
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	t, err := topicFromRows(rows)
+	if err != nil {
+		return nil, err
+	}
+	return t, nil
 }
 
-func topicsCountByCategory(ctx context.Context, tx *pg.Tx, id string) (int, error) {
-	return tx.Model(&Topic{}).Where("category_id=?", id).Count()
+func topicsCountByCategory(ctx context.Context, tx *sql.Tx, id string) (int64, error) {
+	var count int64
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics WHERE category_id=$1", id).Scan(&count)
+	if err != nil {
+		return 0, session.TransactionError(ctx, err)
+	}
+	return count, nil
 }
 
-func topicsCount(ctx context.Context, tx *pg.Tx) (int, error) {
-	return tx.Model(&Topic{}).Count()
+func topicsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
+	var count int64
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics").Scan(&count)
+	return count, err
 }
 
-// BeforeInsert hook insert
-func (t *Topic) BeforeInsert(db orm.DB) error {
-	t.CreatedAt = time.Now()
-	t.UpdatedAt = t.CreatedAt
-	return nil
-}
-
-// BeforeUpdate hook update
-func (t *Topic) BeforeUpdate(db orm.DB) error {
-	t.UpdatedAt = time.Now()
-	return nil
+func topicFromRows(rows *sql.Rows) (*Topic, error) {
+	var t Topic
+	err := rows.Scan(&t.TopicID, &t.Title, &t.Body, &t.CommentsCount, &t.CategoryID, &t.UserID, &t.Score, &t.CreatedAt, &t.UpdatedAt)
+	return &t, err
 }

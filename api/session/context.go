@@ -2,8 +2,8 @@ package session
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/unrolled/render"
 )
@@ -21,13 +21,13 @@ const (
 )
 
 // Database read database from context
-func Database(ctx context.Context) *pg.DB {
-	v, _ := ctx.Value(keyDatabase).(*pg.DB)
+func Database(ctx context.Context) *sql.DB {
+	v, _ := ctx.Value(keyDatabase).(*sql.DB)
 	return v
 }
 
 // WithDatabase put database into context
-func WithDatabase(ctx context.Context, database *pg.DB) context.Context {
+func WithDatabase(ctx context.Context, database *sql.DB) context.Context {
 	return context.WithValue(ctx, keyDatabase, database)
 }
 
