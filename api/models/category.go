@@ -119,8 +119,12 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 		return err
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
 		return nil, session.TransactionError(ctx, err)
-	} else if category == nil {
+	}
+	if category == nil {
 		return nil, session.NotFoundError(ctx)
 	}
 	return category, nil

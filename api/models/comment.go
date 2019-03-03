@@ -210,6 +210,9 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 		return err
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return err
+		}
 		return session.TransactionError(ctx, err)
 	}
 	return nil

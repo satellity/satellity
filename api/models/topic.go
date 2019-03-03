@@ -149,8 +149,12 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 		return err
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
 		return nil, session.TransactionError(ctx, err)
-	} else if topic == nil {
+	}
+	if topic == nil {
 		return nil, session.NotFoundError(ctx)
 	}
 	if prevCategoryID != "" {

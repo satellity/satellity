@@ -112,6 +112,9 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 		return nil
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return user, nil
@@ -170,7 +173,10 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 			return nil
 		})
 		if err != nil {
-			return nil, err
+			if _, ok := err.(session.Error); ok {
+				return nil, err
+			}
+			return nil, session.TransactionError(ctx, err)
 		}
 		pkix, err := hex.DecodeString(s.Secret)
 		if err != nil {
@@ -217,6 +223,9 @@ func ReadUser(ctx context.Context, id string) (*User, error) {
 		return err
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return user, nil
@@ -247,6 +256,9 @@ func ReadUserByUsernameOrEmail(ctx context.Context, identity string) (*User, err
 		return nil
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
 		return user, session.TransactionError(ctx, err)
 	}
 	return user, nil
