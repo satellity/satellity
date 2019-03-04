@@ -13,7 +13,8 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-const STATISTIC_ID = "540cbd3c-f4eb-479c-bcd8-b5629af57267"
+// SolidStatisticID is used to generate a solid id from name
+const SolidStatisticID = "540cbd3c-f4eb-479c-bcd8-b5629af57267"
 
 const statisticsDDL = `
 CREATE TABLE IF NOT EXISTS statistics (
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS statistics (
 );
 `
 
+// Statistic is the body of statistic
 type Statistic struct {
 	StatisticID string    `sql:"statistic_id,pk"`
 	Name        string    `sql:"name,notnull"`
@@ -40,7 +42,7 @@ func (s *Statistic) values() []interface{} {
 }
 
 func upsertStatistic(ctx context.Context, name string) (*Statistic, error) {
-	id, _ := generateStatisticId(STATISTIC_ID, name)
+	id, _ := generateStatisticID(SolidStatisticID, name)
 	var s *Statistic
 	err := runInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
@@ -97,22 +99,22 @@ func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, erro
 		}
 		return nil, nil
 	}
-	s, err := StatisticFromRows(rows)
+	s, err := statisticFromRows(rows)
 	if err != nil {
 		return nil, err
 	}
 	return s, nil
 }
 
-func StatisticFromRows(rows *sql.Rows) (*Statistic, error) {
+func statisticFromRows(rows *sql.Rows) (*Statistic, error) {
 	var s Statistic
 	err := rows.Scan(&s.StatisticID, &s.Name, &s.Count, &s.CreatedAt, &s.UpdatedAt)
 	return &s, err
 }
 
-func generateStatisticId(Id, name string) (string, error) {
+func generateStatisticID(ID, name string) (string, error) {
 	h := md5.New()
-	io.WriteString(h, Id)
+	io.WriteString(h, ID)
 	io.WriteString(h, name)
 	sum := h.Sum(nil)
 	sum[6] = (sum[6] & 0x0f) | 0x30
