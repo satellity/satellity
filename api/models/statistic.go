@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 )
 
@@ -54,6 +55,8 @@ func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, 
 		count, err = topicsCount(ctx, tx)
 	case "comments":
 		count, err = commentsCount(ctx, tx)
+	default:
+		return nil, session.BadDataError(ctx)
 	}
 	if err != nil {
 		return nil, err
