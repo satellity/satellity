@@ -1,15 +1,15 @@
 package models
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 )
 
 // topics_count should use pg int64
@@ -29,19 +29,23 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE INDEX ON categories (position);
 `
 
-var categoryCols = []string{"category_id", "name", "alias", "description", "topics_count", "last_topic_id", "position", "created_at", "updated_at"}
-
 // Category is used to categorize topics.
 type Category struct {
-	CategoryID  string         `sql:"category_id,pk"`
-	Name        string         `sql:"name,notnull"`
-	Alias       string         `sql:"alias,notnull"`
-	Description string         `sql:"description,notnull"`
-	TopicsCount int64          `sql:"topics_count,notnull"`
-	LastTopicID sql.NullString `sql:"last_topic_id"`
-	Position    int64          `sql:"position,notnull"`
-	CreatedAt   time.Time      `sql:"created_at"`
-	UpdatedAt   time.Time      `sql:"updated_at"`
+	CategoryID  string
+	Name        string
+	Alias       string
+	Description string
+	TopicsCount int64
+	LastTopicID sql.NullString
+	Position    int64
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+var categoryCols = []string{"category_id", "name", "alias", "description", "topics_count", "last_topic_id", "position", "created_at", "updated_at"}
+
+func (c *Category) values() []interface{} {
+	return []interface{}{c.CategoryID, c.Name, c.Alias, c.Description, c.TopicsCount, c.LastTopicID, c.Position, c.CreatedAt, c.UpdatedAt}
 }
 
 // CreateCategory create a new category.
@@ -55,23 +59,29 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 		alias = name
 	}
 
+	t := time.Now()
 	category := &Category{
 		CategoryID:  uuid.Must(uuid.NewV4()).String(),
 		Name:        name,
 		Alias:       alias,
 		Description: description,
+		TopicsCount: 0,
 		LastTopicID: sql.NullString{String: "", Valid: false},
 		Position:    position,
+		CreatedAt:   t,
+		UpdatedAt:   t,
 	}
 	if position == 0 {
 		count, err := categoryCount(ctx)
 		if err != nil {
-			return nil, session.TransactionError(ctx, err)
+			return nil, err
 		}
-		category.Position = int64(count)
+		category.Position = count
 	}
 
-	if err := session.Database(ctx).Insert(category); err != nil {
+	cols, params := prepareColumnsWithValues(categoryCols)
+	_, err := session.Database(ctx).ExecContext(ctx, fmt.Sprintf("INSERT INTO categories(%s) VALUES (%s)", cols, params), category.values()...)
+	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return category, nil
@@ -86,13 +96,11 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 	}
 
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
-		if err != nil {
+		if err != nil || category == nil {
 			return err
-		} else if category == nil {
-			return session.BadDataError(ctx)
 		}
 		if len(name) > 0 {
 			category.Name = name
@@ -104,7 +112,11 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 			category.Description = description
 		}
 		category.Position = position
-		return tx.Update(category)
+		category.UpdatedAt = time.Now()
+		cols, params := prepareColumnsWithValues([]string{"name", "alias", "description", "position", "updated_at"})
+		vals := []interface{}{category.Name, category.Alias, category.Description, category.Position, category.UpdatedAt}
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
+		return err
 	})
 	if err != nil {
 		if _, ok := err.(session.Error); ok {
@@ -112,13 +124,16 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 		}
 		return nil, session.TransactionError(ctx, err)
 	}
+	if category == nil {
+		return nil, session.NotFoundError(ctx)
+	}
 	return category, nil
 }
 
 // ReadCategory read a category by ID (uuid).
 func ReadCategory(ctx context.Context, id string) (*Category, error) {
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		return err
@@ -131,11 +146,36 @@ func ReadCategory(ctx context.Context, id string) (*Category, error) {
 
 // ReadCategories read categories order by position
 func ReadCategories(ctx context.Context) ([]*Category, error) {
+	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 100", strings.Join(categoryCols, ",")))
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	defer rows.Close()
+
 	var categories []*Category
-	if _, err := session.Database(ctx).Query(&categories, "SELECT * FROM categories ORDER BY position LIMIT 100"); err != nil {
+	for rows.Next() {
+		category, err := categoryFromRows(rows)
+		if err != nil {
+			return nil, session.TransactionError(ctx, err)
+		}
+		categories = append(categories, category)
+	}
+	if err := rows.Err(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return categories, nil
+}
+
+func readCategorySet(ctx context.Context) (map[string]*Category, error) {
+	categories, err := ReadCategories(ctx)
+	if err != nil {
+		return nil, err
+	}
+	set := make(map[string]*Category, 0)
+	for _, c := range categories {
+		set[c.CategoryID] = c
+	}
+	return set, nil
 }
 
 // ElevateCategory update category's info, e.g.: LastTopicID, TopicsCount
@@ -144,7 +184,7 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 		return nil, nil
 	}
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil {
@@ -156,12 +196,12 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 		if err != nil {
 			return err
 		}
-		var lastTopicId = sql.NullString{String: "", Valid: false}
+		var lastTopicID = sql.NullString{String: "", Valid: false}
 		if topic != nil {
-			lastTopicId = sql.NullString{String: topic.TopicID, Valid: true}
+			lastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
 		}
-		if category.LastTopicID.String != lastTopicId.String {
-			category.LastTopicID = lastTopicId
+		if category.LastTopicID.String != lastTopicID.String {
+			category.LastTopicID = lastTopicID
 		}
 		category.TopicsCount = 0
 		if category.LastTopicID.Valid {
@@ -169,9 +209,13 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 			if err != nil {
 				return err
 			}
-			category.TopicsCount = int64(count)
+			category.UpdatedAt = time.Now()
+			cols, params := prepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
+			vals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
+			_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
+			category.TopicsCount = count
 		}
-		return tx.Update(category)
+		return err
 	})
 	if err != nil {
 		if _, ok := err.(session.Error); ok {
@@ -182,32 +226,75 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 	return category, nil
 }
 
-func findCategory(ctx context.Context, tx *pg.Tx, id string) (*Category, error) {
+func findCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	category := &Category{CategoryID: id}
-	if err := tx.Model(category).Column(categoryCols...).WherePK().Select(); err == pg.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
+
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories WHERE category_id=$1", strings.Join(categoryCols, ",")), id)
+	if err != nil {
 		return nil, err
 	}
-	return category, nil
+	defer rows.Close()
+
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	c, err := categoryFromRows(rows)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
-func categoryCount(ctx context.Context) (int, error) {
-	return session.Database(ctx).Model(&Category{}).Count()
+func categoryCount(ctx context.Context) (int64, error) {
+	var count int64
+	err := session.Database(ctx).QueryRowContext(ctx, "SELECT count(*) FROM categories").Scan(&count)
+	if err != nil {
+		return 0, session.TransactionError(ctx, err)
+	}
+	return count, nil
 }
 
-// BeforeInsert hook insert
-func (c *Category) BeforeInsert(db orm.DB) error {
-	c.CreatedAt = time.Now()
-	c.UpdatedAt = c.CreatedAt
-	return nil
+func categoryFromRows(rows *sql.Rows) (*Category, error) {
+	var c Category
+	err := rows.Scan(&c.CategoryID, &c.Name, &c.Alias, &c.Description, &c.TopicsCount, &c.LastTopicID, &c.Position, &c.CreatedAt, &c.UpdatedAt)
+	return &c, err
 }
 
-// BeforeUpdate hook update
-func (c *Category) BeforeUpdate(db orm.DB) error {
-	c.UpdatedAt = time.Now()
-	return nil
+func prepareColumnsWithValues(columns []string) (string, string) {
+	if len(columns) < 1 {
+		return "", ""
+	}
+	cols, params := bytes.Buffer{}, bytes.Buffer{}
+	for i, column := range columns {
+		if i > 0 {
+			cols.WriteString(",")
+			params.WriteString(",")
+		}
+		cols.WriteString(column)
+		params.WriteString(fmt.Sprintf("$%d", i+1))
+	}
+	return cols.String(), params.String()
+}
+
+func runInTransaction(ctx context.Context, fn func(*sql.Tx) error) error {
+	tx, err := session.Database(ctx).Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := recover(); err != nil {
+			_ = tx.Rollback()
+			panic(err)
+		}
+	}()
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	return tx.Commit()
 }

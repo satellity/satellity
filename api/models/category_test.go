@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/godiscourse/godiscourse/api/session"
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,7 +59,7 @@ func TestCategoryCRUD(t *testing.T) {
 			assert.Len(categories, tc.position)
 			count, err := categoryCount(ctx)
 			assert.Nil(err)
-			assert.Equal(len(categories), count)
+			assert.Len(categories, int(count))
 			new, err = UpdateCategory(ctx, uuid.Must(uuid.NewV4()).String(), "new"+category.Name, "new"+category.Alias, "new"+category.Description, 10)
 			assert.NotNil(err)
 			assert.Nil(new)

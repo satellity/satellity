@@ -2,13 +2,13 @@ package models
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 )
 
 const (
@@ -25,13 +25,10 @@ CREATE TABLE IF NOT EXISTS comments (
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
-
 CREATE INDEX ON comments (topic_id, created_at);
 CREATE INDEX ON comments (user_id, created_at);
 CREATE INDEX ON comments (score DESC, created_at);
 `
-
-var commentColumns = []string{"comment_id", "body", "topic_id", "user_id", "score", "created_at", "updated_at"}
 
 // Comment is struct for comment of topic
 type Comment struct {
@@ -46,18 +43,27 @@ type Comment struct {
 	User *User
 }
 
+var commentCols = []string{"comment_id", "body", "topic_id", "user_id", "score", "created_at", "updated_at"}
+
+func (c *Comment) values() []interface{} {
+	return []interface{}{c.CommentID, c.Body, c.TopicID, c.UserID, c.Score, c.CreatedAt, c.UpdatedAt}
+}
+
 // CreateComment create a new comment
 func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Comment, error) {
 	body = strings.TrimSpace(body)
 	if len(body) < minCommentBodySize {
 		return nil, session.BadDataError(ctx)
 	}
+	t := time.Now()
 	c := &Comment{
 		CommentID: uuid.Must(uuid.NewV4()).String(),
 		Body:      body,
 		UserID:    user.UserID,
+		CreatedAt: t,
+		UpdatedAt: t,
 	}
-	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
 		topic, err := findTopic(ctx, tx, topicID)
 		if err != nil {
 			return err
@@ -68,12 +74,22 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		if err != nil {
 			return err
 		}
-		topic.CommentsCount = int64(count) + 1
+		topic.CommentsCount = count + 1
+		topic.UpdatedAt = t
 		c.TopicID = topic.TopicID
-		tx.Update(topic)
-		return tx.Insert(c)
+		cols, params := prepareColumnsWithValues(commentCols)
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO comments (%s) VALUES (%s)", cols, params), c.values()...)
+		if err != nil {
+			return err
+		}
+		tcols, tparams := prepareColumnsWithValues([]string{"comments_count", "updated_at"})
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", tcols, tparams, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
+		if err != nil {
+			return err
+		}
+		_, err = upsertStatistic(ctx, tx, "comments")
+		return err
 	})
-
 	if err != nil {
 		if _, ok := err.(session.Error); ok {
 			return nil, err
@@ -81,7 +97,6 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		return nil, session.TransactionError(ctx, err)
 	}
 	c.User = user
-	go upsertStatistic(ctx, "comments")
 	return c, nil
 }
 
@@ -92,7 +107,7 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 		return nil, session.BadDataError(ctx)
 	}
 	var comment *Comment
-	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		comment, err = findComment(ctx, tx, id)
 		if err != nil {
@@ -103,7 +118,10 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 			return session.AuthorizationError(ctx)
 		}
 		comment.Body = body
-		return tx.Update(comment)
+		comment.UpdatedAt = time.Now()
+		cols, params := prepareColumnsWithValues([]string{"body", "updated_at"})
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, params, comment.CommentID), comment.Body, comment.UpdatedAt)
+		return err
 	})
 	if err != nil {
 		if _, ok := err.(session.Error); ok {
@@ -116,8 +134,24 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 
 // ReadComments read comments by topicID, parameters: offset
 func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentCols, ",")), topic.TopicID, offset, LIMIT)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
 	var comments []*Comment
-	if err := session.Database(ctx).Model(&comments).Relation("User").Where("comment.topic_id=? AND comment.created_at>?", topic.TopicID, offset).Order("comment.created_at").Limit(LIMIT).Select(); err != nil {
+	for rows.Next() {
+		c, err := commentFromRows(rows)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, c)
+	}
+	if err := rows.Err(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return comments, nil
@@ -128,20 +162,32 @@ func (user *User) ReadComments(ctx context.Context, offset time.Time) ([]*Commen
 	if offset.IsZero() {
 		offset = time.Now()
 	}
+	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentCols, ",")), user.UserID, offset, LIMIT)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
 	var comments []*Comment
-	if _, err := session.Database(ctx).Query(&comments, "SELECT * FROM comments WHERE user_id=? AND created_at<? ORDER BY created_at DESC LIMIT 50", user.UserID, offset); err != nil {
+	for rows.Next() {
+		c, err := commentFromRows(rows)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, c)
+	}
+	if err := rows.Err(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return comments, nil
 }
 
+//DeleteComment delete a comment by ID
 func (user *User) DeleteComment(ctx context.Context, id string) error {
-	err := session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
 		comment, err := findComment(ctx, tx, id)
-		if err != nil {
+		if err != nil || comment == nil {
 			return err
-		} else if comment == nil {
-			return nil
 		}
 		if !user.isAdmin() && user.UserID != comment.UserID {
 			return session.ForbiddenError(ctx)
@@ -156,9 +202,15 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 		if err != nil {
 			return err
 		}
-		topic.CommentsCount = int64(count) - 1
-		tx.Update(topic)
-		return tx.Delete(comment)
+		topic.CommentsCount = count - 1
+		topic.UpdatedAt = time.Now()
+		cols, params := prepareColumnsWithValues([]string{"comments_count", "updated_at"})
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
+		if err != nil {
+			return err
+		}
+		_, err = tx.ExecContext(ctx, "DELETE FROM comments WHERE comment_id=$1", comment.CommentID)
+		return err
 	})
 	if err != nil {
 		if _, ok := err.(session.Error); ok {
@@ -169,36 +221,44 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 	return nil
 }
 
-func findComment(ctx context.Context, tx *pg.Tx, id string) (*Comment, error) {
+func findComment(ctx context.Context, tx *sql.Tx, id string) (*Comment, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	comment := &Comment{CommentID: id}
-	if err := tx.Model(comment).Column(commentColumns...).WherePK().Select(); err == pg.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
+
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE comment_id=$1", strings.Join(commentCols, ",")), id)
+	if err != nil {
 		return nil, err
 	}
-	return comment, nil
+	defer rows.Close()
+
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	c, err := commentFromRows(rows)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
-func commentsCountByTopic(ctx context.Context, tx *pg.Tx, id string) (int, error) {
-	return tx.Model(&Comment{}).Where("topic_id=?", id).Count()
+func commentsCountByTopic(ctx context.Context, tx *sql.Tx, id string) (int64, error) {
+	var count int64
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM comments WHERE topic_id=$1", id).Scan(&count)
+	return count, err
 }
 
-func commentsCount(ctx context.Context, tx *pg.Tx) (int, error) {
-	return tx.Model(&Comment{}).Count()
+func commentsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
+	var count int64
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM comments").Scan(&count)
+	return count, err
 }
 
-// BeforeInsert hook insert
-func (c *Comment) BeforeInsert(db orm.DB) error {
-	c.CreatedAt = time.Now()
-	c.UpdatedAt = c.CreatedAt
-	return nil
-}
-
-// BeforeUpdate hook update
-func (c *Comment) BeforeUpdate(db orm.DB) error {
-	c.UpdatedAt = time.Now()
-	return nil
+func commentFromRows(rows *sql.Rows) (*Comment, error) {
+	var c Comment
+	err := rows.Scan(&c.CommentID, &c.Body, &c.TopicID, &c.UserID, &c.Score, &c.CreatedAt, &c.UpdatedAt)
+	return &c, err
 }

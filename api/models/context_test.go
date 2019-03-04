@@ -32,8 +32,11 @@ func teardownTestContext(ctx context.Context) {
 		dropSessionsDDL,
 		dropUsersDDL,
 	}
+	db := session.Database(ctx)
 	for _, q := range tables {
-		session.Database(ctx).Exec(q)
+		if _, err := db.Exec(q); err != nil {
+			log.Panicln(err)
+		}
 	}
 }
 
@@ -51,7 +54,9 @@ func setupTestContext() context.Context {
 		statisticsDDL,
 	}
 	for _, q := range tables {
-		db.Exec(q)
+		if _, err := db.Exec(q); err != nil {
+			log.Panicln(err)
+		}
 	}
 	return session.WithDatabase(context.Background(), db)
 }

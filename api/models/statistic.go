@@ -3,16 +3,19 @@ package models
 import (
 	"context"
 	"crypto/md5"
+	"database/sql"
+	"fmt"
 	"io"
+	"strings"
 	"time"
 
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
 	"github.com/godiscourse/godiscourse/api/session"
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 )
 
-const STATISTIC_ID = "540cbd3c-f4eb-479c-bcd8-b5629af57267"
+// SolidStatisticID is used to generate a solid id from name
+const SolidStatisticID = "540cbd3c-f4eb-479c-bcd8-b5629af57267"
+
 const statisticsDDL = `
 CREATE TABLE IF NOT EXISTS statistics (
 	statistic_id          VARCHAR(36) PRIMARY KEY,
@@ -23,6 +26,7 @@ CREATE TABLE IF NOT EXISTS statistics (
 );
 `
 
+// Statistic is the body of statistic
 type Statistic struct {
 	StatisticID string    `sql:"statistic_id,pk"`
 	Name        string    `sql:"name,notnull"`
@@ -33,71 +37,80 @@ type Statistic struct {
 
 var statisticColums = []string{"statistic_id", "name", "count", "created_at", "updated_at"}
 
-func upsertStatistic(ctx context.Context, name string) (*Statistic, error) {
-	id, _ := generateStatisticId(STATISTIC_ID, name)
-	s, err := readStatistic(ctx, id)
+func (s *Statistic) values() []interface{} {
+	return []interface{}{s.StatisticID, s.Name, s.Count, s.CreatedAt, s.UpdatedAt}
+}
+
+func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, error) {
+	id, _ := generateStatisticID(SolidStatisticID, name)
+	s, err := findStatistic(ctx, tx, id)
 	if err != nil {
 		return nil, err
 	}
-	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
-		var count int
-		switch name {
-		case "users":
-			count, err = usersCount(ctx, tx)
-		case "topics":
-			count, err = topicsCount(ctx, tx)
-		case "comments":
-			count, err = commentsCount(ctx, tx)
-		}
-		if err != nil {
-			return err
-		}
-		if s != nil {
-			s.Count = int64(count)
-			return tx.Update(s)
-		}
-		s = &Statistic{
-			StatisticID: id,
-			Name:        name,
-			Count:       int64(count),
-		}
-		return tx.Insert(s)
-	})
+	var count int64
+	switch name {
+	case "users":
+		count, err = usersCount(ctx, tx)
+	case "topics":
+		count, err = topicsCount(ctx, tx)
+	case "comments":
+		count, err = commentsCount(ctx, tx)
+	default:
+		return nil, session.BadDataError(ctx)
+	}
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
+	}
+	if s != nil {
+		s.Count = count
+		_, err := tx.ExecContext(ctx, fmt.Sprintf("UPDATE statistics SET count=$1 WHERE statistic_id=$2"), count, id)
+		return s, err
+	}
+	s = &Statistic{
+		StatisticID: id,
+		Name:        name,
+		Count:       int64(count),
+	}
+	cols, params := prepareColumnsWithValues(statisticColums)
+	if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...); err != nil {
+		return nil, err
 	}
 	return s, nil
 }
 
-func readStatistic(ctx context.Context, id string) (*Statistic, error) {
+func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	s := &Statistic{StatisticID: id}
-	if err := session.Database(ctx).Model(s).WherePK().Select(); err == pg.ErrNoRows {
+
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(statisticColums, ",")), id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
 		return nil, nil
-	} else if err != nil {
-		return nil, session.TransactionError(ctx, err)
+	}
+	s, err := statisticFromRows(rows)
+	if err != nil {
+		return nil, err
 	}
 	return s, nil
 }
 
-// BeforeInsert hook insert
-func (s *Statistic) BeforeInsert(db orm.DB) error {
-	s.CreatedAt = time.Now()
-	s.UpdatedAt = s.CreatedAt
-	return nil
+func statisticFromRows(rows *sql.Rows) (*Statistic, error) {
+	var s Statistic
+	err := rows.Scan(&s.StatisticID, &s.Name, &s.Count, &s.CreatedAt, &s.UpdatedAt)
+	return &s, err
 }
 
-// BeforeUpdate hook update
-func (s *Statistic) BeforeUpdate(db orm.DB) error {
-	s.UpdatedAt = time.Now()
-	return nil
-}
-
-func generateStatisticId(Id, name string) (string, error) {
+func generateStatisticID(ID, name string) (string, error) {
 	h := md5.New()
-	io.WriteString(h, Id)
+	io.WriteString(h, ID)
 	io.WriteString(h, name)
 	sum := h.Sum(nil)
 	sum[6] = (sum[6] & 0x0f) | 0x30

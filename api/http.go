@@ -1,12 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/facebookgo/grace/gracehttp"
-	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/api/config"
 	"github.com/godiscourse/godiscourse/api/controllers"
 	"github.com/godiscourse/godiscourse/api/durable"
@@ -15,7 +15,7 @@ import (
 	"github.com/unrolled/render"
 )
 
-func startHttp(db *pg.DB) error {
+func startHTTP(db *sql.DB) error {
 	router := httptreemux.New()
 	controllers.RegisterHanders(router)
 	controllers.RegisterRoutes(router)

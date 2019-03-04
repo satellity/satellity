@@ -2,13 +2,13 @@ package models
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"testing"
 	"time"
 
-	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/api/session"
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -91,11 +91,11 @@ func TestCommentCRUD(t *testing.T) {
 }
 
 func readTestComment(ctx context.Context, id string) (*Comment, error) {
-	comment := &Comment{CommentID: id}
-	if err := session.Database(ctx).Model(comment).Column(commentColumns...).WherePK().Select(); err == pg.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return comment, nil
+	var comment *Comment
+	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		comment, err = findComment(ctx, tx, id)
+		return err
+	})
+	return comment, err
 }

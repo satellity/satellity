@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 

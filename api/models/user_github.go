@@ -7,12 +7,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
 
-	"github.com/go-pg/pg"
 	"github.com/godiscourse/godiscourse/api/config"
 	"github.com/godiscourse/godiscourse/api/external"
 	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 )
 
 // GithubUser is the response body of github oauth.
@@ -33,40 +34,50 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
 	}
-	user, err := findUserByGithubId(ctx, data.NodeID)
+	var user *User
+	err = runInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		user, err = findUserByGithubID(ctx, tx, data.NodeID)
+		return err
+	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	if user == nil {
+		t := time.Now()
 		user = &User{
-			UserID:   uuid.Must(uuid.NewV4()).String(),
-			Username: fmt.Sprintf("GH_%s", data.Login),
-			Nickname: data.Name,
-			GithubID: sql.NullString{String: data.NodeID, Valid: true},
-			isNew:    true,
+			UserID:    uuid.Must(uuid.NewV4()).String(),
+			Username:  fmt.Sprintf("GH_%s", data.Login),
+			Nickname:  data.Name,
+			GithubID:  sql.NullString{String: data.NodeID, Valid: true},
+			CreatedAt: t,
+			UpdatedAt: t,
+			isNew:     true,
 		}
 		if data.Email != "" {
 			user.Email = sql.NullString{String: data.Email, Valid: true}
 		}
 	}
 
-	err = session.Database(ctx).RunInTransaction(func(tx *pg.Tx) error {
+	err = runInTransaction(ctx, func(tx *sql.Tx) error {
 		if user.isNew {
-			if err := tx.Insert(user); err != nil {
+			cols, params := prepareColumnsWithValues(userCols)
+			_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
+			if err != nil {
 				return err
 			}
 		}
-		sess, err := user.addSession(ctx, tx, sessionSecret)
+		s, err := user.addSession(ctx, tx, sessionSecret)
 		if err != nil {
 			return err
 		}
-		user.SessionID = sess.SessionID
-		return nil
+		user.SessionID = s.SessionID
+		_, err = upsertStatistic(ctx, tx, "users")
+		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	go upsertStatistic(ctx, "users")
 	return user, nil
 }
 
@@ -155,12 +166,22 @@ func featchUserEmail(ctx context.Context, accessToken string) (string, error) {
 	return emails[0].Email, nil
 }
 
-func findUserByGithubId(ctx context.Context, id string) (*User, error) {
-	user := &User{}
-	if err := session.Database(ctx).Model(user).Column(userColumns...).Where("github_id = ?", id).Select(); err == pg.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
+func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userCols, ",")), id)
+	if err != nil {
 		return nil, err
 	}
-	return user, nil
+	defer rows.Close()
+
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	u, err := userFromRows(rows)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
 }
