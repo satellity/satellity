@@ -190,6 +190,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 	return user, nil
 }
 
+// ReadUsers read users by offset
 func ReadUsers(ctx context.Context, offset time.Time) ([]*User, error) {
 	if offset.IsZero() {
 		offset = time.Now()
@@ -214,6 +215,7 @@ func ReadUsers(ctx context.Context, offset time.Time) ([]*User, error) {
 	return users, nil
 }
 
+// ReadUsersByIds by users' id
 func ReadUsersByIds(ctx context.Context, ids []string) ([]*User, error) {
 	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userCols, ","), strings.Join(ids, "','")))
 	if err != nil {

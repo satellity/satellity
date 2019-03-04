@@ -196,12 +196,12 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 		if err != nil {
 			return err
 		}
-		var lastTopicId = sql.NullString{String: "", Valid: false}
+		var lastTopicID = sql.NullString{String: "", Valid: false}
 		if topic != nil {
-			lastTopicId = sql.NullString{String: topic.TopicID, Valid: true}
+			lastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
 		}
-		if category.LastTopicID.String != lastTopicId.String {
-			category.LastTopicID = lastTopicId
+		if category.LastTopicID.String != lastTopicID.String {
+			category.LastTopicID = lastTopicID
 		}
 		category.TopicsCount = 0
 		if category.LastTopicID.Valid {
