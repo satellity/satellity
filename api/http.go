@@ -15,7 +15,7 @@ import (
 	"github.com/unrolled/render"
 )
 
-func startHttp(db *sql.DB) error {
+func startHTTP(db *sql.DB) error {
 	router := httptreemux.New()
 	controllers.RegisterHanders(router)
 	controllers.RegisterRoutes(router)

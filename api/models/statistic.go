@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 )
 
@@ -41,43 +40,37 @@ func (s *Statistic) values() []interface{} {
 	return []interface{}{s.StatisticID, s.Name, s.Count, s.CreatedAt, s.UpdatedAt}
 }
 
-func upsertStatistic(ctx context.Context, name string) (*Statistic, error) {
+func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, error) {
 	id, _ := generateStatisticID(SolidStatisticID, name)
-	var s *Statistic
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		s, err = findStatistic(ctx, tx, id)
-		if err != nil {
-			return err
-		}
-		var count int64
-		switch name {
-		case "users":
-			count, err = usersCount(ctx, tx)
-		case "topics":
-			count, err = topicsCount(ctx, tx)
-		case "comments":
-			count, err = commentsCount(ctx, tx)
-		}
-		if err != nil {
-			return err
-		}
-		if s != nil {
-			s.Count = count
-			_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE statistics SET count=$1 WHERE statistic_id=$2"), count, id)
-			return err
-		}
-		s = &Statistic{
-			StatisticID: id,
-			Name:        name,
-			Count:       int64(count),
-		}
-		cols, params := prepareColumnsWithValues(statisticColums)
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...)
-		return err
-	})
+	s, err := findStatistic(ctx, tx, id)
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
+	}
+	var count int64
+	switch name {
+	case "users":
+		count, err = usersCount(ctx, tx)
+	case "topics":
+		count, err = topicsCount(ctx, tx)
+	case "comments":
+		count, err = commentsCount(ctx, tx)
+	}
+	if err != nil {
+		return nil, err
+	}
+	if s != nil {
+		s.Count = count
+		_, err := tx.ExecContext(ctx, fmt.Sprintf("UPDATE statistics SET count=$1 WHERE statistic_id=$2"), count, id)
+		return nil, err
+	}
+	s = &Statistic{
+		StatisticID: id,
+		Name:        name,
+		Count:       int64(count),
+	}
+	cols, params := prepareColumnsWithValues(statisticColums)
+	if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...); err != nil {
+		return nil, err
 	}
 	return s, nil
 }

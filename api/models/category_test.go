@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/godiscourse/godiscourse/api/session"
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 

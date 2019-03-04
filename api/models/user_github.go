@@ -72,12 +72,12 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 			return err
 		}
 		user.SessionID = s.SessionID
-		return nil
+		_, err = upsertStatistic(ctx, tx, "users")
+		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	go upsertStatistic(ctx, "users")
 	return user, nil
 }
 

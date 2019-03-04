@@ -97,6 +97,10 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 		ccols, cparams := prepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
 		cvals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", ccols, cparams, category.CategoryID), cvals...)
+		if err != nil {
+			return err
+		}
+		_, err = upsertStatistic(ctx, tx, "topics")
 		return err
 	})
 	if err != nil {
@@ -105,7 +109,6 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 		}
 		return nil, session.TransactionError(ctx, err)
 	}
-	go upsertStatistic(ctx, "topics")
 	return topic, nil
 }
 

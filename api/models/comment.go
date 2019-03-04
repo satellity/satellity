@@ -84,6 +84,10 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		}
 		tcols, tparams := prepareColumnsWithValues([]string{"comments_count", "updated_at"})
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", tcols, tparams, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
+		if err != nil {
+			return err
+		}
+		_, err = upsertStatistic(ctx, tx, "comments")
 		return err
 	})
 	if err != nil {
@@ -93,7 +97,6 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		return nil, session.TransactionError(ctx, err)
 	}
 	c.User = user
-	go upsertStatistic(ctx, "comments")
 	return c, nil
 }
 
