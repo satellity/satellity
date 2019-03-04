@@ -13,7 +13,7 @@ import (
 	"github.com/godiscourse/godiscourse/api/config"
 	"github.com/godiscourse/godiscourse/api/external"
 	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 )
 
 // GithubUser is the response body of github oauth.

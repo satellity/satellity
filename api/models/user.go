@@ -13,7 +13,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/godiscourse/godiscourse/api/config"
 	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
