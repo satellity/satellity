@@ -108,6 +108,9 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 			return err
 		}
 		s, err := user.addSession(ctx, tx, sessionSecret)
+		if err != nil {
+			return err
+		}
 		user.SessionID = s.SessionID
 		return nil
 	})

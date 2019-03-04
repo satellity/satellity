@@ -64,7 +64,7 @@ func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, 
 	if s != nil {
 		s.Count = count
 		_, err := tx.ExecContext(ctx, fmt.Sprintf("UPDATE statistics SET count=$1 WHERE statistic_id=$2"), count, id)
-		return nil, err
+		return s, err
 	}
 	s = &Statistic{
 		StatisticID: id,

@@ -215,7 +215,7 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 			_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
 			category.TopicsCount = count
 		}
-		return nil
+		return err
 	})
 	if err != nil {
 		if _, ok := err.(session.Error); ok {
