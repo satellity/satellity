@@ -339,11 +339,7 @@ func findUserByID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
 		}
 		return nil, nil
 	}
-	u, err := userFromRows(rows)
-	if err != nil {
-		return nil, err
-	}
-	return u, nil
+	return userFromRows(rows)
 }
 
 func usersCount(ctx context.Context, tx *sql.Tx) (int64, error) {

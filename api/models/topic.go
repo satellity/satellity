@@ -336,11 +336,7 @@ func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, er
 		}
 		return nil, nil
 	}
-	t, err := topicFromRows(rows)
-	if err != nil {
-		return nil, err
-	}
-	return t, nil
+	return topicFromRows(rows)
 }
 
 func topicsCountByCategory(ctx context.Context, tx *sql.Tx, id string) (int64, error) {

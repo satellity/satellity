@@ -238,11 +238,7 @@ func findComment(ctx context.Context, tx *sql.Tx, id string) (*Comment, error) {
 		}
 		return nil, nil
 	}
-	c, err := commentFromRows(rows)
-	if err != nil {
-		return nil, err
-	}
-	return c, nil
+	return commentFromRows(rows)
 }
 
 func commentsCountByTopic(ctx context.Context, tx *sql.Tx, id string) (int64, error) {

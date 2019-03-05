@@ -95,11 +95,7 @@ func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, erro
 		}
 		return nil, nil
 	}
-	s, err := statisticFromRows(rows)
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
+	return statisticFromRows(rows)
 }
 
 func statisticFromRows(rows *sql.Rows) (*Statistic, error) {

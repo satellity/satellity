@@ -179,9 +179,5 @@ func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*User, erro
 		}
 		return nil, nil
 	}
-	u, err := userFromRows(rows)
-	if err != nil {
-		return nil, err
-	}
-	return u, nil
+	return userFromRows(rows)
 }

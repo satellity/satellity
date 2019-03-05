@@ -115,11 +115,7 @@ func readSession(ctx context.Context, tx *sql.Tx, uid, sid string) (*Session, er
 		}
 		return nil, nil
 	}
-	s, err := sessionFromRows(rows)
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
+	return sessionFromRows(rows)
 }
 
 func sessionFromRows(rows *sql.Rows) (*Session, error) {

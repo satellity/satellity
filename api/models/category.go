@@ -243,11 +243,7 @@ func findCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error)
 		}
 		return nil, nil
 	}
-	c, err := categoryFromRows(rows)
-	if err != nil {
-		return nil, err
-	}
-	return c, nil
+	return categoryFromRows(rows)
 }
 
 func categoryCount(ctx context.Context) (int64, error) {
