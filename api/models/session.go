@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -118,8 +119,8 @@ func readSession(ctx context.Context, tx *sql.Tx, uid, sid string) (*Session, er
 	return sessionFromRows(rows)
 }
 
-func sessionFromRows(rows *sql.Rows) (*Session, error) {
+func sessionFromRows(row durable.Row) (*Session, error) {
 	var s Session
-	err := rows.Scan(&s.SessionID, &s.UserID, &s.Secret, &s.CreatedAt)
+	err := row.Scan(&s.SessionID, &s.UserID, &s.Secret, &s.CreatedAt)
 	return &s, err
 }

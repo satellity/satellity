@@ -22,3 +22,7 @@ func OpenDatabaseClient(ctx context.Context) *sql.DB {
 	}
 	return db
 }
+
+type Row interface {
+	Scan(dest ...interface{}) error
+}

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 )
@@ -98,9 +99,9 @@ func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, erro
 	return statisticFromRows(rows)
 }
 
-func statisticFromRows(rows *sql.Rows) (*Statistic, error) {
+func statisticFromRows(row durable.Row) (*Statistic, error) {
 	var s Statistic
-	err := rows.Scan(&s.StatisticID, &s.Name, &s.Count, &s.CreatedAt, &s.UpdatedAt)
+	err := row.Scan(&s.StatisticID, &s.Name, &s.Count, &s.CreatedAt, &s.UpdatedAt)
 	return &s, err
 }
 

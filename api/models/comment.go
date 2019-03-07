@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 )
@@ -253,8 +254,8 @@ func commentsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	return count, err
 }
 
-func commentFromRows(rows *sql.Rows) (*Comment, error) {
+func commentFromRows(row durable.Row) (*Comment, error) {
 	var c Comment
-	err := rows.Scan(&c.CommentID, &c.Body, &c.TopicID, &c.UserID, &c.Score, &c.CreatedAt, &c.UpdatedAt)
+	err := row.Scan(&c.CommentID, &c.Body, &c.TopicID, &c.UserID, &c.Score, &c.CreatedAt, &c.UpdatedAt)
 	return &c, err
 }

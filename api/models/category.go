@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 )
@@ -255,9 +256,9 @@ func categoryCount(ctx context.Context) (int64, error) {
 	return count, nil
 }
 
-func categoryFromRows(rows *sql.Rows) (*Category, error) {
+func categoryFromRows(row durable.Row) (*Category, error) {
 	var c Category
-	err := rows.Scan(&c.CategoryID, &c.Name, &c.Alias, &c.Description, &c.TopicsCount, &c.LastTopicID, &c.Position, &c.CreatedAt, &c.UpdatedAt)
+	err := row.Scan(&c.CategoryID, &c.Name, &c.Alias, &c.Description, &c.TopicsCount, &c.LastTopicID, &c.Position, &c.CreatedAt, &c.UpdatedAt)
 	return &c, err
 }
 

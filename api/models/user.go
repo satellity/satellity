@@ -12,6 +12,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/godiscourse/godiscourse/api/config"
+	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -362,8 +363,8 @@ func validateAndEncryptPassword(ctx context.Context, password string) (string, e
 	return string(hashedPassword), nil
 }
 
-func userFromRows(rows *sql.Rows) (*User, error) {
+func userFromRows(row durable.Row) (*User, error) {
 	var u User
-	err := rows.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.CreatedAt, &u.UpdatedAt)
+	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.CreatedAt, &u.UpdatedAt)
 	return &u, err
 }
