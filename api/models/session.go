@@ -41,7 +41,8 @@ func (s *Session) values() []interface{} {
 }
 
 // CreateSession create a new user session
-func CreateSession(ctx context.Context, identity, password, sessionSecret string) (*User, error) {
+func CreateSession(context *Context, identity, password, sessionSecret string) (*User, error) {
+	ctx := context.context
 	data, err := hex.DecodeString(sessionSecret)
 	if err != nil {
 		return nil, session.BadDataError(ctx)
@@ -56,7 +57,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 		return nil, session.BadDataError(ctx)
 	}
 
-	user, err := ReadUserByUsernameOrEmail(ctx, identity)
+	user, err := ReadUserByUsernameOrEmail(context, identity)
 	if err != nil {
 		return nil, err
 	} else if user == nil {
@@ -66,7 +67,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 		return nil, session.InvalidPasswordError(ctx)
 	}
 
-	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		s, err := user.addSession(ctx, tx, sessionSecret)
 		if err != nil {
 			return err

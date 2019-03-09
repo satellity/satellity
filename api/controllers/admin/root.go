@@ -1,10 +1,13 @@
 package admin
 
-import "github.com/dimfeld/httptreemux"
+import (
+	"github.com/dimfeld/httptreemux"
+	"github.com/godiscourse/godiscourse/api/durable"
+)
 
 // RegisterAdminRoutes register admin routes
-func RegisterAdminRoutes(router *httptreemux.TreeMux) {
-	registerAdminUser(router)
-	registerAdminCategory(router)
-	registerAdminTopic(router)
+func RegisterAdminRoutes(database *durable.Database, router *httptreemux.TreeMux) {
+	registerAdminUser(database, router)
+	registerAdminCategory(database, router)
+	registerAdminTopic(database, router)
 }

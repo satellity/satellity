@@ -49,7 +49,8 @@ func (c *Category) values() []interface{} {
 }
 
 // CreateCategory create a new category.
-func CreateCategory(ctx context.Context, name, alias, description string, position int64) (*Category, error) {
+func CreateCategory(context *Context, name, alias, description string, position int64) (*Category, error) {
+	ctx := context.context
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(name) < 1 {
@@ -72,7 +73,7 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 		UpdatedAt:   t,
 	}
 	if position == 0 {
-		count, err := categoryCount(ctx)
+		count, err := categoryCount(context)
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +81,7 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 	}
 
 	cols, params := durable.PrepareColumnsWithValues(categoryCols)
-	_, err := session.Database(ctx).ExecContext(ctx, fmt.Sprintf("INSERT INTO categories(%s) VALUES (%s)", cols, params), category.values()...)
+	_, err := context.database.ExecContext(ctx, fmt.Sprintf("INSERT INTO categories(%s) VALUES (%s)", cols, params), category.values()...)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -88,7 +89,8 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 }
 
 // UpdateCategory update a category's attributes
-func UpdateCategory(ctx context.Context, id, name, alias, description string, position int64) (*Category, error) {
+func UpdateCategory(context *Context, id, name, alias, description string, position int64) (*Category, error) {
+	ctx := context.context
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(alias) < 1 && len(name) < 1 {
@@ -96,7 +98,7 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 	}
 
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil || category == nil {
@@ -131,9 +133,10 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 }
 
 // ReadCategory read a category by ID (uuid).
-func ReadCategory(ctx context.Context, id string) (*Category, error) {
+func ReadCategory(context *Context, id string) (*Category, error) {
+	ctx := context.context
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		return err
@@ -145,8 +148,9 @@ func ReadCategory(ctx context.Context, id string) (*Category, error) {
 }
 
 // ReadCategories read categories order by position
-func ReadCategories(ctx context.Context) ([]*Category, error) {
-	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 100", strings.Join(categoryCols, ",")))
+func ReadCategories(context *Context) ([]*Category, error) {
+	ctx := context.context
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 100", strings.Join(categoryCols, ",")))
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -166,8 +170,8 @@ func ReadCategories(ctx context.Context) ([]*Category, error) {
 	return categories, nil
 }
 
-func readCategorySet(ctx context.Context) (map[string]*Category, error) {
-	categories, err := ReadCategories(ctx)
+func readCategorySet(context *Context) (map[string]*Category, error) {
+	categories, err := ReadCategories(context)
 	if err != nil {
 		return nil, err
 	}
@@ -179,12 +183,13 @@ func readCategorySet(ctx context.Context) (map[string]*Category, error) {
 }
 
 // ElevateCategory update category's info, e.g.: LastTopicID, TopicsCount
-func ElevateCategory(ctx context.Context, id string) (*Category, error) {
+func ElevateCategory(context *Context, id string) (*Category, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
+	ctx := context.context
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil {
@@ -246,9 +251,10 @@ func findCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error)
 	return categoryFromRows(rows)
 }
 
-func categoryCount(ctx context.Context) (int64, error) {
+func categoryCount(context *Context) (int64, error) {
+	ctx := context.context
 	var count int64
-	row, err := session.Database(ctx).QueryRowContext(ctx, "SELECT count(*) FROM categories")
+	row, err := context.database.QueryRowContext(ctx, "SELECT count(*) FROM categories")
 	if err != nil {
 		return 0, session.TransactionError(ctx, err)
 	}

@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,7 +12,7 @@ import (
 func TestTopicCRUD(t *testing.T) {
 	assert := assert.New(t)
 	ctx := setupTestContext()
-	defer session.Database(ctx).Close()
+	defer ctx.database.Close()
 	defer teardownTestContext(ctx)
 
 	user := createTestUser(ctx, "im.yuqlee@gmail.com", "username", "password")

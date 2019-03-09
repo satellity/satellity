@@ -26,7 +26,8 @@ type GithubUser struct {
 }
 
 // CreateGithubUser create a github user.
-func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, error) {
+func CreateGithubUser(context *Context, code, sessionSecret string) (*User, error) {
+	ctx := context.context
 	token, err := fetchAccessToken(ctx, code)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
@@ -36,7 +37,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		return nil, session.ServerError(ctx, err)
 	}
 	var user *User
-	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		user, err = findUserByGithubID(ctx, tx, data.NodeID)
 		return err
@@ -60,7 +61,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		}
 	}
 
-	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		if user.isNew {
 			cols, params := durable.PrepareColumnsWithValues(userCols)
 			_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)

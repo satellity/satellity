@@ -5,12 +5,15 @@ import (
 	"net/http"
 
 	"github.com/dimfeld/httptreemux"
+	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/models"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/godiscourse/godiscourse/api/views"
 )
 
-type adminCategoryImpl struct{}
+type adminCategoryImpl struct {
+	database *durable.Database
+}
 
 type categoryRequest struct {
 	Name        string `json:"name"`
@@ -19,8 +22,8 @@ type categoryRequest struct {
 	Position    int64  `json:"position"`
 }
 
-func registerAdminCategory(router *httptreemux.TreeMux) {
-	impl := &adminCategoryImpl{}
+func registerAdminCategory(database *durable.Database, router *httptreemux.TreeMux) {
+	impl := &adminCategoryImpl{database: database}
 
 	router.POST("/admin/categories", impl.create)
 	router.GET("/admin/categories", impl.index)
@@ -34,7 +37,8 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	category, err := models.CreateCategory(r.Context(), body.Name, body.Alias, body.Description, body.Position)
+	ctx := models.WrapContext(r.Context(), impl.database)
+	category, err := models.CreateCategory(ctx, body.Name, body.Alias, body.Description, body.Position)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
@@ -43,12 +47,12 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 }
 
 func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	categories, err := models.ReadCategories(r.Context())
+	ctx := models.WrapContext(r.Context(), impl.database)
+	categories, err := models.ReadCategories(ctx)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
 	}
-
 	views.RenderCategories(w, r, categories)
 }
 
@@ -58,7 +62,8 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	category, err := models.UpdateCategory(r.Context(), params["id"], body.Name, body.Alias, body.Description, body.Position)
+	ctx := models.WrapContext(r.Context(), impl.database)
+	category, err := models.UpdateCategory(ctx, params["id"], body.Name, body.Alias, body.Description, body.Position)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
@@ -67,7 +72,8 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 }
 
 func (impl *adminCategoryImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	category, err := models.ReadCategory(r.Context(), params["id"])
+	ctx := models.WrapContext(r.Context(), impl.database)
+	category, err := models.ReadCategory(ctx, params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return

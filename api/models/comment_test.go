@@ -1,13 +1,11 @@
 package models
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"testing"
 	"time"
 
-	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +13,7 @@ import (
 func TestCommentCRUD(t *testing.T) {
 	assert := assert.New(t)
 	ctx := setupTestContext()
-	defer session.Database(ctx).Close()
+	defer ctx.database.Close()
 	defer teardownTestContext(ctx)
 
 	user := createTestUser(ctx, "im.yuqlee@gmail.com", "username", "password")
@@ -90,11 +88,11 @@ func TestCommentCRUD(t *testing.T) {
 	}
 }
 
-func readTestComment(ctx context.Context, id string) (*Comment, error) {
+func readTestComment(ctx *Context, id string) (*Comment, error) {
 	var comment *Comment
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := ctx.database.RunInTransaction(ctx.context, func(tx *sql.Tx) error {
 		var err error
-		comment, err = findComment(ctx, tx, id)
+		comment, err = findComment(ctx.context, tx, id)
 		return err
 	})
 	return comment, err

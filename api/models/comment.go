@@ -51,7 +51,8 @@ func (c *Comment) values() []interface{} {
 }
 
 // CreateComment create a new comment
-func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Comment, error) {
+func (user *User) CreateComment(context *Context, topicID, body string) (*Comment, error) {
+	ctx := context.context
 	body = strings.TrimSpace(body)
 	if len(body) < minCommentBodySize {
 		return nil, session.BadDataError(ctx)
@@ -64,7 +65,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		topic, err := findTopic(ctx, tx, topicID)
 		if err != nil {
 			return err
@@ -102,13 +103,14 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 }
 
 // UpdateComment update the comment by id
-func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment, error) {
+func (user *User) UpdateComment(context *Context, id, body string) (*Comment, error) {
+	ctx := context.context
 	body = strings.TrimSpace(body)
 	if len(body) < minCommentBodySize {
 		return nil, session.BadDataError(ctx)
 	}
 	var comment *Comment
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		comment, err = findComment(ctx, tx, id)
 		if err != nil {
@@ -134,11 +136,12 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 }
 
 // ReadComments read comments by topicID, parameters: offset
-func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
+func (topic *Topic) ReadComments(context *Context, offset time.Time) ([]*Comment, error) {
+	ctx := context.context
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentCols, ",")), topic.TopicID, offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentCols, ",")), topic.TopicID, offset, LIMIT)
 	if err != nil {
 		return nil, err
 	}
@@ -159,11 +162,12 @@ func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comm
 }
 
 // ReadComments read comments by userID, parameters: offset
-func (user *User) ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
+func (user *User) ReadComments(context *Context, offset time.Time) ([]*Comment, error) {
+	ctx := context.context
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentCols, ",")), user.UserID, offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentCols, ",")), user.UserID, offset, LIMIT)
 	if err != nil {
 		return nil, err
 	}
@@ -184,8 +188,9 @@ func (user *User) ReadComments(ctx context.Context, offset time.Time) ([]*Commen
 }
 
 //DeleteComment delete a comment by ID
-func (user *User) DeleteComment(ctx context.Context, id string) error {
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+func (user *User) DeleteComment(context *Context, id string) error {
+	ctx := context.context
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		comment, err := findComment(ctx, tx, id)
 		if err != nil || comment == nil {
 			return err

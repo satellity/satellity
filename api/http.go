@@ -16,13 +16,14 @@ import (
 )
 
 func startHTTP(db *sql.DB) error {
+	database := durable.WrapDatabase(db)
 	router := httptreemux.New()
 	controllers.RegisterHanders(router)
-	controllers.RegisterRoutes(router)
+	controllers.RegisterRoutes(database, router)
 
-	handler := middleware.Authenticate(router)
+	handler := middleware.Authenticate(database, router)
 	handler = middleware.Constraint(handler)
-	handler = middleware.Context(handler, db, render.New())
+	handler = middleware.Context(handler, render.New())
 	handler = middleware.State(handler)
 	handler = middleware.Logger(handler, durable.NewLogger())
 	handler = handlers.ProxyHeaders(handler)

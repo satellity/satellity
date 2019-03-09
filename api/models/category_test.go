@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,7 +12,7 @@ import (
 func TestCategoryCRUD(t *testing.T) {
 	assert := assert.New(t)
 	ctx := setupTestContext()
-	defer session.Database(ctx).Close()
+	defer ctx.database.Close()
 	defer teardownTestContext(ctx)
 
 	categoryCases := []struct {

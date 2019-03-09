@@ -6,11 +6,16 @@ import (
 	"time"
 
 	"github.com/dimfeld/httptreemux"
+	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/middleware"
 	"github.com/godiscourse/godiscourse/api/models"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/godiscourse/godiscourse/api/views"
 )
+
+type userImpl struct {
+	database *durable.Database
+}
 
 type userRequest struct {
 	Code          string `json:"code"`
@@ -19,10 +24,8 @@ type userRequest struct {
 	Biography     string `json:"biography"`
 }
 
-type userImpl struct{}
-
-func registerUser(router *httptreemux.TreeMux) {
-	impl := &userImpl{}
+func registerUser(database *durable.Database, router *httptreemux.TreeMux) {
+	impl := &userImpl{database: database}
 
 	router.POST("/oauth/:provider", impl.oauth)
 	router.POST("/me", impl.update)
@@ -37,7 +40,8 @@ func (impl *userImpl) oauth(w http.ResponseWriter, r *http.Request, params map[s
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	if user, err := models.CreateGithubUser(r.Context(), body.Code, body.SessionSecret); err != nil {
+	ctx := models.WrapContext(r.Context(), impl.database)
+	if user, err := models.CreateGithubUser(ctx, body.Code, body.SessionSecret); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderAccount(w, r, user)
@@ -50,8 +54,9 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
+	ctx := models.WrapContext(r.Context(), impl.database)
 	current := middleware.CurrentUser(r)
-	if err := current.UpdateProfile(r.Context(), body.Nickname, body.Biography); err != nil {
+	if err := current.UpdateProfile(ctx, body.Nickname, body.Biography); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderAccount(w, r, current)
@@ -63,7 +68,8 @@ func (impl *userImpl) current(w http.ResponseWriter, r *http.Request, _ map[stri
 }
 
 func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if user, err := models.ReadUser(r.Context(), params["id"]); err != nil {
+	ctx := models.WrapContext(r.Context(), impl.database)
+	if user, err := models.ReadUser(ctx, params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if user == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
@@ -73,13 +79,14 @@ func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[st
 }
 
 func (impl *userImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	ctx := models.WrapContext(r.Context(), impl.database)
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	user, err := models.ReadUser(r.Context(), params["id"])
+	user, err := models.ReadUser(ctx, params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if user == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if topics, err := user.ReadTopics(r.Context(), offset); err != nil {
+	} else if topics, err := user.ReadTopics(ctx, offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

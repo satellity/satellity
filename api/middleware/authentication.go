@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/models"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/godiscourse/godiscourse/api/views"
@@ -37,14 +38,15 @@ func CurrentUser(r *http.Request) *models.User {
 }
 
 // Authenticate handle routes by user's role
-func Authenticate(handler http.Handler) http.Handler {
+func Authenticate(database *durable.Database, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("Authorization")
 		if !strings.HasPrefix(header, "Bearer ") {
 			handleUnauthorized(handler, w, r)
 			return
 		}
-		user, err := models.AuthenticateUser(r.Context(), header[7:])
+		mcontext := models.WrapContext(r.Context(), database)
+		user, err := models.AuthenticateUser(mcontext, header[7:])
 		if err != nil {
 			views.RenderErrorResponse(w, r, err)
 			return

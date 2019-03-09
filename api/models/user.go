@@ -58,7 +58,8 @@ func (u *User) values() []interface{} {
 }
 
 // CreateUser create a new user
-func CreateUser(ctx context.Context, email, username, nickname, biography, password string, sessionSecret string) (*User, error) {
+func CreateUser(context *Context, email, username, nickname, biography, password string, sessionSecret string) (*User, error) {
+	ctx := context.context
 	data, err := hex.DecodeString(sessionSecret)
 	if err != nil {
 		return nil, session.BadDataError(ctx)
@@ -102,7 +103,7 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 		UpdatedAt:         t,
 	}
 
-	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		cols, params := durable.PrepareColumnsWithValues(userCols)
 		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
 		if err != nil {
@@ -125,7 +126,8 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 }
 
 // UpdateProfile update user's profile
-func (u *User) UpdateProfile(ctx context.Context, nickname, biography string) error {
+func (u *User) UpdateProfile(context *Context, nickname, biography string) error {
+	ctx := context.context
 	nickname, biography = strings.TrimSpace(nickname), strings.TrimSpace(biography)
 	if len(nickname) == 0 && len(biography) == 0 {
 		return nil
@@ -138,7 +140,7 @@ func (u *User) UpdateProfile(ctx context.Context, nickname, biography string) er
 	}
 	u.UpdatedAt = time.Now()
 	cols, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
-	_, err := session.Database(ctx).ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
+	_, err := context.database.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
 	if err != nil {
 		return session.TransactionError(ctx, err)
 	}
@@ -147,7 +149,8 @@ func (u *User) UpdateProfile(ctx context.Context, nickname, biography string) er
 
 // AuthenticateUser read a user by tokenString. tokenString is a jwt token, more
 // about jwt: https://github.com/dgrijalva/jwt-go
-func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
+func AuthenticateUser(context *Context, tokenString string) (*User, error) {
+	ctx := context.context
 	var user *User
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		claims, ok := token.Claims.(jwt.MapClaims)
@@ -159,7 +162,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
 		var s *Session
-		err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+		err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 			u, err := findUserByID(ctx, tx, uid)
 			if err != nil {
 				return err
@@ -195,11 +198,12 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 }
 
 // ReadUsers read users by offset
-func ReadUsers(ctx context.Context, offset time.Time) ([]*User, error) {
+func ReadUsers(context *Context, offset time.Time) ([]*User, error) {
+	ctx := context.context
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(userCols, ",")), offset)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(userCols, ",")), offset)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -220,8 +224,9 @@ func ReadUsers(ctx context.Context, offset time.Time) ([]*User, error) {
 }
 
 // ReadUsersByIds by users' id
-func ReadUsersByIds(ctx context.Context, ids []string) ([]*User, error) {
-	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userCols, ","), strings.Join(ids, "','")))
+func ReadUsersByIds(context *Context, ids []string) ([]*User, error) {
+	ctx := context.context
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userCols, ","), strings.Join(ids, "','")))
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -241,8 +246,8 @@ func ReadUsersByIds(ctx context.Context, ids []string) ([]*User, error) {
 	return users, nil
 }
 
-func readUserSet(ctx context.Context, ids []string) (map[string]*User, error) {
-	users, err := ReadUsersByIds(ctx, ids)
+func readUserSet(context *Context, ids []string) (map[string]*User, error) {
+	users, err := ReadUsersByIds(context, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -254,9 +259,10 @@ func readUserSet(ctx context.Context, ids []string) (map[string]*User, error) {
 }
 
 // ReadUser read user by id.
-func ReadUser(ctx context.Context, id string) (*User, error) {
+func ReadUser(context *Context, id string) (*User, error) {
+	ctx := context.context
 	var user *User
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		user, err = findUserByID(ctx, tx, id)
 		return err
@@ -271,14 +277,15 @@ func ReadUser(ctx context.Context, id string) (*User, error) {
 }
 
 // ReadUserByUsernameOrEmail read user by identity, which is an email or username.
-func ReadUserByUsernameOrEmail(ctx context.Context, identity string) (*User, error) {
+func ReadUserByUsernameOrEmail(context *Context, identity string) (*User, error) {
+	ctx := context.context
 	identity = strings.ToLower(strings.TrimSpace(identity))
 	if len(identity) < 3 {
 		return nil, nil
 	}
 
 	var user *User
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(userCols, ",")), identity)
 		defer rows.Close()
 

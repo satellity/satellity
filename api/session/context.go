@@ -11,24 +11,12 @@ type contextValueKey int
 
 const (
 	keyRequest           contextValueKey = 0
-	keyDatabase          contextValueKey = 1
-	keyLogger            contextValueKey = 2
-	keyRender            contextValueKey = 3
+	keyLogger            contextValueKey = 1
+	keyRender            contextValueKey = 2
 	keyRemoteAddress     contextValueKey = 11
 	keyAuthorizationInfo contextValueKey = 12
 	keyRequestBody       contextValueKey = 13
 )
-
-// Database read database from context
-func Database(ctx context.Context) *durable.Database {
-	v, _ := ctx.Value(keyDatabase).(*durable.Database)
-	return v
-}
-
-// WithDatabase put database into context
-func WithDatabase(ctx context.Context, database *durable.Database) context.Context {
-	return context.WithValue(ctx, keyDatabase, database)
-}
 
 // Logger read logger from context
 func Logger(ctx context.Context) *durable.Logger {

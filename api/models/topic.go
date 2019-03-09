@@ -59,7 +59,8 @@ type Topic struct {
 }
 
 //CreateTopic create a new Topic
-func (user *User) CreateTopic(ctx context.Context, title, body, categoryID string) (*Topic, error) {
+func (user *User) CreateTopic(context *Context, title, body, categoryID string) (*Topic, error) {
+	ctx := context.context
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
 	if len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
@@ -75,7 +76,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 		UpdatedAt: t,
 	}
 
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		category, err := findCategory(ctx, tx, categoryID)
 		if err != nil {
 			return err
@@ -114,7 +115,8 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 }
 
 // UpdateTopic update a Topic by ID
-func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID string) (*Topic, error) {
+func (user *User) UpdateTopic(context *Context, id, title, body, categoryID string) (*Topic, error) {
+	ctx := context.context
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
 	if title != "" && len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
@@ -122,7 +124,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 
 	var topic *Topic
 	var prevCategoryID string
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
 		if err != nil {
@@ -162,17 +164,18 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 		return nil, session.NotFoundError(ctx)
 	}
 	if prevCategoryID != "" {
-		go ElevateCategory(ctx, prevCategoryID)
-		go ElevateCategory(ctx, topic.CategoryID)
+		go ElevateCategory(context, prevCategoryID)
+		go ElevateCategory(context, topic.CategoryID)
 	}
 	topic.User = user
 	return topic, nil
 }
 
 //ReadTopic read a topic by ID
-func ReadTopic(ctx context.Context, id string) (*Topic, error) {
+func ReadTopic(context *Context, id string) (*Topic, error) {
+	ctx := context.context
 	var topic *Topic
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
 		if err != nil {
@@ -220,16 +223,17 @@ func findTopic(ctx context.Context, tx *sql.Tx, id string) (*Topic, error) {
 }
 
 // ReadTopics read all topics, parameters: offset default time.Now()
-func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
+func ReadTopics(context *Context, offset time.Time) ([]*Topic, error) {
+	ctx := context.context
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	set, err := readCategorySet(ctx)
+	set, err := readCategorySet(context)
 	if err != nil {
 		return nil, err
 	}
 	var topics []*Topic
-	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicCols, ",")), offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicCols, ",")), offset, LIMIT)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -248,7 +252,7 @@ func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 	if err := rows.Err(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	userSet, err := readUserSet(ctx, userIds)
+	userSet, err := readUserSet(context, userIds)
 	if err != nil {
 		return nil, err
 	}
@@ -259,16 +263,17 @@ func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 }
 
 // ReadTopics read user's topics, parameters: offset default time.Now()
-func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
+func (user *User) ReadTopics(context *Context, offset time.Time) ([]*Topic, error) {
+	ctx := context.context
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	set, err := readCategorySet(ctx)
+	set, err := readCategorySet(context)
 	if err != nil {
 		return nil, err
 	}
 	var topics []*Topic
-	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicCols, ",")), user.UserID, offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicCols, ",")), user.UserID, offset, LIMIT)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -290,12 +295,13 @@ func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, e
 }
 
 // ReadTopics read topics by CategoryID order by created_at DESC
-func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
+func (category *Category) ReadTopics(context *Context, offset time.Time) ([]*Topic, error) {
+	ctx := context.context
 	if offset.IsZero() {
 		offset = time.Now()
 	}
 	var topics []*Topic
-	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicCols, ",")), category.CategoryID, offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicCols, ",")), category.CategoryID, offset, LIMIT)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -314,7 +320,7 @@ func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*
 	if err := rows.Err(); err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	userSet, err := readUserSet(ctx, userIds)
+	userSet, err := readUserSet(context, userIds)
 	if err != nil {
 		return nil, err
 	}

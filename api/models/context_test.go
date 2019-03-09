@@ -6,7 +6,6 @@ import (
 
 	"github.com/godiscourse/godiscourse/api/config"
 	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/session"
 )
 
 const (
@@ -23,7 +22,7 @@ const (
 	dropStatisticsDDL = `DROP TABLE IF EXISTS statistics;`
 )
 
-func teardownTestContext(ctx context.Context) {
+func teardownTestContext(context *Context) {
 	tables := []string{
 		dropStatisticsDDL,
 		dropCommentsDDL,
@@ -32,7 +31,7 @@ func teardownTestContext(ctx context.Context) {
 		dropSessionsDDL,
 		dropUsersDDL,
 	}
-	db := session.Database(ctx)
+	db := context.database
 	for _, q := range tables {
 		if _, err := db.Exec(q); err != nil {
 			log.Panicln(err)
@@ -40,7 +39,7 @@ func teardownTestContext(ctx context.Context) {
 	}
 }
 
-func setupTestContext() context.Context {
+func setupTestContext() *Context {
 	if config.Environment != testEnvironment || config.DatabaseName != testDatabase {
 		log.Panicln(config.Environment, config.DatabaseName)
 	}
@@ -59,5 +58,5 @@ func setupTestContext() context.Context {
 		}
 	}
 	database := durable.WrapDatabase(db)
-	return session.WithDatabase(context.Background(), database)
+	return WrapContext(context.Background(), database)
 }

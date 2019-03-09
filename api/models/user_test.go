@@ -1,7 +1,6 @@
 package models
 
 import (
-	"context"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -14,7 +13,6 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
@@ -23,7 +21,7 @@ import (
 func TestUserCRUD(t *testing.T) {
 	assert := assert.New(t)
 	ctx := setupTestContext()
-	defer session.Database(ctx).Close()
+	defer ctx.database.Close()
 	defer teardownTestContext(ctx)
 
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
@@ -116,18 +114,18 @@ func TestUserCRUD(t *testing.T) {
 	}
 }
 
-func createTestUser(ctx context.Context, email, username, password string) *User {
+func createTestUser(context *Context, email, username, password string) *User {
 	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	public, _ := x509.MarshalPKIXPublicKey(priv.Public())
-	user, _ := CreateUser(ctx, email, username, "nickname", "", password, hex.EncodeToString(public))
+	user, _ := CreateUser(context, email, username, "nickname", "", password, hex.EncodeToString(public))
 	return user
 }
 
-func readTestSession(ctx context.Context, uid, sid string) (*Session, error) {
+func readTestSession(context *Context, uid, sid string) (*Session, error) {
 	var s *Session
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := context.database.RunInTransaction(context.context, func(tx *sql.Tx) error {
 		var err error
-		s, err = readSession(ctx, tx, uid, sid)
+		s, err = readSession(context.context, tx, uid, sid)
 		return err
 	})
 	return s, err
