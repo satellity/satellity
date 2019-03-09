@@ -58,5 +58,6 @@ func setupTestContext() context.Context {
 			log.Panicln(err)
 		}
 	}
-	return session.WithDatabase(context.Background(), db)
+	database := durable.WrapDatabase(db)
+	return session.WithDatabase(context.Background(), database)
 }

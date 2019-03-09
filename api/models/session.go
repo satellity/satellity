@@ -66,7 +66,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 		return nil, session.InvalidPasswordError(ctx)
 	}
 
-	err = runInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		s, err := user.addSession(ctx, tx, sessionSecret)
 		if err != nil {
 			return err

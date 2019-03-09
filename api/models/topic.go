@@ -75,7 +75,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 		UpdatedAt: t,
 	}
 
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		category, err := findCategory(ctx, tx, categoryID)
 		if err != nil {
 			return err
@@ -122,7 +122,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 
 	var topic *Topic
 	var prevCategoryID string
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
 		if err != nil {
@@ -172,7 +172,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 //ReadTopic read a topic by ID
 func ReadTopic(ctx context.Context, id string) (*Topic, error) {
 	var topic *Topic
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
 		if err != nil {

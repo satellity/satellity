@@ -125,7 +125,7 @@ func createTestUser(ctx context.Context, email, username, password string) *User
 
 func readTestSession(ctx context.Context, uid, sid string) (*Session, error) {
 	var s *Session
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		s, err = readSession(ctx, tx, uid, sid)
 		return err

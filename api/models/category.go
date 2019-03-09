@@ -97,7 +97,7 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 	}
 
 	var category *Category
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil || category == nil {
@@ -134,7 +134,7 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 // ReadCategory read a category by ID (uuid).
 func ReadCategory(ctx context.Context, id string) (*Category, error) {
 	var category *Category
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		return err
@@ -185,7 +185,7 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 		return nil, nil
 	}
 	var category *Category
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil {
@@ -249,7 +249,11 @@ func findCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error)
 
 func categoryCount(ctx context.Context) (int64, error) {
 	var count int64
-	err := session.Database(ctx).QueryRowContext(ctx, "SELECT count(*) FROM categories").Scan(&count)
+	row, err := session.Database(ctx).QueryRowContext(ctx, "SELECT count(*) FROM categories")
+	if err != nil {
+		return 0, session.TransactionError(ctx, err)
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		return 0, session.TransactionError(ctx, err)
 	}
@@ -276,22 +280,4 @@ func prepareColumnsWithValues(columns []string) (string, string) {
 		params.WriteString(fmt.Sprintf("$%d", i+1))
 	}
 	return cols.String(), params.String()
-}
-
-func runInTransaction(ctx context.Context, fn func(*sql.Tx) error) error {
-	tx, err := session.Database(ctx).Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := recover(); err != nil {
-			_ = tx.Rollback()
-			panic(err)
-		}
-	}()
-	if err := fn(tx); err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-	return tx.Commit()
 }

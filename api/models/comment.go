@@ -64,7 +64,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		topic, err := findTopic(ctx, tx, topicID)
 		if err != nil {
 			return err
@@ -108,7 +108,7 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 		return nil, session.BadDataError(ctx)
 	}
 	var comment *Comment
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		comment, err = findComment(ctx, tx, id)
 		if err != nil {
@@ -185,7 +185,7 @@ func (user *User) ReadComments(ctx context.Context, offset time.Time) ([]*Commen
 
 //DeleteComment delete a comment by ID
 func (user *User) DeleteComment(ctx context.Context, id string) error {
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		comment, err := findComment(ctx, tx, id)
 		if err != nil || comment == nil {
 			return err

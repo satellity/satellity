@@ -2,7 +2,6 @@ package session
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/unrolled/render"
@@ -21,13 +20,13 @@ const (
 )
 
 // Database read database from context
-func Database(ctx context.Context) *sql.DB {
-	v, _ := ctx.Value(keyDatabase).(*sql.DB)
+func Database(ctx context.Context) *durable.Database {
+	v, _ := ctx.Value(keyDatabase).(*durable.Database)
 	return v
 }
 
 // WithDatabase put database into context
-func WithDatabase(ctx context.Context, database *sql.DB) context.Context {
+func WithDatabase(ctx context.Context, database *durable.Database) context.Context {
 	return context.WithValue(ctx, keyDatabase, database)
 }
 

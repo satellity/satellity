@@ -102,7 +102,7 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 		UpdatedAt:         t,
 	}
 
-	err = runInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		cols, params := prepareColumnsWithValues(userCols)
 		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
 		if err != nil {
@@ -159,7 +159,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
 		var s *Session
-		err := runInTransaction(ctx, func(tx *sql.Tx) error {
+		err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 			u, err := findUserByID(ctx, tx, uid)
 			if err != nil {
 				return err
@@ -256,7 +256,7 @@ func readUserSet(ctx context.Context, ids []string) (map[string]*User, error) {
 // ReadUser read user by id.
 func ReadUser(ctx context.Context, id string) (*User, error) {
 	var user *User
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		user, err = findUserByID(ctx, tx, id)
 		return err
@@ -278,7 +278,7 @@ func ReadUserByUsernameOrEmail(ctx context.Context, identity string) (*User, err
 	}
 
 	var user *User
-	err := runInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(userCols, ",")), identity)
 		defer rows.Close()
 

@@ -35,7 +35,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		return nil, session.ServerError(ctx, err)
 	}
 	var user *User
-	err = runInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		user, err = findUserByGithubID(ctx, tx, data.NodeID)
 		return err
@@ -59,7 +59,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		}
 	}
 
-	err = runInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		if user.isNew {
 			cols, params := prepareColumnsWithValues(userCols)
 			_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
