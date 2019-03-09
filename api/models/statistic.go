@@ -72,7 +72,7 @@ func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, 
 		Name:        name,
 		Count:       int64(count),
 	}
-	cols, params := prepareColumnsWithValues(statisticColums)
+	cols, params := durable.PrepareColumnsWithValues(statisticColums)
 	if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...); err != nil {
 		return nil, err
 	}

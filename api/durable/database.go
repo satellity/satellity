@@ -11,6 +11,7 @@ import (
 	_ "github.com/lib/pq" //
 )
 
+// Database is wrapped struct of *sql.DB
 type Database struct {
 	db *sql.DB
 }
@@ -28,14 +29,17 @@ func OpenDatabaseClient(ctx context.Context) *sql.DB {
 	return db
 }
 
+// WrapDatabase create a *Database
 func WrapDatabase(db *sql.DB) *Database {
 	return &Database{db: db}
 }
 
+// Close the *sql.DB
 func (d *Database) Close() error {
 	return d.db.Close()
 }
 
+// Exec executes a prepared statement
 func (d *Database) Exec(query string, args ...interface{}) (sql.Result, error) {
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
@@ -46,6 +50,7 @@ func (d *Database) Exec(query string, args ...interface{}) (sql.Result, error) {
 	return stmt.Exec(args...)
 }
 
+// ExecContext executes a prepared statement with a context
 func (d *Database) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
@@ -56,6 +61,7 @@ func (d *Database) ExecContext(ctx context.Context, query string, args ...interf
 	return stmt.ExecContext(ctx, args...)
 }
 
+// Query executes a prepared query statement with the given arguments
 func (d *Database) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
@@ -66,6 +72,7 @@ func (d *Database) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return stmt.Query(args...)
 }
 
+// QueryContext executes a prepared query statement with the given arguments
 func (d *Database) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
@@ -76,6 +83,7 @@ func (d *Database) QueryContext(ctx context.Context, query string, args ...inter
 	return stmt.QueryContext(ctx, args...)
 }
 
+// QueryRow executes a prepared query statement with the given arguments.
 func (d *Database) QueryRow(query string, args ...interface{}) (*sql.Row, error) {
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
@@ -86,6 +94,7 @@ func (d *Database) QueryRow(query string, args ...interface{}) (*sql.Row, error)
 	return stmt.QueryRow(args...), nil
 }
 
+// QueryRowContext executes a prepared query statement with the given arguments.
 func (d *Database) QueryRowContext(ctx context.Context, query string, args ...interface{}) (*sql.Row, error) {
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
@@ -96,6 +105,7 @@ func (d *Database) QueryRowContext(ctx context.Context, query string, args ...in
 	return stmt.QueryRowContext(ctx, args...), nil
 }
 
+// RunInTransaction run a query in the transaction
 func (d *Database) RunInTransaction(ctx context.Context, fn func(*sql.Tx) error) error {
 
 	tx, err := d.db.Begin()
@@ -115,6 +125,7 @@ func (d *Database) RunInTransaction(ctx context.Context, fn func(*sql.Tx) error)
 	return tx.Commit()
 }
 
+// PrepareColumnsWithValues prepare columns and placeholder
 func PrepareColumnsWithValues(columns []string) (string, string) {
 	if len(columns) < 1 {
 		return "", ""
@@ -131,6 +142,7 @@ func PrepareColumnsWithValues(columns []string) (string, string) {
 	return cols.String(), params.String()
 }
 
+// Row is a interface
 type Row interface {
 	Scan(dest ...interface{}) error
 }

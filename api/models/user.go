@@ -103,7 +103,7 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 	}
 
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
-		cols, params := prepareColumnsWithValues(userCols)
+		cols, params := durable.PrepareColumnsWithValues(userCols)
 		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
 		if err != nil {
 			return err
@@ -137,7 +137,7 @@ func (u *User) UpdateProfile(ctx context.Context, nickname, biography string) er
 		u.Biography = biography
 	}
 	u.UpdatedAt = time.Now()
-	cols, params := prepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
+	cols, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
 	_, err := session.Database(ctx).ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
 	if err != nil {
 		return session.TransactionError(ctx, err)

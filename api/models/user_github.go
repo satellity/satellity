@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/godiscourse/godiscourse/api/config"
+	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/external"
 	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
@@ -61,7 +62,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		if user.isNew {
-			cols, params := prepareColumnsWithValues(userCols)
+			cols, params := durable.PrepareColumnsWithValues(userCols)
 			_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
 			if err != nil {
 				return err

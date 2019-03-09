@@ -78,12 +78,12 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		topic.CommentsCount = count + 1
 		topic.UpdatedAt = t
 		c.TopicID = topic.TopicID
-		cols, params := prepareColumnsWithValues(commentCols)
+		cols, params := durable.PrepareColumnsWithValues(commentCols)
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO comments (%s) VALUES (%s)", cols, params), c.values()...)
 		if err != nil {
 			return err
 		}
-		tcols, tparams := prepareColumnsWithValues([]string{"comments_count", "updated_at"})
+		tcols, tparams := durable.PrepareColumnsWithValues([]string{"comments_count", "updated_at"})
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", tcols, tparams, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
 		if err != nil {
 			return err
@@ -120,7 +120,7 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 		}
 		comment.Body = body
 		comment.UpdatedAt = time.Now()
-		cols, params := prepareColumnsWithValues([]string{"body", "updated_at"})
+		cols, params := durable.PrepareColumnsWithValues([]string{"body", "updated_at"})
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, params, comment.CommentID), comment.Body, comment.UpdatedAt)
 		return err
 	})
@@ -205,7 +205,7 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 		}
 		topic.CommentsCount = count - 1
 		topic.UpdatedAt = time.Now()
-		cols, params := prepareColumnsWithValues([]string{"comments_count", "updated_at"})
+		cols, params := durable.PrepareColumnsWithValues([]string{"comments_count", "updated_at"})
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
 		if err != nil {
 			return err

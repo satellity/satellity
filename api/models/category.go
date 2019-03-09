@@ -1,7 +1,6 @@
 package models
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
@@ -80,7 +79,7 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 		category.Position = count
 	}
 
-	cols, params := prepareColumnsWithValues(categoryCols)
+	cols, params := durable.PrepareColumnsWithValues(categoryCols)
 	_, err := session.Database(ctx).ExecContext(ctx, fmt.Sprintf("INSERT INTO categories(%s) VALUES (%s)", cols, params), category.values()...)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
@@ -114,7 +113,7 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 		}
 		category.Position = position
 		category.UpdatedAt = time.Now()
-		cols, params := prepareColumnsWithValues([]string{"name", "alias", "description", "position", "updated_at"})
+		cols, params := durable.PrepareColumnsWithValues([]string{"name", "alias", "description", "position", "updated_at"})
 		vals := []interface{}{category.Name, category.Alias, category.Description, category.Position, category.UpdatedAt}
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
 		return err
@@ -211,7 +210,7 @@ func ElevateCategory(ctx context.Context, id string) (*Category, error) {
 				return err
 			}
 			category.UpdatedAt = time.Now()
-			cols, params := prepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
+			cols, params := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
 			vals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
 			_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
 			category.TopicsCount = count
@@ -264,20 +263,4 @@ func categoryFromRows(row durable.Row) (*Category, error) {
 	var c Category
 	err := row.Scan(&c.CategoryID, &c.Name, &c.Alias, &c.Description, &c.TopicsCount, &c.LastTopicID, &c.Position, &c.CreatedAt, &c.UpdatedAt)
 	return &c, err
-}
-
-func prepareColumnsWithValues(columns []string) (string, string) {
-	if len(columns) < 1 {
-		return "", ""
-	}
-	cols, params := bytes.Buffer{}, bytes.Buffer{}
-	for i, column := range columns {
-		if i > 0 {
-			cols.WriteString(",")
-			params.WriteString(",")
-		}
-		cols.WriteString(column)
-		params.WriteString(fmt.Sprintf("$%d", i+1))
-	}
-	return cols.String(), params.String()
 }

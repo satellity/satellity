@@ -90,12 +90,12 @@ func (user *User) CreateTopic(ctx context.Context, title, body, categoryID strin
 			return err
 		}
 		category.TopicsCount, category.UpdatedAt = count+1, time.Now()
-		cols, params := prepareColumnsWithValues(topicCols)
+		cols, params := durable.PrepareColumnsWithValues(topicCols)
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO topics(%s) VALUES (%s)", cols, params), topic.values()...)
 		if err != nil {
 			return err
 		}
-		ccols, cparams := prepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
+		ccols, cparams := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
 		cvals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", ccols, cparams, category.CategoryID), cvals...)
 		if err != nil {
@@ -147,7 +147,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, categoryID s
 			topic.CategoryID = category.CategoryID
 			topic.Category = category
 		}
-		cols, params := prepareColumnsWithValues([]string{"title", "body", "category_id"})
+		cols, params := durable.PrepareColumnsWithValues([]string{"title", "body", "category_id"})
 		vals := []interface{}{topic.Title, topic.Body, topic.CategoryID}
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), vals...)
 		return err
