@@ -221,7 +221,6 @@ func ReadTopics(context *Context, offset time.Time) ([]*Topic, error) {
 	if err != nil {
 		return nil, err
 	}
-	var topics []*Topic
 	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicColumns, ",")), offset, LIMIT)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
@@ -229,6 +228,7 @@ func ReadTopics(context *Context, offset time.Time) ([]*Topic, error) {
 	defer rows.Close()
 
 	userIds := []string{}
+	var topics []*Topic
 	for rows.Next() {
 		topic, err := topicFromRows(rows)
 		if err != nil {

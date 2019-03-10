@@ -147,16 +147,25 @@ func (topic *Topic) ReadComments(context *Context, offset time.Time) ([]*Comment
 	}
 	defer rows.Close()
 
+	userIds := []string{}
 	var comments []*Comment
 	for rows.Next() {
 		c, err := commentFromRows(rows)
 		if err != nil {
 			return nil, err
 		}
+		userIds = append(userIds, c.UserID)
 		comments = append(comments, c)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, session.TransactionError(ctx, err)
+	}
+	userSet, err := readUserSet(context, userIds)
+	if err != nil {
+		return nil, err
+	}
+	for i, c := range comments {
+		comments[i].User = userSet[c.UserID]
 	}
 	return comments, nil
 }
@@ -179,6 +188,7 @@ func (user *User) ReadComments(context *Context, offset time.Time) ([]*Comment, 
 		if err != nil {
 			return nil, err
 		}
+		c.User = user
 		comments = append(comments, c)
 	}
 	if err := rows.Err(); err != nil {
