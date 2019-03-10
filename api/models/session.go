@@ -34,7 +34,7 @@ type Session struct {
 	CreatedAt time.Time `sql:"created_at"`
 }
 
-var sessionCols = []string{"session_id", "user_id", "secret", "created_at"}
+var sessionColumns = []string{"session_id", "user_id", "secret", "created_at"}
 
 func (s *Session) values() []interface{} {
 	return []interface{}{s.SessionID, s.UserID, s.Secret, s.CreatedAt}
@@ -89,7 +89,7 @@ func (user *User) addSession(ctx context.Context, tx *sql.Tx, secret string) (*S
 		CreatedAt: time.Now(),
 	}
 
-	cols, params := durable.PrepareColumnsWithValues(sessionCols)
+	cols, params := durable.PrepareColumnsWithValues(sessionColumns)
 	_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO sessions(%s) VALUES(%s)", cols, params), s.values()...)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
@@ -105,7 +105,7 @@ func readSession(ctx context.Context, tx *sql.Tx, uid, sid string) (*Session, er
 		return nil, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM sessions WHERE user_id=$1 AND session_id=$2", strings.Join(sessionCols, ",")), uid, sid)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM sessions WHERE user_id=$1 AND session_id=$2", strings.Join(sessionColumns, ",")), uid, sid)
 	if err != nil {
 		return nil, err
 	}

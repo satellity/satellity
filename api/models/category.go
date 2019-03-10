@@ -42,7 +42,7 @@ type Category struct {
 	UpdatedAt   time.Time
 }
 
-var categoryCols = []string{"category_id", "name", "alias", "description", "topics_count", "last_topic_id", "position", "created_at", "updated_at"}
+var categoryColumns = []string{"category_id", "name", "alias", "description", "topics_count", "last_topic_id", "position", "created_at", "updated_at"}
 
 func (c *Category) values() []interface{} {
 	return []interface{}{c.CategoryID, c.Name, c.Alias, c.Description, c.TopicsCount, c.LastTopicID, c.Position, c.CreatedAt, c.UpdatedAt}
@@ -80,7 +80,7 @@ func CreateCategory(context *Context, name, alias, description string, position 
 		category.Position = count
 	}
 
-	cols, params := durable.PrepareColumnsWithValues(categoryCols)
+	cols, params := durable.PrepareColumnsWithValues(categoryColumns)
 	_, err := context.database.ExecContext(ctx, fmt.Sprintf("INSERT INTO categories(%s) VALUES (%s)", cols, params), category.values()...)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
@@ -150,7 +150,7 @@ func ReadCategory(context *Context, id string) (*Category, error) {
 // ReadCategories read categories order by position
 func ReadCategories(context *Context) ([]*Category, error) {
 	ctx := context.context
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 100", strings.Join(categoryCols, ",")))
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 100", strings.Join(categoryColumns, ",")))
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -236,7 +236,7 @@ func findCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error)
 		return nil, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories WHERE category_id=$1", strings.Join(categoryCols, ",")), id)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories WHERE category_id=$1", strings.Join(categoryColumns, ",")), id)
 	if err != nil {
 		return nil, err
 	}

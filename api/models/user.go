@@ -51,7 +51,7 @@ type User struct {
 	isNew     bool
 }
 
-var userCols = []string{"user_id", "email", "username", "nickname", "biography", "encrypted_password", "github_id", "created_at", "updated_at"}
+var userColumns = []string{"user_id", "email", "username", "nickname", "biography", "encrypted_password", "github_id", "created_at", "updated_at"}
 
 func (u *User) values() []interface{} {
 	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.Biography, u.EncryptedPassword, u.GithubID, u.CreatedAt, u.UpdatedAt}
@@ -104,7 +104,7 @@ func CreateUser(context *Context, email, username, nickname, biography, password
 	}
 
 	err = context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		cols, params := durable.PrepareColumnsWithValues(userCols)
+		cols, params := durable.PrepareColumnsWithValues(userColumns)
 		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
 		if err != nil {
 			return err
@@ -203,7 +203,7 @@ func ReadUsers(context *Context, offset time.Time) ([]*User, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(userCols, ",")), offset)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(userColumns, ",")), offset)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -226,7 +226,7 @@ func ReadUsers(context *Context, offset time.Time) ([]*User, error) {
 // ReadUsersByIds by users' id
 func ReadUsersByIds(context *Context, ids []string) ([]*User, error) {
 	ctx := context.context
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userCols, ","), strings.Join(ids, "','")))
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userColumns, ","), strings.Join(ids, "','")))
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -286,7 +286,7 @@ func ReadUserByUsernameOrEmail(context *Context, identity string) (*User, error)
 
 	var user *User
 	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(userCols, ",")), identity)
+		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(userColumns, ",")), identity)
 		defer rows.Close()
 
 		if !rows.Next() {
@@ -335,7 +335,7 @@ func findUserByID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
 		return nil, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id=$1", strings.Join(userCols, ",")), id)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id=$1", strings.Join(userColumns, ",")), id)
 	if err != nil {
 		return nil, err
 	}

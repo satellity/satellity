@@ -63,7 +63,7 @@ func CreateGithubUser(context *Context, code, sessionSecret string) (*User, erro
 
 	err = context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		if user.isNew {
-			cols, params := durable.PrepareColumnsWithValues(userCols)
+			cols, params := durable.PrepareColumnsWithValues(userColumns)
 			_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
 			if err != nil {
 				return err
@@ -169,7 +169,7 @@ func featchUserEmail(ctx context.Context, accessToken string) (string, error) {
 }
 
 func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userCols, ",")), id)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
 	if err != nil {
 		return nil, err
 	}

@@ -44,7 +44,7 @@ type Comment struct {
 	User *User
 }
 
-var commentCols = []string{"comment_id", "body", "topic_id", "user_id", "score", "created_at", "updated_at"}
+var commentColumns = []string{"comment_id", "body", "topic_id", "user_id", "score", "created_at", "updated_at"}
 
 func (c *Comment) values() []interface{} {
 	return []interface{}{c.CommentID, c.Body, c.TopicID, c.UserID, c.Score, c.CreatedAt, c.UpdatedAt}
@@ -79,7 +79,7 @@ func (user *User) CreateComment(context *Context, topicID, body string) (*Commen
 		topic.CommentsCount = count + 1
 		topic.UpdatedAt = t
 		c.TopicID = topic.TopicID
-		cols, params := durable.PrepareColumnsWithValues(commentCols)
+		cols, params := durable.PrepareColumnsWithValues(commentColumns)
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO comments (%s) VALUES (%s)", cols, params), c.values()...)
 		if err != nil {
 			return err
@@ -141,7 +141,7 @@ func (topic *Topic) ReadComments(context *Context, offset time.Time) ([]*Comment
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentCols, ",")), topic.TopicID, offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentColumns, ",")), topic.TopicID, offset, LIMIT)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (user *User) ReadComments(context *Context, offset time.Time) ([]*Comment, 
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentCols, ",")), user.UserID, offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentColumns, ",")), user.UserID, offset, LIMIT)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +232,7 @@ func findComment(ctx context.Context, tx *sql.Tx, id string) (*Comment, error) {
 		return nil, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE comment_id=$1", strings.Join(commentCols, ",")), id)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE comment_id=$1", strings.Join(commentColumns, ",")), id)
 	if err != nil {
 		return nil, err
 	}

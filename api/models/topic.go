@@ -36,7 +36,7 @@ CREATE INDEX ON topics (category_id, created_at DESC);
 CREATE INDEX ON topics (score DESC, created_at DESC);
 `
 
-var topicCols = []string{"topic_id", "title", "body", "comments_count", "category_id", "user_id", "score", "created_at", "updated_at"}
+var topicColumns = []string{"topic_id", "title", "body", "comments_count", "category_id", "user_id", "score", "created_at", "updated_at"}
 
 func (t *Topic) values() []interface{} {
 	return []interface{}{t.TopicID, t.Title, t.Body, t.CommentsCount, t.CategoryID, t.UserID, t.Score, t.CreatedAt, t.UpdatedAt}
@@ -91,7 +91,7 @@ func (user *User) CreateTopic(context *Context, title, body, categoryID string) 
 			return err
 		}
 		category.TopicsCount, category.UpdatedAt = count+1, time.Now()
-		cols, params := durable.PrepareColumnsWithValues(topicCols)
+		cols, params := durable.PrepareColumnsWithValues(topicColumns)
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO topics(%s) VALUES (%s)", cols, params), topic.values()...)
 		if err != nil {
 			return err
@@ -203,7 +203,7 @@ func findTopic(ctx context.Context, tx *sql.Tx, id string) (*Topic, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(topicCols, ",")), id)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(topicColumns, ",")), id)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +233,7 @@ func ReadTopics(context *Context, offset time.Time) ([]*Topic, error) {
 		return nil, err
 	}
 	var topics []*Topic
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicCols, ",")), offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicColumns, ",")), offset, LIMIT)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -273,7 +273,7 @@ func (user *User) ReadTopics(context *Context, offset time.Time) ([]*Topic, erro
 		return nil, err
 	}
 	var topics []*Topic
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicCols, ",")), user.UserID, offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ",")), user.UserID, offset, LIMIT)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -301,7 +301,7 @@ func (category *Category) ReadTopics(context *Context, offset time.Time) ([]*Top
 		offset = time.Now()
 	}
 	var topics []*Topic
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicCols, ",")), category.CategoryID, offset, LIMIT)
+	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ",")), category.CategoryID, offset, LIMIT)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -331,7 +331,7 @@ func (category *Category) ReadTopics(context *Context, offset time.Time) ([]*Top
 }
 
 func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, error) {
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(topicCols, ",")), category.CategoryID)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
 	if err != nil {
 		return nil, err
 	}

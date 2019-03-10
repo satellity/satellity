@@ -36,7 +36,7 @@ type Statistic struct {
 	UpdatedAt   time.Time `sql:"updated_at"`
 }
 
-var statisticColums = []string{"statistic_id", "name", "count", "created_at", "updated_at"}
+var statisticColumns = []string{"statistic_id", "name", "count", "created_at", "updated_at"}
 
 func (s *Statistic) values() []interface{} {
 	return []interface{}{s.StatisticID, s.Name, s.Count, s.CreatedAt, s.UpdatedAt}
@@ -72,7 +72,7 @@ func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, 
 		Name:        name,
 		Count:       int64(count),
 	}
-	cols, params := durable.PrepareColumnsWithValues(statisticColums)
+	cols, params := durable.PrepareColumnsWithValues(statisticColumns)
 	if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...); err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, erro
 		return nil, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(statisticColums, ",")), id)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(statisticColumns, ",")), id)
 	if err != nil {
 		return nil, err
 	}
