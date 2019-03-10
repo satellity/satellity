@@ -203,23 +203,12 @@ func findTopic(ctx context.Context, tx *sql.Tx, id string) (*Topic, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(topicColumns, ",")), id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(topicColumns, ",")), id)
+	t, err := topicFromRows(row)
+	if sql.ErrNoRows == err {
 		return nil, nil
 	}
-	t, err := topicFromRows(rows)
-	if err != nil {
-		return nil, err
-	}
-	return t, nil
+	return t, err
 }
 
 // ReadTopics read all topics, parameters: offset default time.Now()
@@ -331,19 +320,12 @@ func (category *Category) ReadTopics(context *Context, offset time.Time) ([]*Top
 }
 
 func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, error) {
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
+	t, err := topicFromRows(row)
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return topicFromRows(rows)
+	return t, err
 }
 
 func topicsCountByCategory(ctx context.Context, tx *sql.Tx, id string) (int64, error) {

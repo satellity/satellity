@@ -121,9 +121,6 @@ func UpdateCategory(context *Context, id, name, alias, description string, posit
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	if category == nil {
@@ -214,11 +211,11 @@ func ElevateCategory(context *Context, id string) (*Category, error) {
 			if err != nil {
 				return err
 			}
+			category.TopicsCount = count
 			category.UpdatedAt = time.Now()
 			cols, params := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
 			vals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
 			_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
-			category.TopicsCount = count
 		}
 		return err
 	})
@@ -236,19 +233,12 @@ func findCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error)
 		return nil, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories WHERE category_id=$1", strings.Join(categoryColumns, ",")), id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM categories WHERE category_id=$1", strings.Join(categoryColumns, ",")), id)
+	c, err := categoryFromRows(row)
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return categoryFromRows(rows)
+	return c, err
 }
 
 func categoryCount(context *Context) (int64, error) {

@@ -84,19 +84,12 @@ func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, erro
 		return nil, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(statisticColumns, ",")), id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(statisticColumns, ",")), id)
+	s, err := statisticFromRows(row)
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return statisticFromRows(rows)
+	return s, err
 }
 
 func statisticFromRows(row durable.Row) (*Statistic, error) {

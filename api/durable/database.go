@@ -107,7 +107,6 @@ func (d *Database) QueryRowContext(ctx context.Context, query string, args ...in
 
 // RunInTransaction run a query in the transaction
 func (d *Database) RunInTransaction(ctx context.Context, fn func(*sql.Tx) error) error {
-
 	tx, err := d.db.Begin()
 	if err != nil {
 		return err

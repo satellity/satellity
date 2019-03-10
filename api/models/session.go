@@ -101,23 +101,16 @@ func readSession(ctx context.Context, tx *sql.Tx, uid, sid string) (*Session, er
 	if id, _ := uuid.FromString(uid); id.String() == uuid.Nil.String() {
 		return nil, nil
 	}
-	if id, _ := uuid.FromString(uid); id.String() == uuid.Nil.String() {
+	if id, _ := uuid.FromString(sid); id.String() == uuid.Nil.String() {
 		return nil, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM sessions WHERE user_id=$1 AND session_id=$2", strings.Join(sessionColumns, ",")), uid, sid)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM sessions WHERE user_id=$1 AND session_id=$2", strings.Join(sessionColumns, ",")), uid, sid)
+	s, err := sessionFromRows(row)
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return sessionFromRows(rows)
+	return s, err
 }
 
 func sessionFromRows(row durable.Row) (*Session, error) {

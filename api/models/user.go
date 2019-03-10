@@ -335,19 +335,12 @@ func findUserByID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
 		return nil, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id=$1", strings.Join(userColumns, ",")), id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id=$1", strings.Join(userColumns, ",")), id)
+	u, err := userFromRows(row)
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return userFromRows(rows)
+	return u, err
 }
 
 func usersCount(ctx context.Context, tx *sql.Tx) (int64, error) {

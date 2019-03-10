@@ -118,7 +118,7 @@ func (user *User) UpdateComment(context *Context, id, body string) (*Comment, er
 		} else if comment == nil {
 			return session.NotFoundError(ctx)
 		} else if comment.UserID != user.UserID && !user.isAdmin() {
-			return session.AuthorizationError(ctx)
+			return session.ForbiddenError(ctx)
 		}
 		comment.Body = body
 		comment.UpdatedAt = time.Now()
@@ -231,20 +231,12 @@ func findComment(ctx context.Context, tx *sql.Tx, id string) (*Comment, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE comment_id=$1", strings.Join(commentColumns, ",")), id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE comment_id=$1", strings.Join(commentColumns, ",")), id)
+	c, err := commentFromRows(row)
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return commentFromRows(rows)
+	return c, err
 }
 
 func commentsCountByTopic(ctx context.Context, tx *sql.Tx, id string) (int64, error) {
