@@ -72,16 +72,19 @@ func CreateCategory(context *Context, name, alias, description string, position 
 		CreatedAt:   t,
 		UpdatedAt:   t,
 	}
-	if position == 0 {
-		count, err := categoryCount(context)
-		if err != nil {
-			return nil, err
-		}
-		category.Position = count
-	}
 
 	cols, params := durable.PrepareColumnsWithValues(categoryColumns)
-	_, err := context.database.ExecContext(ctx, fmt.Sprintf("INSERT INTO categories(%s) VALUES (%s)", cols, params), category.values()...)
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		if position == 0 {
+			count, err := categoryCount(ctx, tx)
+			if err != nil {
+				return err
+			}
+			category.Position = count
+		}
+		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO categories(%s) VALUES (%s)", cols, params), category.values()...)
+		return err
+	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -241,14 +244,10 @@ func findCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error)
 	return c, err
 }
 
-func categoryCount(context *Context) (int64, error) {
-	ctx := context.context
+func categoryCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	var count int64
-	row, err := context.database.QueryRowContext(ctx, "SELECT count(*) FROM categories")
-	if err != nil {
-		return 0, session.TransactionError(ctx, err)
-	}
-	err = row.Scan(&count)
+	row := tx.QueryRowContext(ctx, "SELECT count(*) FROM categories")
+	err := row.Scan(&count)
 	if err != nil {
 		return 0, session.TransactionError(ctx, err)
 	}
