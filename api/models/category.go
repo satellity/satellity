@@ -147,31 +147,23 @@ func ReadCategory(context *Context, id string) (*Category, error) {
 	return category, nil
 }
 
-// ReadCategories read categories order by position
-func ReadCategories(context *Context) ([]*Category, error) {
+// ReadAllCategories read categories order by position
+func ReadAllCategories(context *Context) ([]*Category, error) {
 	ctx := context.context
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 100", strings.Join(categoryColumns, ",")))
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	defer rows.Close()
-
 	var categories []*Category
-	for rows.Next() {
-		category, err := categoryFromRows(rows)
-		if err != nil {
-			return nil, session.TransactionError(ctx, err)
-		}
-		categories = append(categories, category)
-	}
-	if err := rows.Err(); err != nil {
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		categories, err = readCategories(ctx, tx)
+		return err
+	})
+	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return categories, nil
 }
 
-func readCategorySet(context *Context) (map[string]*Category, error) {
-	categories, err := ReadCategories(context)
+func readCategorySet(ctx context.Context, tx *sql.Tx) (map[string]*Category, error) {
+	categories, err := readCategories(ctx, tx)
 	if err != nil {
 		return nil, err
 	}
@@ -180,6 +172,24 @@ func readCategorySet(context *Context) (map[string]*Category, error) {
 		set[c.CategoryID] = c
 	}
 	return set, nil
+}
+
+func readCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 500", strings.Join(categoryColumns, ",")))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var categories []*Category
+	for rows.Next() {
+		category, err := categoryFromRows(rows)
+		if err != nil {
+			return nil, err
+		}
+		categories = append(categories, category)
+	}
+	return categories, rows.Err()
 }
 
 // ElevateCategory update category's info, e.g.: LastTopicID, TopicsCount

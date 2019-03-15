@@ -53,7 +53,7 @@ func TestCategoryCRUD(t *testing.T) {
 			new, err = ElevateCategory(ctx, category.CategoryID)
 			assert.Nil(err)
 			assert.NotNil(new)
-			categories, err := ReadCategories(ctx)
+			categories, err := ReadAllCategories(ctx)
 			assert.Nil(err)
 			assert.Len(categories, tc.position)
 			new, err = UpdateCategory(ctx, uuid.Must(uuid.NewV4()).String(), "new"+category.Name, "new"+category.Alias, "new"+category.Description, 10)

@@ -48,7 +48,7 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 
 func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	ctx := models.WrapContext(r.Context(), impl.database)
-	categories, err := models.ReadCategories(ctx)
+	categories, err := models.ReadAllCategories(ctx)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return

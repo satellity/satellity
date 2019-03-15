@@ -141,31 +141,39 @@ func (topic *Topic) ReadComments(context *Context, offset time.Time) ([]*Comment
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentColumns, ",")), topic.TopicID, offset, LIMIT)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
 
-	userIds := []string{}
 	var comments []*Comment
-	for rows.Next() {
-		c, err := commentFromRows(rows)
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, topic.TopicID, offset, LIMIT)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		userIds = append(userIds, c.UserID)
-		comments = append(comments, c)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	userSet, err := readUserSet(context, userIds)
+		defer rows.Close()
+
+		userIds := []string{}
+		for rows.Next() {
+			c, err := commentFromRows(rows)
+			if err != nil {
+				return err
+			}
+			userIds = append(userIds, c.UserID)
+			comments = append(comments, c)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		userSet, err := readUserSet(ctx, tx, userIds)
+		if err != nil {
+			return err
+		}
+		for i, c := range comments {
+			comments[i].User = userSet[c.UserID]
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, err
-	}
-	for i, c := range comments {
-		comments[i].User = userSet[c.UserID]
+		return nil, session.TransactionError(ctx, err)
 	}
 	return comments, nil
 }

@@ -217,36 +217,45 @@ func ReadTopics(context *Context, offset time.Time) ([]*Topic, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	set, err := readCategorySet(context)
-	if err != nil {
-		return nil, err
-	}
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicColumns, ",")), offset, LIMIT)
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	defer rows.Close()
 
-	userIds := []string{}
 	var topics []*Topic
-	for rows.Next() {
-		topic, err := topicFromRows(rows)
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		set, err := readCategorySet(ctx, tx)
 		if err != nil {
-			return nil, session.TransactionError(ctx, err)
+			return err
 		}
-		userIds = append(userIds, topic.UserID)
-		topic.Category = set[topic.CategoryID]
-		topics = append(topics, topic)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	userSet, err := readUserSet(context, userIds)
+
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicColumns, ","))
+		rows, err := context.database.QueryContext(ctx, query, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		userIds := []string{}
+		for rows.Next() {
+			topic, err := topicFromRows(rows)
+			if err != nil {
+				return err
+			}
+			userIds = append(userIds, topic.UserID)
+			topic.Category = set[topic.CategoryID]
+			topics = append(topics, topic)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		userSet, err := readUserSet(ctx, tx, userIds)
+		if err != nil {
+			return err
+		}
+		for i, topic := range topics {
+			topics[i].User = userSet[topic.UserID]
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, err
-	}
-	for i, topic := range topics {
-		topics[i].User = userSet[topic.UserID]
+		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
 }
@@ -257,27 +266,32 @@ func (user *User) ReadTopics(context *Context, offset time.Time) ([]*Topic, erro
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	set, err := readCategorySet(context)
-	if err != nil {
-		return nil, err
-	}
-	var topics []*Topic
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ",")), user.UserID, offset, LIMIT)
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	defer rows.Close()
 
-	for rows.Next() {
-		topic, err := topicFromRows(rows)
+	var topics []*Topic
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		set, err := readCategorySet(ctx, tx)
 		if err != nil {
-			return nil, session.TransactionError(ctx, err)
+			return err
 		}
-		topic.User = user
-		topic.Category = set[topic.CategoryID]
-		topics = append(topics, topic)
-	}
-	if err := rows.Err(); err != nil {
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, user.UserID, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			topic, err := topicFromRows(rows)
+			if err != nil {
+				return err
+			}
+			topic.User = user
+			topic.Category = set[topic.CategoryID]
+			topics = append(topics, topic)
+		}
+		return rows.Err()
+	})
+	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
@@ -289,32 +303,40 @@ func (category *Category) ReadTopics(context *Context, offset time.Time) ([]*Top
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	var topics []*Topic
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ",")), category.CategoryID, offset, LIMIT)
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	defer rows.Close()
 
-	userIds := []string{}
-	for rows.Next() {
-		topic, err := topicFromRows(rows)
+	var topics []*Topic
+	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, category.CategoryID, offset, LIMIT)
 		if err != nil {
-			return nil, session.TransactionError(ctx, err)
+			return err
 		}
-		userIds = append(userIds, topic.UserID)
-		topic.Category = category
-		topics = append(topics, topic)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	userSet, err := readUserSet(context, userIds)
+		defer rows.Close()
+
+		userIds := []string{}
+		for rows.Next() {
+			topic, err := topicFromRows(rows)
+			if err != nil {
+				return err
+			}
+			userIds = append(userIds, topic.UserID)
+			topic.Category = category
+			topics = append(topics, topic)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		userSet, err := readUserSet(ctx, tx, userIds)
+		if err != nil {
+			return err
+		}
+		for i, topic := range topics {
+			topics[i].User = userSet[topic.UserID]
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, err
-	}
-	for i, topic := range topics {
-		topics[i].User = userSet[topic.UserID]
+		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
 }

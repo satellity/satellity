@@ -223,12 +223,10 @@ func ReadUsers(context *Context, offset time.Time) ([]*User, error) {
 	return users, nil
 }
 
-// ReadUsersByIds by users' id
-func ReadUsersByIds(context *Context, ids []string) ([]*User, error) {
-	ctx := context.context
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userColumns, ","), strings.Join(ids, "','")))
+func readUsersByIds(ctx context.Context, tx *sql.Tx, ids []string) ([]*User, error) {
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userColumns, ","), strings.Join(ids, "','")))
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -236,18 +234,15 @@ func ReadUsersByIds(context *Context, ids []string) ([]*User, error) {
 	for rows.Next() {
 		user, err := userFromRows(rows)
 		if err != nil {
-			return nil, session.TransactionError(ctx, err)
+			return nil, err
 		}
 		users = append(users, user)
 	}
-	if err := rows.Err(); err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return users, nil
+	return users, rows.Err()
 }
 
-func readUserSet(context *Context, ids []string) (map[string]*User, error) {
-	users, err := ReadUsersByIds(context, ids)
+func readUserSet(ctx context.Context, tx *sql.Tx, ids []string) (map[string]*User, error) {
+	users, err := readUsersByIds(ctx, tx, ids)
 	if err != nil {
 		return nil, err
 	}
