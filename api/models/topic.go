@@ -353,10 +353,7 @@ func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, er
 func topicsCountByCategory(ctx context.Context, tx *sql.Tx, id string) (int64, error) {
 	var count int64
 	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics WHERE category_id=$1", id).Scan(&count)
-	if err != nil {
-		return 0, session.TransactionError(ctx, err)
-	}
-	return count, nil
+	return count, err
 }
 
 func topicsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
