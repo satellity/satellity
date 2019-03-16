@@ -164,8 +164,8 @@ func (user *User) UpdateTopic(context *Context, id, title, body, categoryID stri
 		return nil, session.NotFoundError(ctx)
 	}
 	if prevCategoryID != "" {
-		go ElevateCategory(context, prevCategoryID)
-		go ElevateCategory(context, topic.CategoryID)
+		go dispersalCategory(context, prevCategoryID)
+		go dispersalCategory(context, topic.CategoryID)
 	}
 	topic.User = user
 	return topic, nil

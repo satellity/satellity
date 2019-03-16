@@ -49,8 +49,8 @@ func (c *Category) values() []interface{} {
 }
 
 // CreateCategory create a new category.
-func CreateCategory(context *Context, name, alias, description string, position int64) (*Category, error) {
-	ctx := context.context
+func CreateCategory(mctx *Context, name, alias, description string, position int64) (*Category, error) {
+	ctx := mctx.context
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(name) < 1 {
@@ -74,7 +74,7 @@ func CreateCategory(context *Context, name, alias, description string, position 
 	}
 
 	cols, params := durable.PrepareColumnsWithValues(categoryColumns)
-	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		if position == 0 {
 			count, err := categoryCount(ctx, tx)
 			if err != nil {
@@ -92,8 +92,8 @@ func CreateCategory(context *Context, name, alias, description string, position 
 }
 
 // UpdateCategory update a category's attributes
-func UpdateCategory(context *Context, id, name, alias, description string, position int64) (*Category, error) {
-	ctx := context.context
+func UpdateCategory(mctx *Context, id, name, alias, description string, position int64) (*Category, error) {
+	ctx := mctx.context
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(alias) < 1 && len(name) < 1 {
@@ -101,7 +101,7 @@ func UpdateCategory(context *Context, id, name, alias, description string, posit
 	}
 
 	var category *Category
-	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil || category == nil {
@@ -148,10 +148,10 @@ func ReadCategory(context *Context, id string) (*Category, error) {
 }
 
 // ReadAllCategories read categories order by position
-func ReadAllCategories(context *Context) ([]*Category, error) {
-	ctx := context.context
+func ReadAllCategories(mctx *Context) ([]*Category, error) {
+	ctx := mctx.context
 	var categories []*Category
-	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		categories, err = readCategories(ctx, tx)
 		return err
@@ -192,14 +192,14 @@ func readCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
 	return categories, rows.Err()
 }
 
-// ElevateCategory update category's info, e.g.: LastTopicID, TopicsCount
-func ElevateCategory(context *Context, id string) (*Category, error) {
+// dispersalCategory update category's info, e.g.: LastTopicID, TopicsCount
+func dispersalCategory(mctx *Context, id string) (*Category, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	ctx := context.context
+	ctx := context.Background()
 	var category *Category
-	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil {

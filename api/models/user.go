@@ -58,8 +58,8 @@ func (u *User) values() []interface{} {
 }
 
 // CreateUser create a new user
-func CreateUser(context *Context, email, username, nickname, biography, password string, sessionSecret string) (*User, error) {
-	ctx := context.context
+func CreateUser(mctx *Context, email, username, nickname, biography, password string, sessionSecret string) (*User, error) {
+	ctx := mctx.context
 	data, err := hex.DecodeString(sessionSecret)
 	if err != nil {
 		return nil, session.BadDataError(ctx)
@@ -103,7 +103,7 @@ func CreateUser(context *Context, email, username, nickname, biography, password
 		UpdatedAt:         t,
 	}
 
-	err = context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		cols, params := durable.PrepareColumnsWithValues(userColumns)
 		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
 		if err != nil {
@@ -126,8 +126,8 @@ func CreateUser(context *Context, email, username, nickname, biography, password
 }
 
 // UpdateProfile update user's profile
-func (u *User) UpdateProfile(context *Context, nickname, biography string) error {
-	ctx := context.context
+func (u *User) UpdateProfile(mctx *Context, nickname, biography string) error {
+	ctx := mctx.context
 	nickname, biography = strings.TrimSpace(nickname), strings.TrimSpace(biography)
 	if len(nickname) == 0 && len(biography) == 0 {
 		return nil
@@ -140,7 +140,7 @@ func (u *User) UpdateProfile(context *Context, nickname, biography string) error
 	}
 	u.UpdatedAt = time.Now()
 	cols, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
-	_, err := context.database.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
+	_, err := mctx.database.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
 	if err != nil {
 		return session.TransactionError(ctx, err)
 	}
@@ -149,8 +149,8 @@ func (u *User) UpdateProfile(context *Context, nickname, biography string) error
 
 // AuthenticateUser read a user by tokenString. tokenString is a jwt token, more
 // about jwt: https://github.com/dgrijalva/jwt-go
-func AuthenticateUser(context *Context, tokenString string) (*User, error) {
-	ctx := context.context
+func AuthenticateUser(mctx *Context, tokenString string) (*User, error) {
+	ctx := mctx.context
 	var user *User
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		claims, ok := token.Claims.(jwt.MapClaims)
@@ -162,7 +162,7 @@ func AuthenticateUser(context *Context, tokenString string) (*User, error) {
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
 		var s *Session
-		err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 			u, err := findUserByID(ctx, tx, uid)
 			if err != nil {
 				return err
@@ -198,12 +198,12 @@ func AuthenticateUser(context *Context, tokenString string) (*User, error) {
 }
 
 // ReadUsers read users by offset
-func ReadUsers(context *Context, offset time.Time) ([]*User, error) {
-	ctx := context.context
+func ReadUsers(mctx *Context, offset time.Time) ([]*User, error) {
+	ctx := mctx.context
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := context.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(userColumns, ",")), offset)
+	rows, err := mctx.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(userColumns, ",")), offset)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -272,15 +272,15 @@ func ReadUser(context *Context, id string) (*User, error) {
 }
 
 // ReadUserByUsernameOrEmail read user by identity, which is an email or username.
-func ReadUserByUsernameOrEmail(context *Context, identity string) (*User, error) {
-	ctx := context.context
+func ReadUserByUsernameOrEmail(mctx *Context, identity string) (*User, error) {
+	ctx := mctx.context
 	identity = strings.ToLower(strings.TrimSpace(identity))
 	if len(identity) < 3 {
 		return nil, nil
 	}
 
 	var user *User
-	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(userColumns, ",")), identity)
 		defer rows.Close()
 
