@@ -225,11 +225,11 @@ func dispersalCategory(mctx *Context, id string) (*Category, error) {
 				return err
 			}
 			category.TopicsCount = count
-			category.UpdatedAt = time.Now()
-			cols, params := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
-			vals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
-			_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
 		}
+		category.UpdatedAt = time.Now()
+		cols, params := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
+		vals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
 		return err
 	})
 	if err != nil {
