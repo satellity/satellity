@@ -10,6 +10,20 @@ import Comment from './comment.js';
 import Topic from './topic.js';
 import User from './user.js';
 
+Noty.overrideDefaults({
+    type: 'error',
+    layout: 'topCenter',
+    theme: 'mint',
+    killer: true,
+    theme: 'nest',
+    timeout: 1000,
+    progressBar: false,
+    animation: {
+      open : 'noty_effects_open',
+      close: 'noty_effects_close'
+    }
+});
+
 axios.defaults.baseURL = 'https://api.godiscourse.com';
 if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = 'http://localhost:4000';
@@ -41,17 +55,7 @@ axios.interceptors.response.use(function(response) {
         return
       }
       new Noty({
-        type: 'error',
-        layout: 'topCenter',
-        killer: true,
-        theme: 'nest',
         text: error.code,
-        timeout: 1000,
-        progressBar: false,
-        animation: {
-          open : 'noty_effects_open',
-          close: 'noty_effects_close'
-        }
       }).show();
       if (error.code === 500) {
         window.location.href = '/';
@@ -63,19 +67,24 @@ axios.interceptors.response.use(function(response) {
   }
   return response
 }, function(error) {
-  new Noty({
-    type: 'error',
-    layout: 'topCenter',
-    killer: true,
-    theme: 'nest',
-    text: error.message,
-    timeout: 1000,
-    progressBar: false,
-    animation: {
-      open : 'noty_effects_open',
-      close: 'noty_effects_close'
+  if (error.response) {
+    if (error.response.status === 500) {
+      new Noty({
+        text: "Internal Server Error"
+      }).show();
+      return
     }
-  }).show();
+  } else if (error.request) {
+    new Noty({
+      text: error.message
+    }).show();
+    return
+  } else {
+    new Noty({
+      text: error.message
+    }).show();
+    return
+  }
   return Promise.reject(error);
 });
 
