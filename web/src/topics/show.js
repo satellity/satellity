@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
+import { Helmet } from 'react-helmet';
 import API from '../api/index.js';
 import style from './style.scss';
 import SiteWidget from '../components/site-widget.js';
@@ -15,7 +16,7 @@ class TopicShow extends Component {
     this.api = new API();
     this.converter = new showdown.Converter();
     this.state = {
-      topic_id: props.match.params.id, title: '', body: '', comments_count: 0, created_at: '', user_id: '', is_author: false, loading: true,
+      topic_id: props.match.params.id, title: '', short_body: '', body: '', comments_count: 0, created_at: '', user_id: '', is_author: false, loading: true,
       user: {user_id: '', nickname: ''},
       category: {category_id: '', name: ''}
     };
@@ -26,6 +27,7 @@ class TopicShow extends Component {
     this.api.topic.show(this.props.match.params.id).then((data) => {
       data.loading = false;
       data.is_author = data.user.user_id === user.user_id;
+      data.short_body = data.body.substring(0, 128);
       data.body = this.converter.makeHtml(data.body);
       this.setState(data);
     });
@@ -54,6 +56,10 @@ const View = ({state}) => {
   )
   return (
     <div className='container'>
+      <Helmet>
+        <title>{state.title} - {state.user.nickname} - GoDiscourse</title>
+        <meta name='description' content={state.short_body} />
+      </Helmet>
       <main className='section main'>
         {state.loading && loadingView}
         <div className={style.content}>
