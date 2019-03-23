@@ -178,7 +178,7 @@ func ReadTopic(context *Context, id string) (*Topic, error) {
 	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
-		if err != nil {
+		if topic == nil || err != nil {
 			return err
 		}
 		user, err := findUserByID(ctx, tx, topic.UserID)
