@@ -13,7 +13,6 @@ class SiteWidget extends Component {
   }
 
   render() {
-    // TODO
     let githubClientId = '71905afbd6e4541ad62b';
     if (process.env.NODE_ENV === 'development') {
       githubClientId = 'b9b78f343f3a5b0d7c99';
@@ -29,7 +28,8 @@ class SiteWidget extends Component {
     return (
       <div>
         <div className={style.widget}>
-          GoDiscourse is an open source community written in Go, get codes in <a href='https://github.com/godiscourse/godiscourse' target='blank' className='soft'>Github</a>.
+          <div className={style.name}> GoDiscourse </div>
+           An open source community written in Go, get codes in <a href='https://github.com/godiscourse/godiscourse' target='blank' className='soft'>Github</a>.
         </div>
         {signIn}
         <div className={style.copyright}>

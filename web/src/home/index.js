@@ -126,7 +126,7 @@ const HomeView = (props) => {
   const categories = props.state.categories.map((category) => {
     return (
       <Link
-        to="/"
+        to={`?c=${category.name}`}
         className={`${style.node} ${props.state.category === category.category_id ? style.current : ''}`}
         onClick={(e) => props.handleClick(category.category_id, e)}
         key={category.category_id}>{category.alias}</Link>

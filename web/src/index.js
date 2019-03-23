@@ -14,8 +14,8 @@ import NoMatch from './notfound.js';
 import Oauth from './users/oauth.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faComment, faEdit, faEye, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
-import { faEllipsisV, faPlus } from '@fortawesome/free-solid-svg-icons';
-library.add(faComment, faEdit, faEye, faTrashAlt, faEllipsisV, faPlus);
+import { faEllipsisV, faPlus, faHome } from '@fortawesome/free-solid-svg-icons';
+library.add(faComment, faEdit, faEye, faTrashAlt, faEllipsisV, faPlus, faHome);
 
 showdown.setOption('customizedHeaderId', true);
 showdown.setOption('simplifiedAutoLink', true);

@@ -3,7 +3,11 @@
 .widget {
   background: white;
   box-sizing: border-box;
+  text-align: center;
   padding: .8rem;
+  .name {
+    margin-bottom: .8rem;
+  }
   a {
     color: rgba(218, 40, 16, 0.8);
     &:after {

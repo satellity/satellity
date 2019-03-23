@@ -8,10 +8,12 @@ $color-dark-background: #25476A;
 .header {
   background-image: linear-gradient(90deg, rgba(218, 40, 16, 0.6), rgba(218, 40, 16, 0.8));
   box-sizing: border-box;
+  color: white;
+  display: flex;
   font-size: 1.2rem;
-  padding: .8rem 1.6rem;
-  text-align: right;
+  text-align: center;
   line-height: 1.8rem;
+  padding: .8rem 1.6rem;
   &:after {
     content: '';
     display: block;
@@ -29,19 +31,16 @@ $color-dark-background: #25476A;
     display: none;
   }
 }
-.mobile {
-  display: none;
-}
-.logo {
-  float: left;
-  width: 1.6rem;
-  height: 1.6rem;
-  margin-right: 0.3rem;
+.site {
+  font-size: 1.125rem;
+  flex-grow: 1;
+  text-align: center;
 }
 .navi {
   color: white;
+  display: inline-block;
   font-size: 1rem;
-  margin-right: .6rem;
+  margin-right: .8rem;
   transition: all 0.2s ease-in-out;
   &:hover {
     opacity: 0.8;
@@ -52,16 +51,17 @@ $color-dark-background: #25476A;
   &:last-child {
     margin-right: 0;
   }
+  &.user {
+    max-width: 6rem;
+    overflow: hidden;
+  }
 }
 
 @media only screen and (max-width: 64rem) {
   .header {
     padding: .8rem;
   }
-  .pc {
+  .name {
     display: none;
-  }
-  .mobile {
-    display: inline-block;
   }
 }
