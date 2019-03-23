@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// HttpClient is a client with Timeout (5 seconds).
-func HttpClient() *http.Client {
+// HTTPClient is a client with Timeout (5 seconds).
+func HTTPClient() *http.Client {
 	return &http.Client{Timeout: 5 * time.Second}
 }

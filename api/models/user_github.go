@@ -84,7 +84,7 @@ func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) 
 }
 
 func fetchAccessToken(ctx context.Context, code string) (string, error) {
-	client := external.HttpClient()
+	client := external.HTTPClient()
 	data, err := json.Marshal(map[string]interface{}{
 		"client_id":     config.GithubClientID,
 		"client_secret": config.GithubClientSecret,
@@ -117,7 +117,7 @@ func fetchAccessToken(ctx context.Context, code string) (string, error) {
 }
 
 func fetchOauthUser(ctx context.Context, accessToken string) (*GithubUser, error) {
-	client := external.HttpClient()
+	client := external.HTTPClient()
 	req, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
 		return nil, err
@@ -143,7 +143,7 @@ func fetchOauthUser(ctx context.Context, accessToken string) (*GithubUser, error
 }
 
 func featchUserEmail(ctx context.Context, accessToken string) (string, error) {
-	client := external.HttpClient()
+	client := external.HTTPClient()
 	req, err := http.NewRequest("GET", "https://api.github.com/user/public_emails", nil)
 	if err != nil {
 		return "", err

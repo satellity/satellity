@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"net/http"
+	"runtime"
 
 	"github.com/dimfeld/httptreemux"
+	"github.com/godiscourse/godiscourse/api/config"
 	"github.com/godiscourse/godiscourse/api/controllers/admin"
 	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/godiscourse/godiscourse/api/views"
@@ -20,5 +22,8 @@ func RegisterRoutes(database *durable.Database, router *httptreemux.TreeMux) {
 }
 
 func health(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	views.RenderBlankResponse(w, r)
+	views.RenderResponse(w, r, map[string]string{
+		"build":      config.BuildVersion + "-" + runtime.Version(),
+		"developers": "https://live.godiscourse.com",
+	})
 }
