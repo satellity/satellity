@@ -8,15 +8,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
 import showdown from 'showdown';
-import MainRoute from './layouts/main.js';
+import MainLayout from './layouts/main.js';
 import AdminRoute from './admin/admin.js';
 import NoMatch from './notfound.js';
 import Oauth from './users/oauth.js';
-import Home from './home/index.js';
-import UserEdit from './users/edit.js';
-import UserShow from './users/show.js';
-import TopicNew from './topics/new.js';
-import TopicShow from './topics/show.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faComment, faEdit, faEye, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { faEllipsisV, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -31,15 +26,10 @@ ReactDOM.render((
   <Router>
     <div>
       <Switch>
-        <MainRoute exact path='/' component={Home} />
-        <MainRoute exact path='/user/edit' component={UserEdit} />
-        <MainRoute path='/users/:id' component={UserShow} />
-        <MainRoute exact path='/topics/new' component={TopicNew} />
-        <MainRoute path='/topics/:id/edit' component={TopicNew} />
-        <MainRoute path='/topics/:id' component={TopicShow} />
         <Route path='/oauth/callback' component={Oauth} />
         <Route path='/admin' component={AdminRoute} />
-        <Route component={NoMatch} />
+        <Route path='/404' component={NoMatch} />
+        <MainLayout />
       </Switch>
     </div>
   </Router>

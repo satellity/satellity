@@ -6,11 +6,13 @@ const NoMatch = ({ location }) => {
   const classes = document.body.classList.values();
   document.body.classList.remove(...classes);
   document.body.classList.add('not-found', 'layout');
+  let params = new URLSearchParams(location.search);
+  let p = params.get('p') || '/404';
 
   return (
     <div className={style.container}>
       <h3 className={style.body}>
-         LOL! NO MATCH FOR <span className={style.path}>{location.pathname.slice(0, 13)}</span>
+         LOL! NO MATCH FOR <span className={style.path}>{p}</span>
         <div className={style.action}>
           <Link to='/'>Back to homepage</Link>
         </div>
