@@ -3,16 +3,24 @@
 .widget {
   background: white;
   box-sizing: border-box;
-  text-align: center;
   padding: .8rem;
-  .name {
-    margin-bottom: .8rem;
-  }
   a {
     color: rgba(218, 40, 16, 0.8);
     &:after {
       background: rgba(218, 40, 16, 0.8);
     }
+  }
+}
+.name {
+  font-size: 1.125rem;
+  margin-bottom: .2rem;
+  svg {
+    margin-right: .4rem;
+  }
+}
+.features {
+  li {
+    padding: 0 0 .3rem;
   }
 }
 .sign_in {

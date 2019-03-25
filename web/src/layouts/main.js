@@ -2,6 +2,7 @@ import style from './main.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Route, Link, Switch, Redirect } from 'react-router-dom';
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 import logoURL from '../assets/images/chat.svg';
 import API from '../api/index.js'
 import Home from '../home/index.js';
@@ -24,15 +25,22 @@ class MainLayout extends Component {
       <div className={style.container}>
         <Header />
         <div className='wrapper'>
-          <Switch>
-            <Route exact path='/' component={Home} />
-            <Route exact path='/user/edit' component={UserEdit} />
-            <Route path='/users/:id' component={UserShow} />
-            <Route exact path='/topics/new' component={TopicNew} />
-            <Route path='/topics/:id/edit' component={TopicNew} />
-            <Route path='/topics/:id' component={TopicShow} />
-            <Redirect to={`/404?p=${this.state.p}`} />
-          </Switch>
+          <TransitionGroup>
+            <CSSTransition
+              key={this.props.location.key}
+              classNames="fade"
+              timeout={300}>
+              <Switch location={this.props.location}>
+                <Route exact path='/' component={Home} />
+                <Route exact path='/user/edit' component={UserEdit} />
+                <Route path='/users/:id' component={UserShow} />
+                <Route exact path='/topics/new' component={TopicNew} />
+                <Route path='/topics/:id/edit' component={TopicNew} />
+                <Route path='/topics/:id' component={TopicShow} />
+                <Redirect to={`/404?p=${this.state.p}`} />
+              </Switch>
+            </CSSTransition>
+          </TransitionGroup>
         </div>
       </div>
     )

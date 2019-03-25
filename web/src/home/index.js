@@ -128,7 +128,6 @@ const HomeView = (props) => {
       <Link
         to={`?c=${category.name}`}
         className={`${style.node} ${props.state.category === category.category_id ? style.current : ''}`}
-        onClick={(e) => props.handleClick(category.category_id, e)}
         key={category.category_id}>{category.alias}</Link>
     )
   });
@@ -144,8 +143,7 @@ const HomeView = (props) => {
       <main className='section main'>
         <div className={style.nodes}>
           <Link to='/'
-            className={`${style.node} ${props.state.category === 'latest' ? style.current : ''}`}
-            onClick={(e) => props.handleClick('latest', e)}>Latest</Link>
+            className={`${style.node} ${props.state.category === 'latest' ? style.current : ''}`}>Latest</Link>
           {categories}
         </div>
         {props.state.loading && loadingView}
