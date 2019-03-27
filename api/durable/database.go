@@ -8,7 +8,6 @@ import (
 	"log"
 
 	"github.com/godiscourse/godiscourse/api/config"
-	_ "github.com/lib/pq" //
 )
 
 // Database is wrapped struct of *sql.DB

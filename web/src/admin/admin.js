@@ -1,7 +1,7 @@
 import './admin.scss';
 import React, { Component } from 'react';
 import { Route, Link } from 'react-router-dom';
-import constants from '../components/constants.js';
+import Config from '../components/constants.js';
 import Index from './index.js';
 import Categories from './categories/index.js';
 import Users from './users/index.js';
@@ -16,7 +16,7 @@ class AdminRoute extends Component {
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
     document.body.classList.add('admin', 'layout');
-    this.state = {site: constants.site};
+    this.state = {site: Config.Name};
     if (!new API().user.isAdmin()) {
       props.history.push('/');
     }

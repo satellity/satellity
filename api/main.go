@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/godiscourse/godiscourse/api/durable"
+	_ "github.com/lib/pq"
 )
 
 func main() {

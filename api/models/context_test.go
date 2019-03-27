@@ -6,6 +6,7 @@ import (
 
 	"github.com/godiscourse/godiscourse/api/config"
 	"github.com/godiscourse/godiscourse/api/durable"
+	_ "github.com/lib/pq"
 )
 
 const (

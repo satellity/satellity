@@ -5,6 +5,7 @@ import uuid from 'uuid/v4';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import Noty from 'noty';
+import Config from '../components/constants.js';
 import Category from './category.js';
 import Comment from './comment.js';
 import Topic from './topic.js';
@@ -24,12 +25,8 @@ Noty.overrideDefaults({
     }
 });
 
-axios.defaults.baseURL = 'https://api.godiscourse.com';
-if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'http://localhost:4000';
-}
+axios.defaults.baseURL = Config.ApiHost();
 axios.defaults.headers.common['Content-Type'] = 'application/json';
-
 axios.interceptors.request.use(function(config) {
   let method = config.method, url = config.url, data = config.data;
   config.headers.common['Authorization'] = `Bearer ${token(method, url, data)}`;
@@ -44,11 +41,7 @@ axios.interceptors.response.use(function(response) {
     if (!!data.error) {
       let error = data.error;
       if (error.code === 401) {
-        let githubClientId = '71905afbd6e4541ad62b';
-        if (process.env.NODE_ENV === 'development') {
-          githubClientId = 'b9b78f343f3a5b0d7c99';
-        }
-        window.location.href = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${githubClientId}`;
+        window.location.href = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${config.GithubClientId()}`;
         return
       } else if (error.code === 404) {
         window.location.href = '/404'
