@@ -24,98 +24,75 @@ class Home extends Component {
       categories = JSON.parse(atob(d));
     }
     this.state = {topics: [], categories: categories, category: 'latest', loading: true, offset: ''};
-    this.handleClick = this.handleClick.bind(this);
-    this.load = this.load.bind(this);
+    this.loadMore = this.loadMore.bind(this);
   }
 
   componentDidMount() {
     this.api.category.index().then((data) => {
       this.setState({categories: data});
-    })
-    const category = this.params.get("c");
-    let request, id = 'latest';
-    if (!!category) {
-      for (let i=0; i< this.state.categories.length; i++) {
-        let c = this.state.categories[i];
-        if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-          id = c.category_id, request = this.api.category.topics(id);
-          break;
+      let categoryId = 'latest';
+      const category = this.params.get("c");
+      if (!!category) {
+        for (let i=0; i< this.state.categories.length; i++) {
+          let c = this.state.categories[i];
+          if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
+            categoryId = c.category_id;
+            break;
+          }
         }
       }
-    }
-    if (id === 'latest') {
-      request = this.api.topic.index();
-    }
-    request.then((data) => {
-      let offset = '';
-      if (data.length === this.pagination) {
-        offset = data[data.length-1].created_at;
-      }
-      this.setState({category: id, topics: data, loading: false, offset: offset});
+      this.loadTopics(categoryId, true);
     });
   }
 
   componentDidUpdate(prevProps) {
     let props = this.props;
     if (props.location.search !== prevProps.location.search) {
-      let id = 'latest';
+      let categoryId = 'latest';
       let params = new URLSearchParams(props.location.search);
       let category = params.get("c");
       if (!!category) {
         for (let i=0; i< this.state.categories.length; i++) {
           let c = this.state.categories[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-            id = c.category_id;
+            categoryId = c.category_id;
             break;
           }
         }
       }
-      this.handleClick(id)
+      console.log(this.state.categories, categoryId);
+      this.loadTopics(categoryId, true);
     }
   }
 
-  handleClick(id, e) {
-    if (e) {
-      e.preventDefault();
-    }
+  loadMore(e) {
+    e.preventDefault();
+    this.loadTopics(this.state.category, false);
+  }
+
+  loadTopics(categoryId, reload) {
     this.setState({loading: true, offset: ''});
     let request;
-    if (id === 'latest') {
-      request = this.api.topic.index();
-    } else {
-      request = this.api.category.topics(id)
-    }
-    request.then((data) => {
-      let offset = '';
-      if (data.length == this.pagination) {
-        offset = data[data.length-1].created_at;
-      }
-      this.setState({category: id, topics: data, loading: false, offset: offset});
-    });
-  }
-
-  load(e) {
-    e.preventDefault();
-    let id = this.state.category;
-    let request;
-    if (id === 'latest') {
+    if (categoryId === 'latest') {
       request = this.api.topic.index(this.state.offset);
     } else {
-      request = this.api.category.topics(id, this.state.offset);
+      request = this.api.category.topics(categoryId, this.state.offset);
     }
     request.then((data) => {
       let offset = '';
       if (data.length === this.pagination) {
         offset = data[data.length-1].created_at;
       }
-      data = this.state.topics.concat(data);
-      this.setState({category: id, topics: data, loading: false, offset: offset});
+      if (!reload) {
+        data = this.state.topics.concat(data);
+      }
+      this.setState({category: categoryId, topics: data, loading: false, offset: offset});
     });
   }
 
   render() {
     return (
-      <HomeView state={this.state} color={this.color} handleClick={this.handleClick} load={this.load} />
+      <HomeView state={this.state} color={this.color} loadMore={this.loadMore} />
     );
   }
 }
@@ -171,7 +148,7 @@ const HomeView = (props) => {
         <ul className={style.topics}>
           {topics}
         </ul>
-        {props.state.offset !== '' && <div className={style.load}><a href='javascript:;' onClick={(e) => props.load(e)}>Load More</a></div>}
+        {props.state.offset !== '' && <div className={style.load}><a href='javascript:;' onClick={(e) => props.loadMore(e)}>Load More</a></div>}
       </main>
       <aside className='section aside'>
         <SiteWidget />
