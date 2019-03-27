@@ -55,8 +55,29 @@ class Home extends Component {
     });
   }
 
+  componentDidUpdate(prevProps) {
+    let props = this.props;
+    if (props.location.search !== prevProps.location.search) {
+      let id = 'latest';
+      let params = new URLSearchParams(props.location.search);
+      let category = params.get("c");
+      if (!!category) {
+        for (let i=0; i< this.state.categories.length; i++) {
+          let c = this.state.categories[i];
+          if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
+            id = c.category_id;
+            break;
+          }
+        }
+      }
+      this.handleClick(id)
+    }
+  }
+
   handleClick(id, e) {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     this.setState({loading: true, offset: ''});
     let request;
     if (id === 'latest') {
@@ -126,7 +147,7 @@ const HomeView = (props) => {
   const categories = props.state.categories.map((category) => {
     return (
       <Link
-        to={`?c=${category.name}`}
+        to={{ pathname: "/", search: `?c=${category.name}` }}
         className={`${style.node} ${props.state.category === category.category_id ? style.current : ''}`}
         key={category.category_id}>{category.alias}</Link>
     )
