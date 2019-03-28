@@ -2,11 +2,10 @@ package models
 
 import (
 	"context"
+	"godiscourse/session"
 	"net"
 	"regexp"
 	"strings"
-
-	"github.com/godiscourse/godiscourse/api/session"
 )
 
 var (

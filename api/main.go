@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"godiscourse/durable"
 	"log"
 
-	"github.com/godiscourse/godiscourse/api/durable"
 	_ "github.com/lib/pq"
 )
 

@@ -3,11 +3,10 @@ package views
 import (
 	"crypto/md5"
 	"fmt"
+	"godiscourse/models"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/godiscourse/godiscourse/api/models"
 )
 
 // UserView is the response body of user

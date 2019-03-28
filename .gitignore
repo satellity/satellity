@@ -1,5 +1,5 @@
 .DS_Store
-api/api
+api/godiscourse
 config.go
 dev.cfg
 production.cfg

@@ -1,10 +1,9 @@
 package views
 
 import (
+	"godiscourse/models"
 	"net/http"
 	"time"
-
-	"github.com/godiscourse/godiscourse/api/models"
 )
 
 // TopicView is the response body of topic

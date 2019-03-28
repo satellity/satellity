@@ -5,9 +5,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"godiscourse/config"
 	"log"
-
-	"github.com/godiscourse/godiscourse/api/config"
 )
 
 // Database is wrapped struct of *sql.DB

@@ -1,10 +1,9 @@
 package middleware
 
 import (
+	"godiscourse/durable"
+	"godiscourse/session"
 	"net/http"
-
-	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/session"
 )
 
 // Logger put logger in r.Context

@@ -7,13 +7,13 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"godiscourse/config"
+	"godiscourse/durable"
+	"godiscourse/session"
 	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/godiscourse/godiscourse/api/config"
-	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )

@@ -1,8 +1,9 @@
 package admin
 
 import (
+	"godiscourse/durable"
+
 	"github.com/dimfeld/httptreemux"
-	"github.com/godiscourse/godiscourse/api/durable"
 )
 
 // RegisterAdminRoutes register admin routes

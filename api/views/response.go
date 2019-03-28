@@ -1,9 +1,8 @@
 package views
 
 import (
+	"godiscourse/session"
 	"net/http"
-
-	"github.com/godiscourse/godiscourse/api/session"
 )
 
 // ResponseView is the struct of response

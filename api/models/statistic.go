@@ -5,12 +5,12 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"fmt"
+	"godiscourse/durable"
+	"godiscourse/session"
 	"io"
 	"strings"
 	"time"
 
-	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 )
 

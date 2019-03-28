@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"godiscourse/session"
 	"net/http"
 
-	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/unrolled/render"
 )
 

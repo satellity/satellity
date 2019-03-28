@@ -6,14 +6,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"godiscourse/config"
+	"godiscourse/durable"
+	"godiscourse/external"
+	"godiscourse/session"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/godiscourse/godiscourse/api/config"
-	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/external"
-	"github.com/godiscourse/godiscourse/api/session"
 	"github.com/gofrs/uuid"
 )
 

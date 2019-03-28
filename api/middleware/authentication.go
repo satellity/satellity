@@ -2,14 +2,13 @@ package middleware
 
 import (
 	"context"
+	"godiscourse/durable"
+	"godiscourse/models"
+	"godiscourse/session"
+	"godiscourse/views"
 	"net/http"
 	"regexp"
 	"strings"
-
-	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/models"
-	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/godiscourse/godiscourse/api/views"
 )
 
 var whitelist = [][2]string{

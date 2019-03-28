@@ -1,10 +1,9 @@
 package views
 
 import (
+	"godiscourse/models"
 	"net/http"
 	"time"
-
-	"github.com/godiscourse/godiscourse/api/models"
 )
 
 // CommentView is the response body of comment

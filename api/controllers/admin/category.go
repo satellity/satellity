@@ -2,13 +2,13 @@ package admin
 
 import (
 	"encoding/json"
+	"godiscourse/durable"
+	"godiscourse/models"
+	"godiscourse/session"
+	"godiscourse/views"
 	"net/http"
 
 	"github.com/dimfeld/httptreemux"
-	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/models"
-	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/godiscourse/godiscourse/api/views"
 )
 
 type adminCategoryImpl struct {

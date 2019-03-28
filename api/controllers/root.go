@@ -1,14 +1,14 @@
 package controllers
 
 import (
+	"godiscourse/config"
+	"godiscourse/controllers/admin"
+	"godiscourse/durable"
+	"godiscourse/views"
 	"net/http"
 	"runtime"
 
 	"github.com/dimfeld/httptreemux"
-	"github.com/godiscourse/godiscourse/api/config"
-	"github.com/godiscourse/godiscourse/api/controllers/admin"
-	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/views"
 )
 
 // RegisterRoutes register all routes

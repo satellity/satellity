@@ -1,11 +1,11 @@
 package controllers
 
 import (
+	"godiscourse/session"
+	"godiscourse/views"
 	"net/http"
 
 	"github.com/dimfeld/httptreemux"
-	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/godiscourse/godiscourse/api/views"
 )
 
 // RegisterHanders handle global responses: MethodNotAllowedHandler, NotFoundHandler, PanicHandler

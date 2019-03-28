@@ -1,9 +1,8 @@
 package middleware
 
 import (
+	"godiscourse/views"
 	"net/http"
-
-	"github.com/godiscourse/godiscourse/api/views"
 )
 
 // Constraint process OPTIONS request.

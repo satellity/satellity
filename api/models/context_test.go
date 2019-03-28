@@ -2,10 +2,10 @@ package models
 
 import (
 	"context"
+	"godiscourse/config"
+	"godiscourse/durable"
 	"log"
 
-	"github.com/godiscourse/godiscourse/api/config"
-	"github.com/godiscourse/godiscourse/api/durable"
 	_ "github.com/lib/pq"
 )
 

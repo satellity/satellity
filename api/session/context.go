@@ -2,8 +2,8 @@ package session
 
 import (
 	"context"
+	"godiscourse/durable"
 
-	"github.com/godiscourse/godiscourse/api/durable"
 	"github.com/unrolled/render"
 )
 

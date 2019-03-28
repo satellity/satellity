@@ -2,14 +2,13 @@ package middleware
 
 import (
 	"bytes"
+	"godiscourse/config"
+	"godiscourse/session"
+	"godiscourse/views"
 	"io/ioutil"
 	"net/http"
 	"runtime"
 	"time"
-
-	"github.com/godiscourse/godiscourse/api/config"
-	"github.com/godiscourse/godiscourse/api/session"
-	"github.com/godiscourse/godiscourse/api/views"
 )
 
 // State output states of request, e.g.: r.Method, r.URL etc.

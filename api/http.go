@@ -3,14 +3,14 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"godiscourse/config"
+	"godiscourse/controllers"
+	"godiscourse/durable"
+	"godiscourse/middleware"
 	"net/http"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/facebookgo/grace/gracehttp"
-	"github.com/godiscourse/godiscourse/api/config"
-	"github.com/godiscourse/godiscourse/api/controllers"
-	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/middleware"
 	"github.com/gorilla/handlers"
 	"github.com/unrolled/render"
 )

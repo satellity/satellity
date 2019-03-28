@@ -1,13 +1,13 @@
 package admin
 
 import (
+	"godiscourse/durable"
+	"godiscourse/models"
+	"godiscourse/views"
 	"net/http"
 	"time"
 
 	"github.com/dimfeld/httptreemux"
-	"github.com/godiscourse/godiscourse/api/durable"
-	"github.com/godiscourse/godiscourse/api/models"
-	"github.com/godiscourse/godiscourse/api/views"
 )
 
 type userImpl struct {

@@ -2,8 +2,7 @@ package models
 
 import (
 	"context"
-
-	"github.com/godiscourse/godiscourse/api/durable"
+	"godiscourse/durable"
 )
 
 type Context struct {
