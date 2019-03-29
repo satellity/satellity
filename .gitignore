@@ -8,4 +8,5 @@ publish
 node_modules
 dist
 .cache
-.env*
+.env
+.env.development

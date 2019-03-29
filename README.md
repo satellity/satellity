@@ -28,10 +28,11 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 3. `cd ./ && make install && make build && ./bin/godiscourse` to start Golang server
 
 ### Frontend
-1. `cd ./web`, create .env and .env.development files with the following content:
+1. `cd ./web`, copy `.env.example` to `.env` and `.env.development` and change the following fields:
+   
     ```
-    SITE_NAME=Go Discourse
-    API_HOST=http://localhost:4000
+    SITE_NAME=your site name
+    API_HOST=http://localhost:4000 or production url
     GITHUB_CLIENT_ID=put your client id
     ```
 2. run `npm install` to prepare front-end.
