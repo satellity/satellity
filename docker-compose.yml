@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  web:
+    build: './web'
+  api:
+    build: './internal'
