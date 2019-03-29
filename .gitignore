@@ -2,6 +2,7 @@
 bin
 internal/configs/*
 !internal/configs/test.cfg
+publish
 
 # web
 node_modules
