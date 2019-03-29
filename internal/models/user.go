@@ -7,7 +7,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
-	"godiscourse/internal/config"
+	"godiscourse/internal/configs"
 	"godiscourse/internal/durable"
 	"godiscourse/internal/session"
 	"strings"
@@ -307,7 +307,7 @@ func ReadUserByUsernameOrEmail(mctx *Context, identity string) (*User, error) {
 
 // Role of an user, contains admin and member for now.
 func (u *User) Role() string {
-	if config.Operators[u.Email.String] {
+	if configs.Operators[u.Email.String] {
 		return "admin"
 	}
 	return "member"

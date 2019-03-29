@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"godiscourse/internal/config"
+	"godiscourse/internal/configs"
 	"godiscourse/internal/controllers/admin"
 	"godiscourse/internal/durable"
 	"godiscourse/internal/views"
@@ -23,7 +23,7 @@ func RegisterRoutes(database *durable.Database, router *httptreemux.TreeMux) {
 
 func health(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	views.RenderResponse(w, r, map[string]string{
-		"build":      config.BuildVersion + "-" + runtime.Version(),
+		"build":      configs.BuildVersion + "-" + runtime.Version(),
 		"developers": "https://live.godiscourse.com",
 	})
 }

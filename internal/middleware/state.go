@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"bytes"
-	"godiscourse/internal/config"
+	"godiscourse/internal/configs"
 	"godiscourse/internal/session"
 	"godiscourse/internal/views"
 	"io/ioutil"
@@ -30,7 +30,7 @@ func State(handler http.Handler) http.Handler {
 		r.Body.Close()
 		r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 		r = r.WithContext(session.WithRequestBody(r.Context(), string(body)))
-		w.Header().Set("X-Build-Info", config.BuildVersion+"-"+runtime.Version())
+		w.Header().Set("X-Build-Info", configs.BuildVersion+"-"+runtime.Version())
 		handler.ServeHTTP(w, r)
 	})
 }

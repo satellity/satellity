@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"godiscourse/internal/config"
+	"godiscourse/internal/configs"
 	"godiscourse/internal/durable"
 	"godiscourse/internal/external"
 	"godiscourse/internal/session"
@@ -86,8 +86,8 @@ func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) 
 func fetchAccessToken(ctx context.Context, code string) (string, error) {
 	client := external.HTTPClient()
 	data, err := json.Marshal(map[string]interface{}{
-		"client_id":     config.GithubClientID,
-		"client_secret": config.GithubClientSecret,
+		"client_id":     configs.GithubClientID,
+		"client_secret": configs.GithubClientSecret,
 		"code":          code,
 	})
 	if err != nil {

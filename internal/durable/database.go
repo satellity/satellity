@@ -5,7 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"godiscourse/internal/config"
+	"godiscourse/internal/configs"
 	"log"
 )
 
@@ -16,7 +16,7 @@ type Database struct {
 
 // OpenDatabaseClient generate a database client
 func OpenDatabaseClient(ctx context.Context) *sql.DB {
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.DatabaseUser, config.DatabasePassword, config.DatabaseHost, config.DatabasePort, config.DatabaseName)
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", configs.DatabaseUser, configs.DatabasePassword, configs.DatabaseHost, configs.DatabasePort, configs.DatabaseName)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)

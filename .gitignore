@@ -1,6 +1,8 @@
 .DS_Store
 bin
-internal/config
+internal/configs/*
+!internal/configs/test.cfg
+cmd/godiscourse/godiscourse
 
 # web
 node_modules

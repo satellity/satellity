@@ -2,7 +2,7 @@ package models
 
 import (
 	"context"
-	"godiscourse/internal/config"
+	"godiscourse/internal/configs"
 	"godiscourse/internal/durable"
 	"log"
 
@@ -41,8 +41,8 @@ func teardownTestContext(context *Context) {
 }
 
 func setupTestContext() *Context {
-	if config.Environment != testEnvironment || config.DatabaseName != testDatabase {
-		log.Panicln(config.Environment, config.DatabaseName)
+	if configs.Environment != testEnvironment || configs.DatabaseName != testDatabase {
+		log.Panicln(configs.Environment, configs.DatabaseName)
 	}
 	db := durable.OpenDatabaseClient(context.Background())
 	tables := []string{

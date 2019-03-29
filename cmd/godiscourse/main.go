@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"godiscourse/internal/config"
+	"godiscourse/internal/configs"
 	"godiscourse/internal/controllers"
 	"godiscourse/internal/durable"
 	"godiscourse/internal/middleware"
@@ -31,7 +31,7 @@ func startHTTP(db *sql.DB) error {
 	handler = middleware.Logger(handler, durable.NewLogger())
 	handler = handlers.ProxyHeaders(handler)
 
-	return gracehttp.Serve(&http.Server{Addr: fmt.Sprintf(":%d", config.HTTPListenPort), Handler: handler})
+	return gracehttp.Serve(&http.Server{Addr: fmt.Sprintf(":%d", configs.HTTPListenPort), Handler: handler})
 }
 
 func main() {
