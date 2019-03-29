@@ -19,7 +19,7 @@ class SiteWidget extends Component {
     if (!this.api.user.loggedIn()) {
       signIn = (
         <div className={style.sign_in}>
-          <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId()}`}>Sign in with GitHub</a>
+          <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`}>Sign in with GitHub</a>
         </div>
       )
     }

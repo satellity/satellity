@@ -25,7 +25,7 @@ Noty.overrideDefaults({
     }
 });
 
-axios.defaults.baseURL = Config.ApiHost();
+axios.defaults.baseURL = Config.ApiHost;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.interceptors.request.use(function(config) {
   let method = config.method, url = config.url, data = config.data;
@@ -41,7 +41,7 @@ axios.interceptors.response.use(function(response) {
     if (!!data.error) {
       let error = data.error;
       if (error.code === 401) {
-        window.location.href = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${config.GithubClientId()}`;
+        window.location.href = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${config.GithubClientId}`;
         return
       } else if (error.code === 404) {
         window.location.href = '/404'
