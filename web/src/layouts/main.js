@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Route, Link, Switch, Redirect } from 'react-router-dom';
 import logoURL from '../assets/images/chat.svg';
+import Config from '../components/constants.js';
 import API from '../api/index.js'
 import Home from '../home/index.js';
 import UserEdit from '../users/edit.js';
@@ -52,7 +53,7 @@ const Header = () => {
       <Link to='/' className={style.brand}>
         <FontAwesomeIcon icon={['fa', 'home']} />
       </Link>
-      <div className={style.site}><span className={style.name}>Go Discourse</span></div>
+      <div className={style.site}><span className={style.name}>{Config.Name}</span></div>
       <Link to='/topics/new' className={style.navi}>
         <FontAwesomeIcon icon={['fa', 'plus']} />
       </Link>
