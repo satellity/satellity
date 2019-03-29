@@ -1,9 +1,6 @@
 .DS_Store
-api/godiscourse
-config.go
-dev.cfg
-production.cfg
-scripts
+bin
+internal/config
 
 # web
 node_modules
