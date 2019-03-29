@@ -4,4 +4,4 @@ services:
   web:
     build: './web'
   api:
-    build: './api'
+    build: './internal'
