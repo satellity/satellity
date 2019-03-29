@@ -27,5 +27,9 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 4. `cd path/to/api && go build && ./api` to start Golang server
 5. `cd path/to/web && npm run dev` to run front-end, and open `http://localhost:1234`
 
+## Docker
+1. go to godiscourse folder
+2. type `docker-compose up` 
+
 ## License
 ![https://opensource.org/licenses/MIT](https://img.shields.io/github/license/mashape/apistatus.svg)
