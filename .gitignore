@@ -2,7 +2,6 @@
 bin
 internal/configs/*
 !internal/configs/test.cfg
-cmd/godiscourse/godiscourse
 
 # web
 node_modules
