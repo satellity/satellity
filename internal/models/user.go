@@ -254,10 +254,10 @@ func readUserSet(ctx context.Context, tx *sql.Tx, ids []string) (map[string]*Use
 }
 
 // ReadUser read user by id.
-func ReadUser(context *Context, id string) (*User, error) {
-	ctx := context.context
+func ReadUser(mctx *Context, id string) (*User, error) {
+	ctx := mctx.context
 	var user *User
-	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		user, err = findUserByID(ctx, tx, id)
 		return err

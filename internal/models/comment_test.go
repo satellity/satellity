@@ -91,11 +91,12 @@ func TestCommentCRUD(t *testing.T) {
 	}
 }
 
-func readTestComment(ctx *Context, id string) (*Comment, error) {
+func readTestComment(mctx *Context, id string) (*Comment, error) {
+	ctx := mctx.context
 	var comment *Comment
-	err := ctx.database.RunInTransaction(ctx.context, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
-		comment, err = findComment(ctx.context, tx, id)
+		comment, err = findComment(ctx, tx, id)
 		return err
 	})
 	return comment, err

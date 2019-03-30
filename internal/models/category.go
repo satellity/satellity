@@ -133,10 +133,10 @@ func UpdateCategory(mctx *Context, id, name, alias, description string, position
 }
 
 // ReadCategory read a category by ID (uuid).
-func ReadCategory(context *Context, id string) (*Category, error) {
-	ctx := context.context
+func ReadCategory(mctx *Context, id string) (*Category, error) {
+	ctx := mctx.context
 	var category *Category
-	err := context.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		return err

@@ -42,6 +42,7 @@ CREATE INDEX ON categories (position);
 
 CREATE TABLE IF NOT EXISTS topics (
 	topic_id              VARCHAR(36) PRIMARY KEY,
+	short_id              VARCHAR(255) NOT NULL,
 	title                 VARCHAR(512) NOT NULL,
 	body                  TEXT NOT NULL,
 	comments_count        INTEGER NOT NULL DEFAULT 0,
@@ -52,6 +53,7 @@ CREATE TABLE IF NOT EXISTS topics (
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
+CREATE UNIQUE INDEX ON topics (short_id);
 CREATE INDEX ON topics (created_at DESC);
 CREATE INDEX ON topics (user_id, created_at DESC);
 CREATE INDEX ON topics (category_id, created_at DESC);

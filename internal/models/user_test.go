@@ -117,18 +117,19 @@ func TestUserCRUD(t *testing.T) {
 	}
 }
 
-func createTestUser(context *Context, email, username, password string) *User {
+func createTestUser(mctx *Context, email, username, password string) *User {
 	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	public, _ := x509.MarshalPKIXPublicKey(priv.Public())
-	user, _ := CreateUser(context, email, username, "nickname", "", password, hex.EncodeToString(public))
+	user, _ := CreateUser(mctx, email, username, "nickname", "", password, hex.EncodeToString(public))
 	return user
 }
 
-func readTestSession(context *Context, uid, sid string) (*Session, error) {
+func readTestSession(mctx *Context, uid, sid string) (*Session, error) {
+	ctx := mctx.context
 	var s *Session
-	err := context.database.RunInTransaction(context.context, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
-		s, err = readSession(context.context, tx, uid, sid)
+		s, err = readSession(ctx, tx, uid, sid)
 		return err
 	})
 	return s, err

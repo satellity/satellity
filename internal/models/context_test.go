@@ -23,7 +23,7 @@ const (
 	dropStatisticsDDL = `DROP TABLE IF EXISTS statistics;`
 )
 
-func teardownTestContext(context *Context) {
+func teardownTestContext(mctx *Context) {
 	tables := []string{
 		dropStatisticsDDL,
 		dropCommentsDDL,
@@ -32,7 +32,7 @@ func teardownTestContext(context *Context) {
 		dropSessionsDDL,
 		dropUsersDDL,
 	}
-	db := context.database
+	db := mctx.database
 	for _, q := range tables {
 		if _, err := db.Exec(q); err != nil {
 			log.Panicln(err)
