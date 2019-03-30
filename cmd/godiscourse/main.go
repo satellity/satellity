@@ -24,7 +24,7 @@ type Options struct {
 	GoDiscourseURL  string `long:"url" env:"GODISCOURSE_URL" default:"http://localhost" required:"true"`
 	GoDiscoursePort string `long:"port" env:"GODISCOURSE_PORT" default:"4000" requred:"true"`
 	DbUser          string `long:"dbuser" env:"DB_USER" requred:"true"`
-	DbPassword      string `long:"dbpassword" env:"DB_PASSWORD" required:"true"`
+	DbPassword      string `long:"dbpassword" env:"DB_PASSWORD"`
 	DbHost          string `long:"dbhost" env:"DB_HOST" default:"localhost"`
 	DbPort          string `long:"dbport" env:"DB_PORT" default:"5432"`
 	DbName          string `long:"dbname" env:"DB_NAME" default:"godiscourse_dev"`
