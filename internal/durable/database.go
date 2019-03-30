@@ -20,9 +20,11 @@ func OpenDatabaseClient(ctx context.Context) *sql.DB {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
+		return nil
 	}
 	if err := db.Ping(); err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("Fail to connect the database, please make sure the database: %s and the port: %d is available.", configs.DatabaseName, configs.DatabasePort))
+		return nil
 	}
 	return db
 }
