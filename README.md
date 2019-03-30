@@ -16,7 +16,7 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 7. Model tested
 
 ## Structure
-1. `./` is back-end service, which is Rails like structure.
+1. `./` is back-end service, we followed [golang-standards project-layout](https://github.com/golang-standards/project-layout).
 2. `./web` is front-end service, contains React, Parcel and etc.
 2. `./deploy` contains example of deploy, nginx and systemd.
 
