@@ -41,10 +41,17 @@ func teardownTestContext(context *Context) {
 }
 
 func setupTestContext() *Context {
-	if configs.Environment != testEnvironment || configs.DatabaseName != testDatabase {
-		log.Panicln(configs.Environment, configs.DatabaseName)
+	if configs.Environment != testEnvironment {
+		log.Panicln(configs.Environment)
 	}
-	db := durable.OpenDatabaseClient(context.Background())
+	//TODO: change db dependency in favor of in-memory structures
+	db := durable.OpenDatabaseClient(context.Background(), &durable.ConnectionInfo{
+		User:     "test",
+		Password: "test",
+		Host:     "localhost",
+		Port:     "5432",
+		Name:     "godicourse_test",
+	})
 	tables := []string{
 		usersDDL,
 		sessionsDDL,

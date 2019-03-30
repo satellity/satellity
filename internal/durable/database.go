@@ -5,9 +5,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"godiscourse/internal/configs"
 	"log"
 )
+
+type ConnectionInfo struct {
+	User     string
+	Password string
+	Host     string
+	Port     string
+	Name     string
+}
 
 // Database is wrapped struct of *sql.DB
 type Database struct {
@@ -15,15 +22,15 @@ type Database struct {
 }
 
 // OpenDatabaseClient generate a database client
-func OpenDatabaseClient(ctx context.Context) *sql.DB {
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", configs.DatabaseUser, configs.DatabasePassword, configs.DatabaseHost, configs.DatabasePort, configs.DatabaseName)
+func OpenDatabaseClient(ctx context.Context, c *ConnectionInfo) *sql.DB {
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", c.User, c.Password, c.Host, c.Port, c.Name)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 		return nil
 	}
 	if err := db.Ping(); err != nil {
-		log.Fatal(fmt.Errorf("Fail to connect the database, please make sure the database: %s and the port: %d is available.", configs.DatabaseName, configs.DatabasePort))
+		log.Fatal(fmt.Errorf("Fail to connect the database, please make sure the database: %s and the port: %s is available.", c.Name, c.Port))
 		return nil
 	}
 	return db
