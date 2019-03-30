@@ -10,3 +10,4 @@ dist
 .cache
 .env
 .env.development
+.env.production
