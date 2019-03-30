@@ -30,7 +30,7 @@ func OpenDatabaseClient(ctx context.Context, c *ConnectionInfo) *sql.DB {
 		return nil
 	}
 	if err := db.Ping(); err != nil {
-		log.Fatal(fmt.Errorf("Fail to connect the database, please make sure the database: %s and the port: %s is available.", c.Name, c.Port))
+		log.Fatal(fmt.Errorf("\nFail to connect the database.\nPlease make sure the connection info is valid %#v", c))
 		return nil
 	}
 	return db
