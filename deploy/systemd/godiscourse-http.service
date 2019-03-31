@@ -5,6 +5,14 @@ After=network.target
 [Service]
 User=user
 Type=simple
+Environment=GODISCOURSE_URL=http://example.godiscourse.com
+Environment=GODISCOURSE_PORT=4000
+Environment=DB_USER=datebase-username
+Environment=DB_PASSWORD=database-password
+Environment=DB_HOST=localhost
+Environment=DB_NAME=database-name
+Environment=DB_PORT=5432
+Environment=ENV=production
 ExecStart=/path/to/godiscourse
 Restart=on-failure
 LimitNOFILE=65536
