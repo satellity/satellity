@@ -34,6 +34,7 @@ class SiteWidget extends Component {
             <li> 1. Open Source on <a href='https://github.com/godiscourse/godiscourse' target='blank' className='soft'>Github</a>. </li>
             <li> 2. Based on Golang, React and PostgreSQL. </li>
             <li> 3. Model tested. </li>
+            <li> 4. <a href='https://github.com/godiscourse/godiscourse/projects/1' target='_blank'>Project Roadmap</a>. </li>
           </ul>
         </div>
         {signIn}
