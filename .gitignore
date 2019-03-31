@@ -1,7 +1,7 @@
 .DS_Store
 bin
 internal/configs/*
-!internal/configs/test.cfg
+!internal/configs/example.cfg
 publish
 
 # web

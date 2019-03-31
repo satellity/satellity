@@ -36,7 +36,7 @@ export DB_PORT=5432
 export ENV=test|development|production
 ```
 
-2. `cd ./internal`, copy `config/test.cfg` to `config/config.go`. Replace config with yours.
+2. `cd ./internal`, copy `config/example.cfg` to `config/config.go`. Replace config with yours.
 3. Prepare and start database, the database schema under `./internal/models/schema.sql`, [how to install postgresql](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04).
 4. `cd ./ && make install && make build && ./bin/godiscourse` to start Golang server
 

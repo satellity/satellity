@@ -41,16 +41,16 @@ func teardownTestContext(mctx *Context) {
 }
 
 func setupTestContext() *Context {
-	if configs.Environment != testEnvironment {
-		log.Panicln(configs.Environment)
+	opts := configs.DefaultOptions()
+	if opts.Environment != testEnvironment {
+		log.Panicln(opts.Environment)
 	}
-	//TODO: change db dependency in favor of in-memory structures
 	db := durable.OpenDatabaseClient(context.Background(), &durable.ConnectionInfo{
-		User:     "test",
-		Password: "test",
-		Host:     "localhost",
-		Port:     "5432",
-		Name:     "godicourse_test",
+		User:     opts.DbUser,
+		Password: opts.DbPassword,
+		Host:     opts.DbHost,
+		Port:     opts.DbPort,
+		Name:     opts.DbName,
 	})
 	tables := []string{
 		usersDDL,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"godiscourse/internal/configs"
 	"godiscourse/internal/controllers"
 	"godiscourse/internal/durable"
 	"godiscourse/internal/middleware"
@@ -19,17 +20,6 @@ import (
 	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
-
-type Options struct {
-	GoDiscourseURL  string `long:"url" env:"GODISCOURSE_URL" default:"http://localhost" required:"true"`
-	GoDiscoursePort string `long:"port" env:"GODISCOURSE_PORT" default:"4000" requred:"true"`
-	DbUser          string `long:"dbuser" env:"DB_USER" requred:"true"`
-	DbPassword      string `long:"dbpassword" env:"DB_PASSWORD"`
-	DbHost          string `long:"dbhost" env:"DB_HOST" default:"localhost"`
-	DbPort          string `long:"dbport" env:"DB_PORT" default:"5432"`
-	DbName          string `long:"dbname" env:"DB_NAME" default:"godiscourse_dev"`
-	Environment     string `long:"environment" env:"ENV" default:"development"`
-}
 
 func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	database := durable.WrapDatabase(db)
@@ -48,14 +38,15 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 }
 
 func main() {
-	var opts Options
-	p := flags.NewParser(&opts, flags.Default)
-
-	if _, err := p.Parse(); err != nil {
-		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
-			os.Exit(0)
-		} else {
-			os.Exit(1)
+	opts := configs.DefaultOptions()
+	if configs.Environment == "production" {
+		p := flags.NewParser(&opts, flags.Default)
+		if _, err := p.Parse(); err != nil {
+			if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
+				os.Exit(0)
+			} else {
+				os.Exit(1)
+			}
 		}
 	}
 
