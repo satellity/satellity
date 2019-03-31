@@ -110,7 +110,7 @@ const HomeView = (props) => {
         <img src={topic.user.avatar_url} className={topicStyle.avatar} />
         <div className={topicStyle.detail}>
           <h2 className={topicStyle.title}>
-            <Link to={`/topics/${topic.topic_id}`}>{topic.title}</Link>
+            <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`}>{topic.title}</Link>
           </h2>
           <span>{topic.category.name}</span> • {topic.user.nickname} • <TimeAgo date={topic.created_at} />
         </div>
