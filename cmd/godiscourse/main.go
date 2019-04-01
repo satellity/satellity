@@ -13,7 +13,6 @@ import (
 	"os"
 
 	"github.com/dimfeld/httptreemux"
-	"github.com/facebookgo/grace/gracehttp"
 	"github.com/gorilla/handlers"
 	flags "github.com/jessevdk/go-flags"
 	_ "github.com/lib/pq"
@@ -34,7 +33,7 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	handler = middleware.Logger(handler, durable.NewLogger(logger))
 	handler = handlers.ProxyHeaders(handler)
 
-	return gracehttp.Serve(&http.Server{Addr: fmt.Sprintf(":%s", port), Handler: handler})
+	return http.ListenAndServe(fmt.Sprintf(":%s", port), handler)
 }
 
 func main() {
