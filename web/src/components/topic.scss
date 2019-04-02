@@ -29,7 +29,8 @@
 }
 .title {
   font-weight: normal;
-  margin: -.3rem 0 0;
+  line-height: 1.2;
+  margin: -.3rem 0 .4rem;
   word-break: break-all;
 }
 .comment {
@@ -51,5 +52,9 @@
   .avatar {
     width: 2.4rem;
     height: 2.4rem;
+  }
+  .title {
+    margin: -.2rem 0 0;
+    font-size: 1.125rem;
   }
 }
