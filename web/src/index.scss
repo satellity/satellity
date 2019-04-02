@@ -5,12 +5,30 @@
 @import './assets/css/markdown.scss';
 
 :global {
+html {
+  line-height: 1.6;
+}
 html, body {
   color: $color-font-dark;
-  font-family: Roboto Mono, Maven Pro,sans-serif;
+  font-family: Maven Pro,Roboto Mono,Roboto,Helvetica,Arial,sans-serif;
 }
-body {
-  line-height: 1.6rem;
+h1 {
+  font-size: 1.5rem;
+}
+h2 {
+  font-size: 1.25rem;
+}
+h3 {
+  font-size: 1.125rem;
+}
+h4 {
+  font-size: 1rem;
+}
+h5 {
+  font-size: 0.875rem;
+}
+h6 {
+  font-size: 0.75rem;
 }
 a {
   color: $color-font-dark;
@@ -82,24 +100,6 @@ div.container {
     flex-shrink: 0;
     width: 20rem;
   }
-}
-
-.fade-enter {
-  opacity: 0;
-}
-
-.fade-enter.fade-enter-active {
-  opacity: 1;
-  transition: opacity 250ms ease-in;
-}
-
-.fade-exit {
-  opacity: 0;
-}
-
-.fade-exit.fade-enter-exit {
-  opacity: 0;
-  transition: opacity 250ms ease-out;
 }
 
 @media only screen and (max-width: 64rem) {

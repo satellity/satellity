@@ -4,10 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Typed from 'typed.js';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import TimeAgo from 'react-timeago';
 import API from '../api/index.js';
-import ColorUtils from '../components/color.js';
-import SiteWidget from '../components/site-widget.js';
+import SiteWidget from '../components/widget.js';
+import TopicItem from '../components/topic';
 import LoadingView from '../loading/loading.js';
 
 class Home extends Component {
@@ -15,7 +14,6 @@ class Home extends Component {
     super(props);
 
     this.api = new API();
-    this.color = new ColorUtils();
     this.params = new URLSearchParams(props.location.search);
     this.pagination = 50;
     let categories = [];
@@ -99,25 +97,8 @@ class Home extends Component {
 
 const HomeView = (props) => {
   const topics = props.state.topics.map((topic) => {
-    let comment = '';
-    if (topic.comments_count > 0) {
-      comment = (
-        <span className={topicStyle.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
-      )
-    }
     return (
-      <li className={topicStyle.topic} key={topic.topic_id}>
-        <img src={topic.user.avatar_url} className={topicStyle.avatar} />
-        <div className={topicStyle.detail}>
-          <h2 className={topicStyle.title}>
-            <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`}>{topic.title}</Link>
-          </h2>
-          <span>{topic.category.name}</span> • {topic.user.nickname} • <TimeAgo date={topic.created_at} />
-        </div>
-        <div className={topicStyle.comment}>
-          {comment}
-        </div>
-      </li>
+      <TopicItem topic={topic} key={topic.topic_id}/>
     )
   });
 

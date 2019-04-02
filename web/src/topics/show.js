@@ -6,7 +6,7 @@ import showdown from 'showdown';
 import { Helmet } from 'react-helmet';
 import API from '../api/index.js';
 import style from './style.scss';
-import SiteWidget from '../components/site-widget.js';
+import SiteWidget from '../components/widget.js';
 import CommentList from '../comments/index.js';
 import LoadingView from '../loading/loading.js';
 

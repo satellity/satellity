@@ -1,0 +1,55 @@
+@import '../assets/css/constant.scss';
+
+.topic {
+  border-bottom: 1px solid #F4F5F5;
+  display: flex;
+  align-items: flex-start;
+  padding: .8rem 0 .8rem;
+  &:first-child {
+    padding-top: 0;
+  }
+}
+.avatar {
+  border-radius: .4rem;
+  flex-shrink: 0;
+  width: 3.2rem;
+  height: 3.2rem;
+}
+.sep {
+  padding: 0 .4rem;
+}
+.detail {
+  color: $color-font-light-grey;
+  flex-grow: 1;
+  font-size: .875rem;
+  padding-left: 0.8rem;
+  &.no_avatar {
+    padding-left: 0;
+  }
+}
+.title {
+  font-weight: normal;
+  margin: -.3rem 0 0;
+  word-break: break-all;
+}
+.comment {
+  box-sizing: border-box;
+  font-size: .8rem;
+  flex-shrink: 0;
+  text-align: right;
+  min-width: 3rem;
+  padding-left: .8rem;
+}
+.count {
+  background: rgba($color-main-red, $color-main-red-alpha);
+  border-radius: 1.6rem;
+  color: white;
+  padding: .1rem .8rem;
+}
+
+@media only screen and (max-width: 64rem) {
+  .avatar {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+}

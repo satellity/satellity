@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Config from './constants.js';
-import style from './style.scss';
+import style from './widget.scss';
 import API from '../api/index.js';
 
 class SiteWidget extends Component {
@@ -26,15 +26,14 @@ class SiteWidget extends Component {
     return (
       <div>
         <div className={style.widget}>
-          <div className={style.name}>
-            <FontAwesomeIcon icon={['far', 'comments']} />
-            GoDiscourse
-          </div>
+          <h2 className={style.site}>
+            Go Discourse
+          </h2>
           <ul className={style.features}>
             <li> 1. Open Source on <a href='https://github.com/godiscourse/godiscourse' target='blank' className='soft'>Github</a>. </li>
             <li> 2. Based on Golang, React and PostgreSQL. </li>
             <li> 3. Model tested. </li>
-            <li> 4. <a href='https://github.com/godiscourse/godiscourse/projects/1' target='_blank'>Project Roadmap</a>. </li>
+            <li> 4. Project <a href='https://github.com/godiscourse/godiscourse/projects/1' target='_blank'>Roadmap</a>. </li>
           </ul>
         </div>
         {signIn}
