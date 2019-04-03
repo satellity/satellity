@@ -16,9 +16,10 @@ class TopicShow extends Component {
     this.api = new API();
     this.converter = new showdown.Converter();
     this.state = {
-      topic_id: props.match.params.id, title: '', short_body: '', body: '', comments_count: 0, created_at: '', user_id: '', is_author: false, loading: true,
-      user: {user_id: '', nickname: ''},
-      category: {category_id: '', name: ''}
+      loading: true,
+      topic_id: props.match.params.id,
+      user: {},
+      category: {},
     };
   }
 
@@ -34,55 +35,61 @@ class TopicShow extends Component {
   }
 
   render() {
-    return (
-      <View state={this.state} />
+    let state = this.state;
+    const loadingView = (
+      <div className={style.loading}>
+        <LoadingView style='md-ring' />
+      </div>
     )
-  }
-}
 
-const View = ({state}) => {
-  let editAction = '';
-  if (state.is_author) {
-    editAction = (
-      <Link to={`/topics/${state.topic_id}/edit`} className={style.edit}>
-        <FontAwesomeIcon icon={['far', 'edit']} />
-      </Link>
-    )
-  }
-  const loadingView = (
-    <div className={style.loading}>
-      <LoadingView style='md-ring' />
-    </div>
-  )
-  return (
-    <div className='container'>
+    const seoView = (
       <Helmet>
         <title>{state.title} - {state.user.nickname} - GoDiscourse</title>
         <meta name='description' content={state.short_body} />
       </Helmet>
-      <main className='section main'>
-        {state.loading && loadingView}
-        <div className={style.content}>
-          <header className={style.header}>
-            <img src={state.user.avatar_url} className={style.avatar} />
-            <h1 className={style.title}>
-              {state.title}
-              {editAction}
-            </h1>
-            <div className={style.info}>
-              {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />
-            </div>
-          </header>
-          {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}}>
-          </article>}
+    )
+
+    let editAction;
+    if (state.is_author) {
+      editAction = (
+        <Link to={`/topics/${state.topic_id}/edit`} className={style.edit}>
+          <FontAwesomeIcon icon={['far', 'edit']} />
+        </Link>
+      )
+    }
+
+    const topicView = (
+      <div className={style.content}>
+        <header className={style.header}>
+          <img src={state.user.avatar_url} className={style.avatar} />
+          <h1 className={style.title}>
+            {state.title}
+            {editAction}
+          </h1>
+          <div className={style.info}>
+            {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />
+          </div>
+        </header>
+        <div>
+          { state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}} /> }
         </div>
-        {state.title !== "" && <CommentList topicId={state.topic_id} commentsCount={state.comments_count} />}
-      </main>
-      <aside className='section aside'>
-        <SiteWidget />
-      </aside>
-    </div>
-  )
+      </div>
+    )
+
+    return (
+      <div className='container'>
+        {!state.loading && seoView}
+        <main className='section main'>
+          {state.loading && loadingView}
+          { !state.loading && topicView }
+          {!state.loading && <CommentList topicId={state.topic_id} commentsCount={state.comments_count} />}
+        </main>
+        <aside className='section aside'>
+          <SiteWidget />
+        </aside>
+      </div>
+    )
+  }
 }
 
 export default TopicShow;
