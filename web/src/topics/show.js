@@ -13,6 +13,7 @@ import LoadingView from '../loading/loading.js';
 class TopicShow extends Component {
   constructor(props) {
     super(props);
+
     this.api = new API();
     this.converter = new showdown.Converter();
     this.state = {
@@ -81,7 +82,7 @@ class TopicShow extends Component {
         {!state.loading && seoView}
         <main className='section main'>
           {state.loading && loadingView}
-          { !state.loading && topicView }
+          {!state.loading && topicView}
           {!state.loading && <CommentList topicId={state.topic_id} commentsCount={state.comments_count} />}
         </main>
         <aside className='section aside'>
