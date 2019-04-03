@@ -72,7 +72,7 @@ class TopicShow extends Component {
           </div>
         </header>
         <div>
-          { state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}} /> }
+          {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}} />}
         </div>
       </div>
     )
