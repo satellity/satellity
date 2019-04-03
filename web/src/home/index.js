@@ -1,12 +1,10 @@
 import style from './index.scss';
-import topicStyle from '../styles/topic_item.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Typed from 'typed.js';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
-import SiteWidget from '../components/widget.js';
-import TopicItem from '../components/topic';
+import SiteWidget from './widget.js';
+import TopicItem from '../topics/item.js';
 import LoadingView from '../loading/loading.js';
 
 class Home extends Component {

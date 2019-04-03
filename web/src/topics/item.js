@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
-import style from './topic.scss';
-import ColorUtils from './color.js';
+import style from './item.scss';
+import ColorUtils from '../components/color.js';
 
 class TopicItem extends Component {
   constructor(props) {

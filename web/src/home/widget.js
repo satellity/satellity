@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import Config from './constants.js';
+import Config from '../components/constants.js';
 import style from './widget.scss';
 import API from '../api/index.js';
 

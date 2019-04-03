@@ -3,15 +3,13 @@ import topicStyle from '../styles/topic_item.scss';
 import moment from 'moment';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import TimeAgo from 'react-timeago';
 import API from '../api/index.js';
-import ColorUtils from '../components/color.js';
+import TopicItem from '../topics/item.js';
 
 class UserShow extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
-    this.color = new ColorUtils();
     this.state = {user: {user_id: props.match.params.id, nickname: '', biography: '', avatar_url: '', created_at: ''}, topics: []}
   }
 
@@ -27,33 +25,15 @@ class UserShow extends Component {
 
   render() {
     return (
-      <View state={this.state} color={this.color} />
+      <View state={this.state} />
     )
   }
 }
 
 const View = (props) => {
   const topics = props.state.topics.map((topic) => {
-    let comment = '';
-    if (topic.comments_count > 0) {
-      comment = (
-        <span className={topicStyle.count} style={{backgroundColor: props.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
-      )
-    }
     return (
-      <li className={topicStyle.topic} key={topic.topic_id}>
-        <div className={topicStyle.detail + ' ' + topicStyle.no_avatar}>
-          <h2 className={topicStyle.title}>
-            <Link to={`/topics/${topic.topic_id}`}>
-              {topic.title}
-            </Link>
-          </h2>
-          <span>{topic.category.name}</span> • <TimeAgo date={topic.created_at} />
-        </div>
-        <div className={topicStyle.comment}>
-          {comment}
-        </div>
-      </li>
+      <TopicItem topic={topic} key={topic.topic_id}/>
     )
   });
 
