@@ -1,5 +1,4 @@
 import style from './show.scss';
-import topicStyle from '../styles/topic_item.scss';
 import moment from 'moment';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
