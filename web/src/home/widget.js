@@ -1,6 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import Config from '../components/constants.js';
 import style from './widget.scss';
 import API from '../api/index.js';
@@ -8,14 +6,12 @@ import API from '../api/index.js';
 class SiteWidget extends Component {
   constructor(props) {
     super(props);
+
     this.api = new API();
   }
 
-  componentDidMount() {
-  }
-
   render() {
-    let signIn = '';
+    let signIn;
     if (!this.api.user.loggedIn()) {
       signIn = (
         <div className={style.sign_in}>
@@ -23,6 +19,7 @@ class SiteWidget extends Component {
         </div>
       )
     }
+
     return (
       <div>
         <div className={style.widget}>

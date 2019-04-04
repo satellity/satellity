@@ -1,17 +1,24 @@
 import style from './index.scss';
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
 
 class UserEdit extends Component {
   constructor(props) {
     super(props);
+
     this.api = new API();
     const user = this.api.user.readMe();
-    this.state = {nickname: user.nickname, biography: user.biography, submitting: false};
+    this.state = {
+      nickname: user.nickname,
+      biography: user.biography,
+      submitting: false
+    };
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+
+    //TODO should in router
     if (!this.api.user.loggedIn()) {
       props.history.push('/');
     }
@@ -24,6 +31,7 @@ class UserEdit extends Component {
   }
 
   handleChange(e) {
+    e.preventDefault();
     const target = e.target;
     const name = target.name;
     this.setState({
@@ -45,48 +53,37 @@ class UserEdit extends Component {
     });
   }
 
-  handleChange(e) {
-    const target = e.target, name = target.name;
-    this.setState({
-      [name]: target.value
-    });
-  }
-
   render() {
+    let state = this.state;
+
     return (
-      <View onSubmit={this.handleSubmit} onChange={this.handleChange} state={this.state} />
+      <div className='container'>
+        <main className='section main'>
+          <div className={style.profile}>
+            <h2>Update Profile</h2>
+            <form onSubmit={this.handleSubmit}>
+              <div>
+                <label name='nickname'>Nickname</label>
+                <input type='text' name='nickname' value={state.nickname} autoComplete='off' onChange={this.handleChange} />
+              </div>
+              <div>
+                <label name='biography'>Biography</label>
+                <textarea type='text' name='biography' value={state.biography} onChange={this.handleChange} />
+              </div>
+              <div className='action'>
+                <button className='btn submit' disabled={state.submitting}>
+                  {state.submitting && <LoadingView style='sm-ring blank'/>}
+                  &nbsp;SUBMIT
+                </button>
+              </div>
+            </form>
+          </div>
+        </main>
+        <aside className='section aside'>
+        </aside>
+      </div>
     )
   }
 }
-
-const View = (props) => {
-  return (
-    <div className='container'>
-      <main className='section main'>
-        <div className={style.profile}>
-          <h2>Update Profile</h2>
-          <form onSubmit={(e) => props.onSubmit(e)}>
-            <div>
-              <label name='nickname'>Nickname</label>
-              <input type='text' name='nickname' value={props.state.nickname} autoComplete='off' onChange={(e) => props.onChange(e)} />
-            </div>
-            <div>
-              <label name='biography'>Biography</label>
-              <textarea type='text' name='biography' value={props.state.biography} onChange={(e) => props.onChange(e)} />
-            </div>
-            <div className='action'>
-              <button className='btn submit' disabled={props.state.submitting}>
-                { props.state.submitting && <LoadingView style='sm-ring blank'/> }
-                &nbsp;SUBMIT
-              </button>
-            </div>
-          </form>
-        </div>
-      </main>
-      <aside className='section aside'>
-      </aside>
-    </div>
-  )
-};
 
 export default UserEdit;

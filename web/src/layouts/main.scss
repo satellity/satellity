@@ -1,18 +1,15 @@
-$border-light-color: rgba(225, 225, 225, 0.8);
-$color-dark-background: #25476A;
-
 .container {
   min-height: 100vh;
   background: rgb(236, 240, 245);
 }
 .header {
   background-image: linear-gradient(90deg, rgba(218, 40, 16, 0.6), rgba(218, 40, 16, 0.8));
-  box-sizing: border-box;
   color: white;
   display: flex;
   font-size: 1.2rem;
   text-align: center;
   line-height: 1.8rem;
+  box-sizing: border-box;
   padding: .8rem 1.6rem;
   &:after {
     content: '';

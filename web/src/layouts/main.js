@@ -2,7 +2,6 @@ import style from './main.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Route, Link, Switch, Redirect } from 'react-router-dom';
-import logoURL from '../assets/images/chat.svg';
 import Config from '../components/constants.js';
 import API from '../api/index.js'
 import Home from '../home/index.js';
@@ -42,7 +41,7 @@ class MainLayout extends Component {
 
 const Header = () => {
   const user = new API().user;
-  let profile = '';
+  let profile;
   if (user.loggedIn()) {
     profile = (
       <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {user.readMe().nickname} </Link>

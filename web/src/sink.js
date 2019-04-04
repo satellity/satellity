@@ -1,4 +1,4 @@
-import style from './assets/css/not_fount.scss';
+import style from './assets/css/sink.scss';
 import React from 'react';
 import { Link } from 'react-router-dom';
 

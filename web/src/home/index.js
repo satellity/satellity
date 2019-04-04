@@ -20,16 +20,17 @@ class Home extends Component {
       categories = JSON.parse(atob(d));
     }
     this.state = {topics: [], categories: categories, category: 'latest', loading: true, offset: ''};
-    this.loadMore = this.loadMore.bind(this);
+
+    this.loadTopics = this.loadTopics.bind(this);
   }
 
   componentDidMount() {
     this.api.category.index().then((data) => {
       this.setState({categories: data});
       let categoryId = 'latest';
-      const category = this.params.get("c");
+      let category = this.params.get('c');
       if (!!category) {
-        for (let i=0; i< this.state.categories.length; i++) {
+        for (let i = 0; i < this.state.categories.length; i++) {
           let c = this.state.categories[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
             categoryId = c.category_id;
@@ -37,7 +38,7 @@ class Home extends Component {
           }
         }
       }
-      this.loadTopics(categoryId, true);
+      this.fetchTopics(categoryId, true);
     });
   }
 
@@ -46,9 +47,10 @@ class Home extends Component {
     if (props.location.search !== prevProps.location.search) {
       let categoryId = 'latest';
       let params = new URLSearchParams(props.location.search);
-      let category = params.get("c");
+      let category = params.get('c');
       if (!!category) {
-        for (let i=0; i< this.state.categories.length; i++) {
+        // TODO better method?
+        for (let i = 0; i < this.state.categories.length; i++) {
           let c = this.state.categories[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
             categoryId = c.category_id;
@@ -56,84 +58,78 @@ class Home extends Component {
           }
         }
       }
-      console.log(this.state.categories, categoryId);
-      this.loadTopics(categoryId, true);
+      this.fetchTopics(categoryId, true);
     }
   }
 
-  loadMore(e) {
+  loadTopics(e) {
     e.preventDefault();
-    this.loadTopics(this.state.category, false);
+    this.fetchTopics(this.state.category, false);
   }
 
-  loadTopics(categoryId, reload) {
-    this.setState({loading: true, offset: ''});
+  fetchTopics(categoryId, replace) {
+    this.setState({loading: replace, offset: ''});
     let request;
     if (categoryId === 'latest') {
       request = this.api.topic.index(this.state.offset);
     } else {
       request = this.api.category.topics(categoryId, this.state.offset);
     }
+
     request.then((data) => {
       let offset = '';
-      if (data.length === this.pagination) {
+      if (data.length > this.pagination) {
         offset = data[data.length-1].created_at;
       }
-      if (!reload) {
+      if (!replace) {
         data = this.state.topics.concat(data);
       }
-      this.setState({category: categoryId, topics: data, loading: false, offset: offset});
+      this.setState({category: categoryId, loading: false, offset: offset, topics: data});
     });
   }
 
   render() {
+    let state = this.state;
+
+    const loadingView = (
+      <div className={style.loading}>
+        <LoadingView style='md-ring'/>
+      </div>
+    )
+
+    const topics = state.topics.map((topic) => {
+      return (
+        <TopicItem topic={topic} key={topic.topic_id}/>
+      )
+    });
+
+    const categories = state.categories.map((category) => {
+      return (
+        <Link
+          to={{ pathname: "/", search: `?c=${category.name}` }}
+          className={`${style.node} ${state.category === category.category_id ? style.current : ''}`}
+          key={category.category_id}>{category.alias}</Link>
+      )
+    });
+
     return (
-      <HomeView state={this.state} color={this.color} loadMore={this.loadMore} />
+      <div className='container'>
+        <main className='section main'>
+          <div className={style.nodes}>
+            <Link to='/'
+              className={`${style.node} ${state.category === 'latest' ? style.current : ''}`}>Latest</Link>
+            {categories}
+          </div>
+          {state.loading && loadingView}
+          {!state.loading && <ul className={style.topics}> {topics} </ul>}
+          {state.offset !== '' && <div className={style.load}><a href='javascript:;' onClick={this.loadTopics}>Load More</a></div>}
+        </main>
+        <aside className='section aside'>
+          <SiteWidget />
+        </aside>
+      </div>
     );
   }
-}
-
-const HomeView = (props) => {
-  const topics = props.state.topics.map((topic) => {
-    return (
-      <TopicItem topic={topic} key={topic.topic_id}/>
-    )
-  });
-
-  const categories = props.state.categories.map((category) => {
-    return (
-      <Link
-        to={{ pathname: "/", search: `?c=${category.name}` }}
-        className={`${style.node} ${props.state.category === category.category_id ? style.current : ''}`}
-        key={category.category_id}>{category.alias}</Link>
-    )
-  });
-
-  const loadingView = (
-    <div className={style.loading}>
-      <LoadingView style='md-ring'/>
-    </div>
-  )
-
-  return (
-    <div className='container'>
-      <main className='section main'>
-        <div className={style.nodes}>
-          <Link to='/'
-            className={`${style.node} ${props.state.category === 'latest' ? style.current : ''}`}>Latest</Link>
-          {categories}
-        </div>
-        {props.state.loading && loadingView}
-        <ul className={style.topics}>
-          {topics}
-        </ul>
-        {props.state.offset !== '' && <div className={style.load}><a href='javascript:;' onClick={(e) => props.loadMore(e)}>Load More</a></div>}
-      </main>
-      <aside className='section aside'>
-        <SiteWidget />
-      </aside>
-    </div>
-  );
 }
 
 export default Home;

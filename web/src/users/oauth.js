@@ -9,13 +9,12 @@ class Oauth extends Component {
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
     document.body.classList.add('loading', 'layout');
-    this.api = new API();
   }
 
   componentDidMount() {
     const history = this.props.history;
     const code = new URLUtils().getUrlParameter('code');
-    this.api.user.signIn(code).then((resp) => {
+    new API().user.signIn(code).then((resp) => {
       history.push('/');
     });
   }

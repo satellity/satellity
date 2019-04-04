@@ -9,7 +9,10 @@ class UserShow extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
-    this.state = {user: {user_id: props.match.params.id, nickname: '', biography: '', avatar_url: '', created_at: ''}, topics: []}
+    this.state = {
+      user: {},
+      topics: [],
+    }
   }
 
   componentDidMount() {
@@ -23,39 +26,38 @@ class UserShow extends Component {
   }
 
   render() {
+    let state = this.state;
+    const topics = state.topics.map((topic) => {
+      return (
+        <TopicItem topic={topic} key={topic.topic_id}/>
+      )
+    });
+
+    const profile = (
+      <div className={style.profile}>
+        <img src={state.user.avatar_url} className={style.avatar} />
+        <div className={style.name}>
+          {state.user.nickname}
+        </div>
+        <div className={style.created}>
+          Joined {state.user.created_at}
+        </div>
+      </div>
+    );
+
     return (
-      <View state={this.state} />
+      <div className='container'>
+        <aside className='section aside'>
+          {profile}
+        </aside>
+        <main className='section main'>
+          <ul className={style.topics}>
+            {topics}
+          </ul>
+        </main>
+      </div>
     )
   }
 }
-
-const View = (props) => {
-  const topics = props.state.topics.map((topic) => {
-    return (
-      <TopicItem topic={topic} key={topic.topic_id}/>
-    )
-  });
-
-  return (
-    <div className='container'>
-      <aside className='section aside'>
-        <div className={style.profile}>
-          <img src={props.state.user.avatar_url} className={style.avatar} />
-          <div className={style.name}>
-            {props.state.user.nickname}
-          </div>
-          <div className={style.created}>
-            Joined {props.state.user.created_at}
-          </div>
-        </div>
-      </aside>
-      <main className='section main'>
-        <ul className={style.topics}>
-          {topics}
-        </ul>
-      </main>
-    </div>
-  )
-};
 
 export default UserShow;
