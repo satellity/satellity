@@ -18,14 +18,23 @@ class TopicNew extends Component {
     this.converter = new showdown.Converter();
     let categories = [];
     let d = window.localStorage.getItem('categories');
-    if (d !== null && d !== undefined && d !== '') {
+    if (!!d) {
       categories = JSON.parse(atob(d));
     }
     let id = this.props.match.params.id;
-    if (id === null || id == undefined) {
+    // false , 0 , "" , null , undefined , and NaN
+    if (!id) {
       id = ''
     }
-    this.state = {topic_id: id, title: '', category_id: '', body: '', body_html: '', categories: categories, preview: false, loading: true, submitting: false};
+    this.state = {
+      topic_id: id,
+      title: '',
+      body: '',
+      categories: categories,
+      preview: false,
+      loading: true,
+      submitting: false
+    };
     this.handleChange = this.handleChange.bind(this);
     this.handleCategoryClick = this.handleCategoryClick.bind(this);
     this.handleBodyChange = this.handleBodyChange.bind(this);
@@ -48,7 +57,7 @@ class TopicNew extends Component {
     }
     this.api.category.index().then((data) => {
       let category_id = this.state.category_id;
-      if (category_id === '' && data.length > 0) {
+      if (!category_id && data.length > 0) {
         category_id = data[0].category_id;
       }
       this.setState({categories: data, category_id: category_id});
@@ -85,6 +94,7 @@ class TopicNew extends Component {
     this.setState({submitting: true});
     const history = this.props.history;
     const data = {title: this.state.title, body: this.state.body, category_id: this.state.category_id};
+    // TODO should update submitting always
     if (validate(this.state.topic_id)) {
       this.api.topic.update(this.state.topic_id, data).then((data) => {
         this.setState({submitting: false});
@@ -99,91 +109,83 @@ class TopicNew extends Component {
   }
 
   render() {
+    let state = this.state;
+    const categories = state.categories.map((c) => {
+      return (
+        <span key={c.category_id} className={`${style.category} ${c.category_id === state.category_id ? style.categoryCurrent : ''}`} onClick={(e) => onCategoryClick(e, c.category_id)}>{c.alias}</span>
+      )
+    });
+
+    let title = <h2>Create a new topic</h2>;
+    if (validate(state.topic_id)) {
+      title = <h2>Edit: {state.title}</h2>
+    }
+
+    const loadingView = (
+      <div className={style.form_loading}>
+        <LoadingView style='md-ring'/>
+      </div>
+    )
+
+    let form = (
+      <form onSubmit={this.handleSubmit}>
+        <div className={style.categories}>
+          {categories}
+        </div>
+        <div>
+          <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' placeholder='Title *' onChange={this.handleChange} />
+        </div>
+        <div className={style.preview}> <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> </div>
+        <div className={style.topic_body}>
+          {!state.preview && <CodeMirror
+            className='editor'
+            value={state.body}
+            options={{
+              mode: 'markdown',
+              theme: 'xq-light',
+              lineNumbers: true,
+              lineWrapping: true,
+              placeholder: 'Text (optional)'
+            }}
+            onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
+          />}
+          {state.preview && <article className={`md ${style.preview_body}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
+        </article>}
+      </div>
+      <div className='action'>
+        <button className='btn submit' disabled={state.submitting}>
+          { state.submitting && <LoadingView style='sm-ring blank'/> }
+          &nbsp;SUBMIT
+        </button>
+      </div>
+    </form>
+    )
+
     return (
-      <View
-        onSubmit={this.handleSubmit}
-        onChange={this.handleChange}
-        onBodyChange={this.handleBodyChange}
-        onCategoryClick={this.handleCategoryClick}
-        onPreview={this.handlePreview}
-        state={this.state} />
+      <div className='container'>
+        <main className='section main'>
+          {state.loading && loadingView}
+          <div className={style.form}>
+            {!state.loading && title}
+            {!state.loading && form}
+          </div>
+        </main>
+        <aside className='section aside'>
+          <ol className={style.rules}>
+            <li className={style.rule}>
+              1. To be a kind human, keep goodwill towards others
+            </li>
+            <li className={style.rule}>
+              2. It's a good habits to preview before posting.
+            </li>
+            <li className={style.rule}>
+              3. Welcome to share. Enjoy!
+            </li>
+          </ol>
+        </aside>
+      </div>
     )
   }
 }
-
-// TODO jsx editor format
-const View = (props) => {
-  const categories = props.state.categories.map((c) => {
-    return (
-      <span key={c.category_id} className={`${style.category} ${c.category_id === props.state.category_id ? style.categoryCurrent : ''}`} onClick={(e) => props.onCategoryClick(e, c.category_id)}>{c.alias}</span>
-    )
-  });
-
-  let title = <h2>Create a new topic</h2>;
-  if (validate(props.state.topic_id)) {
-    title = <h2>Edit: {props.state.title}</h2>
-  }
-
-  const loadingView = (
-    <div className={style.form_loading}>
-      <LoadingView style='md-ring'/>
-    </div>
-  )
-
-  return (
-    <div className='container'>
-      <main className='section main'>
-        {props.state.loading && loadingView}
-        <div className={style.form}>
-          {title}
-          <form onSubmit={(e) => props.onSubmit(e)}>
-            <div className={style.categories}>
-              {categories}
-            </div>
-            <div>
-              <input type='text' name='title' pattern='.{3,}' required value={props.state.title} autoComplete='off' placeholder='Title *' onChange={(e) => props.onChange(e)} />
-            </div>
-            <div className={style.preview}> <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={(e) => props.onPreview(e)} /> </div>
-            <div className={style.topic_body}>
-              {!props.state.preview && <CodeMirror
-                className='editor'
-                value={props.state.body}
-                options={{
-                  mode: 'markdown',
-                  theme: 'xq-light',
-                  lineNumbers: true,
-                  lineWrapping: true,
-                  placeholder: 'Text (optional)'
-                }}
-                onBeforeChange={(editor, data, value) => props.onBodyChange(editor, data, value)}
-              />}
-              {props.state.preview && <article className={`md ${style.preview_body}`} dangerouslySetInnerHTML={{__html: props.state.body_html}}>
-              </article>}
-            </div>
-            <div className='action'>
-              <button className='btn submit' disabled={props.state.submitting}>
-                { props.state.submitting && <LoadingView style='sm-ring blank'/> }
-                &nbsp;SUBMIT
-              </button>
-            </div>
-          </form>
-        </div>
-      </main>
-      <aside className='section aside'>
-        <ol className={style.rules}>
-          <li className={style.rule}>
-            1. To be a kind human, keep goodwill towards others
-          </li>
-          <li className={style.rule}>
-            2. It's a good habits to preview before posting.
-          </li>
-          <li className={style.rule}>
-            3. Welcome to share. Enjoy!
-          </li>
-        </ol>
-      </aside>
-    </div>
-  )
-};
 
 export default TopicNew;
