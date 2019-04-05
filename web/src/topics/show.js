@@ -62,14 +62,16 @@ class TopicShow extends Component {
     const topicView = (
       <div className={style.content}>
         <header className={style.header}>
-          <img src={state.user.avatar_url} className={style.avatar} />
-          <h1 className={style.title}>
-            {state.title}
-            {editAction}
-          </h1>
-          <div className={style.info}>
-            {state.category.name} • {state.user.nickname} • <TimeAgo date={state.created_at} />
+          <div className={style.heading}>
+            <h1>
+              {state.title}
+              {editAction}
+            </h1>
+            <div className={style.info}>
+              {state.user.nickname} IN {state.category.name} AT <TimeAgo date={state.created_at} />
+            </div>
           </div>
+          <img src={state.user.avatar_url} className={style.avatar} />
         </header>
         <div>
           {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}} />}

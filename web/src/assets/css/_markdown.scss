@@ -2,53 +2,48 @@
 
 :global {
 article.md {
-  word-wrap: break-word;
-  h1 {
-    padding-bottom: 0.3rem;
-    font-size: 2rem;
-    border-bottom: 1px solid $color-main-light;
+  ul, ol {
+    margin: .8rem 0 0;
+    list-style: disc;
+    padding-left: 1.3em;
+    padding-right: 1.5em;
+    li {
+      padding: 0 0 0 .2rem;
+    }
   }
-  h2 {
-    padding-bottom: 0.3rem;
-    font-size: 1.5rem;
-    border-bottom: 1px solid $color-main-light;
+  blockquote {
+    padding: 0 0 0 1.2em;
+    border-left: 2px solid #3eb0ef;
+    margin: 0;
   }
-  h3 {
-    font-size: 1.25em;
-  }
-  h4 {
-    font-size: 1rem;
-  }
-  h5 {
-    font-size: 0.875rem;
-  }
-  h6 {
-    font-size: 0.85rem;
-    color: #6a737d;
-  }
-  p,
-  blockquote,
-  ul,
-  ol,
-  dl,
-  table,
   pre {
-    margin-top: 0;
-    margin-bottom: 1rem;
+    border: none;
+    background: #2a3644;
+    padding: 1.2rem 1.6rem;
+    margin: 1.6rem -.8rem 0;
+    overflow: auto;
+    code {
+      color: white;
+      background: transparent;
+      white-space: pre;
+    }
+  }
+  hr {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    height: 1px;
+    border: none;
+    border-top: 1px solid #e5eff5;
   }
   li {
-    margin-top: 0;
-    padding-top: 0;
-    word-wrap: break-word;
-  }
-  li>p {
-    margin-top: 1rem;
-  }
-  li+li {
-    margin-top: 0.25rem;
-  }
-  p:last-child {
-    margin-bottom: 0;
+    ul, ol {
+      margin: 0.8rem 0 0;
+    }
+    pre {
+      margin: 1.6rem 0 0;
+    }
   }
 }
 }

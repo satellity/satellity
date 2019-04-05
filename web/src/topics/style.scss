@@ -18,8 +18,23 @@
 .header {
   background: $color-bg-light-grey;
   box-sizing: border-box;
+  display: flex;
   font-size: 1rem;
   padding: .8rem;
+  .heading {
+    flex-grow: 1;
+    padding-right: 1.6rem;
+  }
+  h1 {
+    margin: 0 0 .8rem 0;
+    font-weight: normal;
+    line-height: 1.2rem;
+  }
+  .avatar {
+    border-radius: 2.4rem;
+    width: 2.4rem;
+    height: 2.4rem;
+  }
 }
 .title {
   font-size: 1.25rem;
@@ -35,14 +50,8 @@
   font-size: .875rem;
   color: $color-font-grey;
 }
-.avatar {
-  float: right;
-  border-radius: 3.2rem;
-  width: 3.2rem;
-  height: 3.2rem;
-}
 .body {
-  padding: 1.6rem .8rem;
+  padding: .8rem .8rem 1.6rem;
 }
 /* new & edit page */
 .rules {
@@ -105,5 +114,8 @@
     border-radius: 3.2rem;
     width: 3.2rem;
     height: 3.2rem;
+  }
+  .body {
+    padding: .8rem .8rem 1.6rem;
   }
 }
