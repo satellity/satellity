@@ -45,5 +45,11 @@ article.md {
       margin: 1.6rem 0 0;
     }
   }
+  img, video {
+    display: block;
+    margin: 1.5em auto;
+    max-width: 100%;
+    height: auto;
+  }
 }
 }
