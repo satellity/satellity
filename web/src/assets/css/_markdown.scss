@@ -11,6 +11,9 @@ article.md {
       padding: 0 0 0 .2rem;
     }
   }
+  ol {
+    list-style: decimal;
+  }
   blockquote {
     padding: 0 0 0 1.2em;
     border-left: 2px solid #3eb0ef;
