@@ -1,4 +1,4 @@
-package models
+package user
 
 import (
 	"bytes"
@@ -7,14 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"godiscourse/internal/configs"
-	"godiscourse/internal/durable"
 	"godiscourse/internal/external"
 	"godiscourse/internal/session"
 	"net/http"
 	"strings"
-	"time"
-
-	"github.com/gofrs/uuid"
 )
 
 // GithubUser is the response body of github oauth.
@@ -23,64 +19,6 @@ type GithubUser struct {
 	NodeID string `json:"node_id"`
 	Name   string `json:"name"`
 	Email  string `json:"email"`
-}
-
-// CreateGithubUser create a github user.
-func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) {
-	ctx := mctx.context
-	token, err := fetchAccessToken(ctx, code)
-	if err != nil {
-		return nil, session.ServerError(ctx, err)
-	}
-	data, err := fetchOauthUser(ctx, token)
-	if err != nil {
-		return nil, session.ServerError(ctx, err)
-	}
-	var user *User
-	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		user, err = findUserByGithubID(ctx, tx, data.NodeID)
-		return err
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	if user == nil {
-		t := time.Now()
-		user = &User{
-			UserID:    uuid.Must(uuid.NewV4()).String(),
-			Username:  fmt.Sprintf("GH_%s", data.Login),
-			Nickname:  data.Name,
-			GithubID:  sql.NullString{String: data.NodeID, Valid: true},
-			CreatedAt: t,
-			UpdatedAt: t,
-			isNew:     true,
-		}
-		if data.Email != "" {
-			user.Email = sql.NullString{String: data.Email, Valid: true}
-		}
-	}
-
-	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		if user.isNew {
-			cols, params := durable.PrepareColumnsWithValues(userColumns)
-			_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
-			if err != nil {
-				return err
-			}
-		}
-		s, err := user.addSession(ctx, tx, sessionSecret)
-		if err != nil {
-			return err
-		}
-		user.SessionID = s.SessionID
-		_, err = upsertStatistic(ctx, tx, "users")
-		return err
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return user, nil
 }
 
 func fetchAccessToken(ctx context.Context, code string) (string, error) {
@@ -168,7 +106,7 @@ func featchUserEmail(ctx context.Context, accessToken string) (string, error) {
 	return emails[0].Email, nil
 }
 
-func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
+func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*Data, error) {
 	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
 	if err != nil {
 		return nil, err

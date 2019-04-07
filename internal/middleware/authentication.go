@@ -2,9 +2,8 @@ package middleware
 
 import (
 	"context"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/models"
 	"godiscourse/internal/session"
+	"godiscourse/internal/user"
 	"godiscourse/internal/views"
 	"net/http"
 	"regexp"
@@ -31,21 +30,20 @@ type contextValueKey int
 const keyCurrentUser contextValueKey = 1000
 
 // CurrentUser read the user from r.Context
-func CurrentUser(r *http.Request) *models.User {
-	user, _ := r.Context().Value(keyCurrentUser).(*models.User)
+func CurrentUser(r *http.Request) *user.Data {
+	user, _ := r.Context().Value(keyCurrentUser).(*user.Data)
 	return user
 }
 
 // Authenticate handle routes by user's role
-func Authenticate(database *durable.Database, handler http.Handler) http.Handler {
+func Authenticate(userRepo *user.User, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("Authorization")
 		if !strings.HasPrefix(header, "Bearer ") {
 			handleUnauthorized(handler, w, r)
 			return
 		}
-		mcontext := models.WrapContext(r.Context(), database)
-		user, err := models.AuthenticateUser(mcontext, header[7:])
+		user, err := userRepo.Authenticate(r.Context(), header[7:])
 		if err != nil {
 			views.RenderErrorResponse(w, r, err)
 			return

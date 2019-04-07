@@ -1,11 +1,14 @@
-package models
+package user
 
 import (
 	"context"
-	"godiscourse/internal/session"
 	"net"
 	"regexp"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
+
+	"godiscourse/internal/session"
 )
 
 var (
@@ -21,4 +24,18 @@ func validateEmailFormat(ctx context.Context, email string) error {
 		return session.InvalidEmailFormatError(ctx, email)
 	}
 	return nil
+}
+
+func validateAndEncryptPassword(ctx context.Context, password string) (string, error) {
+	if len(password) < 8 {
+		return password, session.PasswordTooSimpleError(ctx)
+	}
+	if len(password) > 64 {
+		return password, session.BadDataError(ctx)
+	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return password, session.ServerError(ctx, err)
+	}
+	return string(hashedPassword), nil
 }

@@ -8,6 +8,7 @@ import (
 	"godiscourse/internal/controllers"
 	"godiscourse/internal/durable"
 	"godiscourse/internal/middleware"
+	"godiscourse/internal/user"
 	"log"
 	"net/http"
 	"os"
@@ -22,11 +23,14 @@ import (
 
 func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	database := durable.WrapDatabase(db)
+	u := user.New(database)
 	router := httptreemux.New()
+
 	controllers.RegisterHanders(router)
 	controllers.RegisterRoutes(database, router)
+	controllers.RegisterUser(u, router)
 
-	handler := middleware.Authenticate(database, router)
+	handler := middleware.Authenticate(u, router)
 	handler = middleware.Constraint(handler)
 	handler = middleware.Context(handler, render.New())
 	handler = middleware.State(handler)
