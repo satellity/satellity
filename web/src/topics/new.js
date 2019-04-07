@@ -64,6 +64,19 @@ class TopicNew extends Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.location.pathname != prevProps.location.pathname) {
+      if (this.props.location.pathname === '/topics/new') {
+        this.setState({
+          topic_id: '',
+          title: '',
+          body: '',
+          preview: false,
+        });
+      }
+    }
+  }
+
   handleChange(e) {
     const target = e.target;
     const name = target.name;
@@ -116,9 +129,9 @@ class TopicNew extends Component {
       )
     });
 
-    let title = <h2>Create a new topic</h2>;
+    let title = <h1>Create a new topic</h1>;
     if (validate(state.topic_id)) {
-      title = <h2>Edit: {state.title}</h2>
+      title = <h1>Edit: {state.title}</h1>
     }
 
     const loadingView = (
