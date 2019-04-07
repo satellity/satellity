@@ -60,14 +60,17 @@ class CommentIndex extends Component {
   render() {
     return (
       <div>
-        {this.state.comments_count > 0 && <View
-          state={this.state}
-          user={this.api.user.readMe()}
-          handleActionClick={this.handleActionClick}
-          handleClick={this.handleClick} />}
-          <CommentNew
-            topicId={this.props.topicId}
-            handleSubmit={this.handleSubmit} />
+        {
+          this.state.comments_count > 0 &&
+          <View
+            state={this.state}
+            user={this.api.user.readMe()}
+            handleActionClick={this.handleActionClick}
+            handleClick={this.handleClick} />
+        }
+        <CommentNew
+          topicId={this.props.topicId}
+          handleSubmit={this.handleSubmit} />
       </div>
     )
   }
@@ -75,7 +78,7 @@ class CommentIndex extends Component {
 
 const View = (props) => {
   const comments = props.state.comments.map((comment) => {
-    let delAction = '';
+    let delAction;
     if (props.user.user_id === comment.user_id) {
       delAction = (
         <span className={style.station}>

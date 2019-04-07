@@ -112,7 +112,7 @@ class TopicNew extends Component {
     let state = this.state;
     const categories = state.categories.map((c) => {
       return (
-        <span key={c.category_id} className={`${style.category} ${c.category_id === state.category_id ? style.categoryCurrent : ''}`} onClick={(e) => onCategoryClick(e, c.category_id)}>{c.alias}</span>
+        <span key={c.category_id} className={`${style.category} ${c.category_id === state.category_id ? style.categoryCurrent : ''}`} onClick={(e) => this.handleCategoryClick(e, c.category_id)}>{c.alias}</span>
       )
     });
 
