@@ -21,8 +21,8 @@ class SiteWidget extends Component {
     }
 
     return (
-      <div>
-        <div className={style.widget}>
+      <div className={style.widget}>
+        <div className={style.section}>
           <h2 className={style.site}>
             Go Discourse
           </h2>

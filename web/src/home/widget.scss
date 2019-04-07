@@ -1,6 +1,11 @@
 @import '../assets/css/constant.scss';
 
 .widget {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 1.6rem;
+}
+.section {
   background: white;
   box-sizing: border-box;
   padding: .8rem;
