@@ -131,9 +131,9 @@ class TopicNew extends Component {
       )
     });
 
-    let title = <h1>Create a new topic</h1>;
+    let title = <h1>{i18n.t('topic.title.new')}</h1>;
     if (validate(state.topic_id)) {
-      title = <h1>Edit: {state.title}</h1>
+      title = <h1>{i18n.t('topic.title.edit', {name: state.title})}</h1>
     }
 
     const loadingView = (

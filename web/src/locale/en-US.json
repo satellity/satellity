@@ -1,0 +1,9 @@
+{
+  "general": "general",
+  "topic": {
+    "title": {
+      "new": "Create a new topic",
+      "edit": "Edit %{name}"
+    }
+  }
+}
