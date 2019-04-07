@@ -1,5 +1,6 @@
 import style from './index.scss';
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
 
@@ -17,11 +18,6 @@ class UserEdit extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-
-    //TODO should in router
-    if (!this.api.user.loggedIn()) {
-      props.history.push('/');
-    }
   }
 
   componentDidMount() {
@@ -54,6 +50,12 @@ class UserEdit extends Component {
   }
 
   render() {
+    if (!this.api.user.loggedIn()) {
+      return (
+        <Redirect to={{ pathname: "/" }} />
+      )
+    }
+
     let state = this.state;
 
     return (

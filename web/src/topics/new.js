@@ -3,7 +3,7 @@ require('codemirror/theme/xq-light.css');
 require('codemirror/mode/markdown/markdown.js');
 import style from './style.scss';
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import {Controlled as CodeMirror} from 'react-codemirror2'
 import showdown from 'showdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -40,10 +40,6 @@ class TopicNew extends Component {
     this.handleBodyChange = this.handleBodyChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handlePreview = this.handlePreview.bind(this);
-    // TODO handle authentication
-    if (!this.api.user.loggedIn()) {
-      props.history.push('/');
-    }
   }
 
   componentDidMount() {
@@ -122,6 +118,12 @@ class TopicNew extends Component {
   }
 
   render() {
+    if (!this.api.user.loggedIn()) {
+      return (
+        <Redirect to={{ pathname: "/" }} />
+      )
+    }
+
     let state = this.state;
     const categories = state.categories.map((c) => {
       return (
@@ -150,28 +152,34 @@ class TopicNew extends Component {
         </div>
         <div className={style.preview}> <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> </div>
         <div className={style.topic_body}>
-          {!state.preview && <CodeMirror
-            className='editor'
-            value={state.body}
-            options={{
-              mode: 'markdown',
-              theme: 'xq-light',
-              lineNumbers: true,
-              lineWrapping: true,
-              placeholder: 'Text (optional)'
-            }}
-            onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
-          />}
-          {state.preview && <article className={`md ${style.preview_body}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
-        </article>}
-      </div>
-      <div className='action'>
-        <button className='btn submit' disabled={state.submitting}>
-          { state.submitting && <LoadingView style='sm-ring blank'/> }
-          &nbsp;SUBMIT
-        </button>
-      </div>
-    </form>
+          {
+            !state.preview &&
+            <CodeMirror
+              className='editor'
+              value={state.body}
+              options={{
+                mode: 'markdown',
+                theme: 'xq-light',
+                lineNumbers: true,
+                lineWrapping: true,
+                placeholder: 'Text (optional)'
+              }}
+              onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
+            />
+          }
+          {
+            state.preview &&
+            <article className={`md ${style.preview_body}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
+            </article>
+          }
+        </div>
+        <div className='action'>
+          <button className='btn submit' disabled={state.submitting}>
+            { state.submitting && <LoadingView style='sm-ring blank'/> }
+            &nbsp;SUBMIT
+          </button>
+        </div>
+      </form>
     )
 
     return (
