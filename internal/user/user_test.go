@@ -1,11 +1,11 @@
-package models
+package user
 
 import (
+	"context"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/x509"
-	"database/sql"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -20,9 +20,8 @@ import (
 
 func TestUserCRUD(t *testing.T) {
 	assert := assert.New(t)
-	ctx := setupTestContext()
-	defer ctx.database.Close()
-	defer teardownTestContext(ctx)
+	ctx := context.Background()
+	userMock := NewMock()
 
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	assert.Nil(err)
@@ -48,50 +47,68 @@ func TestUserCRUD(t *testing.T) {
 	for _, tc := range userCases {
 		t.Run(fmt.Sprintf("user username %s", tc.username), func(t *testing.T) {
 			if !tc.valid {
-				user, err := CreateUser(ctx, tc.email, tc.username, tc.nickname, tc.biography, tc.password, tc.sessionSecret)
+				user, err := userMock.Create(ctx, &Params{
+					Email:         tc.email,
+					Username:      tc.username,
+					Nickname:      tc.nickname,
+					Biography:     tc.biography,
+					Password:      tc.password,
+					SessionSecret: tc.sessionSecret,
+				})
 				assert.NotNil(err)
 				assert.Nil(user)
 				return
 			}
 
-			user, err := CreateUser(ctx, tc.email, tc.username, tc.nickname, tc.biography, tc.password, tc.sessionSecret)
+			user, err := userMock.Create(ctx, &Params{
+				Email:         tc.email,
+				Username:      tc.username,
+				Nickname:      tc.nickname,
+				Biography:     tc.biography,
+				Password:      tc.password,
+				SessionSecret: tc.sessionSecret,
+			})
 			assert.Nil(err)
 			assert.NotNil(user)
 
-			new, err := ReadUser(ctx, user.UserID)
+			new, err := userMock.GetByID(ctx, user.UserID)
 			assert.Nil(err)
 			assert.NotNil(new)
 			assert.Equal(user.Username, new.Username)
 			assert.Equal(user.Nickname, new.Nickname)
 			err = bcrypt.CompareHashAndPassword([]byte(new.EncryptedPassword.String), []byte(tc.password))
 			assert.Nil(err)
-			new, err = ReadUser(ctx, uuid.Must(uuid.NewV4()).String())
+			new, err = userMock.GetByID(ctx, uuid.Must(uuid.NewV4()).String())
 			assert.Nil(err)
 			assert.Nil(new)
-			new, err = ReadUserByUsernameOrEmail(ctx, "None")
+			new, err = userMock.GetByUsernameOrEmail(ctx, "None")
 			assert.Nil(err)
 			assert.Nil(new)
-			new, err = ReadUserByUsernameOrEmail(ctx, tc.email)
+			new, err = userMock.GetByUsernameOrEmail(ctx, tc.email)
 			assert.Nil(err)
 			assert.NotNil(new)
-			new, err = ReadUserByUsernameOrEmail(ctx, tc.username)
+			new, err = userMock.GetByUsernameOrEmail(ctx, tc.username)
 			assert.Nil(err)
 			assert.NotNil(new)
-			new, err = ReadUserByUsernameOrEmail(ctx, strings.ToUpper(tc.email))
+			new, err = userMock.GetByUsernameOrEmail(ctx, strings.ToUpper(tc.email))
 			assert.Nil(err)
 			assert.NotNil(new)
-			new, err = CreateSession(ctx, tc.email, tc.password, hex.EncodeToString(public))
+			new, err = userMock.CreateSession(ctx, &SessionParams{
+				Identity: tc.email,
+				Password: tc.password,
+				Secret:   hex.EncodeToString(public),
+			})
 			assert.Nil(err)
 			assert.NotNil(new)
 			assert.Equal(tc.username, user.Username)
 			assert.Equal(tc.role, user.Role())
 
-			sess, err := readTestSession(ctx, new.UserID, new.SessionID)
-			assert.Nil(err)
-			assert.NotNil(sess)
-			sess, err = readTestSession(ctx, uuid.Must(uuid.NewV4()).String(), new.SessionID)
-			assert.Nil(err)
-			assert.Nil(sess)
+			// sess, err := readTestSession(ctx, new.UserID, new.SessionID)
+			// assert.Nil(err)
+			// assert.NotNil(sess)
+			// sess, err = readTestSession(ctx, uuid.Must(uuid.NewV4()).String(), new.SessionID)
+			// assert.Nil(err)
+			// assert.Nil(sess)
 
 			claims := &jwt.MapClaims{
 				"uid": new.UserID,
@@ -100,37 +117,29 @@ func TestUserCRUD(t *testing.T) {
 			token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
 			ss, err := token.SignedString(priv)
 			assert.Nil(err)
-			new, err = AuthenticateUser(ctx, ss)
+			new, err = userMock.Authenticate(ctx, ss)
 			assert.Nil(err)
 			assert.NotNil(new)
-			err = new.UpdateProfile(ctx, "Jason", "")
+			err = userMock.Update(ctx, new, &Params{
+				Username:  "Jason",
+				Biography: "",
+			})
 			assert.Nil(err)
 			assert.Equal("Jason", new.Name())
-			new, err = ReadUserByUsernameOrEmail(ctx, tc.username)
+			new, err = userMock.GetByUsernameOrEmail(ctx, tc.username)
 			assert.Nil(err)
 			assert.NotNil(new)
 			assert.Equal("Jason", new.Name())
-			users, err := ReadUsers(ctx, time.Time{})
+			users, err := userMock.GetByOffset(ctx, time.Time{})
 			assert.Nil(err)
 			assert.Len(users, tc.count)
 		})
 	}
 }
 
-func createTestUser(mctx *Context, email, username, password string) *User {
-	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	public, _ := x509.MarshalPKIXPublicKey(priv.Public())
-	user, _ := CreateUser(mctx, email, username, "nickname", "", password, hex.EncodeToString(public))
-	return user
-}
-
-func readTestSession(mctx *Context, uid, sid string) (*Session, error) {
-	ctx := mctx.context
-	var s *Session
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		s, err = readSession(ctx, tx, uid, sid)
-		return err
-	})
-	return s, err
-}
+// func createTestUser(mctx *Context, email, username, password string) *Data {
+// 	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+// 	public, _ := x509.MarshalPKIXPublicKey(priv.Public())
+// 	user, _ := CreateUser(mctx, email, username, "nickname", "", password, hex.EncodeToString(public))
+// 	return user
+// }
