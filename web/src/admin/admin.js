@@ -1,7 +1,7 @@
 import './admin.scss';
 import React, { Component } from 'react';
 import { Route, Link, Redirect } from 'react-router-dom';
-import Config from '../components/constants.js';
+import Config from '../components/config.js';
 import Index from './index.js';
 import Categories from './categories/index.js';
 import Users from './users/index.js';

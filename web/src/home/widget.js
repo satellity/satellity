@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Config from '../components/constants.js';
+import Config from '../components/config.js';
 import style from './widget.scss';
 import API from '../api/index.js';
 

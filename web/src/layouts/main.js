@@ -2,7 +2,7 @@ import style from './main.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Route, Link, Switch, Redirect } from 'react-router-dom';
-import Config from '../components/constants.js';
+import Config from '../components/config.js';
 import API from '../api/index.js'
 import Home from '../home/index.js';
 import UserEdit from '../users/edit.js';
