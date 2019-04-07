@@ -1,8 +1,7 @@
 package admin
 
 import (
-	"godiscourse/internal/durable"
-	"godiscourse/internal/models"
+	"godiscourse/internal/user"
 	"godiscourse/internal/views"
 	"net/http"
 	"time"
@@ -11,19 +10,18 @@ import (
 )
 
 type userImpl struct {
-	database *durable.Database
+	repo *user.UserDatastore
 }
 
-func registerAdminUser(database *durable.Database, router *httptreemux.TreeMux) {
-	impl := &userImpl{database: database}
+func RegisterAdminUser(r *user.User, router *httptreemux.TreeMux) {
+	impl := &userImpl{repo: r}
 
 	router.GET("/admin/users", impl.index)
 }
 
 func (impl *userImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	users, err := models.ReadUsers(ctx, offset)
+	users, err := impl.repo.GetByOffset(r.Context(), offset)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return

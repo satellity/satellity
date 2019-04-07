@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"godiscourse/internal/configs"
 	"godiscourse/internal/durable"
-	"godiscourse/internal/session"
 	"strings"
 	"time"
 )
@@ -45,36 +44,6 @@ type User struct {
 }
 
 var userColumns = []string{"user_id", "email", "username", "nickname", "biography", "encrypted_password", "github_id", "created_at", "updated_at"}
-
-func (u *User) values() []interface{} {
-	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.Biography, u.EncryptedPassword, u.GithubID, u.CreatedAt, u.UpdatedAt}
-}
-
-// ReadUsers read users by offset
-func ReadUsers(mctx *Context, offset time.Time) ([]*User, error) {
-	ctx := mctx.context
-	if offset.IsZero() {
-		offset = time.Now()
-	}
-	rows, err := mctx.database.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(userColumns, ",")), offset)
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	defer rows.Close()
-
-	var users []*User
-	for rows.Next() {
-		user, err := userFromRows(rows)
-		if err != nil {
-			return nil, session.TransactionError(ctx, err)
-		}
-		users = append(users, user)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return users, nil
-}
 
 func readUsersByIds(ctx context.Context, tx *sql.Tx, ids []string) ([]*User, error) {
 	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userColumns, ","), strings.Join(ids, "','")))

@@ -23,7 +23,7 @@ type userRequest struct {
 	Biography     string `json:"biography"`
 }
 
-func RegisterUser(r *users.User, router *httptreemux.TreeMux) {
+func RegisterUser(r *user.User, router *httptreemux.TreeMux) {
 	impl := &userImpl{repo: r}
 
 	router.POST("/oauth/:provider", impl.oauth)

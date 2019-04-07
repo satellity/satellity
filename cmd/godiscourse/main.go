@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"godiscourse/internal/configs"
 	"godiscourse/internal/controllers"
+	"godiscourse/internal/controllers/admin"
 	"godiscourse/internal/durable"
 	"godiscourse/internal/middleware"
 	"godiscourse/internal/user"
@@ -29,6 +30,7 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	controllers.RegisterHanders(router)
 	controllers.RegisterRoutes(database, router)
 	controllers.RegisterUser(u, router)
+	admin.RegisterAdminUser(u, router)
 
 	handler := middleware.Authenticate(u, router)
 	handler = middleware.Constraint(handler)

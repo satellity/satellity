@@ -53,8 +53,8 @@ type UserDatastore interface {
 	CreateGithubUser(context.Context, string, string) (*Data, error)
 	Update(context.Context, *Data, *Params) error
 	Authenticate(context.Context, string) (*Data, error)
-	GetByOffset(context.Context, time.Time) ([]*Data, error)
-	GetByID(context.Context, string) (*Data, error) // equal ReadUser
+	GetByOffset(context.Context, time.Time) ([]*Data, error) // equal ReadUsers
+	GetByID(context.Context, string) (*Data, error)          // equal ReadUser
 	GetByUsernameOrEmail(context.Context, string) (*Data, error)
 	CreateSession(context.Context, *SessionParams) (*Data, error)
 }
@@ -250,6 +250,30 @@ func (u *User) Authenticate(ctx context.Context, tokenString string) (*Data, err
 		return nil, nil
 	}
 	return user, nil
+}
+
+func (u *User) GetByOffset(ctx context.Context, offset time.Time) ([]*Data, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	rows, err := u.db.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(userColumns, ",")), offset)
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	defer rows.Close()
+
+	var users []*Data
+	for rows.Next() {
+		user, err := userFromRows(rows)
+		if err != nil {
+			return nil, session.TransactionError(ctx, err)
+		}
+		users = append(users, user)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return users, nil
 }
 
 func (u *User) GetByID(ctx context.Context, id string) (*Data, error) {
