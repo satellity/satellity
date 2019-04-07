@@ -42,7 +42,7 @@ func (impl *userImpl) oauth(w http.ResponseWriter, r *http.Request, params map[s
 	if user, err := impl.repo.CreateGithubUser(r.Context(), body.Code, body.SessionSecret); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
-		// views.RenderAccount(w, r, user)
+		views.RenderAccount(w, r, user)
 	}
 }
 
@@ -57,7 +57,7 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 	if err := user.Update(r.Context(), body.Nickname, body.Biography); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
-		// views.RenderAccount(w, r, user)
+		views.RenderAccount(w, r, user)
 	}
 }
 
@@ -71,7 +71,7 @@ func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[st
 	} else if user == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 	} else {
-		// views.RenderUser(w, r, user)
+		views.RenderUser(w, r, user)
 	}
 }
 
@@ -86,6 +86,6 @@ func (impl *userImpl) topics(w http.ResponseWriter, r *http.Request, params map[
 	} else if topics, err := user.ReadTopics(ctx, offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
-		// views.RenderTopics(w, r, topics)
+		views.RenderTopics(w, r, topics)
 	}
 }

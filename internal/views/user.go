@@ -3,10 +3,11 @@ package views
 import (
 	"crypto/md5"
 	"fmt"
-	"godiscourse/internal/models"
 	"net/http"
 	"strings"
 	"time"
+
+	"godiscourse/internal/user"
 )
 
 // UserView is the response body of user
@@ -29,25 +30,25 @@ type AccountView struct {
 	Role      string `json:"role"`
 }
 
-func buildUser(user *models.User) UserView {
+func buildUser(u *user.Data) UserView {
 	return UserView{
 		Type:      "user",
-		UserID:    user.UserID,
-		Nickname:  user.Name(),
-		Biography: user.Biography,
-		AvatarURL: fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=180&d=wavatar", md5.Sum([]byte(strings.ToLower(user.Email.String)))),
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
+		UserID:    u.UserID,
+		Nickname:  u.Name(),
+		Biography: u.Biography,
+		AvatarURL: fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=180&d=wavatar", md5.Sum([]byte(strings.ToLower(u.Email.String)))),
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
 	}
 }
 
 // RenderUser response a user
-func RenderUser(w http.ResponseWriter, r *http.Request, user *models.User) {
-	RenderResponse(w, r, buildUser(user))
+func RenderUser(w http.ResponseWriter, r *http.Request, u *user.Data) {
+	RenderResponse(w, r, buildUser(u))
 }
 
 // RenderUsers response a bundle of users
-func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
+func RenderUsers(w http.ResponseWriter, r *http.Request, users []*user.Data) {
 	userViews := make([]UserView, len(users))
 	for i, user := range users {
 		userViews[i] = buildUser(user)
@@ -56,13 +57,13 @@ func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
 }
 
 // RenderAccount response
-func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) {
+func RenderAccount(w http.ResponseWriter, r *http.Request, u *user.Data) {
 	accountView := AccountView{
-		UserView:  buildUser(user),
-		Username:  user.Username,
-		Email:     user.Email.String,
-		SessionID: user.SessionID,
-		Role:      user.Role(),
+		UserView:  buildUser(u),
+		Username:  u.Username,
+		Email:     u.Email.String,
+		SessionID: u.SessionID,
+		Role:      u.Role(),
 	}
 	RenderResponse(w, r, accountView)
 }
