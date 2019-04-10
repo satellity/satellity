@@ -58,9 +58,9 @@
   border-top: .3rem solid $color-main-purple;
   background-color: white;
   padding: .8rem;
-}
-.rule {
-  padding-top: 0;
+  li {
+    padding: 0 0 .4rem;
+  }
 }
 .form {
   background: white;

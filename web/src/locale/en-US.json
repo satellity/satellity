@@ -1,9 +1,35 @@
 {
-  "general": "general",
+  "general": {
+    "delete": "Delete",
+    "submit": "Submit"
+  },
   "topic": {
     "title": {
       "new": "Create a new topic",
       "edit": "Edit %{name}"
+    },
+    "in": "IN",
+    "at": "AT",
+    "rules": "<li> 1. To be a kind human, keep goodwill towards others </li> <li> 2. It's a good habits to preview before posting.  </li> <li> 3. Welcome to share. Enjoy!  </li>"
+  },
+  "comment": {
+    "count": "%{count} Comments",
+    "form": {
+      "body": "Say something ..."
     }
+  },
+  "user": {
+    "edit": "Update Project",
+    "nickname": "Nickname",
+    "biography": "Biography"
+  },
+  "home": {
+    "latest": "Latest"
+  },
+  "login": {
+    "github": "Sign in with GitHub"
+  },
+  "aside": {
+    "rules": "<li>1. Open Source on <a href='https://github.com/godiscourse/godiscourse' target='blank' className='soft'>Github</a>.</li><li> 2. Based on Golang, React and PostgreSQL. </li> <li> 3. Model tested. </li> <li> 4. Project <a href='https://github.com/godiscourse/godiscourse/projects/1' target='_blank'>Roadmap</a>. </li>"
   }
 }
