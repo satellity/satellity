@@ -88,7 +88,7 @@ const View = (props) => {
             <div className={style.actions}>
               <div onClick={(e) => props.handleClick(e, comment.comment_id)} className={style.action}>
                 <FontAwesomeIcon icon={['far', 'trash-alt']} className={style.trash} onClick={(e) => props.handleActionClick(e, comment.comment_id)} />
-                <span className={style.delete}>Delete</span>
+                <span className={style.delete}>{i18n.t('general.delete')}</span>
               </div>
             </div>
           }
@@ -115,7 +115,7 @@ const View = (props) => {
 
   return (
     <div>
-      <h3>{props.state.comments_count} Comments</h3>
+      <h3>{i18n.t('comment.count', {count: props.state.comments_count})}</h3>
       <ul className={style.comments}>
         {comments}
       </ul>

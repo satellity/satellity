@@ -8,6 +8,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import showdown from 'showdown';
+import Locale from './locale/index.js';
 import MainLayout from './layouts/main.js';
 import AdminRoute from './admin/admin.js';
 import NoMatch from './sink.js';
@@ -23,6 +24,8 @@ showdown.setOption('customizedHeaderId', true);
 showdown.setOption('simplifiedAutoLink', true);
 showdown.setOption('strikethrough', true);
 showdown.setOption('simpleLineBreaks', true);
+
+window.i18n = new Locale(navigator.language);
 
 ReactDOM.render((
   <Router>

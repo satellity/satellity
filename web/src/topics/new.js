@@ -131,9 +131,9 @@ class TopicNew extends Component {
       )
     });
 
-    let title = <h1>Create a new topic</h1>;
+    let title = <h1>{i18n.t('topic.title.new')}</h1>;
     if (validate(state.topic_id)) {
-      title = <h1>Edit: {state.title}</h1>
+      title = <h1>{i18n.t('topic.title.edit', {name: state.title})}</h1>
     }
 
     const loadingView = (
@@ -176,7 +176,7 @@ class TopicNew extends Component {
         <div className='action'>
           <button className='btn submit' disabled={state.submitting}>
             { state.submitting && <LoadingView style='sm-ring blank'/> }
-            &nbsp;SUBMIT
+            &nbsp;{i18n.t('general.submit')}
           </button>
         </div>
       </form>
@@ -192,17 +192,7 @@ class TopicNew extends Component {
           </div>
         </main>
         <aside className='section aside'>
-          <ol className={style.rules}>
-            <li className={style.rule}>
-              1. To be a kind human, keep goodwill towards others
-            </li>
-            <li className={style.rule}>
-              2. It's a good habits to preview before posting.
-            </li>
-            <li className={style.rule}>
-              3. Welcome to share. Enjoy!
-            </li>
-          </ol>
+          <ol className={style.rules} dangerouslySetInnerHTML={{__html: i18n.t('topic.rules')}}></ol>
         </aside>
       </div>
     )

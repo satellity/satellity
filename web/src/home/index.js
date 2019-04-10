@@ -117,7 +117,7 @@ class Home extends Component {
         <main className='section main'>
           <div className={style.nodes}>
             <Link to='/'
-              className={`${style.node} ${state.category === 'latest' ? style.current : ''}`}>Latest</Link>
+              className={`${style.node} ${state.category === 'latest' ? style.current : ''}`}>{i18n.t('home.latest')}</Link>
             {categories}
           </div>
           {state.loading && loadingView}

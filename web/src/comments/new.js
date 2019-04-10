@@ -43,12 +43,12 @@ class CommentNew extends Component {
         <form onSubmit={this.handleSubmit}>
           <input type='hidden' name='topic_id' defaultValue={state.topic_id} />
           <div>
-            <textarea type='text' name='body' minLength='3' required placeholder='Say something ...' value={state.body} onChange={this.handleChange} />
+            <textarea type='text' name='body' minLength='3' required placeholder={i18n.t('comment.form.body')} value={state.body} onChange={this.handleChange} />
           </div>
           <div className='action'>
             <button className='btn submit' disabled={state.submitting}>
               { state.submitting && <LoadingView style='sm-ring blank'/> }
-              &nbsp;SUBMIT
+              &nbsp;{i18n.t('general.submit')}
             </button>
           </div>
         </form>

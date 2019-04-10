@@ -33,6 +33,7 @@
     "jsrsasign": "^8.0.12",
     "moment": "^2.24.0",
     "node-forge": "^0.8.2",
+    "node-polyglot": "^2.3.0",
     "normalize.css": "^8.0.1",
     "noty": "^3.2.0-beta",
     "react": "^16.8.4",

@@ -62,20 +62,20 @@ class UserEdit extends Component {
       <div className='container'>
         <main className='section main'>
           <div className={style.profile}>
-            <h2>Update Profile</h2>
+            <h2>{i18n.t('user.edit')}</h2>
             <form onSubmit={this.handleSubmit}>
               <div>
-                <label name='nickname'>Nickname</label>
+                <label name='nickname'>{i18n.t('user.nickname')}</label>
                 <input type='text' name='nickname' value={state.nickname} autoComplete='off' onChange={this.handleChange} />
               </div>
               <div>
-                <label name='biography'>Biography</label>
+                <label name='biography'>{i18n.t('user.biography')}</label>
                 <textarea type='text' name='biography' value={state.biography} onChange={this.handleChange} />
               </div>
               <div className='action'>
                 <button className='btn submit' disabled={state.submitting}>
                   {state.submitting && <LoadingView style='sm-ring blank'/>}
-                  &nbsp;SUBMIT
+                  &nbsp;{i18n.t('general.submit')}
                 </button>
               </div>
             </form>

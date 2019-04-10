@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import Config from '../components/config.js';
 import style from './widget.scss';
 import API from '../api/index.js';
@@ -11,11 +12,11 @@ class SiteWidget extends Component {
   }
 
   render() {
-    let signIn;
+    let action = <div className={style.newTopic}> <Link to='/topics/new'>{i18n.t('topic.new')}</Link> </div>;
     if (!this.api.user.loggedIn()) {
-      signIn = (
-        <div className={style.sign_in}>
-          <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`}>Sign in with GitHub</a>
+      action = (
+        <div className={style.signIn}>
+          <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`}>{i18n.t('login.github')}</a>
         </div>
       )
     }
@@ -26,14 +27,10 @@ class SiteWidget extends Component {
           <h2 className={style.site}>
             Go Discourse
           </h2>
-          <ul className={style.features}>
-            <li> 1. Open Source on <a href='https://github.com/godiscourse/godiscourse' target='blank' className='soft'>Github</a>. </li>
-            <li> 2. Based on Golang, React and PostgreSQL. </li>
-            <li> 3. Model tested. </li>
-            <li> 4. Project <a href='https://github.com/godiscourse/godiscourse/projects/1' target='_blank'>Roadmap</a>. </li>
+          <ul className={style.features} dangerouslySetInnerHTML={{__html: i18n.t('aside.rules')}}>
           </ul>
         </div>
-        {signIn}
+        {action}
         <div className={style.copyright}>
           © 2019 MIT license
         </div>
