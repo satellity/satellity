@@ -42,26 +42,35 @@
   top: 2rem;
   right: -0.6rem;
   z-index: 99;
-  &:before {
-    content:"\A";
-    width: 0;
-    height: 0;
-    border-left: .5rem solid transparent;
-    border-right: .5rem solid transparent;
-    border-bottom: .5rem solid white;
-    position: absolute;
-    top: -.5rem;
-    right: 0.3rem;
-  }
   div {
     padding: .4rem .8rem;
     cursor: pointer;
   }
 }
 .action {
-  box-shadow: 0 0 .8rem 0 $color-font-light-grey;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: .1rem;
   display: flex;
   align-items: center;
+  position: relative;
+  &:before, &:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border: solid transparent;
+    position: absolute;
+    bottom: 100%;
+    right: 0.3rem;
+  }
+  &:before {
+    border-width: .5625rem;
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+  }
+  &:after {
+    border-width: .5rem;
+    border-bottom-color: white;
+    right: 0.3625rem;
+  }
 }
 .trash {
   font-size: .875rem;
