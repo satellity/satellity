@@ -68,7 +68,11 @@ class TopicShow extends Component {
               {editAction}
             </h1>
             <div className={style.info}>
-              {state.user.nickname} IN {state.category.name} AT <TimeAgo date={state.created_at} />
+              {state.user.nickname}
+              <span className={style.sep}>{i18n.t('topic.in')}</span>
+              <Link to={{pathname: "/", search: `?c=${state.category.name}`}}>{state.category.alias}</Link>
+              <span className={style.sep}>{i18n.t('topic.at')}</span>
+              <TimeAgo date={state.created_at} />
             </div>
           </div>
           <img src={state.user.avatar_url} className={style.avatar} />

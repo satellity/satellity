@@ -28,7 +28,8 @@ class TopicItem extends Component {
           </h2>
           <div>
             <span>{topic.user.nickname.slice(0,16)}</span>
-            <span className={style.sep}>{i18n.t('topic.in')}</span><span>{topic.category.name}</span>
+            <span className={style.sep}>{i18n.t('topic.in')}</span>
+            <Link to={{pathname: "/", search: `?c=${topic.category.name}`}}>{topic.category.alias}</Link>
             <span className={style.sep}>{i18n.t('topic.at')}</span><TimeAgo date={topic.created_at} />
           </div>
         </div>
