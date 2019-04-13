@@ -5,6 +5,7 @@ import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
 import { Helmet } from 'react-helmet';
 import API from '../api/index.js';
+import Config from '../components/config.js';
 import style from './style.scss';
 import SiteWidget from '../home/widget.js';
 import CommentList from '../comments/index.js';
@@ -45,7 +46,7 @@ class TopicShow extends Component {
 
     const seoView = (
       <Helmet>
-        <title>{state.title} - {state.user.nickname} - GoDiscourse</title>
+        <title>{state.title} - {state.user.nickname} - {Config.Name}</title>
         <meta name='description' content={state.short_body} />
       </Helmet>
     )
