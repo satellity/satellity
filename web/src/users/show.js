@@ -47,10 +47,10 @@ class UserShow extends Component {
 
     return (
       <div className='container'>
-        <aside className='section aside'>
+        <aside className='column aside'>
           {profile}
         </aside>
-        <main className='section main'>
+        <main className='column main'>
           <ul className={style.topics}>
             {topics}
           </ul>

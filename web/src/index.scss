@@ -85,12 +85,13 @@ ul, ol {
 img {
   max-width: 100%;
 }
+
 .wrapper {
   margin: 0 auto;
   width: 80rem;
   max-width: 100%;
 }
-.section {
+.column {
   box-sizing: border-box;
   padding: 0.8rem;
 }
@@ -121,7 +122,7 @@ div.container {
   html {
     font-size: 16px;
   }
-  .section {
+  .column {
     padding: 0;
   }
   div.container {

@@ -86,12 +86,12 @@ class TopicShow extends Component {
     return (
       <div className='container'>
         {!state.loading && seoView}
-        <main className='section main'>
+        <main className='column main'>
           {state.loading && loadingView}
           {!state.loading && topicView}
           {!state.loading && <CommentList topicId={state.topic_id} commentsCount={state.comments_count} />}
         </main>
-        <aside className='section aside'>
+        <aside className='column aside'>
           <SiteWidget />
         </aside>
       </div>

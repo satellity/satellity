@@ -184,14 +184,14 @@ class TopicNew extends Component {
 
     return (
       <div className='container'>
-        <main className='section main'>
+        <main className='column main'>
           {state.loading && loadingView}
           <div className={style.form}>
             {!state.loading && title}
             {!state.loading && form}
           </div>
         </main>
-        <aside className='section aside'>
+        <aside className='column aside'>
           <ol className={style.rules} dangerouslySetInnerHTML={{__html: i18n.t('topic.rules')}}></ol>
         </aside>
       </div>

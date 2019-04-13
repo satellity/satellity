@@ -60,7 +60,7 @@ class UserEdit extends Component {
 
     return (
       <div className='container'>
-        <main className='section main'>
+        <main className='column main'>
           <div className={style.profile}>
             <h2>{i18n.t('user.edit')}</h2>
             <form onSubmit={this.handleSubmit}>
@@ -81,7 +81,7 @@ class UserEdit extends Component {
             </form>
           </div>
         </main>
-        <aside className='section aside'>
+        <aside className='column aside'>
         </aside>
       </div>
     )

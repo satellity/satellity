@@ -114,7 +114,7 @@ class Home extends Component {
 
     return (
       <div className='container'>
-        <main className='section main'>
+        <main className='column main'>
           <div className={style.nodes}>
             <Link to='/'
               className={`${style.node} ${state.category === 'latest' ? style.current : ''}`}>{i18n.t('home.latest')}</Link>
@@ -124,7 +124,7 @@ class Home extends Component {
           {!state.loading && <ul className={style.topics}> {topics} </ul>}
           {state.offset !== '' && <div className={style.load}><a href='javascript:;' onClick={this.loadTopics}>Load More</a></div>}
         </main>
-        <aside className='section aside'>
+        <aside className='column aside'>
           <SiteWidget />
         </aside>
       </div>
