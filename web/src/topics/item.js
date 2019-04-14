@@ -24,7 +24,7 @@ class TopicItem extends Component {
         <img src={topic.user.avatar_url} className={style.avatar} />
         <div className={style.detail}>
           <h2 className={style.title}>
-            <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`}>{topic.title}</Link>
+            <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`}>{topic.title}</Link>
           </h2>
           <div>
             <span>{topic.user.nickname.slice(0,16)}</span>
