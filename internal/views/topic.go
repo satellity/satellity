@@ -1,7 +1,7 @@
 package views
 
 import (
-	"godiscourse/internal/models"
+	"godiscourse/internal/topic"
 	"net/http"
 	"time"
 )
@@ -23,7 +23,7 @@ type TopicView struct {
 	Category      CategoryView `json:"category"`
 }
 
-func buildTopic(topic *models.Topic) TopicView {
+func buildTopic(topic *topic.Model) TopicView {
 	view := TopicView{
 		Type:          "topic",
 		TopicID:       topic.TopicID,
@@ -47,12 +47,12 @@ func buildTopic(topic *models.Topic) TopicView {
 }
 
 // RenderTopic response a topic
-func RenderTopic(w http.ResponseWriter, r *http.Request, topic *models.Topic) {
+func RenderTopic(w http.ResponseWriter, r *http.Request, topic *topic.Model) {
 	RenderResponse(w, r, buildTopic(topic))
 }
 
 // RenderTopics response a bundle of topics
-func RenderTopics(w http.ResponseWriter, r *http.Request, topics []*models.Topic) {
+func RenderTopics(w http.ResponseWriter, r *http.Request, topics []*topic.Model) {
 	topicViews := make([]TopicView, len(topics))
 	for i, topic := range topics {
 		topicViews[i] = buildTopic(topic)

@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"godiscourse/internal/durable"
 	"godiscourse/internal/middleware"
-	"godiscourse/internal/models"
 	"godiscourse/internal/session"
+	"godiscourse/internal/topic"
+	"godiscourse/internal/user"
 	"godiscourse/internal/views"
 	"net/http"
 	"time"
@@ -14,7 +14,8 @@ import (
 )
 
 type topicImpl struct {
-	database *durable.Database
+	repo      topic.TopicDatastore
+	userStore user.UserDatastore
 }
 
 type topicRequest struct {
@@ -23,8 +24,11 @@ type topicRequest struct {
 	CategoryID string `json:"category_id"`
 }
 
-func registerTopic(database *durable.Database, router *httptreemux.TreeMux) {
-	impl := &topicImpl{database: database}
+func RegisterTopic(t topic.TopicDatastore, us user.UserDatastore, router *httptreemux.TreeMux) {
+	impl := &topicImpl{
+		repo:      t,
+		userStore: us,
+	}
 
 	router.POST("/topics", impl.create)
 	router.POST("/topics/:id", impl.update)
@@ -38,11 +42,16 @@ func (impl *topicImpl) create(w http.ResponseWriter, r *http.Request, _ map[stri
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := middleware.CurrentUser(r).CreateTopic(ctx, body.Title, body.Body, body.CategoryID); err != nil {
+
+	u := middleware.CurrentUser(r)
+	if t, err := impl.repo.Create(r.Context(), u.UserID, &topic.Params{
+		Title:      body.Title,
+		Body:       body.Body,
+		CategoryID: body.CategoryID,
+	}); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
-		views.RenderTopic(w, r, topic)
+		views.RenderTopic(w, r, t)
 	}
 }
 
@@ -52,29 +61,32 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := middleware.CurrentUser(r).UpdateTopic(ctx, params["id"], body.Title, body.Body, body.CategoryID); err != nil {
+
+	u := middleware.CurrentUser(r)
+	if t, err := impl.repo.Update(r.Context(), u.UserID, params["id"], &topic.Params{
+		Title:      body.Title,
+		Body:       body.Body,
+		CategoryID: body.CategoryID,
+	}); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
-		views.RenderTopic(w, r, topic)
+		views.RenderTopic(w, r, t)
 	}
 }
 
 func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := models.ReadTopic(ctx, params["id"]); err != nil {
+	if t, err := impl.repo.GetByID(r.Context(), params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
-	} else if topic == nil {
+	} else if t == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 	} else {
-		views.RenderTopic(w, r, topic)
+		views.RenderTopic(w, r, t)
 	}
 }
 
 func (impl *topicImpl) index(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	if topics, err := models.ReadTopics(ctx, offset); err != nil {
+	if topics, err := impl.repo.GetByOffset(r.Context(), offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

@@ -13,7 +13,7 @@ import (
 )
 
 type userImpl struct {
-	repo *user.UserDatastore
+	repo user.UserDatastore
 }
 
 type userRequest struct {
@@ -77,13 +77,13 @@ func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[st
 
 func (impl *userImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	user, err := impl.repo.GetByID(ctx, params["id"])
+	user, err := impl.repo.GetByID(r.Context(), params["id"])
 
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if user == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if topics, err := user.ReadTopics(ctx, offset); err != nil {
+	} else if topics, err := user.ReadTopics(r.Context(), offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

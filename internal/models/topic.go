@@ -62,67 +62,6 @@ type Topic struct {
 	Category *Category
 }
 
-//CreateTopic create a new Topic
-func (user *User) CreateTopic(mctx *Context, title, body, categoryID string) (*Topic, error) {
-	ctx := mctx.context
-	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
-	if len(title) < minTitleSize {
-		return nil, session.BadDataError(ctx)
-	}
-
-	t := time.Now()
-	topic := &Topic{
-		TopicID:   uuid.Must(uuid.NewV4()).String(),
-		Title:     title,
-		Body:      body,
-		UserID:    user.UserID,
-		CreatedAt: t,
-		UpdatedAt: t,
-	}
-	var err error
-	topic.ShortID, err = generateShortID("topics", t)
-	if err != nil {
-		return nil, session.ServerError(ctx, err)
-	}
-
-	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		category, err := findCategory(ctx, tx, categoryID)
-		if err != nil {
-			return err
-		}
-		if category == nil {
-			return session.BadDataError(ctx)
-		}
-		topic.CategoryID = category.CategoryID
-		category.LastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
-		count, err := topicsCountByCategory(ctx, tx, category.CategoryID)
-		if err != nil {
-			return err
-		}
-		category.TopicsCount, category.UpdatedAt = count+1, time.Now()
-		cols, params := durable.PrepareColumnsWithValues(topicColumns)
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO topics(%s) VALUES (%s)", cols, params), topic.values()...)
-		if err != nil {
-			return err
-		}
-		ccols, cparams := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
-		cvals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", ccols, cparams, category.CategoryID), cvals...)
-		if err != nil {
-			return err
-		}
-		_, err = upsertStatistic(ctx, tx, "topics")
-		return err
-	})
-	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
-		return nil, session.TransactionError(ctx, err)
-	}
-	return topic, nil
-}
-
 // UpdateTopic update a Topic by ID
 func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string) (*Topic, error) {
 	ctx := mctx.context
@@ -410,12 +349,6 @@ func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, er
 		return nil, nil
 	}
 	return t, err
-}
-
-func topicsCountByCategory(ctx context.Context, tx *sql.Tx, id string) (int64, error) {
-	var count int64
-	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics WHERE category_id=$1", id).Scan(&count)
-	return count, err
 }
 
 func topicsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
