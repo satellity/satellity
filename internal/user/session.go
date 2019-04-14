@@ -56,7 +56,7 @@ func checkSecret(ctx context.Context, sessionSecret string) error {
 	return nil
 }
 
-func (d *Data) addSession(ctx context.Context, tx *sql.Tx, secret string) (*Session, error) {
+func (d *Model) addSession(ctx context.Context, tx *sql.Tx, secret string) (*Session, error) {
 	s := &Session{
 		SessionID: uuid.Must(uuid.NewV4()).String(),
 		UserID:    d.UserID,

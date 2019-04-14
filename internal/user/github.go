@@ -106,7 +106,7 @@ func featchUserEmail(ctx context.Context, accessToken string) (string, error) {
 	return emails[0].Email, nil
 }
 
-func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*Data, error) {
+func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*Model, error) {
 	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
 	if err != nil {
 		return nil, err

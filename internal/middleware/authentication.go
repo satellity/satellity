@@ -30,8 +30,8 @@ type contextValueKey int
 const keyCurrentUser contextValueKey = 1000
 
 // CurrentUser read the user from r.Context
-func CurrentUser(r *http.Request) *user.Data {
-	user, _ := r.Context().Value(keyCurrentUser).(*user.Data)
+func CurrentUser(r *http.Request) *user.Model {
+	user, _ := r.Context().Value(keyCurrentUser).(*user.Model)
 	return user
 }
 

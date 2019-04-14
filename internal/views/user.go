@@ -30,7 +30,7 @@ type AccountView struct {
 	Role      string `json:"role"`
 }
 
-func buildUser(u *user.Data) UserView {
+func buildUser(u *user.Model) UserView {
 	return UserView{
 		Type:      "user",
 		UserID:    u.UserID,
@@ -43,12 +43,12 @@ func buildUser(u *user.Data) UserView {
 }
 
 // RenderUser response a user
-func RenderUser(w http.ResponseWriter, r *http.Request, u *user.Data) {
+func RenderUser(w http.ResponseWriter, r *http.Request, u *user.Model) {
 	RenderResponse(w, r, buildUser(u))
 }
 
 // RenderUsers response a bundle of users
-func RenderUsers(w http.ResponseWriter, r *http.Request, users []*user.Data) {
+func RenderUsers(w http.ResponseWriter, r *http.Request, users []*user.Model) {
 	userViews := make([]UserView, len(users))
 	for i, user := range users {
 		userViews[i] = buildUser(user)
@@ -57,7 +57,7 @@ func RenderUsers(w http.ResponseWriter, r *http.Request, users []*user.Data) {
 }
 
 // RenderAccount response
-func RenderAccount(w http.ResponseWriter, r *http.Request, u *user.Data) {
+func RenderAccount(w http.ResponseWriter, r *http.Request, u *user.Model) {
 	accountView := AccountView{
 		UserView:  buildUser(u),
 		Username:  u.Username,

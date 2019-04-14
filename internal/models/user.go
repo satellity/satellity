@@ -3,10 +3,8 @@ package models
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"godiscourse/internal/configs"
 	"godiscourse/internal/durable"
-	"strings"
 	"time"
 )
 
@@ -44,36 +42,6 @@ type User struct {
 }
 
 var userColumns = []string{"user_id", "email", "username", "nickname", "biography", "encrypted_password", "github_id", "created_at", "updated_at"}
-
-func readUsersByIds(ctx context.Context, tx *sql.Tx, ids []string) ([]*User, error) {
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id IN ('%s') LIMIT 100", strings.Join(userColumns, ","), strings.Join(ids, "','")))
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var users []*User
-	for rows.Next() {
-		user, err := userFromRows(rows)
-		if err != nil {
-			return nil, err
-		}
-		users = append(users, user)
-	}
-	return users, rows.Err()
-}
-
-func readUserSet(ctx context.Context, tx *sql.Tx, ids []string) (map[string]*User, error) {
-	users, err := readUsersByIds(ctx, tx, ids)
-	if err != nil {
-		return nil, err
-	}
-	set := make(map[string]*User, 0)
-	for _, u := range users {
-		set[u.UserID] = u
-	}
-	return set, nil
-}
 
 // Role of an user, contains admin and member for now.
 func (u *User) Role() string {

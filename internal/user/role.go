@@ -5,7 +5,7 @@ import (
 )
 
 // Role of an user, contains admin and member for now.
-func (u *Data) Role() string {
+func (u *Model) Role() string {
 	if configs.Operators[u.Email.String] {
 		return "admin"
 	}
@@ -13,13 +13,13 @@ func (u *Data) Role() string {
 }
 
 // Name is nickname or username
-func (u *Data) Name() string {
+func (u *Model) Name() string {
 	if u.Nickname != "" {
 		return u.Nickname
 	}
 	return u.Username
 }
 
-func (u *Data) isAdmin() bool {
+func (u *Model) IsAdmin() bool {
 	return u.Role() == "admin"
 }

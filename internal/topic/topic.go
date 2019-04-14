@@ -33,7 +33,7 @@ type Model struct {
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 
-	User     *user.Data
+	User     *user.Model
 	Category *category.Model
 }
 
@@ -45,12 +45,12 @@ type Params struct {
 
 type TopicDatastore interface {
 	Create(ctx context.Context, uid string, p *Params) (*Model, error)
-	Update(ctx context.Context, uid string, id string, p *Params) (*Model, error)
+	Update(ctx context.Context, user *user.Model, id string, p *Params) (*Model, error)
 	GetByID(ctx context.Context, id string) (*Model, error)
 	GetByShortID(ctx context.Context, id string) (*Model, error)
-	GetByOffset(ctx context.Context, offset time.Time) ([]*Model, error)
-	GetByUserID(ctx context.Context, uid string, offset time.Time) ([]*Model, error)
-	GetByCategoryID(ctx context.Context, cid string, offset time.Time) ([]*Model, error)
+	GetByOffset(ctx context.Context, offset time.Time) ([]*Model, error) // equal ReadTopics
+	GetByUserID(ctx context.Context, user *user.Model, offset time.Time) ([]*Model, error)
+	GetByCategoryID(ctx context.Context, cat *category.Model, offset time.Time) ([]*Model, error)
 }
 
 type Topic struct {
@@ -125,4 +125,254 @@ func (t *Topic) Create(ctx context.Context, uid string, p *Params) (*Model, erro
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topic, nil
+}
+
+func (t *Topic) Update(ctx context.Context, user *user.Model, id string, p *Params) (*Model, error) {
+	title, body := strings.TrimSpace(p.Title), strings.TrimSpace(p.Body)
+	if title != "" && len(title) < minTitleSize {
+		return nil, session.BadDataError(ctx)
+	}
+
+	var topic *Model
+	var prevCategoryID string
+	err := t.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		topic, err = findTopic(ctx, tx, id)
+		if err != nil {
+			return err
+		} else if topic == nil {
+			return nil
+		} else if topic.UserID != user.UserID && !user.IsAdmin() {
+			return session.AuthorizationError(ctx)
+		}
+		if title != "" {
+			topic.Title = title
+		}
+		topic.Body = body
+		if p.CategoryID != "" && topic.CategoryID != p.CategoryID {
+			prevCategoryID = topic.CategoryID
+			// todo: use public category function
+			category, err := findCategory(ctx, tx, p.CategoryID)
+			if err != nil {
+				return err
+			} else if category == nil {
+				return session.BadDataError(ctx)
+			}
+			topic.CategoryID = category.CategoryID
+			topic.Category = category
+		}
+		cols, params := durable.PrepareColumnsWithValues([]string{"title", "body", "category_id"})
+		vals := []interface{}{topic.Title, topic.Body, topic.CategoryID}
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), vals...)
+		return err
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	if topic == nil {
+		return nil, session.NotFoundError(ctx)
+	}
+	if prevCategoryID != "" {
+		// todo use public category function
+		// go dispersalCategory(mctx, prevCategoryID)
+		// go dispersalCategory(mctx, topic.CategoryID)
+	}
+	topic.User = user
+	return topic, nil
+}
+
+func (t *Topic) GetByID(ctx context.Context, id string) (*Model, error) {
+	var topic *Model
+	err := t.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		topic, err = findTopic(ctx, tx, id)
+		if err != nil {
+			return err
+		}
+		if topic == nil {
+			subs := strings.Split(id, "-")
+			if len(subs) < 1 || len(subs[0]) <= 5 {
+				return nil
+			}
+			id = subs[0]
+			topic, err = findTopicByShortID(ctx, tx, id)
+			if topic == nil || err != nil {
+				return err
+			}
+		}
+		user, err := t.userStore.GetByID(ctx, topic.UserID)
+		if err != nil {
+			return err
+		}
+		category, err := findCategory(ctx, tx, topic.CategoryID)
+		if err != nil {
+			return err
+		}
+		topic.User = user
+		topic.Category = category
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topic, nil
+}
+
+func (t *Topic) GetByShortID(ctx context.Context, id string) (*Model, error) {
+	subs := strings.Split(id, "-")
+	if len(subs) < 1 || len(subs[0]) <= 5 {
+		return nil, nil
+	}
+	id = subs[0]
+
+	var topic *Model
+	err := t.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		topic, err = findTopicByShortID(ctx, tx, id)
+		if topic == nil || err != nil {
+			return err
+		}
+		user, err := t.userStore.GetByID(ctx, topic.UserID)
+		if err != nil {
+			return err
+		}
+		category, err := findCategory(ctx, tx, topic.CategoryID)
+		if err != nil {
+			return err
+		}
+		topic.User = user
+		topic.Category = category
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topic, nil
+}
+
+func (t *Topic) GetByOffset(ctx context.Context, offset time.Time) ([]*Model, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+
+	var topics []*Model
+	err := t.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		set, err := readCategorySet(ctx, tx)
+		if err != nil {
+			return err
+		}
+
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		userIds := []string{}
+		for rows.Next() {
+			topic, err := topicFromRows(rows)
+			if err != nil {
+				return err
+			}
+			userIds = append(userIds, topic.UserID)
+			topic.Category = set[topic.CategoryID]
+			topics = append(topics, topic)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		userSet, err := t.userStore.GetUserSet(ctx, tx, userIds)
+		if err != nil {
+			return err
+		}
+		for i, topic := range topics {
+			topics[i].User = userSet[topic.UserID]
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topics, nil
+}
+
+func (t *Topic) GetByUserID(ctx context.Context, user *user.Model, offset time.Time) ([]*Model, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+
+	var topics []*Model
+	err := t.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		set, err := readCategorySet(ctx, tx)
+		if err != nil {
+			return err
+		}
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, user.UserID, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			topic, err := topicFromRows(rows)
+			if err != nil {
+				return err
+			}
+			topic.User = user
+			topic.Category = set[topic.CategoryID]
+			topics = append(topics, topic)
+		}
+		return rows.Err()
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topics, nil
+}
+
+func (t *Topic) GetByCategoryID(ctx context.Context, cat *category.Model, offset time.Time) ([]*Model, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+
+	var topics []*Model
+	err := t.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, cat.CategoryID, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		userIds := []string{}
+		for rows.Next() {
+			topic, err := topicFromRows(rows)
+			if err != nil {
+				return err
+			}
+			userIds = append(userIds, topic.UserID)
+			topic.Category = cat
+			topics = append(topics, topic)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		userSet, err := t.userStore.GetUserSet(ctx, tx, userIds)
+		if err != nil {
+			return err
+		}
+		for i, topic := range topics {
+			topics[i].User = userSet[topic.UserID]
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topics, nil
 }
