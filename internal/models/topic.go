@@ -74,15 +74,6 @@ func findTopic(ctx context.Context, tx *sql.Tx, id string) (*Topic, error) {
 	return t, err
 }
 
-func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, error) {
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
-	t, err := topicFromRows(row)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-	return t, err
-}
-
 func topicsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	var count int64
 	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics").Scan(&count)

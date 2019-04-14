@@ -63,7 +63,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 	}
 
 	u := middleware.CurrentUser(r)
-	if t, err := impl.repo.Update(r.Context(), u.UserID, params["id"], &topic.Params{
+	if t, err := impl.repo.Update(r.Context(), u, params["id"], &topic.Params{
 		Title:      body.Title,
 		Body:       body.Body,
 		CategoryID: body.CategoryID,

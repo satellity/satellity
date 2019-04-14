@@ -51,6 +51,7 @@ type TopicDatastore interface {
 	GetByOffset(ctx context.Context, offset time.Time) ([]*Model, error) // equal ReadTopics
 	GetByUserID(ctx context.Context, user *user.Model, offset time.Time) ([]*Model, error)
 	GetByCategoryID(ctx context.Context, cat *category.Model, offset time.Time) ([]*Model, error)
+	LastTopic(ctx context.Context, tx *sql.Tx) (*Topic, error)
 }
 
 type Topic struct {
@@ -152,7 +153,7 @@ func (t *Topic) Update(ctx context.Context, user *user.Model, id string, p *Para
 		if p.CategoryID != "" && topic.CategoryID != p.CategoryID {
 			prevCategoryID = topic.CategoryID
 			// todo: use public category function
-			category, err := findCategory(ctx, tx, p.CategoryID)
+			category, err := t.categoryStore.Find(ctx, tx, p.CategoryID)
 			if err != nil {
 				return err
 			} else if category == nil {
@@ -207,7 +208,7 @@ func (t *Topic) GetByID(ctx context.Context, id string) (*Model, error) {
 		if err != nil {
 			return err
 		}
-		category, err := findCategory(ctx, tx, topic.CategoryID)
+		category, err := t.categoryStore.Find(ctx, tx, topic.CategoryID)
 		if err != nil {
 			return err
 		}
@@ -239,7 +240,7 @@ func (t *Topic) GetByShortID(ctx context.Context, id string) (*Model, error) {
 		if err != nil {
 			return err
 		}
-		category, err := findCategory(ctx, tx, topic.CategoryID)
+		category, err := t.categoryStore.Find(ctx, tx, topic.CategoryID)
 		if err != nil {
 			return err
 		}
@@ -260,7 +261,7 @@ func (t *Topic) GetByOffset(ctx context.Context, offset time.Time) ([]*Model, er
 
 	var topics []*Model
 	err := t.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		set, err := readCategorySet(ctx, tx)
+		set, err := t.categoryStore.GetCategorySet(ctx, tx)
 		if err != nil {
 			return err
 		}
@@ -307,7 +308,7 @@ func (t *Topic) GetByUserID(ctx context.Context, user *user.Model, offset time.T
 
 	var topics []*Model
 	err := t.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		set, err := readCategorySet(ctx, tx)
+		set, err := t.categoryStore.GetCategorySet(ctx, tx)
 		if err != nil {
 			return err
 		}
@@ -375,4 +376,13 @@ func (t *Topic) GetByCategoryID(ctx context.Context, cat *category.Model, offset
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
+}
+
+func (t *Topic) LastTopic(ctx context.Context, cid string, tx *sql.Tx) (*Model, error) {
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(topicColumns, ",")), cid)
+	t, err := topicFromRows(row)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return t, err
 }
