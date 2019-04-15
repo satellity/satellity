@@ -6,7 +6,7 @@
   "topic": {
     "title": {
       "new": "Create a new topic",
-      "edit": "Edit %{name}"
+      "edit": "Edit: %{name}"
     },
     "new": "New Topic",
     "in": "IN",

@@ -1,7 +1,7 @@
 @import '../assets/css/constant.scss';
 
 /* show page */
-.form_loading {
+.formLoading {
   background: white;
   text-align: center;
   padding: .8rem 0 0;
@@ -55,62 +55,6 @@
 }
 .body {
   padding: .8rem .8rem 1.6rem;
-}
-/* new & edit page */
-.rules {
-  border-top: .3rem solid $color-main-purple;
-  background-color: white;
-  padding: .8rem;
-  li {
-    padding: 0 0 .4rem;
-  }
-}
-.form {
-  background: white;
-  box-sizing: border-box;
-  cursor: pointer;
-  padding: .8rem;
-}
-.categories {
-  margin-bottom: 1rem;
-}
-.category {
-  background: $color-bg-light-grey;
-  border-radius: .2rem;
-  display: inline-block;
-  padding: .2rem .8rem;
-  margin-right: .8rem;
-  &:hover {
-    background: rgba($color-main-red, $color-main-red-alpha);
-    color: white;
-  }
-}
-.categoryCurrent {
-  background: rgba($color-main-red, $color-main-red-alpha);
-  color: white;
-}
-.preview {
-  text-align: right;
-}
-.eye {
-  color: rgba($color-main-dark, .8);
-  &:hover {
-    color: $color-main-dark;
-  }
-}
-.preview_body {
-  padding: .6rem .3rem;
-}
-.topic_body {
-  border: 1px solid #ccc;
-  margin-bottom: 1rem;
-  min-height: 24rem;
-  overflow: hidden;
-  pre {
-    font-size: 1rem;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
 }
 @media only screen and (max-width: 64rem) {
   .avatar {

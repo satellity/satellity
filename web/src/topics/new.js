@@ -1,7 +1,7 @@
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/xq-light.css');
 require('codemirror/mode/markdown/markdown.js');
-import style from './style.scss';
+import style from './new.scss';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import {Controlled as CodeMirror} from 'react-codemirror2'
@@ -127,7 +127,7 @@ class TopicNew extends Component {
     let state = this.state;
     const categories = state.categories.map((c) => {
       return (
-        <span key={c.category_id} className={`${style.category} ${c.category_id === state.category_id ? style.categoryCurrent : ''}`} onClick={(e) => this.handleCategoryClick(e, c.category_id)}>{c.alias}</span>
+        <span key={c.category_id} className={`${style.category} ${c.category_id === state.category_id ? style.active : ''}`} onClick={(e) => this.handleCategoryClick(e, c.category_id)}>{c.alias}</span>
       )
     });
 
@@ -137,7 +137,7 @@ class TopicNew extends Component {
     }
 
     const loadingView = (
-      <div className={style.form_loading}>
+      <div className={style.loading}>
         <LoadingView style='md-ring'/>
       </div>
     )
@@ -150,8 +150,10 @@ class TopicNew extends Component {
         <div>
           <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' placeholder='Title *' onChange={this.handleChange} />
         </div>
-        <div className={style.preview}> <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> </div>
-        <div className={style.topic_body}>
+        <div className={style.actions}>
+          <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} />
+        </div>
+        <div className={style.body}>
           {
             !state.preview &&
             <CodeMirror
@@ -169,11 +171,11 @@ class TopicNew extends Component {
           }
           {
             state.preview &&
-            <article className={`md ${style.preview_body}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
+            <article className={`md ${style.preview}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
             </article>
           }
         </div>
-        <div className='action'>
+        <div>
           <button className='btn submit' disabled={state.submitting}>
             { state.submitting && <LoadingView style='sm-ring blank'/> }
             &nbsp;{i18n.t('general.submit')}
