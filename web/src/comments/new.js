@@ -7,10 +7,12 @@ import LoadingView from '../loading/loading.js';
 class CommentNew extends Component {
   constructor(props) {
     super(props);
+
     this.api = new API();
+    this.state = {topic_id: props.topicId, body: '', submitting: false};
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.state = {topic_id: props.topicId, body: '', submitting: false};
   }
 
   handleChange(e) {

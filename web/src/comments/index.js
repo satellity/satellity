@@ -82,6 +82,7 @@ class CommentIndex extends Component {
           </span>
         )
       }
+
       return (
         <li className={style.comment} key={comment.comment_id}>
           <div className={style.profile}>
