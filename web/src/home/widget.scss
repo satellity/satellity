@@ -19,9 +19,6 @@
 .site {
   margin: 0 0 .2rem;
   font-weight: normal;
-  svg {
-    margin-right: .4rem;
-  }
 }
 .features {
   li {
@@ -33,13 +30,11 @@
   text-align: center;
   a {
     background: rgba(218, 40, 16, 0.8);
+    border-radius: 0.2rem;
     box-sizing: border-box;
     color: white;
     display: block;
     padding: 0.4rem 0.8rem;
-    &:after {
-      background: white;
-    }
   }
 }
 .copyright {
@@ -47,4 +42,9 @@
   font-family: America, sans-serif;
   font-size: .875rem;
   margin-top: 1.6rem;
+}
+@media only screen and (max-width: 64rem) {
+  .signIn, .newTopic {
+    padding: .8rem;
+  }
 }

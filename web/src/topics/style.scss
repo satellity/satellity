@@ -1,11 +1,6 @@
 @import '../assets/css/constant.scss';
 
 /* show page */
-.formLoading {
-  background: white;
-  text-align: center;
-  padding: .8rem 0 0;
-}
 .loading {
   background: $color-bg-light-grey;
   text-align: center;
@@ -30,6 +25,13 @@
     font-weight: normal;
     line-height: 2.4rem;
   }
+  .info {
+    font-size: .875rem;
+    color: $color-font-grey;
+  }
+  .sep {
+    padding: 0 .4rem;
+  }
   .avatar {
     border-radius: 2.4rem;
     width: 2.4rem;
@@ -46,23 +48,6 @@
   font-size: 1rem;
   margin-left: 0.8rem;
 }
-.info {
-  font-size: .875rem;
-  color: $color-font-grey;
-}
-.sep {
-  padding: 0 .4rem;
-}
 .body {
   padding: .8rem .8rem 1.6rem;
-}
-@media only screen and (max-width: 64rem) {
-  .avatar {
-    border-radius: 3.2rem;
-    width: 3.2rem;
-    height: 3.2rem;
-  }
-  .body {
-    padding: .8rem .8rem 1.6rem;
-  }
 }
