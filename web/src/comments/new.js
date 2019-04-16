@@ -38,7 +38,11 @@ class CommentNew extends Component {
   render() {
     let state = this.state;
     if (!this.api.user.loggedIn()) {
-      return ''
+      return (
+        <div className={style.custom}>
+          {i18n.t('comment.custom')}
+        </div>
+      )
     }
     return (
       <div className={style.form}>
