@@ -51,6 +51,14 @@ type Comment struct {
 	topicStore *topic.Topic
 }
 
+func New(db *durable.Database, u *user.User, t *topic.Topic) *Comment {
+	return &Comment{
+		db:         db,
+		userStore:  u,
+		topicStore: t,
+	}
+}
+
 func (c *Comment) Create(ctx context.Context, p *Params) (*Model, error) {
 	body := strings.TrimSpace(p.Body)
 	if len(body) < minCommentBodySize {

@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"godiscourse/internal/durable"
+	"godiscourse/internal/comment"
 	"godiscourse/internal/middleware"
-	"godiscourse/internal/models"
 	"godiscourse/internal/session"
+	"godiscourse/internal/topic"
 	"godiscourse/internal/views"
 	"net/http"
 	"time"
@@ -14,7 +14,8 @@ import (
 )
 
 type commentImpl struct {
-	database *durable.Database
+	comment comment.CommentDatastore
+	topic   topic.TopicDatastore
 }
 
 type commentRequest struct {
@@ -22,8 +23,11 @@ type commentRequest struct {
 	Body    string `json:"body"`
 }
 
-func registerComment(database *durable.Database, router *httptreemux.TreeMux) {
-	impl := &commentImpl{database: database}
+func RegisterComment(c *comment.Comment, t *topic.Topic, router *httptreemux.TreeMux) {
+	impl := &commentImpl{
+		comment: c,
+		topic:   t,
+	}
 
 	router.POST("/comments", impl.create)
 	router.POST("/comments/:id", impl.update)
@@ -37,8 +41,12 @@ func (impl *commentImpl) create(w http.ResponseWriter, r *http.Request, _ map[st
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
-	if comment, err := middleware.CurrentUser(r).CreateComment(ctx, body.TopicID, body.Body); err != nil {
+
+	if comment, err := impl.comment.Create(r.Context(), &comment.Params{
+		UserID:  middleware.CurrentUser(r).UserID,
+		TopicID: body.TopicID,
+		Body:    body.Body,
+	}); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComment(w, r, comment)
@@ -51,8 +59,12 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
-	if comment, err := middleware.CurrentUser(r).CreateComment(ctx, params["id"], body.Body); err != nil {
+
+	if comment, err := impl.comment.Create(r.Context(), &comment.Params{
+		UserID:  middleware.CurrentUser(r).UserID,
+		TopicID: params["id"],
+		Body:    body.Body,
+	}); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComment(w, r, comment)
@@ -60,8 +72,7 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 }
 
 func (impl *commentImpl) destory(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
-	if err := middleware.CurrentUser(r).DeleteComment(ctx, params["id"]); err != nil {
+	if err := impl.comment.Delete(r.Context(), params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)
@@ -70,12 +81,12 @@ func (impl *commentImpl) destory(w http.ResponseWriter, r *http.Request, params 
 
 func (impl *commentImpl) comments(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	ctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := models.ReadTopic(ctx, params["id"]); err != nil {
+
+	if topic, err := impl.topic.GetByID(r.Context(), params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if comments, err := topic.ReadComments(ctx, offset); err != nil {
+	} else if comments, err := impl.comment.GetByTopicID(r.Context(), topic.TopicID, offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComments(w, r, comments)

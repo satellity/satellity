@@ -14,7 +14,6 @@ import (
 // RegisterRoutes register all routes
 func RegisterRoutes(database *durable.Database, router *httptreemux.TreeMux) {
 	router.GET("/_hc", health)
-	registerComment(database, router)
 	admin.RegisterAdminRoutes(database, router)
 }
 
