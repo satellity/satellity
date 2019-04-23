@@ -4,12 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"godiscourse/internal/durable"
 	"godiscourse/internal/session"
-	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
 	hashids "github.com/speps/go-hashids"
 )
 
@@ -39,51 +36,10 @@ CREATE INDEX ON topics (category_id, created_at DESC);
 CREATE INDEX ON topics (score DESC, created_at DESC);
 `
 
-var topicColumns = []string{"topic_id", "short_id", "title", "body", "comments_count", "category_id", "user_id", "score", "created_at", "updated_at"}
-
-func (t *Topic) values() []interface{} {
-	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.CommentsCount, t.CategoryID, t.UserID, t.Score, t.CreatedAt, t.UpdatedAt}
-}
-
-// Topic is what use talking about
-type Topic struct {
-	TopicID       string
-	ShortID       string
-	Title         string
-	Body          string
-	CommentsCount int64
-	CategoryID    string
-	UserID        string
-	Score         int
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-
-	User     *User
-	Category *Category
-}
-
-func findTopic(ctx context.Context, tx *sql.Tx, id string) (*Topic, error) {
-	if _, err := uuid.FromString(id); err != nil {
-		return nil, nil
-	}
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(topicColumns, ",")), id)
-	t, err := topicFromRows(row)
-	if sql.ErrNoRows == err {
-		return nil, nil
-	}
-	return t, err
-}
-
 func topicsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	var count int64
 	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics").Scan(&count)
 	return count, err
-}
-
-func topicFromRows(row durable.Row) (*Topic, error) {
-	var t Topic
-	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.CommentsCount, &t.CategoryID, &t.UserID, &t.Score, &t.CreatedAt, &t.UpdatedAt)
-	return &t, err
 }
 
 func generateShortID(table string, t time.Time) (string, error) {

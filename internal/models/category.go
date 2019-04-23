@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"godiscourse/internal/session"
-	"time"
 )
 
 // topics_count should use pg int64
@@ -23,19 +22,6 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE INDEX ON categories (position);
 `
-
-// Category is used to categorize topics.
-type Category struct {
-	CategoryID  string
-	Name        string
-	Alias       string
-	Description string
-	TopicsCount int64
-	LastTopicID sql.NullString
-	Position    int64
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
 
 func categoryCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	var count int64
