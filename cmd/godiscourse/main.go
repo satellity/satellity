@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"godiscourse/internal/category"
+	"godiscourse/internal/comment"
 	"godiscourse/internal/configs"
 	"godiscourse/internal/controllers"
 	"godiscourse/internal/controllers/admin"
@@ -12,7 +13,6 @@ import (
 	"godiscourse/internal/middleware"
 	"godiscourse/internal/topic"
 	"godiscourse/internal/user"
-	"godiscourse/internal/comment"
 	"log"
 	"net/http"
 	"os"
@@ -31,15 +31,19 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	cat := category.New(database)
 	t := topic.New(database, u, cat)
 	c := comment.New(database, u, t)
+
 	router := httptreemux.New()
 
 	controllers.RegisterHanders(router)
-	controllers.RegisterRoutes(database, router)
-	controllers.RegisterUser(u, router)
-	controllers.RegisterCategory(cat, router)
-	controllers.RegisterTopic(t, u, router)
+	controllers.HealthCheck(router)
+	controllers.RegisterUser(u, t, router)
+	controllers.RegisterCategory(cat, t, router)
+	controllers.RegisterTopic(t, router)
 	controllers.RegisterComment(c, t, router)
+
 	admin.RegisterAdminUser(u, router)
+	admin.RegisterAdminCategory(cat, router)
+	admin.RegisterAdminTopic(t, router)
 
 	handler := middleware.Authenticate(u, router)
 	handler = middleware.Constraint(handler)

@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"godiscourse/internal/configs"
-	"godiscourse/internal/controllers/admin"
-	"godiscourse/internal/durable"
 	"godiscourse/internal/views"
 	"net/http"
 	"runtime"
@@ -11,10 +9,8 @@ import (
 	"github.com/dimfeld/httptreemux"
 )
 
-// RegisterRoutes register all routes
-func RegisterRoutes(database *durable.Database, router *httptreemux.TreeMux) {
+func HealthCheck(router *httptreemux.TreeMux) {
 	router.GET("/_hc", health)
-	admin.RegisterAdminRoutes(database, router)
 }
 
 func health(w http.ResponseWriter, r *http.Request, _ map[string]string) {

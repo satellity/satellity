@@ -10,18 +10,18 @@ import (
 )
 
 type userImpl struct {
-	repo *user.UserDatastore
+	user user.UserDatastore
 }
 
-func RegisterAdminUser(r *user.User, router *httptreemux.TreeMux) {
-	impl := &userImpl{repo: r}
+func RegisterAdminUser(u user.UserDatastore, router *httptreemux.TreeMux) {
+	impl := &userImpl{user: u}
 
 	router.GET("/admin/users", impl.index)
 }
 
 func (impl *userImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	users, err := impl.repo.GetByOffset(r.Context(), offset)
+	users, err := impl.user.GetByOffset(r.Context(), offset)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return

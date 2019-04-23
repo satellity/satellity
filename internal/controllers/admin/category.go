@@ -2,8 +2,7 @@ package admin
 
 import (
 	"encoding/json"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/models"
+	"godiscourse/internal/category"
 	"godiscourse/internal/session"
 	"godiscourse/internal/views"
 	"net/http"
@@ -12,7 +11,7 @@ import (
 )
 
 type adminCategoryImpl struct {
-	database *durable.Database
+	category category.CategoryDatastore
 }
 
 type categoryRequest struct {
@@ -22,8 +21,8 @@ type categoryRequest struct {
 	Position    int64  `json:"position"`
 }
 
-func registerAdminCategory(database *durable.Database, router *httptreemux.TreeMux) {
-	impl := &adminCategoryImpl{database: database}
+func RegisterAdminCategory(c category.CategoryDatastore, router *httptreemux.TreeMux) {
+	impl := &adminCategoryImpl{category: c}
 
 	router.POST("/admin/categories", impl.create)
 	router.GET("/admin/categories", impl.index)
@@ -37,8 +36,12 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.CreateCategory(ctx, body.Name, body.Alias, body.Description, body.Position)
+	category, err := impl.category.Create(r.Context(), &category.Params{
+		Name:        body.Name,
+		Alias:       body.Alias,
+		Description: body.Description,
+		Position:    body.Position,
+	})
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
@@ -47,8 +50,7 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 }
 
 func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
-	categories, err := models.ReadAllCategories(ctx)
+	categories, err := impl.category.GetAll(r.Context())
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
@@ -62,8 +64,13 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.UpdateCategory(ctx, params["id"], body.Name, body.Alias, body.Description, body.Position)
+
+	category, err := impl.category.Update(r.Context(), params["id"], &category.Params{
+		Name:        body.Name,
+		Alias:       body.Alias,
+		Description: body.Description,
+		Position:    body.Position,
+	})
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
@@ -72,8 +79,7 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 }
 
 func (impl *adminCategoryImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.ReadCategory(ctx, params["id"])
+	category, err := impl.category.GetByID(r.Context(), params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return

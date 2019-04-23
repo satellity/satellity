@@ -23,7 +23,7 @@ type commentRequest struct {
 	Body    string `json:"body"`
 }
 
-func RegisterComment(c *comment.Comment, t *topic.Topic, router *httptreemux.TreeMux) {
+func RegisterComment(c comment.CommentDatastore, t *topic.Topic, router *httptreemux.TreeMux) {
 	impl := &commentImpl{
 		comment: c,
 		topic:   t,
@@ -72,7 +72,7 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 }
 
 func (impl *commentImpl) destory(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if err := impl.comment.Delete(r.Context(), params["id"]); err != nil {
+	if err := impl.comment.Delete(r.Context(), params["id"], middleware.CurrentUser(r).UserID); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)

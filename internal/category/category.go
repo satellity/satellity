@@ -167,7 +167,7 @@ func (c *Category) GetAll(ctx context.Context) ([]*Model, error) {
 	return categories, nil
 }
 
-func GetCategorySet(ctx context.Context, tx *sql.Tx) (map[string]*Model, error) {
+func (c *Category) GetCategorySet(ctx context.Context, tx *sql.Tx) (map[string]*Model, error) {
 	categories, err := readCategories(ctx, tx)
 	if err != nil {
 		return nil, err

@@ -1,8 +1,7 @@
 package admin
 
 import (
-	"godiscourse/internal/durable"
-	"godiscourse/internal/models"
+	"godiscourse/internal/topic"
 	"godiscourse/internal/views"
 	"net/http"
 	"time"
@@ -11,19 +10,18 @@ import (
 )
 
 type topicImpl struct {
-	database *durable.Database
+	topic topic.TopicDatastore
 }
 
-func registerAdminTopic(database *durable.Database, router *httptreemux.TreeMux) {
-	impl := &topicImpl{database: database}
+func RegisterAdminTopic(t topic.TopicDatastore, router *httptreemux.TreeMux) {
+	impl := &topicImpl{topic: t}
 
 	router.GET("/admin/topics", impl.index)
 }
 
 func (impl *topicImpl) index(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	if topics, err := models.ReadTopics(ctx, offset); err != nil {
+	if topics, err := impl.topic.GetByOffset(r.Context(), offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

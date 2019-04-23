@@ -40,7 +40,7 @@ type Params struct {
 type CommentDatastore interface {
 	Create(ctx context.Context, p *Params) (*Model, error)
 	Update(ctx context.Context, p *Params) (*Model, error)
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id, uid string) error
 	GetByTopicID(ctx context.Context, tid string, offset time.Time) ([]*Model, error)
 	GetByUserID(ctx context.Context, uid string, offset time.Time) ([]*Model, error)
 }
