@@ -51,7 +51,6 @@ type TopicDatastore interface {
 	GetByOffset(ctx context.Context, offset time.Time) ([]*Model, error) // equal ReadTopics
 	GetByUserID(ctx context.Context, user *user.Model, offset time.Time) ([]*Model, error)
 	GetByCategoryID(ctx context.Context, cat *category.Model, offset time.Time) ([]*Model, error)
-	LastTopic(ctx context.Context, tx *sql.Tx) (*Topic, error)
 }
 
 type Topic struct {
@@ -177,9 +176,8 @@ func (t *Topic) Update(ctx context.Context, user *user.Model, id string, p *Para
 		return nil, session.NotFoundError(ctx)
 	}
 	if prevCategoryID != "" {
-		// todo use public category function
-		// go dispersalCategory(mctx, prevCategoryID)
-		// go dispersalCategory(mctx, topic.CategoryID)
+		go t.dispersalCategory(ctx, prevCategoryID)
+		go t.dispersalCategory(ctx, topic.CategoryID)
 	}
 	topic.User = user
 	return topic, nil
@@ -378,11 +376,59 @@ func (t *Topic) GetByCategoryID(ctx context.Context, cat *category.Model, offset
 	return topics, nil
 }
 
-func (t *Topic) LastTopic(ctx context.Context, cid string, tx *sql.Tx) (*Model, error) {
+func LastTopic(ctx context.Context, cid string, tx *sql.Tx) (*Model, error) {
 	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(topicColumns, ",")), cid)
 	t, err := topicFromRows(row)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	return t, err
+}
+
+// dispersalCategory update category's info, e.g.: LastTopicID, TopicsCount
+func (t *Topic) dispersalCategory(ctx context.Context, id string) (*category.Model, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
+	var result *category.Model
+	err := t.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		result, err = t.categoryStore.Find(ctx, tx, id)
+		if err != nil {
+			return err
+		} else if result == nil {
+			return session.NotFoundError(ctx)
+		}
+		topic, err := LastTopic(ctx, result.CategoryID, tx)
+		if err != nil {
+			return err
+		}
+		var lastTopicID = sql.NullString{String: "", Valid: false}
+		if topic != nil {
+			lastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
+		}
+		if result.LastTopicID.String != lastTopicID.String {
+			result.LastTopicID = lastTopicID
+		}
+		result.TopicsCount = 0
+		if result.LastTopicID.Valid {
+			count, err := topicsCountByCategory(ctx, tx, result.CategoryID)
+			if err != nil {
+				return err
+			}
+			result.TopicsCount = count
+		}
+		result.UpdatedAt = time.Now()
+		cols, params := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
+		vals := []interface{}{result.LastTopicID, result.TopicsCount, result.UpdatedAt}
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, result.CategoryID), vals...)
+		return err
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	return result, nil
 }
