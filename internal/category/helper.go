@@ -16,6 +16,11 @@ func (m *Model) values() []interface{} {
 	return []interface{}{m.CategoryID, m.Name, m.Alias, m.Description, m.TopicsCount, m.LastTopicID, m.Position, m.CreatedAt, m.UpdatedAt}
 }
 
+func categoryFromRows(row durable.Row) (m *Model, err error) {
+	err = row.Scan(&m.CategoryID, &m.Name, &m.Alias, &m.Description, &m.TopicsCount, &m.LastTopicID, &m.Position, &m.CreatedAt, &m.UpdatedAt)
+	return
+}
+
 func categoryCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	var count int64
 	row := tx.QueryRowContext(ctx, "SELECT count(*) FROM categories")
@@ -24,11 +29,6 @@ func categoryCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 		return 0, session.TransactionError(ctx, err)
 	}
 	return count, nil
-}
-
-func categoryFromRows(row durable.Row) (m *Model, err error) {
-	err = row.Scan(&m.CategoryID, &m.Name, &m.Alias, &m.Description, &m.TopicsCount, &m.LastTopicID, &m.Position, &m.CreatedAt, &m.UpdatedAt)
-	return
 }
 
 func readCategories(ctx context.Context, tx *sql.Tx) ([]*Model, error) {

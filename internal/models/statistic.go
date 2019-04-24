@@ -17,16 +17,6 @@ import (
 // SolidStatisticID is used to generate a solid id from name
 const SolidStatisticID = "540cbd3c-f4eb-479c-bcd8-b5629af57267"
 
-const statisticsDDL = `
-CREATE TABLE IF NOT EXISTS statistics (
-	statistic_id          VARCHAR(36) PRIMARY KEY,
-	name                  VARCHAR(512) NOT NULL,
-	count                 BIGINT NOT NULL DEFAULT 0,
-	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-`
-
 // Statistic is the body of statistic
 type Statistic struct {
 	StatisticID string    `sql:"statistic_id,pk"`
