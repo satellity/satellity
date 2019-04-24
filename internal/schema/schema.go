@@ -1,4 +1,4 @@
-package models
+package schema
 
 const usersDDL = `
 CREATE TABLE IF NOT EXISTS users (

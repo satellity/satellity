@@ -1,8 +1,10 @@
-package models
+package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"godiscourse/internal/durable"
 	"godiscourse/internal/session"
 	"time"
 
@@ -17,8 +19,8 @@ func generateShortID(table string, t time.Time) (string, error) {
 }
 
 // MigrateTopics should be deleted after task TODO
-func MigrateTopics(mctx *Context, offset time.Time, limit int64) (int64, time.Time, error) {
-	ctx := mctx.context
+func MigrateTopics(db *durable.Database, offset time.Time, limit int64) (int64, time.Time, error) {
+	ctx := context.Background()
 	if offset.IsZero() {
 		offset = time.Now()
 	}
@@ -26,7 +28,7 @@ func MigrateTopics(mctx *Context, offset time.Time, limit int64) (int64, time.Ti
 	last := offset
 	var count int64
 	set := make(map[string]string)
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		query := "SELECT topic_id,short_id,created_at FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2"
 		rows, err := tx.QueryContext(ctx, query, offset, limit)
 		if err != nil {
@@ -60,7 +62,7 @@ func MigrateTopics(mctx *Context, offset time.Time, limit int64) (int64, time.Ti
 	}
 	for k, v := range set {
 		query := fmt.Sprintf("UPDATE topics SET short_id='%s' WHERE topic_id='%s'", v, k)
-		_, err = mctx.database.ExecContext(ctx, query)
+		_, err = db.ExecContext(ctx, query)
 		if err != nil {
 			return 0, offset, session.TransactionError(ctx, err)
 		}

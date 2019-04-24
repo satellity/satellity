@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"godiscourse/internal/durable"
-	"godiscourse/internal/models"
 	"log"
 	"os"
 	"time"
@@ -13,11 +12,11 @@ import (
 )
 
 func main() {
-	ctx := setupContext()
+	db := setupContext()
 	offset := time.Now()
 	limit := int64(50)
 	for {
-		count, last, err := models.MigrateTopics(ctx, offset, limit)
+		count, last, err := MigrateTopics(db, offset, limit)
 		if err != nil {
 			log.Panicln(err)
 			time.Sleep(100 * time.Millisecond)
@@ -30,7 +29,7 @@ func main() {
 	}
 }
 
-func setupContext() *models.Context {
+func setupContext() *durable.Database {
 	var opts Options
 	p := flags.NewParser(&opts, flags.Default)
 
@@ -52,8 +51,7 @@ func setupContext() *models.Context {
 	if err != nil {
 		log.Panicln(err)
 	}
-	database := durable.WrapDatabase(db)
-	return models.WrapContext(context.Background(), database)
+	return durable.WrapDatabase(db)
 }
 
 type Options struct {

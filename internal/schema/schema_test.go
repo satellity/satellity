@@ -1,4 +1,4 @@
-package models
+package schema
 
 import (
 	"context"
@@ -23,7 +23,7 @@ const (
 	dropStatisticsDDL = `DROP TABLE IF EXISTS statistics;`
 )
 
-func teardownTestContext(mctx *Context) {
+func teardownTestContext(db *durable.Database) {
 	tables := []string{
 		dropStatisticsDDL,
 		dropCommentsDDL,
@@ -32,7 +32,7 @@ func teardownTestContext(mctx *Context) {
 		dropSessionsDDL,
 		dropUsersDDL,
 	}
-	db := mctx.database
+
 	for _, q := range tables {
 		if _, err := db.Exec(q); err != nil {
 			log.Panicln(err)
@@ -40,7 +40,7 @@ func teardownTestContext(mctx *Context) {
 	}
 }
 
-func setupTestContext() *Context {
+func setupTestContext() *durable.Database {
 	opts := configs.DefaultOptions()
 	if opts.Environment != testEnvironment {
 		log.Panicln(opts.Environment)
@@ -65,6 +65,5 @@ func setupTestContext() *Context {
 			log.Panicln(err)
 		}
 	}
-	database := durable.WrapDatabase(db)
-	return WrapContext(context.Background(), database)
+	return durable.WrapDatabase(db)
 }
