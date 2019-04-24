@@ -18,6 +18,7 @@ const (
 	dropUsersDDL      = `DROP TABLE IF EXISTS users;`
 	dropSessionsDDL   = `DROP TABLE IF EXISTS sessions;`
 	dropCategoriesDDL = `DROP TABLE IF EXISTS categories;`
+	dropTopicUsersDDL = `DROP TABLE IF EXISTS topic_users;`
 	dropTopicsDDL     = `DROP TABLE IF EXISTS topics;`
 	dropCommentsDDL   = `DROP TABLE IF EXISTS comments;`
 	dropStatisticsDDL = `DROP TABLE IF EXISTS statistics;`
@@ -27,6 +28,7 @@ func teardownTestContext(mctx *Context) {
 	tables := []string{
 		dropStatisticsDDL,
 		dropCommentsDDL,
+		dropTopicUsersDDL,
 		dropTopicsDDL,
 		dropCategoriesDDL,
 		dropSessionsDDL,
@@ -42,8 +44,8 @@ func teardownTestContext(mctx *Context) {
 
 func setupTestContext() *Context {
 	opts := configs.DefaultOptions()
-	if opts.Environment != testEnvironment {
-		log.Panicln(opts.Environment)
+	if opts.Environment != testEnvironment || opts.DbName != testDatabase {
+		log.Panicln(opts.Environment, opts.DbName)
 	}
 	db := durable.OpenDatabaseClient(context.Background(), &durable.ConnectionInfo{
 		User:     opts.DbUser,
@@ -57,6 +59,7 @@ func setupTestContext() *Context {
 		sessionsDDL,
 		categoriesDDL,
 		topicsDDL,
+		topicUsersDDL,
 		commentsDDL,
 		statisticsDDL,
 	}

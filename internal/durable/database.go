@@ -136,7 +136,7 @@ func PrepareColumnsWithValues(columns []string) (string, string) {
 	if len(columns) < 1 {
 		return "", ""
 	}
-	cols, params := bytes.Buffer{}, bytes.Buffer{}
+	var cols, params bytes.Buffer
 	for i, column := range columns {
 		if i > 0 {
 			cols.WriteString(",")

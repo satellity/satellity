@@ -21,17 +21,19 @@ func TestTopicCRUD(t *testing.T) {
 	assert.NotNil(category)
 
 	topicCases := []struct {
-		title         string
-		body          string
-		categoryID    string
-		topicsCount   int
-		commentsCount int
-		valid         bool
+		title          string
+		body           string
+		categoryID     string
+		topicsCount    int64
+		commentsCount  int64
+		bookmarksCount int64
+		likesCount     int64
+		valid          bool
 	}{
-		{"", "body", category.CategoryID, 0, 0, false},
-		{"title", "body", uuid.Must(uuid.NewV4()).String(), 0, 0, false},
-		{"title", "body", category.CategoryID, 1, 0, true},
-		{"title2", "body", category.CategoryID, 2, 0, true},
+		{"", "body", category.CategoryID, 0, 0, 0, 0, false},
+		{"title", "body", uuid.Must(uuid.NewV4()).String(), 0, 0, 0, 0, false},
+		{"title", "body", category.CategoryID, 1, 0, 0, 0, true},
+		{"title2", "body", category.CategoryID, 2, 0, 0, 0, true},
 	}
 
 	for _, tc := range topicCases {
@@ -49,12 +51,14 @@ func TestTopicCRUD(t *testing.T) {
 			category, _ = ReadCategory(ctx, category.CategoryID)
 			assert.NotNil(category)
 			assert.Equal(topic.TopicID, category.LastTopicID.String)
-			assert.Equal(int64(tc.topicsCount), category.TopicsCount)
+			assert.Equal(tc.topicsCount, category.TopicsCount)
 			topic, err = ReadTopic(ctx, topic.TopicID)
 			assert.Nil(err)
 			assert.NotNil(topic)
 			assert.Equal(tc.title, topic.Title)
 			assert.Equal(tc.body, topic.Body)
+			assert.Equal(tc.bookmarksCount, topic.BookmarksCount)
+			assert.Equal(tc.likesCount, topic.LikesCount)
 			new, err := ReadTopic(ctx, uuid.Must(uuid.NewV4()).String())
 			assert.Nil(err)
 			assert.Nil(new)
@@ -68,13 +72,13 @@ func TestTopicCRUD(t *testing.T) {
 			assert.Nil(new)
 			topics, err := ReadTopics(ctx, time.Time{})
 			assert.Nil(err)
-			assert.Len(topics, tc.topicsCount)
+			assert.Len(topics, int(tc.topicsCount))
 			topics, err = user.ReadTopics(ctx, time.Time{})
 			assert.Nil(err)
-			assert.Len(topics, tc.topicsCount)
+			assert.Len(topics, int(tc.topicsCount))
 			topics, err = category.ReadTopics(ctx, time.Time{})
 			assert.Nil(err)
-			assert.Len(topics, tc.topicsCount)
+			assert.Len(topics, int(tc.topicsCount))
 
 			topic, err = user.UpdateTopic(ctx, topic.TopicID, "hell", "orld", "")
 			assert.Nil(err)
@@ -101,15 +105,17 @@ func TestTopicCRUD(t *testing.T) {
 	category, _ = CreateCategory(ctx, "new name", "new alias", "New Description", 2)
 	assert.NotNil(category)
 	topicCases = []struct {
-		title         string
-		body          string
-		categoryID    string
-		topicsCount   int
-		commentsCount int
-		valid         bool
+		title          string
+		body           string
+		categoryID     string
+		topicsCount    int64
+		commentsCount  int64
+		bookmarksCount int64
+		likesCount     int64
+		valid          bool
 	}{
-		{"title", "body", category.CategoryID, 1, 0, true},
-		{"title2", "body", category.CategoryID, 2, 0, true},
+		{"title", "body", category.CategoryID, 1, 0, 0, 0, true},
+		{"title2", "body", category.CategoryID, 2, 0, 0, 0, true},
 	}
 
 	for _, tc := range topicCases {
@@ -119,13 +125,45 @@ func TestTopicCRUD(t *testing.T) {
 			assert.NotNil(topic)
 			topics, err := ReadTopics(ctx, time.Time{})
 			assert.Nil(err)
-			assert.Len(topics, tc.topicsCount+2)
+			assert.Len(topics, int(tc.topicsCount+2))
 			topics, err = user.ReadTopics(ctx, time.Time{})
 			assert.Nil(err)
-			assert.Len(topics, tc.topicsCount)
+			assert.Len(topics, int(tc.topicsCount))
 			topics, err = category.ReadTopics(ctx, time.Time{})
 			assert.Nil(err)
-			assert.Len(topics, tc.topicsCount)
+			assert.Len(topics, int(tc.topicsCount))
+
+			tu, err := readTopicUser(ctx, topic.TopicID, user.UserID)
+			assert.Nil(err)
+			assert.Nil(tu)
+			err = topic.ActiondBy(ctx, user, TopicUserActionLiked, true)
+			assert.Nil(err)
+			tu, err = readTopicUser(ctx, topic.TopicID, user.UserID)
+			assert.Nil(err)
+			assert.NotNil(tu)
+			assert.True(tu.Liked)
+			assert.False(tu.Bookmarked)
+			err = topic.ActiondBy(ctx, user, TopicUserActionBookmarked, true)
+			assert.Nil(err)
+			tu, err = readTopicUser(ctx, topic.TopicID, user.UserID)
+			assert.Nil(err)
+			assert.NotNil(tu)
+			assert.True(tu.Liked)
+			assert.True(tu.Bookmarked)
+			err = topic.ActiondBy(ctx, user, TopicUserActionLiked, false)
+			assert.Nil(err)
+			tu, err = readTopicUser(ctx, topic.TopicID, user.UserID)
+			assert.Nil(err)
+			assert.NotNil(tu)
+			assert.False(tu.Liked)
+			assert.True(tu.Bookmarked)
+			err = topic.ActiondBy(ctx, user, TopicUserActionBookmarked, false)
+			assert.Nil(err)
+			tu, err = readTopicUser(ctx, topic.TopicID, user.UserID)
+			assert.Nil(err)
+			assert.NotNil(tu)
+			assert.False(tu.Liked)
+			assert.False(tu.Bookmarked)
 		})
 	}
 }
