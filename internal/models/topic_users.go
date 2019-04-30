@@ -37,6 +37,8 @@ type TopicUser struct {
 	Bookmarked bool
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+
+	isNew bool
 }
 
 var topicUserColumns = []string{"topic_id", "user_id", "liked", "bookmarked", "created_at", "updated_at"}
@@ -46,45 +48,50 @@ func (tu *TopicUser) values() []interface{} {
 }
 
 // ActiondBy execute user action, like or bookmark a topic
-func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bool) error {
+func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bool) (*Topic, error) {
 	ctx := mctx.context
 	if action != TopicUserActionLiked &&
 		action != TopicUserActionBookmarked {
-		return session.BadDataError(ctx)
+		return topic, session.BadDataError(ctx)
 	}
 	tu, err := readTopicUser(mctx, topic.TopicID, user.UserID)
 	if err != nil {
-		return session.TransactionError(ctx, err)
+		return topic, session.TransactionError(ctx, err)
 	}
 	query := ""
 	if tu == nil {
-		params, positions := durable.PrepareColumnsWithValues(topicUserColumns)
 		t := time.Now()
 		tu = &TopicUser{
 			TopicID:   topic.TopicID,
 			UserID:    user.UserID,
 			CreatedAt: t,
 			UpdatedAt: t,
+			isNew:     true,
 		}
-		if action == TopicUserActionLiked {
-			tu.Liked = state
-		}
-		if action == TopicUserActionBookmarked {
-			tu.Bookmarked = state
-		}
+	}
+	if action == TopicUserActionLiked {
+		tu.Liked = state
+	}
+	if action == TopicUserActionBookmarked {
+		tu.Bookmarked = state
+	}
+	topic.IsLikedBy = tu.Liked
+	topic.IsBookmarkedBy = tu.Bookmarked
+	if tu.isNew {
+		params, positions := durable.PrepareColumnsWithValues(topicUserColumns)
 		query = fmt.Sprintf("INSERT INTO topic_users (%s) VALUES (%s)", params, positions)
 		_, err = mctx.database.ExecContext(ctx, query, tu.values()...)
 		if err != nil {
-			return session.TransactionError(ctx, err)
+			return topic, session.TransactionError(ctx, err)
 		}
-		return nil
+		return topic, nil
 	}
 	query = fmt.Sprintf("UPDATE topic_users SET %s=$1 WHERE topic_id=$2 AND user_id=$3", action)
 	_, err = mctx.database.ExecContext(ctx, query, state, tu.TopicID, tu.UserID)
 	if err != nil {
-		return session.TransactionError(ctx, err)
+		return topic, session.TransactionError(ctx, err)
 	}
-	return nil
+	return topic, nil
 }
 
 func readTopicUser(mctx *Context, topicID, userID string) (*TopicUser, error) {
@@ -92,13 +99,25 @@ func readTopicUser(mctx *Context, topicID, userID string) (*TopicUser, error) {
 	query := fmt.Sprintf("SELECT %s FROM topic_users WHERE topic_id=$1 AND user_id=$2", strings.Join(topicUserColumns, ","))
 	row, err := mctx.database.QueryRowContext(ctx, query, topicID, userID)
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
 	}
 	tu, err := topicUserFromRow(row)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	return tu, err
+}
+
+func fillTopicWithAction(mctx *Context, topic *Topic, user *User) error {
+	if user == nil {
+		return nil
+	}
+	tu, err := readTopicUser(mctx, topic.TopicID, user.UserID)
+	if err != nil || tu == nil {
+		return err
+	}
+	topic.IsLikedBy, topic.IsBookmarkedBy = tu.Liked, tu.Bookmarked
+	return nil
 }
 
 func topicUserFromRow(row durable.Row) (*TopicUser, error) {

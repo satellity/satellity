@@ -32,6 +32,30 @@ class Topic {
     });
   }
 
+  like(id) {
+    return this.api.axios.get(`/topics/${id}/like`).then((resp) => {
+      return resp.data;
+    });
+  }
+
+  unlike(id) {
+    return this.api.axios.get(`/topics/${id}/unlike`).then((resp) => {
+      return resp.data;
+    });
+  }
+
+  bookmark(id) {
+    return this.api.axios.get(`/topics/${id}/bookmark`).then((resp) => {
+      return resp.data;
+    });
+  }
+
+  abandon(id) {
+    return this.api.axios.get(`/topics/${id}/abandon`).then((resp) => {
+      return resp.data;
+    });
+  }
+
   adminIndex() {
     return this.api.axios.get('/admin/topics').then((resp) => {
       return resp.data;

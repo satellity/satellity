@@ -62,8 +62,10 @@ type Topic struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 
-	User     *User
-	Category *Category
+	IsLikedBy      bool
+	IsBookmarkedBy bool
+	User           *User
+	Category       *Category
 }
 
 //CreateTopic create a new Topic
@@ -180,6 +182,10 @@ func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string)
 		go dispersalCategory(mctx, prevCategoryID)
 		go dispersalCategory(mctx, topic.CategoryID)
 	}
+	err = fillTopicWithAction(mctx, topic, user)
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
 	topic.User = user
 	return topic, nil
 }
@@ -219,6 +225,20 @@ func ReadTopic(mctx *Context, id string) (*Topic, error) {
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
+	}
+	return topic, nil
+}
+
+//ReadTopicWithUser read a topic with user's status like and bookmark
+func ReadTopicWithUser(mctx *Context, id string, user *User) (*Topic, error) {
+	ctx := mctx.context
+	topic, err := ReadTopic(mctx, id)
+	if err != nil || topic == nil {
+		return topic, err
+	}
+	err = fillTopicWithAction(mctx, topic, user)
+	if err != nil {
+		return topic, session.TransactionError(ctx, err)
 	}
 	return topic, nil
 }

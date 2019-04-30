@@ -66,7 +66,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 
 func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := models.ReadTopic(mctx, params["id"]); err != nil {
+	if topic, err := models.ReadTopicWithUser(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
@@ -111,9 +111,9 @@ func (impl *topicImpl) action(w http.ResponseWriter, r *http.Request, id, action
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 		return
 	}
-	if err := topic.ActiondBy(mctx, middleware.CurrentUser(r), action, state); err != nil {
+	if topic, err := topic.ActiondBy(mctx, middleware.CurrentUser(r), action, state); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
-		views.RenderBlankResponse(w, r)
+		views.RenderTopic(w, r, topic)
 	}
 }
