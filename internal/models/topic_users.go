@@ -45,9 +45,11 @@ func (tu *TopicUser) values() []interface{} {
 	return []interface{}{tu.TopicID, tu.UserID, tu.Liked, tu.Bookmarked, tu.CreatedAt, tu.UpdatedAt}
 }
 
+// ActiondBy execute user action, like or bookmark a topic
 func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bool) error {
 	ctx := mctx.context
-	if action != TopicUserActionLiked && action != TopicUserActionBookmarked {
+	if action != TopicUserActionLiked &&
+		action != TopicUserActionBookmarked {
 		return session.BadDataError(ctx)
 	}
 	tu, err := readTopicUser(mctx, topic.TopicID, user.UserID)
