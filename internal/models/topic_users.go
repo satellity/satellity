@@ -21,7 +21,9 @@ CREATE TABLE IF NOT EXISTS topic_users (
   PRIMARY KEY (topic_id, user_id)
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS user_topicx ON topic_users (user_id, topic_id);
+CREATE UNIQUE INDEX IF NOT EXISTS topic_users_reversex ON topic_users(user_id, topic_id);
+CREATE INDEX IF NOT EXISTS topic_users_likedx ON topic_users(topic_id, liked);
+CREATE INDEX IF NOT EXISTS topic_users_bookmarkedx ON topic_users(topic_id, bookmarked);
 `
 
 const (
@@ -58,7 +60,6 @@ func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bo
 	if err != nil {
 		return topic, session.TransactionError(ctx, err)
 	}
-	query := ""
 	if tu == nil {
 		t := time.Now()
 		tu = &TopicUser{
@@ -66,28 +67,55 @@ func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bo
 			UserID:    user.UserID,
 			CreatedAt: t,
 			UpdatedAt: t,
-			isNew:     true,
+
+			isNew: true,
 		}
 	}
-	if action == TopicUserActionLiked {
-		tu.Liked = state
-	}
-	if action == TopicUserActionBookmarked {
-		tu.Bookmarked = state
-	}
-	topic.IsLikedBy = tu.Liked
-	topic.IsBookmarkedBy = tu.Bookmarked
-	if tu.isNew {
-		params, positions := durable.PrepareColumnsWithValues(topicUserColumns)
-		query = fmt.Sprintf("INSERT INTO topic_users (%s) VALUES (%s)", params, positions)
-		_, err = mctx.database.ExecContext(ctx, query, tu.values()...)
-		if err != nil {
-			return topic, session.TransactionError(ctx, err)
+	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var lcount, bcount int64
+		if action == TopicUserActionLiked {
+			tu.Liked = state
+			if err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND liked=true", topic.TopicID).Scan(&lcount); err != nil {
+				return err
+			}
+			if lcount > 0 {
+				topic.LikesCount = lcount - 1
+			}
+			if state {
+				topic.LikesCount = lcount + 1
+			}
 		}
-		return topic, nil
-	}
-	query = fmt.Sprintf("UPDATE topic_users SET %s=$1 WHERE topic_id=$2 AND user_id=$3", action)
-	_, err = mctx.database.ExecContext(ctx, query, state, tu.TopicID, tu.UserID)
+		if action == TopicUserActionBookmarked {
+			tu.Bookmarked = state
+			if err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND bookmarked=true", topic.TopicID).Scan(&bcount); err != nil {
+				return err
+			}
+			if bcount > 0 {
+				topic.BookmarksCount = bcount - 1
+			}
+			if state {
+				topic.BookmarksCount = bcount + 1
+			}
+		}
+		topic.IsLikedBy = tu.Liked
+		topic.IsBookmarkedBy = tu.Bookmarked
+		if _, err := tx.ExecContext(ctx, "UPDATE topics SET (likes_count,bookmarks_count)=($1,$2) WHERE topic_id=$3", topic.LikesCount, topic.BookmarksCount, topic.TopicID); err != nil {
+			return err
+		}
+		if tu.isNew {
+			params, positions := durable.PrepareColumnsWithValues(topicUserColumns)
+			query := fmt.Sprintf("INSERT INTO topic_users (%s) VALUES (%s)", params, positions)
+			if _, err := tx.ExecContext(ctx, query, tu.values()...); err != nil {
+				return err
+			}
+			return nil
+		}
+		query := fmt.Sprintf("UPDATE topic_users SET %s=$1 WHERE topic_id=$2 AND user_id=$3", action)
+		if _, err := mctx.database.ExecContext(ctx, query, state, tu.TopicID, tu.UserID); err != nil {
+			return err
+		}
+		return nil
+	})
 	if err != nil {
 		return topic, session.TransactionError(ctx, err)
 	}

@@ -45,9 +45,9 @@ CREATE TABLE IF NOT EXISTS topics (
 	short_id              VARCHAR(255) NOT NULL,
 	title                 VARCHAR(512) NOT NULL,
 	body                  TEXT NOT NULL,
-	comments_count        INTEGER NOT NULL DEFAULT 0,
-	bookmarks_count       INTEGER NOT NULL DEFAULT 0,
-	likes_count           INTEGER NOT NULL DEFAULT 0,
+	comments_count        BIGINT NOT NULL DEFAULT 0,
+	bookmarks_count       BIGINT NOT NULL DEFAULT 0,
+	likes_count           BIGINT NOT NULL DEFAULT 0,
 	category_id           VARCHAR(36) NOT NULL,
 	user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
 	score                 INTEGER NOT NULL DEFAULT 0,
@@ -72,7 +72,9 @@ CREATE TABLE IF NOT EXISTS topic_users (
   PRIMARY KEY (topic_id, user_id)
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS user_topicx ON topic_users (user_id, topic_id);
+CREATE UNIQUE INDEX IF NOT EXISTS topic_users_reversex ON topic_users(user_id, topic_id);
+CREATE INDEX IF NOT EXISTS topic_users_likedx ON topic_users(topic_id, liked);
+CREATE INDEX IF NOT EXISTS topic_users_bookmarkedx ON topic_users(topic_id, bookmarked);
 
 
 CREATE TABLE IF NOT EXISTS comments (
