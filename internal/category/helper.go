@@ -16,9 +16,10 @@ func (m *Model) values() []interface{} {
 	return []interface{}{m.CategoryID, m.Name, m.Alias, m.Description, m.TopicsCount, m.LastTopicID, m.Position, m.CreatedAt, m.UpdatedAt}
 }
 
-func categoryFromRows(row durable.Row) (m *Model, err error) {
-	err = row.Scan(&m.CategoryID, &m.Name, &m.Alias, &m.Description, &m.TopicsCount, &m.LastTopicID, &m.Position, &m.CreatedAt, &m.UpdatedAt)
-	return
+func categoryFromRows(row durable.Row) (*Model, error) {
+	var m Model
+	err := row.Scan(&m.CategoryID, &m.Name, &m.Alias, &m.Description, &m.TopicsCount, &m.LastTopicID, &m.Position, &m.CreatedAt, &m.UpdatedAt)
+	return &m, err
 }
 
 func categoryCount(ctx context.Context, tx *sql.Tx) (int64, error) {
