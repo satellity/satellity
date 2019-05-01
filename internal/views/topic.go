@@ -17,6 +17,8 @@ type TopicView struct {
 	CategoryID     string       `json:"category_id"`
 	Score          int          `json:"score"`
 	CommentsCount  int64        `json:"comments_count"`
+	LikesCount     int64        `json:"likes_count"`
+	BookmarksCount int64        `json:"bookmarks_count"`
 	IsLikedBy      bool         `json:"is_liked_by"`
 	IsBookmarkedBy bool         `json:"is_bookmarked_by"`
 	CreatedAt      time.Time    `json:"created_at"`
@@ -38,6 +40,8 @@ func buildTopic(topic *models.Topic) TopicView {
 		IsLikedBy:      topic.IsLikedBy,
 		IsBookmarkedBy: topic.IsBookmarkedBy,
 		CommentsCount:  topic.CommentsCount,
+		LikesCount:     topic.LikesCount,
+		BookmarksCount: topic.BookmarksCount,
 		CreatedAt:      topic.CreatedAt,
 		UpdatedAt:      topic.UpdatedAt,
 	}

@@ -32,28 +32,12 @@ class Topic {
     });
   }
 
-  like(id) {
-    return this.api.axios.get(`/topics/${id}/like`).then((resp) => {
-      return resp.data;
-    });
-  }
-
-  unlike(id) {
-    return this.api.axios.get(`/topics/${id}/unlike`).then((resp) => {
-      return resp.data;
-    });
-  }
-
-  bookmark(id) {
-    return this.api.axios.get(`/topics/${id}/bookmark`).then((resp) => {
-      return resp.data;
-    });
-  }
-
-  abandon(id) {
-    return this.api.axios.get(`/topics/${id}/abandon`).then((resp) => {
-      return resp.data;
-    });
+  action(action, id) {
+    if (action !== 'like' || action !== 'unlike' || action !== 'bookmark' || action !== 'abandon') {
+      return this.api.axios.post(`/topics/${id}/${action}`, {}).then((resp) => {
+        return resp.data;
+      });
+    }
   }
 
   adminIndex() {

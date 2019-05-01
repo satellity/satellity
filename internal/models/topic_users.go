@@ -26,6 +26,7 @@ CREATE INDEX IF NOT EXISTS topic_users_likedx ON topic_users(topic_id, liked);
 CREATE INDEX IF NOT EXISTS topic_users_bookmarkedx ON topic_users(topic_id, bookmarked);
 `
 
+//
 const (
 	TopicUserActionLiked      = "liked"
 	TopicUserActionBookmarked = "bookmarked"

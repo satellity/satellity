@@ -51,3 +51,21 @@
 .body {
   padding: .8rem .8rem 1.6rem;
 }
+.actions {
+  font-size: 1.125rem;
+  text-align: right;
+  padding: .8rem;
+  .action {
+    margin-left: 1.6rem;
+    cursor: pointer;
+    &.true {
+      path {
+        fill: $color-main-red !important;
+        stroke: $color-main-red !important;
+      }
+    }
+    span {
+      margin-right: .4rem;
+    }
+  }
+}
