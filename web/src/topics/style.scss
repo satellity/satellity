@@ -49,7 +49,7 @@
   margin-left: 0.8rem;
 }
 .body {
-  padding: .8rem .8rem 1.6rem;
+  padding: .8rem;
 }
 .actions {
   font-size: 1.125rem;
@@ -63,6 +63,9 @@
         fill: $color-main-red !important;
         stroke: $color-main-red !important;
       }
+    }
+    &:hover {
+      opacity: .6;
     }
     span {
       margin-right: .4rem;
