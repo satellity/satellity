@@ -21,6 +21,7 @@ type topicRequest struct {
 	Title      string `json:"title"`
 	Body       string `json:"body"`
 	CategoryID string `json:"category_id"`
+	Draft      bool   `json:"draft"`
 }
 
 func registerTopic(database *durable.Database, router *httptreemux.TreeMux) {
@@ -43,7 +44,7 @@ func (impl *topicImpl) create(w http.ResponseWriter, r *http.Request, _ map[stri
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := middleware.CurrentUser(r).CreateTopic(mctx, body.Title, body.Body, body.CategoryID); err != nil {
+	if topic, err := middleware.CurrentUser(r).CreateTopic(mctx, body.Title, body.Body, body.CategoryID, body.Draft); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopic(w, r, topic)
@@ -57,7 +58,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := middleware.CurrentUser(r).UpdateTopic(mctx, params["id"], body.Title, body.Body, body.CategoryID); err != nil {
+	if topic, err := middleware.CurrentUser(r).UpdateTopic(mctx, params["id"], body.Title, body.Body, body.CategoryID, body.Draft); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopic(w, r, topic)
@@ -66,7 +67,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 
 func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := models.ReadTopicWithUser(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
+	if topic, err := models.ReadTopicWithRelation(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))

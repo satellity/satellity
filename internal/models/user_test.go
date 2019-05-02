@@ -40,7 +40,6 @@ func TestUserCRUD(t *testing.T) {
 		count         int
 		valid         bool
 	}{
-		{"im.yuqlee@gmailabcefgh.com", "username", "nickname", "", "password", hex.EncodeToString(public), "member", 0, false},
 		{"im.yuqlee@gmail.com", "username", "nickname", "", "pass", hex.EncodeToString(public), "member", 0, false},
 		{"im.yuqlee@gmail.com", "username", "nickname", "", "     pass     ", hex.EncodeToString(public), "member", 1, true},
 	}
