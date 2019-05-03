@@ -30,6 +30,7 @@ class TopicNew extends Component {
       topic_id: id,
       title: '',
       body: '',
+      draft: false,
       categories: categories,
       preview: false,
       loading: true,
@@ -39,6 +40,7 @@ class TopicNew extends Component {
     this.handleCategoryClick = this.handleCategoryClick.bind(this);
     this.handleBodyChange = this.handleBodyChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDraft = this.handleDraft.bind(this);
     this.handlePreview = this.handlePreview.bind(this);
   }
 
@@ -49,7 +51,13 @@ class TopicNew extends Component {
         this.setState(data);
       });
     } else {
-      this.setState({loading: false});
+      this.api.topic.show('draft').then((data) => {
+        if (!data) {
+          data = {};
+        }
+        data.loading = false;
+        this.setState(data);
+      });
     }
     this.api.category.index().then((data) => {
       let category_id = this.state.category_id;
@@ -100,9 +108,21 @@ class TopicNew extends Component {
     if (this.state.submitting) {
       return
     }
-    this.setState({submitting: true});
+    this.setState({submitting: true, draft: false}, () => {
+      this.submitForm();
+    });
+  }
+
+  handleDraft(e) {
+    e.preventDefault();
+    this.setState({submitting: true, draft: true}, () => {
+      this.submitForm();
+    });
+  }
+
+  submitForm() {
     const history = this.props.history;
-    const data = {title: this.state.title, body: this.state.body, category_id: this.state.category_id};
+    const data = {title: this.state.title, body: this.state.body, category_id: this.state.category_id, draft: this.state.draft};
     // TODO should update submitting always
     if (validate(this.state.topic_id)) {
       this.api.topic.update(this.state.topic_id, data).then((data) => {
@@ -159,29 +179,42 @@ class TopicNew extends Component {
             <CodeMirror
               className='editor'
               value={state.body}
-              options={{
-                mode: 'markdown',
-                theme: 'xq-light',
-                lineNumbers: true,
-                lineWrapping: true,
-                placeholder: 'Text (optional)'
-              }}
-              onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
-            />
+            options={{
+              mode: 'markdown',
+              theme: 'xq-light',
+              lineNumbers: true,
+              lineWrapping: true,
+              placeholder: 'Text (optional)'
+            }}
+            onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
+          />
           }
-          {
-            state.preview &&
-            <article className={`md ${style.preview}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
-            </article>
-          }
+      {
+        state.preview &&
+        <article className={`md ${style.preview}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
+        </article>
+      }
+    </div>
+    <div>
+      {
+        state.submitting &&
+        <div className={style.submitting}>
+          <LoadingView style='sm-ring'/>
+          <span> Submitting </span>
         </div>
+      }
+      {
+        !state.submitting &&
         <div>
-          <button className='btn submit' disabled={state.submitting}>
-            { state.submitting && <LoadingView style='sm-ring blank'/> }
+          <button type="submit" className='btn topic' disabled={state.submitting}>
+
             &nbsp;{i18n.t('general.submit')}
           </button>
+          <a href="javascript:;" className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</a>
         </div>
-      </form>
+      }
+    </div>
+  </form>
     )
 
     return (

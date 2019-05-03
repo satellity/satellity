@@ -27,10 +27,11 @@ type topicRequest struct {
 func registerTopic(database *durable.Database, router *httptreemux.TreeMux) {
 	impl := &topicImpl{database: database}
 
+	router.GET("/topics", impl.index)
+	router.GET("/topics/draft", impl.draft)
+	router.GET("/topics/:id", impl.show)
 	router.POST("/topics", impl.create)
 	router.POST("/topics/:id", impl.update)
-	router.GET("/topics", impl.index)
-	router.GET("/topics/:id", impl.show)
 	router.POST("/topics/:id/like", impl.like)
 	router.POST("/topics/:id/unlike", impl.unlike)
 	router.POST("/topics/:id/bookmark", impl.bookmark)
@@ -60,6 +61,22 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 	mctx := models.WrapContext(r.Context(), impl.database)
 	if topic, err := middleware.CurrentUser(r).UpdateTopic(mctx, params["id"], body.Title, body.Body, body.CategoryID, body.Draft); err != nil {
 		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderTopic(w, r, topic)
+	}
+}
+
+func (impl *topicImpl) draft(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	user := middleware.CurrentUser(r)
+	if user == nil {
+		views.RenderErrorResponse(w, r, session.AuthorizationError(r.Context()))
+		return
+	}
+	mctx := models.WrapContext(r.Context(), impl.database)
+	if topic, err := user.DraftTopic(mctx); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else if topic == nil {
+		views.RenderBlankResponse(w, r)
 	} else {
 		views.RenderTopic(w, r, topic)
 	}

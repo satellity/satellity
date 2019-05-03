@@ -29,12 +29,13 @@ func TestTopicCRUD(t *testing.T) {
 		bookmarksCount int64
 		likesCount     int64
 		draft          bool
+		hasDraft       bool
 		valid          bool
 	}{
-		{"", "body", category.CategoryID, 0, 0, 0, 0, false, false},
-		{"title", "body", uuid.Must(uuid.NewV4()).String(), 0, 0, 0, 0, false, false},
-		{"title", "body", category.CategoryID, 1, 0, 0, 0, false, true},
-		{"title2", "body", category.CategoryID, 2, 0, 0, 0, false, true},
+		{"", "body", category.CategoryID, 0, 0, 0, 0, false, false, false},
+		{"title", "body", uuid.Must(uuid.NewV4()).String(), 0, 0, 0, 0, false, false, false},
+		{"title", "body", category.CategoryID, 1, 0, 0, 0, false, false, true},
+		{"title2", "body", category.CategoryID, 2, 0, 0, 0, false, true, true},
 	}
 
 	for _, tc := range topicCases {
@@ -99,6 +100,27 @@ func TestTopicCRUD(t *testing.T) {
 			new, err = u.UpdateTopic(ctx, topic.TopicID, "hell", "orld", "", tc.draft)
 			assert.NotNil(err)
 			assert.Nil(new)
+
+			if !tc.hasDraft {
+				topic, err = user.DraftTopic(ctx)
+				assert.Nil(err)
+				assert.Nil(topic)
+				topic, err = user.CreateTopic(ctx, tc.title, tc.body, category.CategoryID, true)
+				assert.Nil(err)
+				assert.NotNil(topic)
+				topic, err = user.DraftTopic(ctx)
+				assert.Nil(err)
+				assert.NotNil(topic)
+			}
+
+			if tc.hasDraft {
+				topic, err = user.DraftTopic(ctx)
+				assert.Nil(err)
+				assert.NotNil(topic)
+				topic, err = user.CreateTopic(ctx, tc.title, tc.body, category.CategoryID, true)
+				assert.NotNil(err)
+				assert.Nil(topic)
+			}
 		})
 	}
 
@@ -115,10 +137,11 @@ func TestTopicCRUD(t *testing.T) {
 		bookmarksCount int64
 		likesCount     int64
 		draft          bool
+		hasDraft       bool
 		valid          bool
 	}{
-		{"title", "body", category.CategoryID, 1, 0, 0, 0, false, true},
-		{"title2", "body", category.CategoryID, 2, 0, 0, 0, false, true},
+		{"title", "body", category.CategoryID, 1, 0, 0, 0, false, false, true},
+		{"title2", "body", category.CategoryID, 2, 0, 0, 0, false, false, true},
 	}
 
 	for _, tc := range topicCases {

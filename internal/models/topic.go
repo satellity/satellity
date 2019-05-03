@@ -74,6 +74,17 @@ type Topic struct {
 //CreateTopic create a new Topic
 func (user *User) CreateTopic(mctx *Context, title, body, categoryID string, draft bool) (*Topic, error) {
 	ctx := mctx.context
+
+	if draft {
+		t, err := user.DraftTopic(mctx)
+		if err != nil {
+			return nil, err
+		}
+		if t != nil {
+			return nil, session.BadDataError(ctx)
+		}
+	}
+
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
 	if len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
@@ -232,6 +243,30 @@ func ReadTopic(mctx *Context, id string) (*Topic, error) {
 		topic.User = user
 		topic.Category = category
 		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topic, nil
+}
+
+//DraftTopic read the draft topic
+func (user *User) DraftTopic(mctx *Context) (*Topic, error) {
+	ctx := mctx.context
+	var topic *Topic
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND draft=true LIMIT 1", strings.Join(topicColumns, ","))
+		row, err := mctx.database.QueryRowContext(ctx, query, user.UserID)
+		if err != nil {
+			return err
+		}
+		topic, err = topicFromRows(row)
+		if err == sql.ErrNoRows {
+			topic = nil
+			return nil
+		}
+		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)

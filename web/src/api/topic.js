@@ -13,14 +13,14 @@ class Topic {
   }
 
   create(params) {
-    const data = {title: params.title, body: params.body, category_id: params.category_id};
+    const data = {title: params.title, body: params.body, category_id: params.category_id, draft: params.draft};
     return this.api.axios.post('/topics', data).then((resp) => {
       return resp.data;
     });
   }
 
   update(id, params) {
-    const data = {title: params.title, body: params.body, category_id: params.category_id};
+    const data = {title: params.title, body: params.body, category_id: params.category_id, draft: params.draft};
     return this.api.axios.post(`/topics/${id}`, data).then((resp) => {
       return resp.data;
     });

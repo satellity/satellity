@@ -59,3 +59,13 @@
     word-wrap: break-word;
   }
 }
+.submitting {
+  display: flex;
+  align-items: center;
+  span {
+    margin-left: .8rem;
+  }
+}
+.draft {
+  margin-left: 2rem;
+}
