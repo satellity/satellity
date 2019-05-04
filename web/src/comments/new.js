@@ -7,10 +7,12 @@ import LoadingView from '../loading/loading.js';
 class CommentNew extends Component {
   constructor(props) {
     super(props);
+
     this.api = new API();
+    this.state = {topic_id: props.topicId, body: '', submitting: false};
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.state = {topic_id: props.topicId, body: '', submitting: false};
   }
 
   handleChange(e) {
@@ -34,32 +36,31 @@ class CommentNew extends Component {
   }
 
   render() {
+    let state = this.state;
     if (!this.api.user.loggedIn()) {
-      return ''
+      return (
+        <div className={style.custom}>
+          {i18n.t('comment.custom')}
+        </div>
+      )
     }
     return (
-      <View onSubmit={this.handleSubmit} onChange={this.handleChange} state={this.state} />
+      <div className={style.form}>
+        <form onSubmit={this.handleSubmit}>
+          <input type='hidden' name='topic_id' defaultValue={state.topic_id} />
+          <div>
+            <textarea type='text' name='body' minLength='3' required placeholder={i18n.t('comment.form.body')} value={state.body} onChange={this.handleChange} />
+          </div>
+          <div className='action'>
+            <button className='btn submit' disabled={state.submitting}>
+              { state.submitting && <LoadingView style='sm-ring blank'/> }
+              &nbsp;{i18n.t('general.submit')}
+            </button>
+          </div>
+        </form>
+      </div>
     )
   }
 }
-
-const View = (props) => {
-  return (
-    <div className={style.form}>
-      <form onSubmit={(e) => props.onSubmit(e)}>
-        <input type='hidden' name='topic_id' defaultValue={props.state.topic_id} />
-        <div>
-          <textarea type='text' name='body' minLength='3' required placeholder='Say something ...' value={props.state.body} onChange={(e) => props.onChange(e)} />
-        </div>
-        <div className='action'>
-          <button className='btn submit' disabled={props.state.submitting}>
-            { props.state.submitting && <LoadingView style='sm-ring blank'/> }
-            &nbsp;SUBMIT
-          </button>
-        </div>
-      </form>
-    </div>
-  )
-};
 
 export default CommentNew;

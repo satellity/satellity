@@ -2,6 +2,8 @@ import style from './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+import Config from '../components/config.js';
 import API from '../api/index.js';
 import SiteWidget from './widget.js';
 import TopicItem from '../topics/item.js';
@@ -19,7 +21,14 @@ class Home extends Component {
     if (d !== null && d !== undefined && d !== '') {
       categories = JSON.parse(atob(d));
     }
-    this.state = {topics: [], categories: categories, category: 'latest', loading: true, offset: ''};
+    this.state = {
+      topics: [],
+      categories: categories,
+      category: {},
+      categoryId: 'latest',
+      loading: true,
+      offset: ''
+    };
 
     this.loadTopics = this.loadTopics.bind(this);
   }
@@ -28,12 +37,14 @@ class Home extends Component {
     this.api.category.index().then((data) => {
       this.setState({categories: data});
       let categoryId = 'latest';
+      this.setState({category: {}});
       let category = this.params.get('c');
       if (!!category) {
         for (let i = 0; i < this.state.categories.length; i++) {
           let c = this.state.categories[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
             categoryId = c.category_id;
+            this.setState({category: c});
             break;
           }
         }
@@ -46,6 +57,7 @@ class Home extends Component {
     let props = this.props;
     if (props.location.search !== prevProps.location.search) {
       let categoryId = 'latest';
+      this.setState({category: {}});
       let params = new URLSearchParams(props.location.search);
       let category = params.get('c');
       if (!!category) {
@@ -54,6 +66,7 @@ class Home extends Component {
           let c = this.state.categories[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
             categoryId = c.category_id;
+            this.setState({category: c});
             break;
           }
         }
@@ -64,7 +77,7 @@ class Home extends Component {
 
   loadTopics(e) {
     e.preventDefault();
-    this.fetchTopics(this.state.category, false);
+    this.fetchTopics(this.state.categoryId, false);
   }
 
   fetchTopics(categoryId, replace) {
@@ -84,7 +97,7 @@ class Home extends Component {
       if (!replace) {
         data = this.state.topics.concat(data);
       }
-      this.setState({category: categoryId, loading: false, offset: offset, topics: data});
+      this.setState({categoryId: categoryId, loading: false, offset: offset, topics: data});
     });
   }
 
@@ -107,24 +120,35 @@ class Home extends Component {
       return (
         <Link
           to={{ pathname: "/", search: `?c=${category.name}` }}
-          className={`${style.node} ${state.category === category.category_id ? style.current : ''}`}
+          className={`${style.node} ${state.categoryId === category.category_id ? style.current : ''}`}
           key={category.category_id}>{category.alias}</Link>
       )
     });
 
+    let seoView;
+    if (!!state.category.name) {
+      seoView = (
+        <Helmet>
+          <title>{state.category.alias} - {Config.Name}</title>
+          <meta name='description' content={state.category.description} />
+        </Helmet>
+      )
+    }
+
     return (
       <div className='container'>
-        <main className='section main'>
+        {!state.loading && seoView}
+        <main className='column main'>
           <div className={style.nodes}>
             <Link to='/'
-              className={`${style.node} ${state.category === 'latest' ? style.current : ''}`}>Latest</Link>
+              className={`${style.node} ${state.categoryId === 'latest' ? style.current : ''}`}>{i18n.t('home.latest')}</Link>
             {categories}
           </div>
           {state.loading && loadingView}
           {!state.loading && <ul className={style.topics}> {topics} </ul>}
           {state.offset !== '' && <div className={style.load}><a href='javascript:;' onClick={this.loadTopics}>Load More</a></div>}
         </main>
-        <aside className='section aside'>
+        <aside className='column aside'>
           <SiteWidget />
         </aside>
       </div>

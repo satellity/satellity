@@ -3,7 +3,11 @@
 .profile {
   background: white;
   box-sizing: border-box;
+  margin: 0 0 1.6rem;
   padding: .8rem;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 1.6rem;
   text-align: center;
 }
 .avatar {
@@ -19,9 +23,18 @@
 }
 .created {
   color: $color-font-light-grey;
+  margin-bottom: .8rem;
+}
+.biography {
+  margin-bottom: .8rem;
 }
 .topics {
   background: white;
   padding: .8rem;
   box-sizing: border-box;
+}
+.header {
+  border-bottom: 1px solid $color-border-light-grey;
+  padding-bottom: .4rem;
+  margin-bottom: 1.6rem;
 }

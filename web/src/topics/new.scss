@@ -1,0 +1,61 @@
+@import '../assets/css/constant.scss';
+
+.loading {
+  background: white;
+  text-align: center;
+  padding: .8rem 0 0;
+}
+.rules {
+  border-top: .3rem solid $color-main-purple;
+  background-color: white;
+  padding: .8rem;
+  li {
+    padding: 0 0 .4rem;
+  }
+}
+.form {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+}
+.categories {
+  margin-bottom: 1rem;
+}
+.category {
+  background: $color-bg-light-grey;
+  border-radius: .2rem;
+  display: inline-block;
+  padding: .2rem .8rem;
+  margin-right: .8rem;
+  &:hover {
+    background: rgba($color-main-red, $color-main-red-alpha);
+    color: white;
+  }
+  &.active {
+    background: rgba($color-main-red, $color-main-red-alpha);
+    color: white;
+  }
+}
+.actions {
+  text-align: right;
+}
+.eye {
+  color: rgba($color-main-dark, .8);
+  &:hover {
+    color: $color-main-dark;
+  }
+}
+.preview {
+  padding: .6rem .3rem;
+}
+.body {
+  border: 1px solid #ccc;
+  margin-bottom: 1rem;
+  min-height: 24rem;
+  overflow: hidden;
+  pre {
+    font-size: 1rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+}

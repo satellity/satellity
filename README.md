@@ -20,6 +20,10 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 2. `./web` is front-end service, contains React, Parcel and etc.
 2. `./deploy` contains example of deploy, nginx and systemd.
 
+## Screenshot
+
+![Go Discourse](/screenshots/aspect.png "Hello Go Discourse")
+
 ## Getting Started
 
 ### Backend

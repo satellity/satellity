@@ -5,6 +5,7 @@ import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
 import { Helmet } from 'react-helmet';
 import API from '../api/index.js';
+import Config from '../components/config.js';
 import style from './style.scss';
 import SiteWidget from '../home/widget.js';
 import CommentList from '../comments/index.js';
@@ -45,7 +46,7 @@ class TopicShow extends Component {
 
     const seoView = (
       <Helmet>
-        <title>{state.title} - {state.user.nickname} - GoDiscourse</title>
+        <title>{state.title} - {state.user.nickname} - {Config.Name}</title>
         <meta name='description' content={state.short_body} />
       </Helmet>
     )
@@ -68,7 +69,11 @@ class TopicShow extends Component {
               {editAction}
             </h1>
             <div className={style.info}>
-              {state.user.nickname} IN {state.category.name} AT <TimeAgo date={state.created_at} />
+              {state.user.nickname}
+              <span className={style.sep}>{i18n.t('topic.in')}</span>
+              <Link to={{pathname: "/", search: `?c=${state.category.name}`}}>{state.category.alias}</Link>
+              <span className={style.sep}>{i18n.t('topic.at')}</span>
+              <TimeAgo date={state.created_at} />
             </div>
           </div>
           <img src={state.user.avatar_url} className={style.avatar} />
@@ -82,12 +87,12 @@ class TopicShow extends Component {
     return (
       <div className='container'>
         {!state.loading && seoView}
-        <main className='section main'>
+        <main className='column main'>
           {state.loading && loadingView}
           {!state.loading && topicView}
           {!state.loading && <CommentList topicId={state.topic_id} commentsCount={state.comments_count} />}
         </main>
-        <aside className='section aside'>
+        <aside className='column aside'>
           <SiteWidget />
         </aside>
       </div>

@@ -1,9 +1,9 @@
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/xq-light.css');
 require('codemirror/mode/markdown/markdown.js');
-import style from './style.scss';
+import style from './new.scss';
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import {Controlled as CodeMirror} from 'react-codemirror2'
 import showdown from 'showdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -40,10 +40,6 @@ class TopicNew extends Component {
     this.handleBodyChange = this.handleBodyChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handlePreview = this.handlePreview.bind(this);
-    // TODO handle authentication
-    if (!this.api.user.loggedIn()) {
-      props.history.push('/');
-    }
   }
 
   componentDidMount() {
@@ -62,6 +58,19 @@ class TopicNew extends Component {
       }
       this.setState({categories: data, category_id: category_id});
     });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.location.pathname != prevProps.location.pathname) {
+      if (this.props.location.pathname === '/topics/new') {
+        this.setState({
+          topic_id: '',
+          title: '',
+          body: '',
+          preview: false,
+        });
+      }
+    }
   }
 
   handleChange(e) {
@@ -109,20 +118,26 @@ class TopicNew extends Component {
   }
 
   render() {
+    if (!this.api.user.loggedIn()) {
+      return (
+        <Redirect to={{ pathname: "/" }} />
+      )
+    }
+
     let state = this.state;
     const categories = state.categories.map((c) => {
       return (
-        <span key={c.category_id} className={`${style.category} ${c.category_id === state.category_id ? style.categoryCurrent : ''}`} onClick={(e) => onCategoryClick(e, c.category_id)}>{c.alias}</span>
+        <span key={c.category_id} className={`${style.category} ${c.category_id === state.category_id ? style.active : ''}`} onClick={(e) => this.handleCategoryClick(e, c.category_id)}>{c.alias}</span>
       )
     });
 
-    let title = <h2>Create a new topic</h2>;
+    let title = <h1>{i18n.t('topic.title.new')}</h1>;
     if (validate(state.topic_id)) {
-      title = <h2>Edit: {state.title}</h2>
+      title = <h1>{i18n.t('topic.title.edit', {name: state.title})}</h1>
     }
 
     const loadingView = (
-      <div className={style.form_loading}>
+      <div className={style.loading}>
         <LoadingView style='md-ring'/>
       </div>
     )
@@ -135,53 +150,51 @@ class TopicNew extends Component {
         <div>
           <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' placeholder='Title *' onChange={this.handleChange} />
         </div>
-        <div className={style.preview}> <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> </div>
-        <div className={style.topic_body}>
-          {!state.preview && <CodeMirror
-            className='editor'
-            value={state.body}
-            options={{
-              mode: 'markdown',
-              theme: 'xq-light',
-              lineNumbers: true,
-              lineWrapping: true,
-              placeholder: 'Text (optional)'
-            }}
-            onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
-          />}
-          {state.preview && <article className={`md ${style.preview_body}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
-        </article>}
-      </div>
-      <div className='action'>
-        <button className='btn submit' disabled={state.submitting}>
-          { state.submitting && <LoadingView style='sm-ring blank'/> }
-          &nbsp;SUBMIT
-        </button>
-      </div>
-    </form>
+        <div className={style.actions}>
+          <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} />
+        </div>
+        <div className={style.body}>
+          {
+            !state.preview &&
+            <CodeMirror
+              className='editor'
+              value={state.body}
+              options={{
+                mode: 'markdown',
+                theme: 'xq-light',
+                lineNumbers: true,
+                lineWrapping: true,
+                placeholder: 'Text (optional)'
+              }}
+              onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
+            />
+          }
+          {
+            state.preview &&
+            <article className={`md ${style.preview}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
+            </article>
+          }
+        </div>
+        <div>
+          <button className='btn submit' disabled={state.submitting}>
+            { state.submitting && <LoadingView style='sm-ring blank'/> }
+            &nbsp;{i18n.t('general.submit')}
+          </button>
+        </div>
+      </form>
     )
 
     return (
       <div className='container'>
-        <main className='section main'>
+        <main className='column main'>
           {state.loading && loadingView}
           <div className={style.form}>
             {!state.loading && title}
             {!state.loading && form}
           </div>
         </main>
-        <aside className='section aside'>
-          <ol className={style.rules}>
-            <li className={style.rule}>
-              1. To be a kind human, keep goodwill towards others
-            </li>
-            <li className={style.rule}>
-              2. It's a good habits to preview before posting.
-            </li>
-            <li className={style.rule}>
-              3. Welcome to share. Enjoy!
-            </li>
-          </ol>
+        <aside className='column aside'>
+          <ol className={style.rules} dangerouslySetInnerHTML={{__html: i18n.t('topic.rules')}}></ol>
         </aside>
       </div>
     )

@@ -5,7 +5,7 @@ import uuid from 'uuid/v4';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import Noty from 'noty';
-import Config from '../components/constants.js';
+import Config from '../components/config.js';
 import Category from './category.js';
 import Comment from './comment.js';
 import Topic from './topic.js';

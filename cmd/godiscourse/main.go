@@ -58,7 +58,7 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 func main() {
 	opts := configs.DefaultOptions()
 	if configs.Environment == "production" {
-		p := flags.NewParser(&opts, flags.Default)
+		p := flags.NewParser(opts, flags.Default)
 		if _, err := p.Parse(); err != nil {
 			if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
 				os.Exit(0)
