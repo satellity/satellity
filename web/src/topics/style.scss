@@ -56,14 +56,8 @@
   text-align: right;
   padding: .8rem;
   .action {
-    margin-left: 1.6rem;
+    margin-left: .8rem;
     cursor: pointer;
-    &.true {
-      path {
-        fill: $color-main-red !important;
-        stroke: $color-main-red !important;
-      }
-    }
     &:hover {
       opacity: .6;
     }
