@@ -142,16 +142,7 @@ func (c *Category) Update(ctx context.Context, id string, p *Params) (*Model, er
 }
 
 func (c *Category) GetByID(ctx context.Context, id string) (*Model, error) {
-	var category *Model
-	err := c.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		category, err = c.Find(ctx, tx, id)
-		return err
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return category, nil
+	return &Model{}, nil
 }
 
 func (c *Category) GetAll(ctx context.Context) ([]*Model, error) {
