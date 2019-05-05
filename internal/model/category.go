@@ -54,3 +54,33 @@ func FindCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error)
 	}
 	return cat, err
 }
+
+func readCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 500", strings.Join(CategoryColumns, ",")))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var categories []*Category
+	for rows.Next() {
+		category, err := CategoryFromRows(rows)
+		if err != nil {
+			return nil, err
+		}
+		categories = append(categories, category)
+	}
+	return categories, rows.Err()
+}
+
+func GetCategorySet(ctx context.Context, tx *sql.Tx) (map[string]*Category, error) {
+	categories, err := readCategories(ctx, tx)
+	if err != nil {
+		return nil, err
+	}
+	set := make(map[string]*Category, 0)
+	for _, c := range categories {
+		set[c.CategoryID] = c
+	}
+	return set, nil
+}

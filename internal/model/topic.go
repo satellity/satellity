@@ -23,6 +23,9 @@ type Topic struct {
 	Score         int
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
+
+	Category Category
+	User     User
 }
 
 type TopicInfo struct {
@@ -55,6 +58,15 @@ func FindTopic(ctx context.Context, tx *sql.Tx, id string) (*Topic, error) {
 		return nil, nil
 	}
 	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(TopicColumns, ",")), id)
+	t, err := TopicFromRows(row)
+	if sql.ErrNoRows == err {
+		return nil, nil
+	}
+	return t, err
+}
+
+func FindTopicByShortID(ctx context.Context, tx *sql.Tx, id string) (*Topic, error) {
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE short_id=$1", strings.Join(TopicColumns, ",")), id)
 	t, err := TopicFromRows(row)
 	if sql.ErrNoRows == err {
 		return nil, nil
