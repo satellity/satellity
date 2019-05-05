@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"godiscourse/internal/configs"
 	"godiscourse/internal/session"
 	"net"
 	"regexp"
@@ -13,6 +14,9 @@ var (
 )
 
 func validateEmailFormat(ctx context.Context, email string) error {
+	if configs.Environment != "production" {
+		return nil
+	}
 	if !emailRegexp.MatchString(email) {
 		return session.InvalidEmailFormatError(ctx, email)
 	}

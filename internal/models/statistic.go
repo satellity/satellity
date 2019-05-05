@@ -42,39 +42,56 @@ func (s *Statistic) values() []interface{} {
 	return []interface{}{s.StatisticID, s.Name, s.Count, s.CreatedAt, s.UpdatedAt}
 }
 
-func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, error) {
-	id, _ := generateStatisticID(SolidStatisticID, name)
-	s, err := findStatistic(ctx, tx, id)
+// TODO: ctx without logger
+func upsertStatistic(mctx *Context, name string) (*Statistic, error) {
+	ctx := context.Background()
+	id, err := generateStatisticID(SolidStatisticID, name)
 	if err != nil {
-		return nil, err
+		return nil, session.ServerError(ctx, err)
 	}
-	var count int64
-	switch name {
-	case "users":
-		count, err = usersCount(ctx, tx)
-	case "topics":
-		count, err = topicsCount(ctx, tx)
-	case "comments":
-		count, err = commentsCount(ctx, tx)
-	default:
+	if name != "users" &&
+		name != "topics" &&
+		name != "comments" {
 		return nil, session.BadDataError(ctx)
 	}
+
+	var s *Statistic
+	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		s, err = findStatistic(ctx, tx, id)
+		if err != nil {
+			return err
+		}
+		var count int64
+		switch name {
+		case "users":
+			count, err = usersCount(ctx, tx)
+		case "topics":
+			count, err = topicsCount(ctx, tx)
+		case "comments":
+			count, err = commentsCount(ctx, tx)
+		}
+		if err != nil {
+			return err
+		}
+		if s != nil {
+			s.Count = count
+			_, err := tx.ExecContext(ctx, fmt.Sprintf("UPDATE statistics SET count=$1 WHERE statistic_id=$2"), count, id)
+			return err
+		}
+		s = &Statistic{
+			StatisticID: id,
+			Name:        name,
+			Count:       int64(count),
+		}
+		cols, params := durable.PrepareColumnsWithValues(statisticColumns)
+		if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...); err != nil {
+			return err
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, err
-	}
-	if s != nil {
-		s.Count = count
-		_, err := tx.ExecContext(ctx, fmt.Sprintf("UPDATE statistics SET count=$1 WHERE statistic_id=$2"), count, id)
-		return s, err
-	}
-	s = &Statistic{
-		StatisticID: id,
-		Name:        name,
-		Count:       int64(count),
-	}
-	cols, params := durable.PrepareColumnsWithValues(statisticColumns)
-	if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...); err != nil {
-		return nil, err
+		return nil, session.TransactionError(ctx, err)
 	}
 	return s, nil
 }

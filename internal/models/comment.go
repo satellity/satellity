@@ -26,9 +26,10 @@ CREATE TABLE IF NOT EXISTS comments (
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
-CREATE INDEX ON comments (topic_id, created_at);
-CREATE INDEX ON comments (user_id, created_at);
-CREATE INDEX ON comments (score DESC, created_at);
+
+CREATE INDEX IF NOT EXISTS comments_topic_createdx ON comments (topic_id, created_at);
+CREATE INDEX IF NOT EXISTS comments_user_createdx ON comments (user_id, created_at);
+CREATE INDEX IF NOT EXISTS comments_score_createdx ON comments (score DESC, created_at);
 `
 
 // Comment is struct for comment of topic
@@ -86,10 +87,6 @@ func (user *User) CreateComment(mctx *Context, topicID, body string) (*Comment, 
 		}
 		tcols, tparams := durable.PrepareColumnsWithValues([]string{"comments_count", "updated_at"})
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", tcols, tparams, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
-		if err != nil {
-			return err
-		}
-		_, err = upsertStatistic(ctx, tx, "comments")
 		return err
 	})
 	if err != nil {
@@ -99,6 +96,7 @@ func (user *User) CreateComment(mctx *Context, topicID, body string) (*Comment, 
 		return nil, session.TransactionError(ctx, err)
 	}
 	c.User = user
+	go upsertStatistic(mctx, "comments")
 	return c, nil
 }
 

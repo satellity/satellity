@@ -1,7 +1,8 @@
 {
   "general": {
     "delete": "Delete",
-    "submit": "Submit"
+    "submit": "Submit",
+    "draft": "Save Draft"
   },
   "topic": {
     "title": {

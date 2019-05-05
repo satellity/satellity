@@ -23,6 +23,7 @@ class TopicShow extends Component {
       user: {},
       category: {},
     };
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
@@ -31,7 +32,19 @@ class TopicShow extends Component {
       data.loading = false;
       data.is_author = data.user.user_id === user.user_id;
       data.short_body = data.body.substring(0, 128);
-      data.body = this.converter.makeHtml(data.body);
+      data.html_body = this.converter.makeHtml(data.body);
+      this.setState(data);
+    });
+  }
+
+  handleClick(e, action) {
+    if (action === 'like' && this.state.is_liked_by) {
+      action = 'unlike';
+    }
+    if (action === 'bookmark' && this.state.is_bookmarked_by) {
+      action = 'abandon';
+    }
+    this.api.topic.action(action, this.state.topic_id).then((data) => {
       this.setState(data);
     });
   }
@@ -60,6 +73,16 @@ class TopicShow extends Component {
       )
     }
 
+    let like = {};
+    if (state.is_liked_by) {
+    like = {color: 'rgb(218, 40, 16)'};
+    }
+
+    let bookmark = {};
+    if (state.is_bookmarked_by) {
+      bookmark = {color: 'rgb(218, 40, 16)'};
+    }
+
     const topicView = (
       <div className={style.content}>
         <header className={style.header}>
@@ -79,7 +102,17 @@ class TopicShow extends Component {
           <img src={state.user.avatar_url} className={style.avatar} />
         </header>
         <div>
-          {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.body}} />}
+          {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.html_body}} />}
+        </div>
+        <div className={style.actions}>
+          <span className={`${style.action} ${state.is_liked_by}`} onClick={(e) => this.handleClick(e, 'like')}>
+            {state.likes_count > 0 && <span>{state.likes_count}</span>}
+            <FontAwesomeIcon icon={['far', 'heart']} style={like}/>
+          </span>
+          <span className={`${style.action} ${state.is_bookmarked_by}`} onClick={(e) => this.handleClick(e, 'bookmark')}>
+            {state.bookmarks_count > 0 && <span>{state.bookmarks_count}</span>}
+            <FontAwesomeIcon icon={['far', 'bookmark']} style={bookmark}/>
+          </span>
         </div>
       </div>
     )

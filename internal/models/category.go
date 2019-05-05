@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS categories (
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX ON categories (position);
+CREATE INDEX IF NOT EXISTS categories_positionx ON categories (position);
 `
 
 // Category is used to categorize topics.
@@ -192,8 +192,8 @@ func readCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
 	return categories, rows.Err()
 }
 
-// dispersalCategory update category's info, e.g.: LastTopicID, TopicsCount
-func dispersalCategory(mctx *Context, id string) (*Category, error) {
+// transmitToCategory update category's info, e.g.: LastTopicID, TopicsCount
+func transmitToCategory(mctx *Context, id string) (*Category, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}

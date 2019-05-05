@@ -10,7 +10,6 @@ require (
 	github.com/facebookgo/httpdown v0.0.0-20180706035922-5979d39b15c2 // indirect
 	github.com/facebookgo/stats v0.0.0-20151006221625-1b76add642e4 // indirect
 	github.com/go-errors/errors v1.0.1
-	github.com/godiscourse/godiscourse v0.10.0
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/gorilla/handlers v1.4.0
 	github.com/jessevdk/go-flags v1.4.0
