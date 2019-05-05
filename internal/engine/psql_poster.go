@@ -18,6 +18,10 @@ type Psql struct {
 	db *durable.Database
 }
 
+func NewPsql(db *durable.Database) *Psql {
+	return &Psql{db: db}
+}
+
 func (p *Psql) GetCategoryByID(ctx context.Context, id string) (*model.Category, error) {
 	var category *model.Category
 	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
@@ -117,7 +121,6 @@ func (p *Psql) UpdateTopic(ctx context.Context, id string, t *model.TopicInfo) (
 		topic.Body = body
 		if t.CategoryID != "" && topic.CategoryID != t.CategoryID {
 			prevCategoryID = topic.CategoryID
-			// todo: use public category function
 			category, err := model.FindCategory(ctx, tx, t.CategoryID)
 			if err != nil {
 				return err
@@ -125,7 +128,6 @@ func (p *Psql) UpdateTopic(ctx context.Context, id string, t *model.TopicInfo) (
 				return session.BadDataError(ctx)
 			}
 			topic.CategoryID = category.CategoryID
-			// topic.Category = category
 		}
 		cols, params := durable.PrepareColumnsWithValues([]string{"title", "body", "category_id"})
 		vals := []interface{}{topic.Title, topic.Body, topic.CategoryID}
@@ -145,6 +147,107 @@ func (p *Psql) UpdateTopic(ctx context.Context, id string, t *model.TopicInfo) (
 		// go t.dispersalCategory(ctx, prevCategoryID)
 		// go t.dispersalCategory(ctx, topic.CategoryID)
 	}
-	// topic.User = user
 	return topic, nil
+}
+
+// todo: rewrite with join
+func (p *Psql) GetTopicByID(ctx context.Context, id string) (*model.Topic, error) {
+	var topic *model.Topic
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		topic, err = model.FindTopic(ctx, tx, id)
+		if err != nil {
+			return err
+		}
+		if topic == nil {
+			subs := strings.Split(id, "-")
+			if len(subs) < 1 || len(subs[0]) <= 5 {
+				return nil
+			}
+			id = subs[0]
+			topic, err = model.FindTopicByShortID(ctx, tx, id)
+			if topic == nil || err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topic, nil
+}
+
+func (p *Psql) GetTopicByUserID(ctx context.Context, userID string, offset time.Time) ([]*model.Topic, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+
+	var topics []*model.Topic
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		// todo: join query
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(model.TopicColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, userID, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			topic, err := model.TopicFromRows(rows)
+			if err != nil {
+				return err
+			}
+			topics = append(topics, topic)
+		}
+		return rows.Err()
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topics, nil
+}
+
+func (p *Psql) GetByCategoryID(ctx context.Context, categoryID string, offset time.Time) ([]*model.Topic, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+
+	var topics []*model.Topic
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		// todo: join query
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(model.TopicColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, categoryID, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topics, nil
+}
+
+func (p *Psql) GetTopicsByOffset(ctx context.Context, offset time.Time) ([]*model.Topic, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+
+	var topics []*model.Topic
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		// todo: join query
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(model.TopicColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topics, nil
 }

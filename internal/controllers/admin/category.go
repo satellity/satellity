@@ -2,7 +2,8 @@ package admin
 
 import (
 	"encoding/json"
-	"godiscourse/internal/category"
+	"godiscourse/internal/engine"
+	"godiscourse/internal/model"
 	"godiscourse/internal/session"
 	"godiscourse/internal/views"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 )
 
 type adminCategoryImpl struct {
-	category category.CategoryDatastore
+	engine engine.Engine
 }
 
 type categoryRequest struct {
@@ -21,8 +22,8 @@ type categoryRequest struct {
 	Position    int64  `json:"position"`
 }
 
-func RegisterAdminCategory(c category.CategoryDatastore, router *httptreemux.TreeMux) {
-	impl := &adminCategoryImpl{category: c}
+func RegisterAdminCategory(e engine.Engine, router *httptreemux.TreeMux) {
+	impl := &adminCategoryImpl{engine: e}
 
 	router.POST("/admin/categories", impl.create)
 	router.GET("/admin/categories", impl.index)
@@ -36,7 +37,7 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	category, err := impl.category.Create(r.Context(), &category.Params{
+	category, err := impl.engine.CreateCategory(r.Context(), &model.CategoryInfo{
 		Name:        body.Name,
 		Alias:       body.Alias,
 		Description: body.Description,
@@ -50,7 +51,7 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 }
 
 func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	categories, err := impl.category.GetAll(r.Context())
+	categories, err := impl.engine.GetAllCategories(r.Context())
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
@@ -65,7 +66,7 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 		return
 	}
 
-	category, err := impl.category.Update(r.Context(), params["id"], &category.Params{
+	category, err := impl.engine.UpdateCategory(r.Context(), params["id"], &model.CategoryInfo{
 		Name:        body.Name,
 		Alias:       body.Alias,
 		Description: body.Description,
@@ -79,7 +80,7 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 }
 
 func (impl *adminCategoryImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	category, err := impl.category.GetByID(r.Context(), params["id"])
+	category, err := impl.engine.GetCategoryByID(r.Context(), params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return

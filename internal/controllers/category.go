@@ -1,9 +1,8 @@
 package controllers
 
 import (
-	"godiscourse/internal/category"
+	"godiscourse/internal/engine"
 	"godiscourse/internal/session"
-	"godiscourse/internal/topic"
 	"godiscourse/internal/views"
 	"net/http"
 	"time"
@@ -12,22 +11,18 @@ import (
 )
 
 type categoryImpl struct {
-	category category.CategoryDatastore
-	topic    topic.TopicDatastore
+	poster engine.Poster
 }
 
-func RegisterCategory(c category.CategoryDatastore, t topic.TopicDatastore, router *httptreemux.TreeMux) {
-	impl := &categoryImpl{
-		category: c,
-		topic:    t,
-	}
+func registerCategory(p engine.Poster, router *httptreemux.TreeMux) {
+	impl := &categoryImpl{poster: p}
 
 	router.GET("/categories", impl.index)
 	router.GET("/categories/:id/topics", impl.topics)
 }
 
 func (impl *categoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	categories, err := impl.category.GetAll(r.Context())
+	categories, err := impl.poster.GetAllCategories(r.Context())
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
@@ -39,12 +34,12 @@ func (impl *categoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[st
 func (impl *categoryImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
 
-	category, err := impl.category.GetByID(r.Context(), params["id"])
+	category, err := impl.poster.GetCategoryByID(r.Context(), params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if category == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if topics, err := impl.topic.GetByCategoryID(r.Context(), category, offset); err != nil {
+	} else if topics, err := impl.poster.GetTopicByCategoryID(r.Context(), category.CategoryID, offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

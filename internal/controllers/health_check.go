@@ -9,7 +9,7 @@ import (
 	"github.com/dimfeld/httptreemux"
 )
 
-func HealthCheck(router *httptreemux.TreeMux) {
+func healthCheck(router *httptreemux.TreeMux) {
 	router.GET("/_hc", health)
 }
 

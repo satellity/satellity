@@ -10,6 +10,7 @@ import (
 	"godiscourse/internal/controllers"
 	"godiscourse/internal/controllers/admin"
 	"godiscourse/internal/durable"
+	"godiscourse/internal/engine"
 	"godiscourse/internal/middleware"
 	"godiscourse/internal/topic"
 	"godiscourse/internal/user"
@@ -27,23 +28,17 @@ import (
 
 func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	database := durable.WrapDatabase(db)
+	engine := engine.NewPsql(database)
+
 	u := user.New(database)
 	cat := category.New(database)
 	t := topic.New(database, u, cat)
 	c := comment.New(database, u, t)
 
 	router := httptreemux.New()
-
-	controllers.RegisterHanders(router)
-	controllers.HealthCheck(router)
-	controllers.RegisterUser(u, t, router)
-	controllers.RegisterCategory(cat, t, router)
-	controllers.RegisterTopic(t, router)
-	controllers.RegisterComment(c, t, router)
-
+	controllers.Register(engine, router)
+	controllers.RegisterUser(u, engine, router)
 	admin.RegisterAdminUser(u, router)
-	admin.RegisterAdminCategory(cat, router)
-	admin.RegisterAdminTopic(t, router)
 
 	handler := middleware.Authenticate(u, router)
 	handler = middleware.Constraint(handler)

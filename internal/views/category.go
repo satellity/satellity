@@ -1,7 +1,7 @@
 package views
 
 import (
-	"godiscourse/internal/category"
+	"godiscourse/internal/model"
 	"net/http"
 	"time"
 )
@@ -20,7 +20,7 @@ type CategoryView struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-func buildCategory(category *category.Model) CategoryView {
+func buildCategory(category *model.Category) CategoryView {
 	return CategoryView{
 		Type:        "category",
 		CategoryID:  category.CategoryID,
@@ -36,12 +36,12 @@ func buildCategory(category *category.Model) CategoryView {
 }
 
 // RenderCategory response a category
-func RenderCategory(w http.ResponseWriter, r *http.Request, category *category.Model) {
+func RenderCategory(w http.ResponseWriter, r *http.Request, category *model.Category) {
 	RenderResponse(w, r, buildCategory(category))
 }
 
 // RenderCategories response sevaral categories
-func RenderCategories(w http.ResponseWriter, r *http.Request, categories []*category.Model) {
+func RenderCategories(w http.ResponseWriter, r *http.Request, categories []*model.Category) {
 	views := make([]CategoryView, len(categories))
 	for i, c := range categories {
 		views[i] = buildCategory(c)

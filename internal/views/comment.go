@@ -1,7 +1,7 @@
 package views
 
 import (
-	"godiscourse/internal/comment"
+	"godiscourse/internal/model"
 	"net/http"
 	"time"
 )
@@ -18,7 +18,7 @@ type CommentView struct {
 	User      UserView  `json:"user"`
 }
 
-func buildComment(comment *comment.Model) CommentView {
+func buildComment(comment *model.Comment) CommentView {
 	view := CommentView{
 		CommentID: comment.CommentID,
 		Body:      comment.Body,
@@ -35,12 +35,12 @@ func buildComment(comment *comment.Model) CommentView {
 }
 
 // RenderComment response a comment
-func RenderComment(w http.ResponseWriter, r *http.Request, comment *comment.Model) {
+func RenderComment(w http.ResponseWriter, r *http.Request, comment *model.Comment) {
 	RenderResponse(w, r, buildComment(comment))
 }
 
 // RenderComments response a bundle of comments
-func RenderComments(w http.ResponseWriter, r *http.Request, comments []*comment.Model) {
+func RenderComments(w http.ResponseWriter, r *http.Request, comments []*model.Comment) {
 	views := make([]CommentView, len(comments))
 	for i, comment := range comments {
 		views[i] = buildComment(comment)

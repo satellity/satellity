@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"godiscourse/internal/engine"
 	"godiscourse/internal/middleware"
+	"godiscourse/internal/model"
 	"godiscourse/internal/session"
-	"godiscourse/internal/topic"
 	"godiscourse/internal/views"
 	"net/http"
 	"time"
@@ -13,7 +14,7 @@ import (
 )
 
 type topicImpl struct {
-	topic topic.TopicDatastore
+	poster engine.Poster
 }
 
 type topicRequest struct {
@@ -22,8 +23,8 @@ type topicRequest struct {
 	CategoryID string `json:"category_id"`
 }
 
-func RegisterTopic(t topic.TopicDatastore, router *httptreemux.TreeMux) {
-	impl := &topicImpl{topic: t}
+func registerTopic(p engine.Poster, router *httptreemux.TreeMux) {
+	impl := &topicImpl{poster: p}
 
 	router.POST("/topics", impl.create)
 	router.POST("/topics/:id", impl.update)
@@ -39,7 +40,7 @@ func (impl *topicImpl) create(w http.ResponseWriter, r *http.Request, _ map[stri
 	}
 
 	u := middleware.CurrentUser(r)
-	if t, err := impl.topic.Create(r.Context(), u.UserID, &topic.Params{
+	if t, err := impl.poster.CreateTopic(r.Context(), u.UserID, &model.TopicInfo{
 		Title:      body.Title,
 		Body:       body.Body,
 		CategoryID: body.CategoryID,
@@ -57,8 +58,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 		return
 	}
 
-	u := middleware.CurrentUser(r)
-	if t, err := impl.topic.Update(r.Context(), u, params["id"], &topic.Params{
+	if t, err := impl.poster.UpdateTopic(r.Context(), params["id"], &model.TopicInfo{
 		Title:      body.Title,
 		Body:       body.Body,
 		CategoryID: body.CategoryID,
@@ -70,7 +70,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 }
 
 func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if t, err := impl.topic.GetByID(r.Context(), params["id"]); err != nil {
+	if t, err := impl.poster.GetTopicByID(r.Context(), params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if t == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
@@ -81,7 +81,7 @@ func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[s
 
 func (impl *topicImpl) index(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	if topics, err := impl.topic.GetByOffset(r.Context(), offset); err != nil {
+	if topics, err := impl.poster.GetTopicsByOffset(r.Context(), offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

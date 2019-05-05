@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"godiscourse/internal/comment"
+	"godiscourse/internal/engine"
 	"godiscourse/internal/middleware"
+	"godiscourse/internal/model"
 	"godiscourse/internal/session"
-	"godiscourse/internal/topic"
 	"godiscourse/internal/views"
 	"net/http"
 	"time"
@@ -14,8 +14,7 @@ import (
 )
 
 type commentImpl struct {
-	comment comment.CommentDatastore
-	topic   topic.TopicDatastore
+	poster engine.Poster
 }
 
 type commentRequest struct {
@@ -23,11 +22,8 @@ type commentRequest struct {
 	Body    string `json:"body"`
 }
 
-func RegisterComment(c comment.CommentDatastore, t *topic.Topic, router *httptreemux.TreeMux) {
-	impl := &commentImpl{
-		comment: c,
-		topic:   t,
-	}
+func registerComment(p engine.Poster, router *httptreemux.TreeMux) {
+	impl := &commentImpl{poster: p}
 
 	router.POST("/comments", impl.create)
 	router.POST("/comments/:id", impl.update)
@@ -42,7 +38,7 @@ func (impl *commentImpl) create(w http.ResponseWriter, r *http.Request, _ map[st
 		return
 	}
 
-	if comment, err := impl.comment.Create(r.Context(), &comment.Params{
+	if comment, err := impl.poster.CreateComment(r.Context(), &model.CommentInfo{
 		UserID:  middleware.CurrentUser(r).UserID,
 		TopicID: body.TopicID,
 		Body:    body.Body,
@@ -60,7 +56,7 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 		return
 	}
 
-	if comment, err := impl.comment.Create(r.Context(), &comment.Params{
+	if comment, err := impl.poster.CreateComment(r.Context(), &model.CommentInfo{
 		UserID:  middleware.CurrentUser(r).UserID,
 		TopicID: params["id"],
 		Body:    body.Body,
@@ -72,7 +68,7 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 }
 
 func (impl *commentImpl) destory(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if err := impl.comment.Delete(r.Context(), params["id"], middleware.CurrentUser(r).UserID); err != nil {
+	if err := impl.poster.DeleteComment(r.Context(), params["id"], middleware.CurrentUser(r).UserID); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)
@@ -82,11 +78,11 @@ func (impl *commentImpl) destory(w http.ResponseWriter, r *http.Request, params 
 func (impl *commentImpl) comments(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
 
-	if topic, err := impl.topic.GetByID(r.Context(), params["id"]); err != nil {
+	if topic, err := impl.poster.GetTopicByID(r.Context(), params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if comments, err := impl.comment.GetByTopicID(r.Context(), topic.TopicID, offset); err != nil {
+	} else if comments, err := impl.poster.GetCommentsByTopicID(r.Context(), topic.TopicID, offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComments(w, r, comments)

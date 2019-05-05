@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
+	"godiscourse/internal/engine"
 	"godiscourse/internal/middleware"
 	"godiscourse/internal/session"
-	"godiscourse/internal/topic"
 	"godiscourse/internal/user"
 	"godiscourse/internal/views"
 	"net/http"
@@ -14,8 +14,8 @@ import (
 )
 
 type userImpl struct {
-	user  user.UserDatastore
-	topic topic.TopicDatastore
+	user   user.UserDatastore
+	poster engine.Poster
 }
 
 type userRequest struct {
@@ -25,10 +25,10 @@ type userRequest struct {
 	Biography     string `json:"biography"`
 }
 
-func RegisterUser(u user.UserDatastore, t topic.TopicDatastore, router *httptreemux.TreeMux) {
+func RegisterUser(u user.UserDatastore, p engine.Poster, router *httptreemux.TreeMux) {
 	impl := &userImpl{
-		user:  u,
-		topic: t,
+		user:   u,
+		poster: p,
 	}
 
 	router.POST("/oauth/:provider", impl.oauth)
@@ -91,7 +91,7 @@ func (impl *userImpl) topics(w http.ResponseWriter, r *http.Request, params map[
 		views.RenderErrorResponse(w, r, err)
 	} else if user == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if topics, err := impl.topic.GetByUserID(r.Context(), user, offset); err != nil {
+	} else if topics, err := impl.poster.GetTopicByUserID(r.Context(), user.UserID, offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

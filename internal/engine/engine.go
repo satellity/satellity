@@ -13,6 +13,11 @@ const (
 	LIMIT        = 50
 )
 
+type Engine interface {
+	Poster
+	Admin
+}
+
 type Poster interface {
 	GetCategoryByID(ctx context.Context, id string) (*model.Category, error)
 	GetAllCategories(ctx context.Context) ([]*model.Category, error)
@@ -20,6 +25,8 @@ type Poster interface {
 	CreateTopic(ctx context.Context, userID string, p *model.TopicInfo) (*model.Topic, error)
 	UpdateTopic(ctx context.Context, id string, p *model.TopicInfo) (*model.Topic, error)
 	GetTopicByID(ctx context.Context, id string) (*model.Topic, error)
+	GetTopicByUserID(ctx context.Context, userID string, offset time.Time) ([]*model.Topic, error)
+	GetTopicByCategoryID(ctx context.Context, categoryID string, offset time.Time) ([]*model.Topic, error)
 	GetTopicsByOffset(ctx context.Context, offset time.Time) ([]*model.Topic, error)
 
 	CreateComment(ctx context.Context, p *model.CommentInfo) (*model.Comment, error)
