@@ -35,6 +35,19 @@ func (p *Psql) GetCategoryByID(ctx context.Context, id string) (*model.Category,
 	return category, nil
 }
 
+func (p *Psql) GetAllCategories(ctx context.Context) ([]*model.Category, error) {
+	var categories []*model.Category
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		categories, err = model.ReadCategories(ctx, tx)
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return categories, nil
+}
+
 func (p *Psql) CreateTopic(ctx context.Context, userID string, t *model.TopicInfo) (*model.Topic, error) {
 	title, body := strings.TrimSpace(t.Title), strings.TrimSpace(t.Body)
 	if len(title) < minTitleSize {
@@ -93,6 +106,54 @@ func (p *Psql) CreateTopic(ctx context.Context, userID string, t *model.TopicInf
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topic, nil
+}
+
+// dispersalCategory update category's info, e.g.: LastTopicID, TopicsCount
+func (p *Psql) dispersalCategory(ctx context.Context, id string) (*model.Category, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
+	var result *model.Category
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		result, err = model.FindCategory(ctx, tx, id)
+		if err != nil {
+			return err
+		} else if result == nil {
+			return session.NotFoundError(ctx)
+		}
+		topic, err := model.LastTopic(ctx, result.CategoryID, tx)
+		if err != nil {
+			return err
+		}
+		var lastTopicID = sql.NullString{String: "", Valid: false}
+		if topic != nil {
+			lastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
+		}
+		if result.LastTopicID.String != lastTopicID.String {
+			result.LastTopicID = lastTopicID
+		}
+		result.TopicsCount = 0
+		if result.LastTopicID.Valid {
+			count, err := topicsCountByCategory(ctx, tx, result.CategoryID)
+			if err != nil {
+				return err
+			}
+			result.TopicsCount = count
+		}
+		result.UpdatedAt = time.Now()
+		cols, params := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
+		vals := []interface{}{result.LastTopicID, result.TopicsCount, result.UpdatedAt}
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, result.CategoryID), vals...)
+		return err
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	return result, nil
 }
 
 func (p *Psql) UpdateTopic(ctx context.Context, id string, t *model.TopicInfo) (*model.Topic, error) {
@@ -208,7 +269,7 @@ func (p *Psql) GetTopicByUserID(ctx context.Context, userID string, offset time.
 	return topics, nil
 }
 
-func (p *Psql) GetByCategoryID(ctx context.Context, categoryID string, offset time.Time) ([]*model.Topic, error) {
+func (p *Psql) GetTopicsByCategoryID(ctx context.Context, categoryID string, offset time.Time) ([]*model.Topic, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
@@ -250,4 +311,146 @@ func (p *Psql) GetTopicsByOffset(ctx context.Context, offset time.Time) ([]*mode
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topics, nil
+}
+
+func (p *Psql) CreateComment(ctx context.Context, c *model.CommentInfo) (*model.Comment, error) {
+	body := strings.TrimSpace(c.Body)
+	if len(body) < minCommentBodySize {
+		return nil, session.BadDataError(ctx)
+	}
+	now := time.Now()
+	result := &model.Comment{
+		CommentID: uuid.Must(uuid.NewV4()).String(),
+		Body:      body,
+		UserID:    c.UserID,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	t, err := p.GetTopicByID(ctx, c.TopicID)
+	if err != nil {
+		return nil, err
+	} else if t == nil {
+		return nil, session.NotFoundError(ctx)
+	}
+
+	err = p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		count, err := commentsCountByTopic(ctx, tx, c.TopicID)
+		if err != nil {
+			return err
+		}
+		t.CommentsCount = count + 1
+		t.UpdatedAt = now
+		result.TopicID = t.TopicID
+		cols, params := durable.PrepareColumnsWithValues(model.CommentColumns)
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO comments (%s) VALUES (%s)", cols, params), result.Values()...)
+		if err != nil {
+			return err
+		}
+		tcols, tparams := durable.PrepareColumnsWithValues([]string{"comments_count", "updated_at"})
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", tcols, tparams, t.TopicID), t.CommentsCount, t.UpdatedAt)
+		if err != nil {
+			return err
+		}
+		// _, err = upsertStatistic(ctx, tx, "comments")
+		return err
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	return result, nil
+}
+
+func (p *Psql) UpdateComment(ctx context.Context, c *model.CommentInfo) (*model.Comment, error) {
+	body := strings.TrimSpace(c.Body)
+	if len(body) < minCommentBodySize {
+		return nil, session.BadDataError(ctx)
+	}
+	var result *model.Comment
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		result, err = model.FindComment(ctx, tx, c.CommentID)
+		if err != nil {
+			return err
+		} else if result == nil {
+			return session.NotFoundError(ctx)
+		} else if result.UserID != c.UserID /*&& !user.isAdmin()*/ { // todo: move to level up
+			return session.ForbiddenError(ctx)
+		}
+		result.Body = body
+		result.UpdatedAt = time.Now()
+		cols, params := durable.PrepareColumnsWithValues([]string{"body", "updated_at"})
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, params, result.CommentID), result.Body, result.UpdatedAt)
+		return err
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	return result, nil
+}
+
+func (p *Psql) DeleteComment(ctx context.Context, id, uid string) error {
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		comment, err := model.FindComment(ctx, tx, id)
+		if err != nil || comment == nil {
+			return err
+		}
+		if /*!user.isAdmin() &&*/ uid != comment.UserID {
+			return session.ForbiddenError(ctx)
+		}
+		topic, err := p.GetTopicByID(ctx, comment.TopicID)
+		if err != nil {
+			return err
+		} else if topic == nil {
+			return session.BadDataError(ctx)
+		}
+		count, err := commentsCountByTopic(ctx, tx, comment.TopicID)
+		if err != nil {
+			return err
+		}
+		topic.CommentsCount = count - 1
+		topic.UpdatedAt = time.Now()
+		cols, params := durable.PrepareColumnsWithValues([]string{"comments_count", "updated_at"})
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
+		if err != nil {
+			return err
+		}
+		_, err = tx.ExecContext(ctx, "DELETE FROM comments WHERE comment_id=$1", comment.CommentID)
+		return err
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return err
+		}
+		return session.TransactionError(ctx, err)
+	}
+	return nil
+}
+
+func (p *Psql) GetCommentsByTopicID(ctx context.Context, topicID string, offset time.Time) ([]*model.Comment, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+
+	var result []*model.Comment
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		// todo: join with user, category in query
+		query := fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(model.CommentColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, topicID, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return result, nil
 }

@@ -55,7 +55,7 @@ func FindCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error)
 	return cat, err
 }
 
-func readCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
+func ReadCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
 	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 500", strings.Join(CategoryColumns, ",")))
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func readCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
 }
 
 func GetCategorySet(ctx context.Context, tx *sql.Tx) (map[string]*Category, error) {
-	categories, err := readCategories(ctx, tx)
+	categories, err := ReadCategories(ctx, tx)
 	if err != nil {
 		return nil, err
 	}

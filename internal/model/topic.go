@@ -73,3 +73,12 @@ func FindTopicByShortID(ctx context.Context, tx *sql.Tx, id string) (*Topic, err
 	}
 	return t, err
 }
+
+func LastTopic(ctx context.Context, categoryID string, tx *sql.Tx) (*Topic, error) {
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(TopicColumns, ",")), categoryID)
+	t, err := TopicFromRows(row)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return t, err
+}

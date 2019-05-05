@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"godiscourse/internal/category"
-	"godiscourse/internal/comment"
 	"godiscourse/internal/configs"
 	"godiscourse/internal/controllers"
 	"godiscourse/internal/controllers/admin"
@@ -31,9 +29,6 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	engine := engine.NewPsql(database)
 
 	u := user.New(database)
-	cat := category.New(database)
-	t := topic.New(database, u, cat)
-	c := comment.New(database, u, t)
 
 	router := httptreemux.New()
 	controllers.Register(engine, router)
