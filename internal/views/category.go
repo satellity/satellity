@@ -20,19 +20,22 @@ type CategoryView struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-func buildCategory(category *model.Category) CategoryView {
-	return CategoryView{
-		Type:        "category",
-		CategoryID:  category.CategoryID,
-		Name:        category.Name,
-		Alias:       category.Alias,
-		Description: category.Description,
-		TopicsCount: category.TopicsCount,
-		LastTopicID: category.LastTopicID.String,
-		Position:    category.Position,
-		CreatedAt:   category.CreatedAt,
-		UpdatedAt:   category.UpdatedAt,
+func buildCategory(category *model.Category) (result CategoryView) {
+	if category != nil {
+		result = CategoryView{
+			Type:        "category",
+			CategoryID:  category.CategoryID,
+			Name:        category.Name,
+			Alias:       category.Alias,
+			Description: category.Description,
+			TopicsCount: category.TopicsCount,
+			LastTopicID: category.LastTopicID.String,
+			Position:    category.Position,
+			CreatedAt:   category.CreatedAt,
+			UpdatedAt:   category.UpdatedAt,
+		}
 	}
+	return
 }
 
 // RenderCategory response a category

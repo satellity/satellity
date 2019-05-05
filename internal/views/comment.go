@@ -28,9 +28,7 @@ func buildComment(comment *model.Comment) CommentView {
 		CreatedAt: comment.CreatedAt,
 		UpdatedAt: comment.UpdatedAt,
 	}
-	// if comment.User != nil {
-	// 	view.User = buildUser(comment.User)
-	// }
+	view.User = buildUser(&comment.User)
 	return view
 }
 

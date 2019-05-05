@@ -30,16 +30,19 @@ type AccountView struct {
 	Role      string `json:"role"`
 }
 
-func buildUser(u *model.User) UserView {
-	return UserView{
-		Type:      "user",
-		UserID:    u.UserID,
-		Nickname:  u.Name(),
-		Biography: u.Biography,
-		AvatarURL: fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=180&d=wavatar", md5.Sum([]byte(strings.ToLower(u.Email.String)))),
-		CreatedAt: u.CreatedAt,
-		UpdatedAt: u.UpdatedAt,
+func buildUser(u *model.User) (result UserView) {
+	if u != nil {
+		result = UserView{
+			Type:      "user",
+			UserID:    u.UserID,
+			Nickname:  u.Name(),
+			Biography: u.Biography,
+			AvatarURL: fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=180&d=wavatar", md5.Sum([]byte(strings.ToLower(u.Email.String)))),
+			CreatedAt: u.CreatedAt,
+			UpdatedAt: u.UpdatedAt,
+		}
 	}
+	return
 }
 
 // RenderUser response a user

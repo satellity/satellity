@@ -20,6 +20,7 @@ type Comment struct {
 	Score     int       `sql:"score,notnull"`
 	CreatedAt time.Time `sql:"created_at"`
 	UpdatedAt time.Time `sql:"updated_at"`
+	User      User
 }
 
 type CommentInfo struct {

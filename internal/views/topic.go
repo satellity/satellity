@@ -38,12 +38,8 @@ func buildTopic(topic *model.Topic) TopicView {
 		CreatedAt:     topic.CreatedAt,
 		UpdatedAt:     topic.UpdatedAt,
 	}
-	// if topic.User != nil {
-	// 	view.User = buildUser(topic.User)
-	// }
-	// if topic.Category != nil {
-	// 	view.Category = buildCategory(topic.Category)
-	// }
+	view.User = buildUser(&topic.User)
+	view.Category = buildCategory(&topic.Category)
 	return view
 }
 
