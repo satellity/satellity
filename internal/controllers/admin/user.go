@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"godiscourse/internal/user"
+	"godiscourse/internal/engine"
 	"godiscourse/internal/views"
 	"net/http"
 	"time"
@@ -10,18 +10,18 @@ import (
 )
 
 type userImpl struct {
-	user user.UserDatastore
+	admin engine.Admin
 }
 
-func RegisterAdminUser(u user.UserDatastore, router *httptreemux.TreeMux) {
-	impl := &userImpl{user: u}
+func RegisterAdminUser(a engine.Admin, router *httptreemux.TreeMux) {
+	impl := &userImpl{admin: a}
 
 	router.GET("/admin/users", impl.index)
 }
 
 func (impl *userImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	users, err := impl.user.GetByOffset(r.Context(), offset)
+	users, err := impl.admin.GetUsersByOffset(r.Context(), offset)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"godiscourse/internal/durable"
+	"godiscourse/internal/model"
 	"godiscourse/internal/session"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -49,15 +50,13 @@ type SessionParams struct {
 }
 
 type UserDatastore interface {
-	Create(context.Context, *Params) (*Model, error)
-	CreateGithubUser(context.Context, string, string) (*Model, error)
-	Update(context.Context, *Model, *Params) error
-	Authenticate(context.Context, string) (*Model, error)
-	GetByOffset(context.Context, time.Time) ([]*Model, error) // equal ReadUsers
-	GetByID(context.Context, string) (*Model, error)          // equal ReadUser
-	GetByUsernameOrEmail(context.Context, string) (*Model, error)
-	GetUserSet(ctx context.Context, tx *sql.Tx, ids []string) (map[string]*Model, error)
-	CreateSession(context.Context, *SessionParams) (*Model, error)
+	CreateGithubUser(context.Context, string, string) (*model.User, error)
+
+	// todo: combine with session and move to standalone auth
+	Authenticate(context.Context, string) (*model.User, error)
+	GetByUsernameOrEmail(context.Context, string) (*model.User, error)
+	Create(context.Context, *Params) (*model.User, error)
+	CreateSession(context.Context, *SessionParams) (*model.User, error)
 }
 
 type User struct {
@@ -68,8 +67,8 @@ func New(db *durable.Database) *User {
 	return &User{db: db}
 }
 
-func (u *User) Create(ctx context.Context, p *Params) (*Model, error) {
-	err := checkSecret(ctx, p.SessionSecret)
+func (u *User) Create(ctx context.Context, p *Params) (*model.User, error) {
+	err := model.CheckSecret(ctx, p.SessionSecret)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +91,7 @@ func (u *User) Create(ctx context.Context, p *Params) (*Model, error) {
 	}
 
 	t := time.Now()
-	user := &Model{
+	user := &model.User{
 		UserID:            uuid.Must(uuid.NewV4()).String(),
 		Email:             sql.NullString{String: p.Email, Valid: true},
 		Username:          p.Username,
@@ -104,12 +103,12 @@ func (u *User) Create(ctx context.Context, p *Params) (*Model, error) {
 	}
 
 	err = u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		cols, params := durable.PrepareColumnsWithValues(userColumns)
-		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
+		cols, params := durable.PrepareColumnsWithValues(model.UserColumns)
+		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.Values()...)
 		if err != nil {
 			return err
 		}
-		s, err := user.addSession(ctx, tx, p.SessionSecret)
+		s, err := user.AddSession(ctx, tx, p.SessionSecret)
 		if err != nil {
 			return err
 		}
@@ -126,7 +125,7 @@ func (u *User) Create(ctx context.Context, p *Params) (*Model, error) {
 }
 
 // CreateGithubUser create a github user.
-func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string) (*Model, error) {
+func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string) (*model.User, error) {
 	token, err := fetchAccessToken(ctx, code)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
@@ -135,10 +134,10 @@ func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
 	}
-	var user *Model
+	var user *model.User
 	err = u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
-		user, err = findUserByGithubID(ctx, tx, data.NodeID)
+		user, err = model.FindUserByGithubID(ctx, tx, data.NodeID)
 		return err
 	})
 	if err != nil {
@@ -146,14 +145,14 @@ func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string)
 	}
 	if user == nil {
 		t := time.Now()
-		user = &Model{
+		user = &model.User{
 			UserID:    uuid.Must(uuid.NewV4()).String(),
 			Username:  fmt.Sprintf("GH_%s", data.Login),
 			Nickname:  data.Name,
 			GithubID:  sql.NullString{String: data.NodeID, Valid: true},
 			CreatedAt: t,
 			UpdatedAt: t,
-			isNew:     true,
+			IsNew:     true,
 		}
 		if data.Email != "" {
 			user.Email = sql.NullString{String: data.Email, Valid: true}
@@ -161,14 +160,14 @@ func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string)
 	}
 
 	err = u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		if user.isNew {
+		if user.IsNew {
 			cols, params := durable.PrepareColumnsWithValues(userColumns)
-			_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.values()...)
+			_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.Values()...)
 			if err != nil {
 				return err
 			}
 		}
-		s, err := user.addSession(ctx, tx, sessionSecret)
+		s, err := user.AddSession(ctx, tx, sessionSecret)
 		if err != nil {
 			return err
 		}
@@ -183,31 +182,10 @@ func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string)
 	return user, nil
 }
 
-// Update update user's profile
-func (u *User) Update(ctx context.Context, current *Model, new *Params) error {
-	nickname, biography := strings.TrimSpace(new.Nickname), strings.TrimSpace(new.Biography)
-	if len(nickname) == 0 && len(biography) == 0 {
-		return nil
-	}
-	if nickname != "" {
-		current.Nickname = nickname
-	}
-	if biography != "" {
-		current.Biography = biography
-	}
-	current.UpdatedAt = time.Now()
-	cols, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
-	_, err := u.db.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, current.UserID), current.Nickname, current.Biography, current.UpdatedAt)
-	if err != nil {
-		return session.TransactionError(ctx, err)
-	}
-	return nil
-}
-
 // Authenticate read a user by tokenString. tokenString is a jwt token, more
 // about jwt: https://github.com/dgrijalva/jwt-go
-func (u *User) Authenticate(ctx context.Context, tokenString string) (*Model, error) {
-	var user *Model
+func (u *User) Authenticate(ctx context.Context, tokenString string) (*model.User, error) {
+	var user *model.User
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
@@ -217,16 +195,16 @@ func (u *User) Authenticate(ctx context.Context, tokenString string) (*Model, er
 			return nil, nil
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
-		var s *Session
+		var s *model.Session
 		err := u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-			u, err := findUserByID(ctx, tx, uid)
+			u, err := model.FindUserByID(ctx, tx, uid)
 			if err != nil {
 				return err
 			} else if u == nil {
 				return nil
 			}
 			user = u
-			s, err = readSession(ctx, tx, uid, sid)
+			s, err = model.ReadSession(ctx, tx, uid, sid)
 			if err != nil {
 				return err
 			} else if s == nil {
@@ -253,56 +231,16 @@ func (u *User) Authenticate(ctx context.Context, tokenString string) (*Model, er
 	return user, nil
 }
 
-func (u *User) GetByOffset(ctx context.Context, offset time.Time) ([]*Model, error) {
-	if offset.IsZero() {
-		offset = time.Now()
-	}
-	rows, err := u.db.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(userColumns, ",")), offset)
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	defer rows.Close()
-
-	var users []*Model
-	for rows.Next() {
-		user, err := userFromRows(rows)
-		if err != nil {
-			return nil, session.TransactionError(ctx, err)
-		}
-		users = append(users, user)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return users, nil
-}
-
-func (u *User) GetByID(ctx context.Context, id string) (*Model, error) {
-	var user *Model
-	err := u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		user, err = findUserByID(ctx, tx, id)
-		return err
-	})
-	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
-		return nil, session.TransactionError(ctx, err)
-	}
-	return user, nil
-}
-
 // GetByUsernameOrEmail read user by identity, which is an email or username.
-func (u *User) GetByUsernameOrEmail(ctx context.Context, identity string) (*Model, error) {
+func (u *User) GetByUsernameOrEmail(ctx context.Context, identity string) (*model.User, error) {
 	identity = strings.ToLower(strings.TrimSpace(identity))
 	if len(identity) < 3 {
 		return nil, nil
 	}
 
-	var user *Model
+	var user *model.User
 	err := u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(userColumns, ",")), identity)
+		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(model.UserColumns, ",")), identity)
 		defer rows.Close()
 
 		if !rows.Next() {
@@ -311,7 +249,7 @@ func (u *User) GetByUsernameOrEmail(ctx context.Context, identity string) (*Mode
 			}
 			return nil
 		}
-		user, err = userFromRows(rows)
+		user, err = model.UserFromRows(rows)
 		if err != nil {
 			return err
 		}
@@ -327,8 +265,8 @@ func (u *User) GetByUsernameOrEmail(ctx context.Context, identity string) (*Mode
 }
 
 // CreateSession create a new user session
-func (u *User) CreateSession(ctx context.Context, sp *SessionParams) (*Model, error) {
-	err := checkSecret(ctx, sp.Secret)
+func (u *User) CreateSession(ctx context.Context, sp *SessionParams) (*model.User, error) {
+	err := model.CheckSecret(ctx, sp.Secret)
 	if err != nil {
 		return nil, err
 	}
@@ -344,7 +282,7 @@ func (u *User) CreateSession(ctx context.Context, sp *SessionParams) (*Model, er
 	}
 
 	err = u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		s, err := user.addSession(ctx, tx, sp.Secret)
+		s, err := user.AddSession(ctx, tx, sp.Secret)
 		if err != nil {
 			return err
 		}
@@ -355,16 +293,4 @@ func (u *User) CreateSession(ctx context.Context, sp *SessionParams) (*Model, er
 		return nil, session.TransactionError(ctx, err)
 	}
 	return user, nil
-}
-
-func (u *User) GetUserSet(ctx context.Context, tx *sql.Tx, ids []string) (map[string]*Model, error) {
-	users, err := readUsersByIds(ctx, tx, ids)
-	if err != nil {
-		return nil, err
-	}
-	set := make(map[string]*Model, 0)
-	for _, u := range users {
-		set[u.UserID] = u
-	}
-	return set, nil
 }

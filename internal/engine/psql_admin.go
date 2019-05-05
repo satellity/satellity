@@ -14,6 +14,30 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+func (p *Psql) GetUsersByOffset(ctx context.Context, offset time.Time) ([]*model.User, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	rows, err := p.db.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(model.UserColumns, ",")), offset)
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	defer rows.Close()
+
+	var users []*model.User
+	for rows.Next() {
+		user, err := model.UserFromRows(rows)
+		if err != nil {
+			return nil, session.TransactionError(ctx, err)
+		}
+		users = append(users, user)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return users, nil
+}
+
 func (p *Psql) CreateCategory(ctx context.Context, c *model.CategoryInfo) (*model.Category, error) {
 	alias, name := strings.TrimSpace(c.Alias), strings.TrimSpace(c.Name)
 	description := strings.TrimSpace(c.Description)

@@ -22,6 +22,42 @@ func NewPsql(db *durable.Database) *Psql {
 	return &Psql{db: db}
 }
 
+func (p *Psql) UpdateUser(ctx context.Context, current *model.User, new *model.UserInfo) error {
+	nickname, biography := strings.TrimSpace(new.Nickname), strings.TrimSpace(new.Biography)
+	if len(nickname) == 0 && len(biography) == 0 {
+		return nil
+	}
+	if nickname != "" {
+		current.Nickname = nickname
+	}
+	if biography != "" {
+		current.Biography = biography
+	}
+	current.UpdatedAt = time.Now()
+	cols, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
+	_, err := p.db.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, current.UserID), current.Nickname, current.Biography, current.UpdatedAt)
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
+}
+
+func (p *Psql) GetUserByID(ctx context.Context, id string) (*model.User, error) {
+	var user *model.User
+	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		user, err = model.FindUserByID(ctx, tx, id)
+		return err
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	return user, nil
+}
+
 func (p *Psql) GetCategoryByID(ctx context.Context, id string) (*model.Category, error) {
 	var category *model.Category
 	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {

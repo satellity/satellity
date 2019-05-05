@@ -6,11 +6,9 @@ import (
 	"fmt"
 	"godiscourse/internal/configs"
 	"godiscourse/internal/controllers"
-	"godiscourse/internal/controllers/admin"
 	"godiscourse/internal/durable"
 	"godiscourse/internal/engine"
 	"godiscourse/internal/middleware"
-	"godiscourse/internal/topic"
 	"godiscourse/internal/user"
 	"log"
 	"net/http"
@@ -33,7 +31,6 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	router := httptreemux.New()
 	controllers.Register(engine, router)
 	controllers.RegisterUser(u, engine, router)
-	admin.RegisterAdminUser(u, router)
 
 	handler := middleware.Authenticate(u, router)
 	handler = middleware.Constraint(handler)

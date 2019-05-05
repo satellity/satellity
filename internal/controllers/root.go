@@ -15,6 +15,7 @@ func Register(engine engine.Engine, router *httptreemux.TreeMux) {
 	registerComment(engine, router)
 	registerTopic(engine, router)
 
+	admin.RegisterAdminUser(engine, router)
 	admin.RegisterAdminCategory(engine, router)
 	admin.RegisterAdminTopic(engine, router)
 }

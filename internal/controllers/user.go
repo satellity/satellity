@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"godiscourse/internal/engine"
 	"godiscourse/internal/middleware"
+	"godiscourse/internal/model"
 	"godiscourse/internal/session"
 	"godiscourse/internal/user"
 	"godiscourse/internal/views"
@@ -59,7 +60,7 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 	}
 
 	result := middleware.CurrentUser(r)
-	if err := impl.user.Update(r.Context(), result, &user.Params{
+	if err := impl.poster.UpdateUser(r.Context(), result, &model.UserInfo{
 		Nickname:  body.Nickname,
 		Biography: body.Biography,
 	}); err != nil {
@@ -74,7 +75,7 @@ func (impl *userImpl) current(w http.ResponseWriter, r *http.Request, _ map[stri
 }
 
 func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if user, err := impl.user.GetByID(r.Context(), params["id"]); err != nil {
+	if user, err := impl.poster.GetUserByID(r.Context(), params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if user == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
@@ -85,7 +86,7 @@ func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[st
 
 func (impl *userImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	user, err := impl.user.GetByID(r.Context(), params["id"])
+	user, err := impl.poster.GetUserByID(r.Context(), params["id"])
 
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)

@@ -24,6 +24,9 @@ type Engine interface {
 }
 
 type Poster interface {
+	UpdateUser(ctx context.Context, current *model.User, new *model.UserInfo) error
+	GetUserByID(ctx context.Context, id string) (*model.User, error)
+
 	GetCategoryByID(ctx context.Context, id string) (*model.Category, error)
 	GetAllCategories(ctx context.Context) ([]*model.Category, error)
 
@@ -41,6 +44,7 @@ type Poster interface {
 }
 
 type Admin interface {
+	GetUsersByOffset(ctx context.Context, offset time.Time) ([]*model.User, error)
 	CreateCategory(ctx context.Context, c *model.CategoryInfo) (*model.Category, error)
 	UpdateCategory(ctx context.Context, id string, c *model.CategoryInfo) (*model.Category, error)
 }

@@ -3,14 +3,12 @@ package user
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"godiscourse/internal/configs"
 	"godiscourse/internal/external"
 	"godiscourse/internal/session"
 	"net/http"
-	"strings"
 )
 
 // GithubUser is the response body of github oauth.
@@ -104,20 +102,4 @@ func featchUserEmail(ctx context.Context, accessToken string) (string, error) {
 		return "", nil
 	}
 	return emails[0].Email, nil
-}
-
-func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*Model, error) {
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
-		return nil, nil
-	}
-	return userFromRows(rows)
 }
