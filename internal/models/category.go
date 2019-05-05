@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS categories (
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS categories_position ON categories (position);
+CREATE INDEX IF NOT EXISTS categories_positionx ON categories (position);
 `
 
 // Category is used to categorize topics.
