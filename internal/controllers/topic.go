@@ -121,15 +121,11 @@ func (impl *topicImpl) abandon(w http.ResponseWriter, r *http.Request, params ma
 
 func (impl *topicImpl) action(w http.ResponseWriter, r *http.Request, id, action string, state bool) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	topic, err := models.ReadTopic(mctx, id)
-	if err != nil {
+	if topic, err := models.ReadTopic(mctx, id); err != nil {
 		views.RenderErrorResponse(w, r, err)
-		return
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-		return
-	}
-	if topic, err := topic.ActiondBy(mctx, middleware.CurrentUser(r), action, state); err != nil {
+	} else if topic, err = topic.ActiondBy(mctx, middleware.CurrentUser(r), action, state); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopic(w, r, topic)
