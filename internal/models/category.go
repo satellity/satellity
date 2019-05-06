@@ -11,6 +11,23 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+const CategoriesDDL = `
+CREATE TABLE IF NOT EXISTS categories (
+	category_id           VARCHAR(36) PRIMARY KEY,
+	name                  VARCHAR(36) NOT NULL,
+	alias                 VARCHAR(128) NOT NULL,
+	description           VARCHAR(512) NOT NULL,
+	topics_count          INTEGER NOT NULL DEFAULT 0,
+	last_topic_id         VARCHAR(36),
+	position              INTEGER NOT NULL DEFAULT 0,
+	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS categories_positionx ON categories (position);
+`
+
+const DropCategoriesDDL = `DROP TABLE IF EXISTS categories;`
+
 type Category struct {
 	CategoryID  string
 	Name        string

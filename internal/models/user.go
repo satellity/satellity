@@ -12,6 +12,26 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+const UsersDDL = `
+CREATE TABLE IF NOT EXISTS users (
+	user_id               VARCHAR(36) PRIMARY KEY,
+	email                 VARCHAR(512),
+	username              VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
+	nickname              VARCHAR(64) NOT NULL DEFAULT '',
+	biography             VARCHAR(2048) NOT NULL DEFAULT '',
+	encrypted_password    VARCHAR(1024),
+	github_id             VARCHAR(1024) UNIQUE,
+	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS users_emailx ON users ((LOWER(email)));
+CREATE UNIQUE INDEX IF NOT EXISTS users_usernamex ON users ((LOWER(username)));
+CREATE INDEX IF NOT EXISTS users_createdx ON users (created_at);
+`
+
+const DropUsersDDL = `DROP TABLE IF EXISTS users;`
+
 type User struct {
 	UserID            string
 	Email             sql.NullString

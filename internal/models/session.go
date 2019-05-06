@@ -15,6 +15,19 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+const SessionsDDL = `
+CREATE TABLE IF NOT EXISTS sessions (
+	session_id            VARCHAR(36) PRIMARY KEY,
+	user_id               VARCHAR(36) NOT NULL,
+	secret                VARCHAR(1024) NOT NULL,
+	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS sessions_userx ON sessions (user_id);
+`
+
+const DropSessionsDDL = `DROP TABLE IF EXISTS sessions;`
+
 // Session contains user's current login infomation
 type Session struct {
 	SessionID string    `sql:"session_id,pk"`

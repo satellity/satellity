@@ -12,6 +12,31 @@ import (
 	hashids "github.com/speps/go-hashids"
 )
 
+const TopicsDDL = `
+CREATE TABLE IF NOT EXISTS topics (
+	topic_id              VARCHAR(36) PRIMARY KEY,
+	short_id              VARCHAR(255) NOT NULL,
+	title                 VARCHAR(512) NOT NULL,
+	body                  TEXT NOT NULL,
+	comments_count        BIGINT NOT NULL DEFAULT 0,
+	bookmarks_count       BIGINT NOT NULL DEFAULT 0,
+	likes_count           BIGINT NOT NULL DEFAULT 0,
+	category_id           VARCHAR(36) NOT NULL,
+	user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
+	score                 INTEGER NOT NULL DEFAULT 0,
+	draft                 BOOL NOT NULL DEFAULT false,
+	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS topics_shortx ON topics(short_id);
+CREATE INDEX IF NOT EXISTS topics_draft_createdx ON topics(draft, created_at DESC);
+CREATE INDEX IF NOT EXISTS topics_user_draft_createdx ON topics(user_id, draft, created_at DESC);
+CREATE INDEX IF NOT EXISTS topics_category_draft_createdx ON topics(category_id, draft, created_at DESC);
+CREATE INDEX IF NOT EXISTS topics_score_draft_createdx ON topics(score DESC, draft, created_at DESC);
+`
+
+const DropTopicsDDL = `DROP TABLE IF EXISTS topics;`
+
 type Topic struct {
 	TopicID       string
 	ShortID       string

@@ -1,4 +1,4 @@
-package schema
+package models
 
 import (
 	"context"
@@ -14,21 +14,33 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+const StatisticsDDL = `
+CREATE TABLE IF NOT EXISTS statistics (
+	statistic_id          VARCHAR(36) PRIMARY KEY,
+	name                  VARCHAR(512) NOT NULL,
+	count                 BIGINT NOT NULL DEFAULT 0,
+	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+`
+
+const DropStatisticsDDL = `DROP TABLE IF EXISTS statistics;`
+
 // SolidStatisticID is used to generate a solid id from name
 const SolidStatisticID = "540cbd3c-f4eb-479c-bcd8-b5629af57267"
 
 // Statistic is the body of statistic
 type Statistic struct {
-	StatisticID string    `sql:"statistic_id,pk"`
-	Name        string    `sql:"name,notnull"`
-	Count       int64     `sql:"count,notnull"`
-	CreatedAt   time.Time `sql:"created_at"`
-	UpdatedAt   time.Time `sql:"updated_at"`
+	StatisticID string
+	Name        string
+	Count       int64
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
-var statisticColumns = []string{"statistic_id", "name", "count", "created_at", "updated_at"}
+var StatisticColumns = []string{"statistic_id", "name", "count", "created_at", "updated_at"}
 
-func (s *Statistic) values() []interface{} {
+func (s *Statistic) Values() []interface{} {
 	return []interface{}{s.StatisticID, s.Name, s.Count, s.CreatedAt, s.UpdatedAt}
 }
 
@@ -62,8 +74,8 @@ func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, 
 		Name:        name,
 		Count:       int64(count),
 	}
-	cols, params := durable.PrepareColumnsWithValues(statisticColumns)
-	if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...); err != nil {
+	cols, params := durable.PrepareColumnsWithValues(StatisticColumns)
+	if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.Values()...); err != nil {
 		return nil, err
 	}
 	return s, nil
@@ -74,12 +86,30 @@ func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, erro
 		return nil, nil
 	}
 
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(statisticColumns, ",")), id)
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(StatisticColumns, ",")), id)
 	s, err := statisticFromRows(row)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	return s, err
+}
+
+func usersCount(ctx context.Context, tx *sql.Tx) (int64, error) {
+	var count int64
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM users").Scan(&count)
+	return count, err
+}
+
+func topicsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
+	var count int64
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics").Scan(&count)
+	return count, err
+}
+
+func commentsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
+	var count int64
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM comments").Scan(&count)
+	return count, err
 }
 
 func statisticFromRows(row durable.Row) (*Statistic, error) {

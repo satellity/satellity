@@ -1,12 +1,11 @@
-package schema
+package engine
 
 import (
 	"context"
 	"godiscourse/internal/configs"
 	"godiscourse/internal/durable"
+	"godiscourse/internal/models"
 	"log"
-
-	_ "github.com/lib/pq"
 )
 
 const (
@@ -14,23 +13,14 @@ const (
 	testDatabase    = "godiscourse_test"
 )
 
-const (
-	dropUsersDDL      = `DROP TABLE IF EXISTS users;`
-	dropSessionsDDL   = `DROP TABLE IF EXISTS sessions;`
-	dropCategoriesDDL = `DROP TABLE IF EXISTS categories;`
-	dropTopicsDDL     = `DROP TABLE IF EXISTS topics;`
-	dropCommentsDDL   = `DROP TABLE IF EXISTS comments;`
-	dropStatisticsDDL = `DROP TABLE IF EXISTS statistics;`
-)
-
 func teardownTestContext(db *durable.Database) {
 	tables := []string{
-		dropStatisticsDDL,
-		dropCommentsDDL,
-		dropTopicsDDL,
-		dropCategoriesDDL,
-		dropSessionsDDL,
-		dropUsersDDL,
+		models.DropStatisticsDDL,
+		models.DropCommentsDDL,
+		models.DropTopicsDDL,
+		models.DropCategoriesDDL,
+		models.DropSessionsDDL,
+		models.DropUsersDDL,
 	}
 
 	for _, q := range tables {
@@ -53,12 +43,12 @@ func setupTestContext() *durable.Database {
 		Name:     opts.DbName,
 	})
 	tables := []string{
-		usersDDL,
-		sessionsDDL,
-		categoriesDDL,
-		topicsDDL,
-		commentsDDL,
-		statisticsDDL,
+		models.UsersDDL,
+		models.SessionsDDL,
+		models.CategoriesDDL,
+		models.TopicsDDL,
+		models.CommentsDDL,
+		models.StatisticsDDL,
 	}
 	for _, q := range tables {
 		if _, err := db.Exec(q); err != nil {

@@ -2,13 +2,12 @@ package user
 
 import (
 	"context"
+	"godiscourse/internal/session"
 	"net"
 	"regexp"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
-
-	"godiscourse/internal/session"
 )
 
 var (
