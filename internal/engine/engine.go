@@ -2,9 +2,8 @@ package engine
 
 import (
 	"context"
+	"godiscourse/internal/models"
 	"time"
-
-	"godiscourse/internal/model"
 )
 
 // Topic related CONST
@@ -24,27 +23,27 @@ type Engine interface {
 }
 
 type Poster interface {
-	UpdateUser(ctx context.Context, current *model.User, new *model.UserInfo) error
-	GetUserByID(ctx context.Context, id string) (*model.User, error)
+	UpdateUser(ctx context.Context, current *models.User, new *models.UserInfo) error
+	GetUserByID(ctx context.Context, id string) (*models.User, error)
 
-	GetCategoryByID(ctx context.Context, id string) (*model.Category, error)
-	GetAllCategories(ctx context.Context) ([]*model.Category, error)
+	GetCategoryByID(ctx context.Context, id string) (*models.Category, error)
+	GetAllCategories(ctx context.Context) ([]*models.Category, error)
 
-	CreateTopic(ctx context.Context, userID string, t *model.TopicInfo) (*model.Topic, error)
-	UpdateTopic(ctx context.Context, id string, t *model.TopicInfo) (*model.Topic, error)
-	GetTopicByID(ctx context.Context, id string) (*model.Topic, error)
-	GetTopicByUserID(ctx context.Context, userID string, offset time.Time) ([]*model.Topic, error)
-	GetTopicsByCategoryID(ctx context.Context, categoryID string, offset time.Time) ([]*model.Topic, error)
-	GetTopicsByOffset(ctx context.Context, offset time.Time) ([]*model.Topic, error)
+	CreateTopic(ctx context.Context, userID string, t *models.TopicInfo) (*models.Topic, error)
+	UpdateTopic(ctx context.Context, id string, t *models.TopicInfo) (*models.Topic, error)
+	GetTopicByID(ctx context.Context, id string) (*models.Topic, error)
+	GetTopicByUserID(ctx context.Context, userID string, offset time.Time) ([]*models.Topic, error)
+	GetTopicsByCategoryID(ctx context.Context, categoryID string, offset time.Time) ([]*models.Topic, error)
+	GetTopicsByOffset(ctx context.Context, offset time.Time) ([]*models.Topic, error)
 
-	CreateComment(ctx context.Context, c *model.CommentInfo) (*model.Comment, error)
-	UpdateComment(ctx context.Context, c *model.CommentInfo) (*model.Comment, error)
+	CreateComment(ctx context.Context, c *models.CommentInfo) (*models.Comment, error)
+	UpdateComment(ctx context.Context, c *models.CommentInfo) (*models.Comment, error)
 	DeleteComment(ctx context.Context, id, userID string) error
-	GetCommentsByTopicID(ctx context.Context, topicID string, offset time.Time) ([]*model.Comment, error)
+	GetCommentsByTopicID(ctx context.Context, topicID string, offset time.Time) ([]*models.Comment, error)
 }
 
 type Admin interface {
-	GetUsersByOffset(ctx context.Context, offset time.Time) ([]*model.User, error)
-	CreateCategory(ctx context.Context, c *model.CategoryInfo) (*model.Category, error)
-	UpdateCategory(ctx context.Context, id string, c *model.CategoryInfo) (*model.Category, error)
+	GetUsersByOffset(ctx context.Context, offset time.Time) ([]*models.User, error)
+	CreateCategory(ctx context.Context, c *models.CategoryInfo) (*models.Category, error)
+	UpdateCategory(ctx context.Context, id string, c *models.CategoryInfo) (*models.Category, error)
 }

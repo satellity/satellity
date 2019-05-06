@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"godiscourse/internal/model"
+	"godiscourse/internal/models"
 	"godiscourse/internal/session"
 	"godiscourse/internal/user"
 	"godiscourse/internal/views"
@@ -31,8 +31,8 @@ type contextValueKey int
 const keyCurrentUser contextValueKey = 1000
 
 // CurrentUser read the user from r.Context
-func CurrentUser(r *http.Request) *model.User {
-	user, _ := r.Context().Value(keyCurrentUser).(*model.User)
+func CurrentUser(r *http.Request) *models.User {
+	user, _ := r.Context().Value(keyCurrentUser).(*models.User)
 	return user
 }
 

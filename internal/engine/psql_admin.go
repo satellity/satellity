@@ -4,29 +4,28 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"godiscourse/internal/durable"
+	"godiscourse/internal/models"
+	"godiscourse/internal/session"
 	"strings"
 	"time"
-
-	"godiscourse/internal/durable"
-	"godiscourse/internal/model"
-	"godiscourse/internal/session"
 
 	"github.com/gofrs/uuid"
 )
 
-func (p *Psql) GetUsersByOffset(ctx context.Context, offset time.Time) ([]*model.User, error) {
+func (p *Psql) GetUsersByOffset(ctx context.Context, offset time.Time) ([]*models.User, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := p.db.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(model.UserColumns, ",")), offset)
+	rows, err := p.db.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE created_at<$1 ORDER BY created_at DESC LIMIT 100", strings.Join(models.UserColumns, ",")), offset)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	defer rows.Close()
 
-	var users []*model.User
+	var users []*models.User
 	for rows.Next() {
-		user, err := model.UserFromRows(rows)
+		user, err := models.UserFromRows(rows)
 		if err != nil {
 			return nil, session.TransactionError(ctx, err)
 		}
@@ -38,7 +37,7 @@ func (p *Psql) GetUsersByOffset(ctx context.Context, offset time.Time) ([]*model
 	return users, nil
 }
 
-func (p *Psql) CreateCategory(ctx context.Context, c *model.CategoryInfo) (*model.Category, error) {
+func (p *Psql) CreateCategory(ctx context.Context, c *models.CategoryInfo) (*models.Category, error) {
 	alias, name := strings.TrimSpace(c.Alias), strings.TrimSpace(c.Name)
 	description := strings.TrimSpace(c.Description)
 	if len(name) < 1 {
@@ -49,7 +48,7 @@ func (p *Psql) CreateCategory(ctx context.Context, c *model.CategoryInfo) (*mode
 	}
 
 	t := time.Now()
-	category := &model.Category{
+	category := &models.Category{
 		CategoryID:  uuid.Must(uuid.NewV4()).String(),
 		Name:        name,
 		Alias:       alias,
@@ -61,7 +60,7 @@ func (p *Psql) CreateCategory(ctx context.Context, c *model.CategoryInfo) (*mode
 		UpdatedAt:   t,
 	}
 
-	cols, params := durable.PrepareColumnsWithValues(model.CategoryColumns)
+	cols, params := durable.PrepareColumnsWithValues(models.CategoryColumns)
 	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		if c.Position == 0 {
 			count, err := categoryCount(ctx, tx)
@@ -79,16 +78,16 @@ func (p *Psql) CreateCategory(ctx context.Context, c *model.CategoryInfo) (*mode
 	return category, nil
 }
 
-func (p *Psql) UpdateCategory(ctx context.Context, id string, c *model.CategoryInfo) (*model.Category, error) {
+func (p *Psql) UpdateCategory(ctx context.Context, id string, c *models.CategoryInfo) (*models.Category, error) {
 	alias, name := strings.TrimSpace(c.Alias), strings.TrimSpace(c.Name)
 	description := strings.TrimSpace(c.Description)
 	if len(alias) < 1 && len(name) < 1 {
 		return nil, session.BadDataError(ctx)
 	}
 
-	var category *model.Category
+	var category *models.Category
 	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		category, err := model.FindCategory(ctx, tx, id)
+		category, err := models.FindCategory(ctx, tx, id)
 		if err != nil || category == nil {
 			return err
 		}

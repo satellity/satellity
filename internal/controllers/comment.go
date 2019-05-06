@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"godiscourse/internal/engine"
 	"godiscourse/internal/middleware"
-	"godiscourse/internal/model"
+	"godiscourse/internal/models"
 	"godiscourse/internal/session"
 	"godiscourse/internal/views"
 	"net/http"
@@ -38,7 +38,7 @@ func (impl *commentImpl) create(w http.ResponseWriter, r *http.Request, _ map[st
 		return
 	}
 
-	if comment, err := impl.poster.CreateComment(r.Context(), &model.CommentInfo{
+	if comment, err := impl.poster.CreateComment(r.Context(), &models.CommentInfo{
 		UserID:  middleware.CurrentUser(r).UserID,
 		TopicID: body.TopicID,
 		Body:    body.Body,
@@ -56,7 +56,7 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 		return
 	}
 
-	if comment, err := impl.poster.CreateComment(r.Context(), &model.CommentInfo{
+	if comment, err := impl.poster.CreateComment(r.Context(), &models.CommentInfo{
 		UserID:  middleware.CurrentUser(r).UserID,
 		TopicID: params["id"],
 		Body:    body.Body,

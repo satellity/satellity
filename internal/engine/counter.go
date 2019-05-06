@@ -3,7 +3,6 @@ package engine
 import (
 	"context"
 	"database/sql"
-
 	"godiscourse/internal/session"
 )
 

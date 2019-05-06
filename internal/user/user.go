@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"godiscourse/internal/durable"
-	"godiscourse/internal/model"
+	"godiscourse/internal/models"
 	"godiscourse/internal/session"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -50,13 +50,13 @@ type SessionParams struct {
 }
 
 type UserDatastore interface {
-	CreateGithubUser(context.Context, string, string) (*model.User, error)
+	CreateGithubUser(context.Context, string, string) (*models.User, error)
 
 	// todo: combine with session and move to standalone auth
-	Authenticate(context.Context, string) (*model.User, error)
-	GetByUsernameOrEmail(context.Context, string) (*model.User, error)
-	Create(context.Context, *Params) (*model.User, error)
-	CreateSession(context.Context, *SessionParams) (*model.User, error)
+	Authenticate(context.Context, string) (*models.User, error)
+	GetByUsernameOrEmail(context.Context, string) (*models.User, error)
+	Create(context.Context, *Params) (*models.User, error)
+	CreateSession(context.Context, *SessionParams) (*models.User, error)
 }
 
 type User struct {
@@ -67,8 +67,8 @@ func New(db *durable.Database) *User {
 	return &User{db: db}
 }
 
-func (u *User) Create(ctx context.Context, p *Params) (*model.User, error) {
-	err := model.CheckSecret(ctx, p.SessionSecret)
+func (u *User) Create(ctx context.Context, p *Params) (*models.User, error) {
+	err := models.CheckSecret(ctx, p.SessionSecret)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (u *User) Create(ctx context.Context, p *Params) (*model.User, error) {
 	}
 
 	t := time.Now()
-	user := &model.User{
+	user := &models.User{
 		UserID:            uuid.Must(uuid.NewV4()).String(),
 		Email:             sql.NullString{String: p.Email, Valid: true},
 		Username:          p.Username,
@@ -103,7 +103,7 @@ func (u *User) Create(ctx context.Context, p *Params) (*model.User, error) {
 	}
 
 	err = u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		cols, params := durable.PrepareColumnsWithValues(model.UserColumns)
+		cols, params := durable.PrepareColumnsWithValues(models.UserColumns)
 		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, params), user.Values()...)
 		if err != nil {
 			return err
@@ -125,7 +125,7 @@ func (u *User) Create(ctx context.Context, p *Params) (*model.User, error) {
 }
 
 // CreateGithubUser create a github user.
-func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string) (*model.User, error) {
+func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string) (*models.User, error) {
 	token, err := fetchAccessToken(ctx, code)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
@@ -134,10 +134,10 @@ func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
 	}
-	var user *model.User
+	var user *models.User
 	err = u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
-		user, err = model.FindUserByGithubID(ctx, tx, data.NodeID)
+		user, err = models.FindUserByGithubID(ctx, tx, data.NodeID)
 		return err
 	})
 	if err != nil {
@@ -145,7 +145,7 @@ func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string)
 	}
 	if user == nil {
 		t := time.Now()
-		user = &model.User{
+		user = &models.User{
 			UserID:    uuid.Must(uuid.NewV4()).String(),
 			Username:  fmt.Sprintf("GH_%s", data.Login),
 			Nickname:  data.Name,
@@ -184,8 +184,8 @@ func (u *User) CreateGithubUser(ctx context.Context, code, sessionSecret string)
 
 // Authenticate read a user by tokenString. tokenString is a jwt token, more
 // about jwt: https://github.com/dgrijalva/jwt-go
-func (u *User) Authenticate(ctx context.Context, tokenString string) (*model.User, error) {
-	var user *model.User
+func (u *User) Authenticate(ctx context.Context, tokenString string) (*models.User, error) {
+	var user *models.User
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
@@ -195,16 +195,16 @@ func (u *User) Authenticate(ctx context.Context, tokenString string) (*model.Use
 			return nil, nil
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
-		var s *model.Session
+		var s *models.Session
 		err := u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-			u, err := model.FindUserByID(ctx, tx, uid)
+			u, err := models.FindUserByID(ctx, tx, uid)
 			if err != nil {
 				return err
 			} else if u == nil {
 				return nil
 			}
 			user = u
-			s, err = model.ReadSession(ctx, tx, uid, sid)
+			s, err = models.ReadSession(ctx, tx, uid, sid)
 			if err != nil {
 				return err
 			} else if s == nil {
@@ -232,15 +232,15 @@ func (u *User) Authenticate(ctx context.Context, tokenString string) (*model.Use
 }
 
 // GetByUsernameOrEmail read user by identity, which is an email or username.
-func (u *User) GetByUsernameOrEmail(ctx context.Context, identity string) (*model.User, error) {
+func (u *User) GetByUsernameOrEmail(ctx context.Context, identity string) (*models.User, error) {
 	identity = strings.ToLower(strings.TrimSpace(identity))
 	if len(identity) < 3 {
 		return nil, nil
 	}
 
-	var user *model.User
+	var user *models.User
 	err := u.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(model.UserColumns, ",")), identity)
+		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(models.UserColumns, ",")), identity)
 		defer rows.Close()
 
 		if !rows.Next() {
@@ -249,7 +249,7 @@ func (u *User) GetByUsernameOrEmail(ctx context.Context, identity string) (*mode
 			}
 			return nil
 		}
-		user, err = model.UserFromRows(rows)
+		user, err = models.UserFromRows(rows)
 		if err != nil {
 			return err
 		}
@@ -265,8 +265,8 @@ func (u *User) GetByUsernameOrEmail(ctx context.Context, identity string) (*mode
 }
 
 // CreateSession create a new user session
-func (u *User) CreateSession(ctx context.Context, sp *SessionParams) (*model.User, error) {
-	err := model.CheckSecret(ctx, sp.Secret)
+func (u *User) CreateSession(ctx context.Context, sp *SessionParams) (*models.User, error) {
+	err := models.CheckSecret(ctx, sp.Secret)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"godiscourse/internal/engine"
 	"godiscourse/internal/middleware"
-	"godiscourse/internal/model"
+	"godiscourse/internal/models"
 	"godiscourse/internal/session"
 	"godiscourse/internal/views"
 	"net/http"
@@ -40,7 +40,7 @@ func (impl *topicImpl) create(w http.ResponseWriter, r *http.Request, _ map[stri
 	}
 
 	u := middleware.CurrentUser(r)
-	if t, err := impl.poster.CreateTopic(r.Context(), u.UserID, &model.TopicInfo{
+	if t, err := impl.poster.CreateTopic(r.Context(), u.UserID, &models.TopicInfo{
 		Title:      body.Title,
 		Body:       body.Body,
 		CategoryID: body.CategoryID,
@@ -58,7 +58,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 		return
 	}
 
-	if t, err := impl.poster.UpdateTopic(r.Context(), params["id"], &model.TopicInfo{
+	if t, err := impl.poster.UpdateTopic(r.Context(), params["id"], &models.TopicInfo{
 		Title:      body.Title,
 		Body:       body.Body,
 		CategoryID: body.CategoryID,

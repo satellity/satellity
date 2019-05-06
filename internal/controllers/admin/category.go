@@ -3,7 +3,7 @@ package admin
 import (
 	"encoding/json"
 	"godiscourse/internal/engine"
-	"godiscourse/internal/model"
+	"godiscourse/internal/models"
 	"godiscourse/internal/session"
 	"godiscourse/internal/views"
 	"net/http"
@@ -37,7 +37,7 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	category, err := impl.engine.CreateCategory(r.Context(), &model.CategoryInfo{
+	category, err := impl.engine.CreateCategory(r.Context(), &models.CategoryInfo{
 		Name:        body.Name,
 		Alias:       body.Alias,
 		Description: body.Description,
@@ -66,7 +66,7 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 		return
 	}
 
-	category, err := impl.engine.UpdateCategory(r.Context(), params["id"], &model.CategoryInfo{
+	category, err := impl.engine.UpdateCategory(r.Context(), params["id"], &models.CategoryInfo{
 		Name:        body.Name,
 		Alias:       body.Alias,
 		Description: body.Description,

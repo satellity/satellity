@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"godiscourse/internal/engine"
 	"godiscourse/internal/middleware"
-	"godiscourse/internal/model"
+	"godiscourse/internal/models"
 	"godiscourse/internal/session"
 	"godiscourse/internal/user"
 	"godiscourse/internal/views"
@@ -60,7 +60,7 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 	}
 
 	result := middleware.CurrentUser(r)
-	if err := impl.poster.UpdateUser(r.Context(), result, &model.UserInfo{
+	if err := impl.poster.UpdateUser(r.Context(), result, &models.UserInfo{
 		Nickname:  body.Nickname,
 		Biography: body.Biography,
 	}); err != nil {

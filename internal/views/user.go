@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"godiscourse/internal/model"
+	"godiscourse/internal/models"
 )
 
 // UserView is the response body of user
@@ -30,7 +30,7 @@ type AccountView struct {
 	Role      string `json:"role"`
 }
 
-func buildUser(u *model.User) (result UserView) {
+func buildUser(u *models.User) (result UserView) {
 	if u != nil {
 		result = UserView{
 			Type:      "user",
@@ -46,12 +46,12 @@ func buildUser(u *model.User) (result UserView) {
 }
 
 // RenderUser response a user
-func RenderUser(w http.ResponseWriter, r *http.Request, u *model.User) {
+func RenderUser(w http.ResponseWriter, r *http.Request, u *models.User) {
 	RenderResponse(w, r, buildUser(u))
 }
 
 // RenderUsers response a bundle of users
-func RenderUsers(w http.ResponseWriter, r *http.Request, users []*model.User) {
+func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
 	userViews := make([]UserView, len(users))
 	for i, user := range users {
 		userViews[i] = buildUser(user)
@@ -60,7 +60,7 @@ func RenderUsers(w http.ResponseWriter, r *http.Request, users []*model.User) {
 }
 
 // RenderAccount response
-func RenderAccount(w http.ResponseWriter, r *http.Request, u *model.User) {
+func RenderAccount(w http.ResponseWriter, r *http.Request, u *models.User) {
 	accountView := AccountView{
 		UserView:  buildUser(u),
 		Username:  u.Username,
