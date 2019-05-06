@@ -8,8 +8,7 @@ import (
 
 func categoryCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	var count int64
-	row := tx.QueryRowContext(ctx, "SELECT count(*) FROM categories")
-	err := row.Scan(&count)
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM categories").Scan(&count)
 	if err != nil {
 		return 0, session.TransactionError(ctx, err)
 	}
