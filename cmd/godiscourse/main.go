@@ -24,13 +24,13 @@ import (
 
 func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	database := durable.WrapDatabase(db)
-	engine := engine.NewPsql(database)
+	store := engine.NewStore(database)
 
 	u := user.New(database)
 
 	router := httptreemux.New()
-	controllers.Register(engine, router)
-	controllers.RegisterUser(u, engine, router)
+	controllers.Register(store, router)
+	controllers.RegisterUser(u, store, router)
 
 	handler := middleware.Authenticate(u, router)
 	handler = middleware.Constraint(handler)

@@ -11,17 +11,17 @@ import (
 	"github.com/dimfeld/httptreemux"
 )
 
-func Register(engine engine.Engine, router *httptreemux.TreeMux) {
+func Register(eng engine.Engine, router *httptreemux.TreeMux) {
 	router.GET("/_hc", health)
 	registerHanders(router)
 
-	registerCategory(engine, router)
-	registerComment(engine, router)
-	registerTopic(engine, router)
+	registerCategory(eng, router)
+	registerComment(eng, router)
+	registerTopic(eng, router)
 
-	admin.RegisterAdminUser(engine, router)
-	admin.RegisterAdminCategory(engine, router)
-	admin.RegisterAdminTopic(engine, router)
+	admin.RegisterAdminUser(eng, router)
+	admin.RegisterAdminCategory(eng, router)
+	admin.RegisterAdminTopic(eng, router)
 }
 
 func health(w http.ResponseWriter, r *http.Request, _ map[string]string) {

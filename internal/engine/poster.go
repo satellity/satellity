@@ -13,15 +13,15 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type Psql struct {
+type Store struct {
 	db *durable.Database
 }
 
-func NewPsql(db *durable.Database) *Psql {
-	return &Psql{db: db}
+func NewStore(db *durable.Database) *Store {
+	return &Store{db: db}
 }
 
-func (p *Psql) UpdateUser(ctx context.Context, current *models.User, new *models.UserInfo) error {
+func (s *Store) UpdateUser(ctx context.Context, current *models.User, new *models.UserInfo) error {
 	nickname, biography := strings.TrimSpace(new.Nickname), strings.TrimSpace(new.Biography)
 	if len(nickname) == 0 && len(biography) == 0 {
 		return nil
@@ -34,16 +34,16 @@ func (p *Psql) UpdateUser(ctx context.Context, current *models.User, new *models
 	}
 	current.UpdatedAt = time.Now()
 	cols, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
-	_, err := p.db.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, current.UserID), current.Nickname, current.Biography, current.UpdatedAt)
+	_, err := s.db.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, current.UserID), current.Nickname, current.Biography, current.UpdatedAt)
 	if err != nil {
 		return session.TransactionError(ctx, err)
 	}
 	return nil
 }
 
-func (p *Psql) GetUserByID(ctx context.Context, id string) (*models.User, error) {
+func (s *Store) GetUserByID(ctx context.Context, id string) (*models.User, error) {
 	var user *models.User
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		user, err = models.FindUserByID(ctx, tx, id)
 		return err
@@ -57,9 +57,9 @@ func (p *Psql) GetUserByID(ctx context.Context, id string) (*models.User, error)
 	return user, nil
 }
 
-func (p *Psql) GetCategoryByID(ctx context.Context, id string) (*models.Category, error) {
+func (s *Store) GetCategoryByID(ctx context.Context, id string) (*models.Category, error) {
 	var category *models.Category
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = models.FindCategory(ctx, tx, id)
 		return err
@@ -70,9 +70,9 @@ func (p *Psql) GetCategoryByID(ctx context.Context, id string) (*models.Category
 	return category, nil
 }
 
-func (p *Psql) GetAllCategories(ctx context.Context) ([]*models.Category, error) {
+func (s *Store) GetAllCategories(ctx context.Context) ([]*models.Category, error) {
 	var categories []*models.Category
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		categories, err = models.ReadCategories(ctx, tx)
 		return err
@@ -83,7 +83,7 @@ func (p *Psql) GetAllCategories(ctx context.Context) ([]*models.Category, error)
 	return categories, nil
 }
 
-func (p *Psql) CreateTopic(ctx context.Context, userID string, t *models.TopicInfo) (*models.Topic, error) {
+func (s *Store) CreateTopic(ctx context.Context, userID string, t *models.TopicInfo) (*models.Topic, error) {
 	title, body := strings.TrimSpace(t.Title), strings.TrimSpace(t.Body)
 	if len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
@@ -105,8 +105,8 @@ func (p *Psql) CreateTopic(ctx context.Context, userID string, t *models.TopicIn
 		return nil, session.ServerError(ctx, err)
 	}
 
-	err = p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		category, err := p.GetCategoryByID(ctx, t.CategoryID)
+	err = s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		category, err := s.GetCategoryByID(ctx, t.CategoryID)
 		if err != nil {
 			return err
 		}
@@ -144,12 +144,12 @@ func (p *Psql) CreateTopic(ctx context.Context, userID string, t *models.TopicIn
 }
 
 // dispersalCategory update category's info, e.g.: LastTopicID, TopicsCount
-func (p *Psql) dispersalCategory(ctx context.Context, id string) (*models.Category, error) {
+func (s *Store) dispersalCategory(ctx context.Context, id string) (*models.Category, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
 	var result *models.Category
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		result, err = models.FindCategory(ctx, tx, id)
 		if err != nil {
@@ -191,7 +191,7 @@ func (p *Psql) dispersalCategory(ctx context.Context, id string) (*models.Catego
 	return result, nil
 }
 
-func (p *Psql) UpdateTopic(ctx context.Context, id string, t *models.TopicInfo) (*models.Topic, error) {
+func (s *Store) UpdateTopic(ctx context.Context, id string, t *models.TopicInfo) (*models.Topic, error) {
 	title, body := strings.TrimSpace(t.Title), strings.TrimSpace(t.Body)
 	if title != "" && len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
@@ -199,7 +199,7 @@ func (p *Psql) UpdateTopic(ctx context.Context, id string, t *models.TopicInfo) 
 
 	var topic *models.Topic
 	var prevCategoryID string
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = models.FindTopic(ctx, tx, id)
 		if err != nil {
@@ -247,9 +247,9 @@ func (p *Psql) UpdateTopic(ctx context.Context, id string, t *models.TopicInfo) 
 }
 
 // todo: rewrite with join
-func (p *Psql) GetTopicByID(ctx context.Context, id string) (*models.Topic, error) {
+func (s *Store) GetTopicByID(ctx context.Context, id string) (*models.Topic, error) {
 	var topic *models.Topic
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = models.FindTopic(ctx, tx, id)
 		if err != nil {
@@ -274,13 +274,13 @@ func (p *Psql) GetTopicByID(ctx context.Context, id string) (*models.Topic, erro
 	return topic, nil
 }
 
-func (p *Psql) GetTopicByUserID(ctx context.Context, userID string, offset time.Time) ([]*models.Topic, error) {
+func (s *Store) GetTopicByUserID(ctx context.Context, userID string, offset time.Time) ([]*models.Topic, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
 
 	var topics []*models.Topic
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		// todo: join query
 		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(models.TopicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, userID, offset, LIMIT)
@@ -304,13 +304,13 @@ func (p *Psql) GetTopicByUserID(ctx context.Context, userID string, offset time.
 	return topics, nil
 }
 
-func (p *Psql) GetTopicsByCategoryID(ctx context.Context, categoryID string, offset time.Time) ([]*models.Topic, error) {
+func (s *Store) GetTopicsByCategoryID(ctx context.Context, categoryID string, offset time.Time) ([]*models.Topic, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
 
 	var topics []*models.Topic
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		// todo: join query
 		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(models.TopicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, categoryID, offset, LIMIT)
@@ -326,13 +326,13 @@ func (p *Psql) GetTopicsByCategoryID(ctx context.Context, categoryID string, off
 	return topics, nil
 }
 
-func (p *Psql) GetTopicsByOffset(ctx context.Context, offset time.Time) ([]*models.Topic, error) {
+func (s *Store) GetTopicsByOffset(ctx context.Context, offset time.Time) ([]*models.Topic, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
 
 	var topics []*models.Topic
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		// todo: join query
 		query := fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(models.TopicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
@@ -348,7 +348,7 @@ func (p *Psql) GetTopicsByOffset(ctx context.Context, offset time.Time) ([]*mode
 	return topics, nil
 }
 
-func (p *Psql) CreateComment(ctx context.Context, c *models.CommentInfo) (*models.Comment, error) {
+func (s *Store) CreateComment(ctx context.Context, c *models.CommentInfo) (*models.Comment, error) {
 	body := strings.TrimSpace(c.Body)
 	if len(body) < minCommentBodySize {
 		return nil, session.BadDataError(ctx)
@@ -362,14 +362,14 @@ func (p *Psql) CreateComment(ctx context.Context, c *models.CommentInfo) (*model
 		UpdatedAt: now,
 	}
 
-	t, err := p.GetTopicByID(ctx, c.TopicID)
+	t, err := s.GetTopicByID(ctx, c.TopicID)
 	if err != nil {
 		return nil, err
 	} else if t == nil {
 		return nil, session.NotFoundError(ctx)
 	}
 
-	err = p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		count, err := commentsCountByTopic(ctx, tx, c.TopicID)
 		if err != nil {
 			return err
@@ -399,13 +399,13 @@ func (p *Psql) CreateComment(ctx context.Context, c *models.CommentInfo) (*model
 	return result, nil
 }
 
-func (p *Psql) UpdateComment(ctx context.Context, c *models.CommentInfo) (*models.Comment, error) {
+func (s *Store) UpdateComment(ctx context.Context, c *models.CommentInfo) (*models.Comment, error) {
 	body := strings.TrimSpace(c.Body)
 	if len(body) < minCommentBodySize {
 		return nil, session.BadDataError(ctx)
 	}
 	var result *models.Comment
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		result, err = models.FindComment(ctx, tx, c.CommentID)
 		if err != nil {
@@ -430,8 +430,8 @@ func (p *Psql) UpdateComment(ctx context.Context, c *models.CommentInfo) (*model
 	return result, nil
 }
 
-func (p *Psql) DeleteComment(ctx context.Context, id, uid string) error {
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+func (s *Store) DeleteComment(ctx context.Context, id, uid string) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		comment, err := models.FindComment(ctx, tx, id)
 		if err != nil || comment == nil {
 			return err
@@ -439,7 +439,7 @@ func (p *Psql) DeleteComment(ctx context.Context, id, uid string) error {
 		if /*!user.isAdmin() &&*/ uid != comment.UserID {
 			return session.ForbiddenError(ctx)
 		}
-		topic, err := p.GetTopicByID(ctx, comment.TopicID)
+		topic, err := s.GetTopicByID(ctx, comment.TopicID)
 		if err != nil {
 			return err
 		} else if topic == nil {
@@ -468,13 +468,13 @@ func (p *Psql) DeleteComment(ctx context.Context, id, uid string) error {
 	return nil
 }
 
-func (p *Psql) GetCommentsByTopicID(ctx context.Context, topicID string, offset time.Time) ([]*models.Comment, error) {
+func (s *Store) GetCommentsByTopicID(ctx context.Context, topicID string, offset time.Time) ([]*models.Comment, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
 
 	var result []*models.Comment
-	err := p.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		// todo: join with user, category in query
 		query := fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(models.CommentColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, topicID, offset, LIMIT)
