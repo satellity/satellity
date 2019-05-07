@@ -24,12 +24,12 @@ func SetupTestContext() (*durable.Database, func()) {
 	}
 
 	tables := []string{
-		models.DropStatisticsDDL,
-		models.DropCommentsDDL,
-		models.DropTopicsDDL,
-		models.DropCategoriesDDL,
-		models.DropSessionsDDL,
-		models.DropUsersDDL,
+		models.UsersDDL,
+		models.SessionsDDL,
+		models.CategoriesDDL,
+		models.TopicsDDL,
+		models.CommentsDDL,
+		models.StatisticsDDL,
 	}
 	for _, q := range tables {
 		if _, err := db.Exec(q); err != nil {
@@ -39,12 +39,12 @@ func SetupTestContext() (*durable.Database, func()) {
 
 	teardown := func() {
 		tables := []string{
-			models.UsersDDL,
-			models.SessionsDDL,
-			models.CategoriesDDL,
-			models.TopicsDDL,
-			models.CommentsDDL,
-			models.StatisticsDDL,
+			models.DropStatisticsDDL,
+			models.DropCommentsDDL,
+			models.DropTopicsDDL,
+			models.DropCategoriesDDL,
+			models.DropSessionsDDL,
+			models.DropUsersDDL,
 		}
 
 		for _, q := range tables {
