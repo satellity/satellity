@@ -17,7 +17,6 @@ import (
 	"github.com/dimfeld/httptreemux"
 	"github.com/gorilla/handlers"
 	flags "github.com/jessevdk/go-flags"
-	_ "github.com/lib/pq"
 	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )

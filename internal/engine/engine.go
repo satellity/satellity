@@ -32,7 +32,7 @@ type Poster interface {
 	CreateTopic(ctx context.Context, userID string, t *models.TopicInfo) (*models.Topic, error)
 	UpdateTopic(ctx context.Context, id string, t *models.TopicInfo) (*models.Topic, error)
 	GetTopicByID(ctx context.Context, id string) (*models.Topic, error)
-	GetTopicByUserID(ctx context.Context, userID string, offset time.Time) ([]*models.Topic, error)
+	GetTopicsByUserID(ctx context.Context, userID string, offset time.Time) ([]*models.Topic, error)
 	GetTopicsByCategoryID(ctx context.Context, categoryID string, offset time.Time) ([]*models.Topic, error)
 	GetTopicsByOffset(ctx context.Context, offset time.Time) ([]*models.Topic, error)
 
@@ -44,6 +44,7 @@ type Poster interface {
 
 type Admin interface {
 	GetUsersByOffset(ctx context.Context, offset time.Time) ([]*models.User, error)
-	CreateCategory(ctx context.Context, c *models.CategoryInfo) (*models.Category, error)
-	UpdateCategory(ctx context.Context, id string, c *models.CategoryInfo) (*models.Category, error)
+
+	CreateCategory(ctx context.Context, c *models.CategoryRequest) (*models.Category, error)
+	UpdateCategory(ctx context.Context, id string, c *models.CategoryRequest) (*models.Category, error)
 }

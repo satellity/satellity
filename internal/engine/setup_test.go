@@ -8,8 +8,16 @@ import (
 	"log"
 )
 
-func SetupTestContext() (*durable.Database, func()) {
+const (
+	testEnvironment = "test"
+	testDatabase    = "godiscourse_test"
+)
+
+func setupTestContext() (*Store, func()) {
 	opts := configs.DefaultOptions()
+	if opts.Environment != testEnvironment && opts.DbName != testDatabase {
+		log.Panicln(opts.Environment, opts.DbName)
+	}
 
 	db := durable.OpenDatabaseClient(context.Background(), &durable.ConnectionInfo{
 		User:     opts.DbUser,
@@ -18,10 +26,6 @@ func SetupTestContext() (*durable.Database, func()) {
 		Port:     opts.DbPort,
 		Name:     opts.DbName,
 	})
-
-	if _, err := db.Exec("CREATE DATABASE godiscourse_test"); err != nil {
-		log.Panicln(err)
-	}
 
 	tables := []string{
 		models.UsersDDL,
@@ -52,11 +56,7 @@ func SetupTestContext() (*durable.Database, func()) {
 				log.Panicln(err)
 			}
 		}
-
-		if _, err := db.Exec("DROP DATABASE godiscourse_test"); err != nil {
-			log.Panicln(err)
-		}
 	}
 
-	return durable.WrapDatabase(db), teardown
+	return NewStore(durable.WrapDatabase(db)), teardown
 }

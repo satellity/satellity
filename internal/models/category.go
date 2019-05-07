@@ -40,11 +40,11 @@ type Category struct {
 	UpdatedAt   time.Time
 }
 
-type CategoryInfo struct {
-	Name        string
-	Alias       string
-	Description string
-	Position    int64
+type CategoryRequest struct {
+	Name        string `json:"name"`
+	Alias       string `json:"alias"`
+	Description string `json:"description"`
+	Position    int64  `json:"position"`
 }
 
 var CategoryColumns = []string{"category_id", "name", "alias", "description", "topics_count", "last_topic_id", "position", "created_at", "updated_at"}
@@ -65,11 +65,11 @@ func FindCategory(ctx context.Context, tx *sql.Tx, id string) (*Category, error)
 	}
 
 	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM categories WHERE category_id=$1", strings.Join(CategoryColumns, ",")), id)
-	cat, err := CategoryFromRows(row)
+	c, err := CategoryFromRows(row)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return cat, err
+	return c, err
 }
 
 func ReadCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
