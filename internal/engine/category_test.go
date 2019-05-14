@@ -14,7 +14,7 @@ import (
 func TestCategoryCRUD(t *testing.T) {
 	assert := assert.New(t)
 	ctx := context.Background()
-	store, teardown := setupTestContext()
+	_, store, teardown := setup(t)
 	defer teardown()
 
 	categoryCases := []struct {

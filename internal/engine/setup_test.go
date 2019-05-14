@@ -60,7 +60,7 @@ func setupTestContext() (*durable.Database, func()) {
 		}
 	}
 
-	return NewStore(durable.WrapDatabase(db)), teardown
+	return durable.WrapDatabase(db), teardown
 }
 
 func seedUsers(user *u.User, t *testing.T) []string {
