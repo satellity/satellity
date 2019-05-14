@@ -21,7 +21,6 @@ import (
 
 func setupTestContext() (*durable.Database, func()) {
 	opts := configs.DefaultOptions()
-
 	db := durable.OpenDatabaseClient(context.Background(), &durable.ConnectionInfo{
 		User:     opts.DbUser,
 		Password: opts.DbPassword,
@@ -61,7 +60,7 @@ func setupTestContext() (*durable.Database, func()) {
 		}
 	}
 
-	return durable.WrapDatabase(db), teardown
+	return NewStore(durable.WrapDatabase(db)), teardown
 }
 
 func seedUsers(user *u.User, t *testing.T) []string {

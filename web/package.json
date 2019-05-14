@@ -1,5 +1,5 @@
 {
-  "name": "GoDiscourse",
+  "name": "Go Discourse",
   "version": "1.0.0",
   "description": "Yet another open source forum using Golang. https://live.godiscourse.com",
   "main": "index.js",
@@ -59,6 +59,7 @@
     "node-sass": "^4.11.0",
     "parcel-bundler": "^1.12.3",
     "postcss-modules": "^1.4.1",
-    "stylelint": "^9.10.1"
+    "stylelint": "^9.10.1",
+    "stylelint-config-standard": "^18.3.0"
   }
 }

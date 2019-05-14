@@ -15,13 +15,6 @@ type adminCategoryImpl struct {
 	engine engine.Engine
 }
 
-type categoryRequest struct {
-	Name        string `json:"name"`
-	Alias       string `json:"alias"`
-	Description string `json:"description"`
-	Position    int64  `json:"position"`
-}
-
 func RegisterAdminCategory(e engine.Engine, router *httptreemux.TreeMux) {
 	impl := &adminCategoryImpl{engine: e}
 
@@ -32,17 +25,12 @@ func RegisterAdminCategory(e engine.Engine, router *httptreemux.TreeMux) {
 }
 
 func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	var body categoryRequest
+	var body models.CategoryRequest
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	category, err := impl.engine.CreateCategory(r.Context(), &models.CategoryInfo{
-		Name:        body.Name,
-		Alias:       body.Alias,
-		Description: body.Description,
-		Position:    body.Position,
-	})
+	category, err := impl.engine.CreateCategory(r.Context(), &body)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return
@@ -60,18 +48,13 @@ func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ m
 }
 
 func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	var body categoryRequest
+	var body models.CategoryRequest
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
 
-	category, err := impl.engine.UpdateCategory(r.Context(), params["id"], &models.CategoryInfo{
-		Name:        body.Name,
-		Alias:       body.Alias,
-		Description: body.Description,
-		Position:    body.Position,
-	})
+	category, err := impl.engine.UpdateCategory(r.Context(), params["id"], &body)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 		return

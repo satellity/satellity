@@ -77,19 +77,6 @@ func (s *Store) GetCategoryByID(ctx context.Context, id string) (*models.Categor
 	return category, nil
 }
 
-func (s *Store) GetAllCategories(ctx context.Context) ([]*models.Category, error) {
-	var categories []*models.Category
-	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		categories, err = models.ReadCategories(ctx, tx)
-		return err
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return categories, nil
-}
-
 func (s *Store) CreateTopic(ctx context.Context, userID string, t *models.TopicInfo) (*models.Topic, error) {
 	title, body := strings.TrimSpace(t.Title), strings.TrimSpace(t.Body)
 	if len(title) < minTitleSize {
@@ -148,54 +135,6 @@ func (s *Store) CreateTopic(ctx context.Context, userID string, t *models.TopicI
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topic, nil
-}
-
-// dispersalCategory update category's info, e.g.: LastTopicID, TopicsCount
-func (s *Store) dispersalCategory(ctx context.Context, id string) (*models.Category, error) {
-	if _, err := uuid.FromString(id); err != nil {
-		return nil, nil
-	}
-	var result *models.Category
-	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		result, err = models.FindCategory(ctx, tx, id)
-		if err != nil {
-			return err
-		} else if result == nil {
-			return session.NotFoundError(ctx)
-		}
-		topic, err := models.LastTopic(ctx, result.CategoryID, tx)
-		if err != nil {
-			return err
-		}
-		var lastTopicID = sql.NullString{String: "", Valid: false}
-		if topic != nil {
-			lastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
-		}
-		if result.LastTopicID.String != lastTopicID.String {
-			result.LastTopicID = lastTopicID
-		}
-		result.TopicsCount = 0
-		if result.LastTopicID.Valid {
-			count, err := topicsCountByCategory(ctx, tx, result.CategoryID)
-			if err != nil {
-				return err
-			}
-			result.TopicsCount = count
-		}
-		result.UpdatedAt = time.Now()
-		cols, params := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
-		vals := []interface{}{result.LastTopicID, result.TopicsCount, result.UpdatedAt}
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, result.CategoryID), vals...)
-		return err
-	})
-	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
-		return nil, session.TransactionError(ctx, err)
-	}
-	return result, nil
 }
 
 func (s *Store) UpdateTopic(ctx context.Context, id string, t *models.TopicInfo) (*models.Topic, error) {
@@ -281,7 +220,7 @@ func (s *Store) GetTopicByID(ctx context.Context, id string) (*models.Topic, err
 	return topic, nil
 }
 
-func (s *Store) GetTopicByUserID(ctx context.Context, userID string, offset time.Time) ([]*models.Topic, error) {
+func (s *Store) GetTopicsByUserID(ctx context.Context, userID string, offset time.Time) ([]*models.Topic, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
