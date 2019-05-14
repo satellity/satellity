@@ -23,8 +23,8 @@ type Engine interface {
 }
 
 type Poster interface {
-	UpdateUser(ctx context.Context, current *models.User, new *models.UserInfo) error
 	GetUserByID(ctx context.Context, id string) (*models.User, error)
+	UpdateUser(ctx context.Context, userID string, info *models.UserInfo) error
 
 	GetCategoryByID(ctx context.Context, id string) (*models.Category, error)
 	GetAllCategories(ctx context.Context) ([]*models.Category, error)

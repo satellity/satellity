@@ -84,6 +84,7 @@ func UserFromRows(row durable.Row) (*User, error) {
 	return &u, err
 }
 
+// todo: remove it
 func FindUserByID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil

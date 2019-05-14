@@ -21,40 +21,47 @@ func NewStore(db *durable.Database) *Store {
 	return &Store{db: db}
 }
 
-func (s *Store) UpdateUser(ctx context.Context, current *models.User, new *models.UserInfo) error {
-	nickname, biography := strings.TrimSpace(new.Nickname), strings.TrimSpace(new.Biography)
-	if len(nickname) == 0 && len(biography) == 0 {
+func (s *Store) GetUserByID(ctx context.Context, id string) (*models.User, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
+
+	row, err := s.db.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id=$1", strings.Join(models.UserColumns, ",")), id)
+	if err != nil {
+		return nil, err
+	}
+
+	u, err := models.UserFromRows(row)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return u, err
+}
+
+func (s *Store) UpdateUser(ctx context.Context, userID string, info *models.UserInfo) error {
+	info.Nickname, info.Biography = strings.TrimSpace(info.Nickname), strings.TrimSpace(info.Biography)
+	if len(info.Nickname) == 0 && len(info.Biography) == 0 {
 		return nil
 	}
-	if nickname != "" {
-		current.Nickname = nickname
+
+	current, err := s.GetUserByID(ctx, userID)
+	if err != nil {
+		return err
 	}
-	if biography != "" {
-		current.Biography = biography
+
+	if info.Nickname != "" {
+		current.Nickname = info.Nickname
+	}
+	if info.Biography != "" {
+		current.Biography = info.Biography
 	}
 	current.UpdatedAt = time.Now()
 	cols, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
-	_, err := s.db.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, current.UserID), current.Nickname, current.Biography, current.UpdatedAt)
+	_, err = s.db.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, userID), current.Nickname, current.Biography, current.UpdatedAt)
 	if err != nil {
 		return session.TransactionError(ctx, err)
 	}
 	return nil
-}
-
-func (s *Store) GetUserByID(ctx context.Context, id string) (*models.User, error) {
-	var user *models.User
-	err := s.db.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		user, err = models.FindUserByID(ctx, tx, id)
-		return err
-	})
-	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
-		return nil, session.TransactionError(ctx, err)
-	}
-	return user, nil
 }
 
 func (s *Store) GetCategoryByID(ctx context.Context, id string) (*models.Category, error) {

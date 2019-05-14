@@ -60,7 +60,7 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 	}
 
 	result := middleware.CurrentUser(r)
-	if err := impl.poster.UpdateUser(r.Context(), result, &models.UserInfo{
+	if err := impl.poster.UpdateUser(r.Context(), result.UserID, &models.UserInfo{
 		Nickname:  body.Nickname,
 		Biography: body.Biography,
 	}); err != nil {
