@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-const participantDDL = `
+const participantsDDL = `
 CREATE TABLE IF NOT EXISTS participants (
 	group_id               VARCHAR(36) NOT NULL REFERENCES groups ON DELETE CASCADE,
 	user_id                VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,

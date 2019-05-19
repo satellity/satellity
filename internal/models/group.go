@@ -41,6 +41,12 @@ func (g *Group) values() []interface{} {
 	return []interface{}{g.GroupID, g.Name, g.Description, g.UserID, g.UsersCount, g.CreatedAt, g.UpdateAt}
 }
 
+func groupFromRow(row durable.Row) (*Group, error) {
+	var g Group
+	err := row.Scan(&g.GroupID, &g.Name, &g.Description, &g.UserID, &g.UsersCount, &g.CreatedAt, &g.UpdateAt)
+	return &g, err
+}
+
 func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, error) {
 	ctx := mctx.context
 
@@ -99,10 +105,4 @@ func ReadGroup(mctx *Context, id string) (*Group, error) {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return group, nil
-}
-
-func groupFromRow(row durable.Row) (*Group, error) {
-	var g Group
-	err := row.Scan(&g.GroupID, &g.Name, &g.Description, &g.UserID, &g.UsersCount, &g.CreatedAt, &g.UpdateAt)
-	return &g, err
 }
