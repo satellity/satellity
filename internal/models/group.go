@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"godiscourse/internal/durable"
@@ -92,16 +93,28 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 
 func ReadGroup(mctx *Context, id string) (*Group, error) {
 	ctx := mctx.context
+	var group *Group
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		group, err = readGroup(ctx, tx, id)
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return group, nil
+}
+
+func readGroup(ctx context.Context, tx *sql.Tx, id string) (*Group, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
 
-	row, err := mctx.database.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM groups WHERE group_id=$1", strings.Join(groupColumns, ",")))
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM groups WHERE group_id=$1", strings.Join(groupColumns, ",")), id)
 	group, err := groupFromRow(row)
-	if err != nil {
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return group, nil

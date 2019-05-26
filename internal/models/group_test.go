@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,6 +38,13 @@ func TestGroupCRUD(t *testing.T) {
 			group, err := user.CreateGroup(mctx, tc.name, tc.description)
 			assert.Nil(err)
 			assert.NotNil(group)
+
+			new, err := ReadGroup(mctx, uuid.Must(uuid.NewV4()).String())
+			assert.Nil(err)
+			assert.Nil(new)
+			new, err = ReadGroup(mctx, group.GroupID)
+			assert.Nil(err)
+			assert.NotNil(new)
 		})
 	}
 }
