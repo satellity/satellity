@@ -45,6 +45,8 @@ func TestGroupCRUD(t *testing.T) {
 			new, err = ReadGroup(mctx, group.GroupID)
 			assert.Nil(err)
 			assert.NotNil(new)
+			participants, err := new.Participants(mctx)
+			assert.Len(participants, 1)
 		})
 	}
 }

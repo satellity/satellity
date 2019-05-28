@@ -1,6 +1,11 @@
 package models
 
-import "time"
+import (
+	"database/sql"
+	"fmt"
+	"godiscourse/internal/durable"
+	"time"
+)
 
 const participantsDDL = `
 CREATE TABLE IF NOT EXISTS participants (
@@ -31,4 +36,27 @@ var participantColumns = []string{"group_id", "user_id", "role", "created_at", "
 
 func (p *Participant) values() []interface{} {
 	return []interface{}{p.GroupID, p.UserID, p.Role, p.CreatedAt, p.UpdateAt}
+}
+
+func participantFromRow(row durable.Row) (*Participant, error) {
+	var p Participant
+	err := row.Scan(&p.GroupID, &p.UserID, &p.Role, &p.CreatedAt, &p.UpdateAt)
+	return &p, err
+}
+
+func createParticipant(mcxt *Context, tx *sql.Tx, groupID, userID, role string) (*Participant, error) {
+	ctx := mcxt.context
+	t := time.Now()
+	p := &Participant{
+		GroupID:   groupID,
+		UserID:    userID,
+		Role:      role,
+		CreatedAt: t,
+		UpdateAt:  t,
+	}
+
+	columns, params := durable.PrepareColumnsWithValues(participantColumns)
+	query := fmt.Sprintf("INSERT INTO participants(%s) VALUES (%s)", columns, params)
+	_, err := tx.ExecContext(ctx, query, p.values()...)
+	return p, err
 }

@@ -65,14 +65,6 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 		UpdateAt:    t,
 	}
 
-	participant := &Participant{
-		GroupID:   group.GroupID,
-		UserID:    user.UserID,
-		Role:      ParticipantRoleOwner,
-		CreatedAt: t,
-		UpdateAt:  t,
-	}
-
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		gcols, gparams := durable.PrepareColumnsWithValues(groupColumns)
 		query := fmt.Sprintf("INSERT INTO groups(%s) VALUES (%s)", gcols, gparams)
@@ -80,9 +72,7 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 		if err != nil {
 			return err
 		}
-		pcols, pparams := durable.PrepareColumnsWithValues(participantColumns)
-		pquery := fmt.Sprintf("INSERT INTO participants(%s) VALUES (%s)", pcols, pparams)
-		_, err = tx.ExecContext(ctx, pquery, participant.values()...)
+		_, err = createParticipant(mctx, tx, group.GroupID, group.UserID, ParticipantRoleOwner)
 		return err
 	})
 	if err != nil {
@@ -118,4 +108,24 @@ func readGroup(ctx context.Context, tx *sql.Tx, id string) (*Group, error) {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return group, nil
+}
+
+func (group *Group) Participants(mctx *Context) ([]*Participant, error) {
+	ctx := mctx.context
+	query := fmt.Sprintf("SELECT %s FROM participants WHERE group_id=$1", strings.Join(participantColumns, ","))
+	rows, err := mctx.database.QueryContext(ctx, query, group.GroupID)
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	defer rows.Close()
+
+	participants := make([]*Participant, 0)
+	for rows.Next() {
+		p, err := participantFromRow(rows)
+		if err != nil {
+			return nil, session.TransactionError(ctx, err)
+		}
+		participants = append(participants, p)
+	}
+	return participants, nil
 }
