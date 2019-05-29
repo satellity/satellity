@@ -74,10 +74,44 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 		if err != nil {
 			return err
 		}
-		_, err = createParticipant(mctx, tx, group.GroupID, group.UserID, ParticipantRoleOwner)
+		_, err = createParticipant(ctx, tx, group.GroupID, group.UserID, ParticipantRoleOwner)
 		return err
 	})
 	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return group, nil
+}
+
+// UpdateGroup update the group by id
+func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Group, error) {
+	ctx := mctx.context
+	name, description = strings.TrimSpace(name), strings.TrimSpace(description)
+	if name == "" && description == "" {
+		return nil, session.BadDataError(ctx)
+	}
+
+	var group *Group
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		group, err = findGroup(ctx, tx, id)
+		if group.UserID != user.UserID {
+			return session.ForbiddenError(ctx)
+		}
+		if len(name) >= 3 {
+			group.Name = name
+		}
+		if description != "" {
+			group.Description = description
+		}
+		query := "UPDATE groups SET (name, description)=($1,$2) WHERE group_id=$3"
+		_, err = tx.ExecContext(ctx, query, group.Name, group.Description, group.GroupID)
+		return err
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return group, nil
@@ -89,7 +123,7 @@ func ReadGroup(mctx *Context, id string) (*Group, error) {
 	var group *Group
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
-		group, err = readGroup(ctx, tx, id)
+		group, err = findGroup(ctx, tx, id)
 		return err
 	})
 	if err != nil {
@@ -98,7 +132,7 @@ func ReadGroup(mctx *Context, id string) (*Group, error) {
 	return group, nil
 }
 
-func readGroup(ctx context.Context, tx *sql.Tx, id string) (*Group, error) {
+func findGroup(ctx context.Context, tx *sql.Tx, id string) (*Group, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}

@@ -16,6 +16,8 @@ func TestGroupCRUD(t *testing.T) {
 
 	user := createTestUser(mctx, "im.yuqlee@gmail.com", "username", "password")
 	assert.NotNil(user)
+	jason := createTestUser(mctx, "validfake@gmail.com", "usernamex", "passwordx")
+	assert.NotNil(jason)
 
 	groupCases := []struct {
 		name        string
@@ -46,6 +48,34 @@ func TestGroupCRUD(t *testing.T) {
 			assert.Nil(err)
 			assert.NotNil(new)
 			participants, err := new.Participants(mctx)
+			assert.Len(participants, 1)
+
+			name := "new" + tc.name
+			description := "new" + tc.description
+			group, err = user.UpdateGroup(mctx, group.GroupID, name, description)
+			assert.Nil(err)
+			assert.NotNil(group)
+			assert.Equal(name, group.Name)
+			assert.Equal(description, group.Description)
+			new, err = ReadGroup(mctx, group.GroupID)
+			assert.Nil(err)
+			assert.NotNil(new)
+			assert.Equal(name, new.Name)
+			assert.Equal(description, new.Description)
+
+			err = jason.JoinGroup(mctx, group.GroupID, "INVALID")
+			assert.NotNil(err)
+			err = jason.JoinGroup(mctx, group.GroupID, ParticipantRoleMember)
+			assert.Nil(err)
+			new, _ = ReadGroup(mctx, group.GroupID)
+			assert.Equal(int64(2), new.UsersCount)
+			participants, err = group.Participants(mctx)
+			assert.Len(participants, 2)
+			err = jason.ExitGroup(mctx, group.GroupID)
+			assert.Nil(err)
+			new, _ = ReadGroup(mctx, group.GroupID)
+			assert.Equal(int64(1), new.UsersCount)
+			participants, err = group.Participants(mctx)
 			assert.Len(participants, 1)
 		})
 	}

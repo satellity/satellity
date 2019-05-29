@@ -1,9 +1,12 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"godiscourse/internal/durable"
+	"godiscourse/internal/session"
+	"strings"
 	"time"
 )
 
@@ -47,8 +50,7 @@ func participantFromRow(row durable.Row) (*Participant, error) {
 	return &p, err
 }
 
-func createParticipant(mcxt *Context, tx *sql.Tx, groupID, userID, role string) (*Participant, error) {
-	ctx := mcxt.context
+func createParticipant(ctx context.Context, tx *sql.Tx, groupID, userID, role string) (*Participant, error) {
 	t := time.Now()
 	p := &Participant{
 		GroupID:   groupID,
@@ -62,4 +64,92 @@ func createParticipant(mcxt *Context, tx *sql.Tx, groupID, userID, role string) 
 	query := fmt.Sprintf("INSERT INTO participants(%s) VALUES (%s)", columns, params)
 	_, err := tx.ExecContext(ctx, query, p.values()...)
 	return p, err
+}
+
+func findParticipant(ctx context.Context, tx *sql.Tx, groupID, userID string) (*Participant, error) {
+	query := fmt.Sprintf("SELECT %s FROM participants WHERE group_id=$1 AND user_id=$2", strings.Join(participantColumns, ","))
+	p, err := participantFromRow(tx.QueryRowContext(ctx, query, groupID, userID))
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// JoinGroup join the group by id
+func (user *User) JoinGroup(mctx *Context, groupID, role string) error {
+	ctx := mctx.context
+	switch role {
+	case ParticipantRoleAdmin,
+		ParticipantRoleVIP,
+		ParticipantRoleMember:
+	default:
+		return session.BadDataError(ctx)
+	}
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		group, err := findGroup(ctx, tx, groupID)
+		if err != nil {
+			return err
+		}
+		p, err := findParticipant(ctx, tx, groupID, user.UserID)
+		if err != nil {
+			return err
+		} else if p != nil {
+			return nil
+		}
+
+		var count int64
+		err = tx.QueryRowContext(ctx, "SELECT count(*) FROM participants WHERE group_id=$1", groupID).Scan(&count)
+		if err != nil {
+			return err
+		}
+		group.UsersCount = count + 1
+		_, err = tx.ExecContext(ctx, "UPDATE groups SET users_count=$1 WHERE group_id=$2", group.UsersCount, group.GroupID)
+		if err != nil {
+			return err
+		}
+		_, err = createParticipant(ctx, tx, groupID, user.UserID, role)
+		return err
+	})
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
+}
+
+// ExitGroup exit the group by id
+func (user *User) ExitGroup(mctx *Context, groupID string) error {
+	ctx := mctx.context
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		group, err := findGroup(ctx, tx, groupID)
+		if err != nil {
+			return err
+		}
+		p, err := findParticipant(ctx, tx, groupID, user.UserID)
+		if err != nil {
+			return err
+		} else if p == nil {
+			return nil
+		} else if p.Role == ParticipantRoleAdmin {
+			return nil
+		}
+
+		var count int64
+		err = tx.QueryRowContext(ctx, "SELECT count(*) FROM participants WHERE group_id=$1", groupID).Scan(&count)
+		if err != nil {
+			return err
+		}
+		group.UsersCount = count - 1
+		_, err = tx.ExecContext(ctx, "UPDATE groups SET users_count=$1 WHERE group_id=$2", group.UsersCount, group.GroupID)
+		if err != nil {
+			return err
+		}
+		_, err = tx.ExecContext(ctx, "DELETE FROM participants WHERE group_id=$1 AND user_id=$2", group.GroupID, user.UserID)
+		return err
+	})
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
 }
