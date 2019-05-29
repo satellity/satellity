@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS participants (
 	PRIMARY KEY (group_id, user_id)
 );
 `
+
+// Roles of the participant
 const (
 	ParticipantRoleOwner  = "OWNER"
 	ParticipantRoleAdmin  = "ADMIN"
@@ -24,6 +26,7 @@ const (
 	ParticipantRoleMember = "MEMBER"
 )
 
+// Participant represents the struct of a group member
 type Participant struct {
 	GroupID   string
 	UserID    string

@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS groups (
 CREATE INDEX IF NOT EXISTS groups_userx ON groups (user_id);
 `
 
+// Group represent the struct of a group
 type Group struct {
 	GroupID     string
 	Name        string
@@ -48,6 +49,7 @@ func groupFromRow(row durable.Row) (*Group, error) {
 	return &g, err
 }
 
+// CreateGroup create a group by an user
 func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, error) {
 	ctx := mctx.context
 
@@ -81,6 +83,7 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 	return group, nil
 }
 
+// ReadGroup read group by an id
 func ReadGroup(mctx *Context, id string) (*Group, error) {
 	ctx := mctx.context
 	var group *Group
@@ -110,10 +113,11 @@ func readGroup(ctx context.Context, tx *sql.Tx, id string) (*Group, error) {
 	return group, nil
 }
 
-func (group *Group) Participants(mctx *Context) ([]*Participant, error) {
+// Participants return members of a group
+func (g *Group) Participants(mctx *Context) ([]*Participant, error) {
 	ctx := mctx.context
 	query := fmt.Sprintf("SELECT %s FROM participants WHERE group_id=$1", strings.Join(participantColumns, ","))
-	rows, err := mctx.database.QueryContext(ctx, query, group.GroupID)
+	rows, err := mctx.database.QueryContext(ctx, query, g.GroupID)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
