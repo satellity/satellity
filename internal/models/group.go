@@ -35,6 +35,8 @@ type Group struct {
 	UsersCount  int64
 	CreatedAt   time.Time
 	UpdateAt    time.Time
+
+	User *User
 }
 
 var groupColumns = []string{"group_id", "name", "description", "user_id", "users_count", "created_at", "updated_at"}
@@ -80,6 +82,7 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
+	group.User = user
 	return group, nil
 }
 
@@ -124,6 +127,13 @@ func ReadGroup(mctx *Context, id string) (*Group, error) {
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		group, err = findGroup(ctx, tx, id)
+		if err != nil {
+			return err
+		} else if group == nil {
+			return nil
+		}
+		user, err := findUserByID(ctx, tx, group.UserID)
+		group.User = user
 		return err
 	})
 	if err != nil {
