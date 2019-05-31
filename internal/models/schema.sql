@@ -100,3 +100,27 @@ CREATE TABLE IF NOT EXISTS statistics (
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS groups (
+  group_id               VARCHAR(36) PRIMARY KEY,
+  name                   VARCHAR(512) NOT NULL,
+  description            TEXT NOT NULL,
+  user_id                VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
+  users_count            BIGINT NOT NULL DEFAULT 0,
+  created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS groups_userx ON groups (user_id);
+
+
+CREATE TABLE IF NOT EXISTS participants (
+  group_id               VARCHAR(36) NOT NULL REFERENCES groups ON DELETE CASCADE,
+  user_id                VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
+  role                   VARCHAR(128) NOT NULL,
+  created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (group_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS participant_createdx ON participants (created_at);

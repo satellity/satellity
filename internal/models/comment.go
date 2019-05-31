@@ -149,7 +149,7 @@ func (topic *Topic) ReadComments(mctx *Context, offset time.Time) ([]*Comment, e
 		}
 		defer rows.Close()
 
-		userIds := []string{}
+		userIds := make([]string, 0)
 		for rows.Next() {
 			c, err := commentFromRows(rows)
 			if err != nil {
