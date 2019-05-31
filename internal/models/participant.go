@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS participants (
 	updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	PRIMARY KEY (group_id, user_id)
 );
+
+CREATE INDEX IF NOT EXISTS participant_createdx ON participants (created_at);
 `
 
 // Roles of the participant
@@ -91,6 +93,8 @@ func (user *User) JoinGroup(mctx *Context, groupID, role string) error {
 		group, err := findGroup(ctx, tx, groupID)
 		if err != nil {
 			return err
+		} else if group == nil {
+			return session.NotFoundError(ctx)
 		}
 		p, err := findParticipant(ctx, tx, groupID, user.UserID)
 		if err != nil {
@@ -113,6 +117,9 @@ func (user *User) JoinGroup(mctx *Context, groupID, role string) error {
 		return err
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return err
+		}
 		return session.TransactionError(ctx, err)
 	}
 	return nil
@@ -125,6 +132,8 @@ func (user *User) ExitGroup(mctx *Context, groupID string) error {
 		group, err := findGroup(ctx, tx, groupID)
 		if err != nil {
 			return err
+		} else if group == nil {
+			return session.NotFoundError(ctx)
 		}
 		p, err := findParticipant(ctx, tx, groupID, user.UserID)
 		if err != nil {
@@ -149,6 +158,9 @@ func (user *User) ExitGroup(mctx *Context, groupID string) error {
 		return err
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return err
+		}
 		return session.TransactionError(ctx, err)
 	}
 	return nil

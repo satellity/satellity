@@ -47,8 +47,8 @@ func TestGroupCRUD(t *testing.T) {
 			new, err = ReadGroup(mctx, group.GroupID)
 			assert.Nil(err)
 			assert.NotNil(new)
-			participants, err := new.Participants(mctx)
-			assert.Len(participants, 1)
+			users, err := new.Participants(mctx)
+			assert.Len(users, 1)
 
 			name := "new" + tc.name
 			description := "new" + tc.description
@@ -69,14 +69,14 @@ func TestGroupCRUD(t *testing.T) {
 			assert.Nil(err)
 			new, _ = ReadGroup(mctx, group.GroupID)
 			assert.Equal(int64(2), new.UsersCount)
-			participants, err = group.Participants(mctx)
-			assert.Len(participants, 2)
+			users, err = group.Participants(mctx)
+			assert.Len(users, 2)
 			err = jason.ExitGroup(mctx, group.GroupID)
 			assert.Nil(err)
 			new, _ = ReadGroup(mctx, group.GroupID)
 			assert.Equal(int64(1), new.UsersCount)
-			participants, err = group.Participants(mctx)
-			assert.Len(participants, 1)
+			users, err = group.Participants(mctx)
+			assert.Len(users, 1)
 		})
 	}
 }
