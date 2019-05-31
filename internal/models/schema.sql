@@ -122,3 +122,5 @@ CREATE TABLE IF NOT EXISTS participants (
   updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY (group_id, user_id)
 );
+
+CREATE INDEX IF NOT EXISTS participant_createdx ON participants (created_at);
