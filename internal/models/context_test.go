@@ -15,18 +15,22 @@ const (
 )
 
 const (
-	dropUsersDDL      = `DROP TABLE IF EXISTS users;`
-	dropSessionsDDL   = `DROP TABLE IF EXISTS sessions;`
-	dropCategoriesDDL = `DROP TABLE IF EXISTS categories;`
-	dropTopicUsersDDL = `DROP TABLE IF EXISTS topic_users;`
-	dropTopicsDDL     = `DROP TABLE IF EXISTS topics;`
-	dropCommentsDDL   = `DROP TABLE IF EXISTS comments;`
-	dropStatisticsDDL = `DROP TABLE IF EXISTS statistics;`
+	dropUsersDDL        = `DROP TABLE IF EXISTS users;`
+	dropSessionsDDL     = `DROP TABLE IF EXISTS sessions;`
+	dropCategoriesDDL   = `DROP TABLE IF EXISTS categories;`
+	dropTopicUsersDDL   = `DROP TABLE IF EXISTS topic_users;`
+	dropTopicsDDL       = `DROP TABLE IF EXISTS topics;`
+	dropCommentsDDL     = `DROP TABLE IF EXISTS comments;`
+	dropGroupsDDL       = `DROP TABLE IF EXISTS groups`
+	dropParticipantsDDL = `DROP TABLE IF EXISTS participants`
+	dropStatisticsDDL   = `DROP TABLE IF EXISTS statistics;`
 )
 
 func teardownTestContext(mctx *Context) {
 	tables := []string{
 		dropStatisticsDDL,
+		dropParticipantsDDL,
+		dropGroupsDDL,
 		dropCommentsDDL,
 		dropTopicUsersDDL,
 		dropTopicsDDL,
@@ -61,6 +65,8 @@ func setupTestContext() *Context {
 		topicsDDL,
 		topicUsersDDL,
 		commentsDDL,
+		groupsDDL,
+		participantsDDL,
 		statisticsDDL,
 	}
 	for _, q := range tables {

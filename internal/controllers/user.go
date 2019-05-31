@@ -40,8 +40,8 @@ func (impl *userImpl) oauth(w http.ResponseWriter, r *http.Request, params map[s
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
-	if user, err := models.CreateGithubUser(ctx, body.Code, body.SessionSecret); err != nil {
+	mctx := models.WrapContext(r.Context(), impl.database)
+	if user, err := models.CreateGithubUser(mctx, body.Code, body.SessionSecret); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderAccount(w, r, user)
@@ -54,9 +54,9 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
+	mctx := models.WrapContext(r.Context(), impl.database)
 	current := middleware.CurrentUser(r)
-	if err := current.UpdateProfile(ctx, body.Nickname, body.Biography); err != nil {
+	if err := current.UpdateProfile(mctx, body.Nickname, body.Biography); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderAccount(w, r, current)
@@ -68,8 +68,8 @@ func (impl *userImpl) current(w http.ResponseWriter, r *http.Request, _ map[stri
 }
 
 func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
-	if user, err := models.ReadUser(ctx, params["id"]); err != nil {
+	mctx := models.WrapContext(r.Context(), impl.database)
+	if user, err := models.ReadUser(mctx, params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if user == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
@@ -79,14 +79,14 @@ func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[st
 }
 
 func (impl *userImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
+	mctx := models.WrapContext(r.Context(), impl.database)
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	user, err := models.ReadUser(ctx, params["id"])
+	user, err := models.ReadUser(mctx, params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if user == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if topics, err := user.ReadTopics(ctx, offset); err != nil {
+	} else if topics, err := user.ReadTopics(mctx, offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)
