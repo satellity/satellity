@@ -12,7 +12,7 @@ class AdminTopic extends Component {
   }
 
   componentDidMount() {
-    this.api.topic.adminIndex().then((data) => {
+    this.api.topic.admin.index().then((data) => {
       this.setState({topics: data});
     });
   }
