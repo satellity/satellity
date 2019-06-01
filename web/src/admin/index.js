@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class AdminIndex extends Component {
+class Index extends Component {
   constructor(props) {
     super(props);
   }
@@ -14,4 +14,4 @@ class AdminIndex extends Component {
   }
 }
 
-export default AdminIndex;
+export default Index;
