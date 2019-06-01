@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 class User {
   constructor(api) {
     this.api = api;
+    this.admin = new Admin(api);
     this.fixed_schema_header = '3059301306072a8648ce3d020106082a8648ce3d030107034200';
   }
 
@@ -78,14 +79,20 @@ class User {
     })
   }
 
-  adminIndex() {
+  clear() {
+    window.localStorage.clear();
+  }
+}
+
+class Admin {
+  constructor(api) {
+    this.api = api;
+  }
+
+  index() {
     return this.api.axios.get('/admin/users').then((resp) => {
       return resp.data;
     })
-  }
-
-  clear() {
-    window.localStorage.clear();
   }
 }
 

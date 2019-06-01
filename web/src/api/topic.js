@@ -1,6 +1,7 @@
 class Topic {
   constructor(api) {
     this.api = api;
+    this.admin = new Admin(api);
   }
 
   index(offset) {
@@ -39,11 +40,17 @@ class Topic {
       });
     }
   }
+}
 
-  adminIndex() {
+class Admin {
+  constructor(api) {
+    this.api = api;
+  }
+
+  index() {
     return this.api.axios.get('/admin/topics').then((resp) => {
       return resp.data;
-    });
+    })
   }
 }
 

@@ -1,6 +1,7 @@
 class Category {
   constructor(api) {
     this.api = api;
+    this.admin = new Admin(api);
   }
 
   index() {
@@ -47,8 +48,14 @@ class Category {
       return resp.data;
     });
   }
+}
 
-  adminIndex() {
+class Admin {
+  constructor(api) {
+    this.api = api;
+  }
+
+  index() {
     return this.api.axios.get('/admin/categories').then((resp) => {
       return resp.data;
     })
