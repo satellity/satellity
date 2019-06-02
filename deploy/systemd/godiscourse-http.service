@@ -6,8 +6,7 @@ After=network.target
 User=user
 Type=simple
 Environment=GO_ENV=production
-Environment=GO_DIR=/path/to/godiscourse/config.yaml
-ExecStart=/path/to/godiscourse
+ExecStart=/path/to/godiscourse -d /path/to/godiscourse/config.yaml
 Restart=on-failure
 LimitNOFILE=65536
 
