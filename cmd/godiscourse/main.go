@@ -12,6 +12,8 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/gorilla/handlers"
@@ -51,11 +53,15 @@ func main() {
 	}
 
 	if options.Dir == "" {
-		pwd, err := os.Getwd()
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
 			log.Panicln(err)
 		}
-		options.Dir = path.Join(pwd, "internal/configs")
+		back := ".."
+		if strings.Contains(dir, "cmd") {
+			back = "../.."
+		}
+		options.Dir = path.Join(dir, back, "internal/configs")
 	}
 
 	if err := configs.Init(options.Dir, options.Environment); err != nil {
