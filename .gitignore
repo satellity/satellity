@@ -1,7 +1,8 @@
 .DS_Store
 bin
 internal/configs/*
-!internal/configs/example.cfg
+!internal/configs/config.go
+!internal/configs/config.yaml.example
 publish
 
 # web

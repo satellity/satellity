@@ -1,0 +1,31 @@
+default: &default
+  name: Yet another open source forum using Golang.
+  http:
+    host: http://localhost
+    port: 4000
+  database:
+    user: godiscourse
+    password: ""
+    host: localhost
+    port: 5432
+  github:
+    client_id: b9b88888f3a5b0d7c99
+    client_secret: d4e58888813aaec4e67c261e18a40bec2a2b8c38
+  operators:
+    - hi@gmail.com
+
+
+development:
+  <<: *default
+  database:
+    name: godiscourse_dev
+
+test:
+  <<: *default
+  database:
+    name: godiscourse_test
+
+production:
+  <<: *default
+  database:
+    name: godiscourse_production
