@@ -27,22 +27,9 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 ## Getting Started
 
 ### Backend
-1. Set the following environment variables on your system:
-
-```
-export GODISCOURSE_URL=http://localhost
-export GODISCOURSE_PORT=4000
-export DB_USER=db user
-export DB_PASSWORD=db pass
-export DB_HOST=localhost
-export DB_NAME=godiscourse_dev
-export DB_PORT=5432
-export ENV=test|development|production
-```
-
-2. `cd ./internal`, copy `config/example.cfg` to `config/config.go`. Replace config with yours.
-3. Prepare and start database, the database schema under `./internal/models/schema.sql`, [how to install postgresql](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04).
-4. `cd ./ && make install && make build && ./bin/godiscourse` to start Golang server
+1. `cd ./internal`, copy `config/config.yaml.example` to `config/config.yaml`. Replace config with yours.
+2. Prepare and start database, the database schema under `./internal/models/schema.sql`, [how to install postgresql](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04).
+3. `cd ./ && make install && make build && ./bin/godiscourse` to start Golang server
 
 ### Frontend
 1. `cd ./web`, copy `.env.example` to `.env` and `.env.development` and change the following fields:

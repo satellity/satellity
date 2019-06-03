@@ -84,10 +84,11 @@ func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) 
 }
 
 func fetchAccessToken(ctx context.Context, code string) (string, error) {
+	config := configs.GetOption()
 	client := external.HTTPClient()
 	data, err := json.Marshal(map[string]interface{}{
-		"client_id":     configs.GithubClientID,
-		"client_secret": configs.GithubClientSecret,
+		"client_id":     config.Github.ClientID,
+		"client_secret": config.Github.ClientSecret,
 		"code":          code,
 	})
 	if err != nil {

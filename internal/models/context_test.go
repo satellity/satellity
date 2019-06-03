@@ -5,8 +5,6 @@ import (
 	"godiscourse/internal/configs"
 	"godiscourse/internal/durable"
 	"log"
-
-	_ "github.com/lib/pq"
 )
 
 const (
@@ -47,16 +45,19 @@ func teardownTestContext(mctx *Context) {
 }
 
 func setupTestContext() *Context {
-	opts := configs.DefaultOptions()
-	if opts.Environment != testEnvironment || opts.DbName != testDatabase {
-		log.Panicln(opts.Environment, opts.DbName)
+	if err := configs.Init("./../configs", testEnvironment); err != nil {
+		log.Panicln(err)
+	}
+	config := configs.GetOption()
+	if config.Environment != testEnvironment || config.Database.Name != testDatabase {
+		log.Panicln(config.Environment, config.Database.Name)
 	}
 	db := durable.OpenDatabaseClient(context.Background(), &durable.ConnectionInfo{
-		User:     opts.DbUser,
-		Password: opts.DbPassword,
-		Host:     opts.DbHost,
-		Port:     opts.DbPort,
-		Name:     opts.DbName,
+		User:     config.Database.User,
+		Password: config.Database.Password,
+		Host:     config.Database.Host,
+		Port:     config.Database.Port,
+		Name:     config.Database.Name,
 	})
 	tables := []string{
 		usersDDL,

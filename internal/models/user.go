@@ -308,7 +308,7 @@ func ReadUserByUsernameOrEmail(mctx *Context, identity string) (*User, error) {
 
 // Role of an user, contains admin and member for now.
 func (u *User) Role() string {
-	if configs.Operators[u.Email.String] {
+	if configs.GetOption().OperatorSet[u.Email.String] {
 		return "admin"
 	}
 	return "member"
