@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"godiscourse/internal/durable"
@@ -12,14 +13,19 @@ import (
 )
 
 const messagesDDL = `
+CREATE TABLE IF NOT EXISTS messages (
 	message_id           VARCHAR(36) PRIMARY KEY,
 	body                 TEXT NOT NULL,
 	group_id             VARCHAR(36) NOT NULL REFERENCES groups ON DELETE CASCADE,
 	user_id              VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
 	created_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS messages_groupx ON messages (group_id);
 `
 
+// Message represent the struct of a message
 type Message struct {
 	MessageID string
 	Body      string
@@ -41,13 +47,14 @@ func messageFromRow(row durable.Row) (*Message, error) {
 	return &m, err
 }
 
-func (u *User) CreateMessage(mctx *Context, groupID, body string) (*Group, error) {
+// CreateMessage create a message
+func (u *User) CreateMessage(mctx *Context, groupID, body string) (*Message, error) {
 	ctx := mctx.context
 	body = strings.TrimSpace(body)
 	if len(body) < 1 {
 		return nil, session.BadDataError(ctx)
 	}
-	var group *Group
+	var message *Message
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		p, err := findParticipant(ctx, tx, groupID, u.UserID)
 		if err != nil {
@@ -57,7 +64,7 @@ func (u *User) CreateMessage(mctx *Context, groupID, body string) (*Group, error
 		}
 
 		t := time.Now()
-		m := Message{
+		message = &Message{
 			MessageID: uuid.Must(uuid.NewV4()).String(),
 			Body:      body,
 			GroupID:   groupID,
@@ -67,7 +74,7 @@ func (u *User) CreateMessage(mctx *Context, groupID, body string) (*Group, error
 		}
 
 		columns, params := durable.PrepareColumnsWithValues(messageColumns)
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO messages (%s) VALUES (%s)", columns, params), m.values()...)
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO messages (%s) VALUES (%s)", columns, params), message.values()...)
 		return err
 	})
 	if err != nil {
@@ -76,5 +83,35 @@ func (u *User) CreateMessage(mctx *Context, groupID, body string) (*Group, error
 		}
 		return nil, session.TransactionError(ctx, err)
 	}
-	return group, nil
+	return message, nil
+}
+
+// ReadMessage read a message by id
+func ReadMessage(mctx *Context, id string) (*Message, error) {
+	ctx := mctx.context
+
+	var message *Message
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		message, err = findMessageByID(ctx, tx, id)
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return message, nil
+}
+
+func findMessageByID(ctx context.Context, tx *sql.Tx, id string) (*Message, error) {
+	if _, err := uuid.FromString(id); err != nil {
+		return nil, nil
+	}
+
+	query := fmt.Sprintf("SELECT %s FROM messages WHERE message_id=$1", strings.Join(messageColumns, ","))
+	row := tx.QueryRowContext(ctx, query, id)
+	m, err := messageFromRow(row)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return m, err
 }
