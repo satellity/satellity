@@ -33,6 +33,8 @@ type Message struct {
 	UserID    string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+
+	User *User
 }
 
 var messageColumns = []string{"message_id", "body", "group_id", "user_id", "created_at", "updated_at"}
@@ -114,4 +116,47 @@ func findMessageByID(ctx context.Context, tx *sql.Tx, id string) (*Message, erro
 		return nil, nil
 	}
 	return m, err
+}
+
+// ReadMessages read all messages, parameters: offset default time.Now()
+func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error) {
+	ctx := mctx.context
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+
+	var messages []*Message
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM messages WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(messageColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		userIds := make([]string, 0)
+		for rows.Next() {
+			msg, err := messageFromRow(rows)
+			if err != nil {
+				return err
+			}
+			userIds = append(userIds, msg.UserID)
+			messages = append(messages, msg)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		userSet, err := readUserSet(ctx, tx, userIds)
+		if err != nil {
+			return err
+		}
+		for i, msg := range messages {
+			messages[i].User = userSet[msg.UserID]
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return messages, nil
 }

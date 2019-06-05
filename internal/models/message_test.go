@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -43,6 +44,9 @@ func TestMessageCRUD(t *testing.T) {
 			new, err = ReadMessage(mctx, uuid.Must(uuid.NewV4()).String())
 			assert.Nil(err)
 			assert.Nil(new)
+			messages, err := group.ReadMessages(mctx, time.Now())
+			assert.Nil(err)
+			assert.Len(messages, 1)
 		})
 	}
 }
