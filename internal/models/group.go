@@ -70,9 +70,16 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 	}
 
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		groups, err := findGroupsByUser(ctx, tx, user)
+		if err != nil {
+			return err
+		}
+		if len(groups) > 2 {
+			return session.TooManyGroupsError(ctx)
+		}
 		gcols, gparams := durable.PrepareColumnsWithValues(groupColumns)
 		query := fmt.Sprintf("INSERT INTO groups(%s) VALUES (%s)", gcols, gparams)
-		_, err := tx.ExecContext(ctx, query, group.values()...)
+		_, err = tx.ExecContext(ctx, query, group.values()...)
 		if err != nil {
 			return err
 		}
@@ -80,6 +87,9 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 		return err
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	group.User = user
@@ -183,4 +193,38 @@ func (g *Group) Participants(mctx *Context) ([]*User, error) {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return users, nil
+}
+
+func (u *User) ReadGroups(mctx *Context) ([]*Group, error) {
+	ctx := mctx.context
+	groups := make([]*Group, 0)
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		groups, err = findGroupsByUser(ctx, tx, u)
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return groups, nil
+}
+
+func findGroupsByUser(ctx context.Context, tx *sql.Tx, u *User) ([]*Group, error) {
+	groups := make([]*Group, 0)
+	query := fmt.Sprintf("SELECT %s FROM groups WHERE user_id=$1", strings.Join(groupColumns, ","))
+	rows, err := tx.QueryContext(ctx, query, u.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		group, err := groupFromRow(rows)
+		if err != nil {
+			return nil, err
+		}
+		group.User = u
+		groups = append(groups, group)
+	}
+	return groups, nil
 }

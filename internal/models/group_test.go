@@ -49,6 +49,9 @@ func TestGroupCRUD(t *testing.T) {
 			assert.NotNil(new)
 			users, err := new.Participants(mctx)
 			assert.Len(users, 1)
+			groups, err := user.ReadGroups(mctx)
+			assert.Nil(err)
+			assert.Len(groups, 1)
 
 			name := "new" + tc.name
 			description := "new" + tc.description
