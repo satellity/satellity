@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
 
-class UserEdit extends Component {
+class Edit extends Component {
   constructor(props) {
     super(props);
 
@@ -88,4 +88,4 @@ class UserEdit extends Component {
   }
 }
 
-export default UserEdit;
+export default Edit;

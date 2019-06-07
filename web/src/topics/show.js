@@ -11,7 +11,7 @@ import SiteWidget from '../home/widget.js';
 import CommentList from '../comments/index.js';
 import LoadingView from '../loading/loading.js';
 
-class TopicShow extends Component {
+class Show extends Component {
   constructor(props) {
     super(props);
 
@@ -133,4 +133,4 @@ class TopicShow extends Component {
   }
 }
 
-export default TopicShow;
+export default Show;

@@ -1,15 +1,14 @@
 import style from './index.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Config from '../components/config.js';
 import API from '../api/index.js';
-import SiteWidget from './widget.js';
-import TopicItem from '../topics/item.js';
+import TopicItem from './item.js';
 import LoadingView from '../loading/loading.js';
+import Widget from '../home/widget.js';
 
-class Home extends Component {
+class Index extends Component {
   constructor(props) {
     super(props);
 
@@ -149,11 +148,11 @@ class Home extends Component {
           {state.offset !== '' && <div className={style.load}><a href='javascript:;' onClick={this.loadTopics}>Load More</a></div>}
         </main>
         <aside className='column aside'>
-          <SiteWidget />
+          <Widget />
         </aside>
       </div>
     );
   }
 }
 
-export default Home;
+export default Index;

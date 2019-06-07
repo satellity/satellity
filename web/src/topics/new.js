@@ -11,7 +11,7 @@ import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
 const validate = require('uuid-validate');
 
-class TopicNew extends Component {
+class New extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
@@ -234,4 +234,4 @@ class TopicNew extends Component {
   }
 }
 
-export default TopicNew;
+export default New;

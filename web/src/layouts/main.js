@@ -4,11 +4,8 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, Redirect } from 'react-router-dom';
 import Config from '../components/config.js';
 import API from '../api/index.js'
-import Home from '../home/index.js';
-import UserEdit from '../users/edit.js';
-import UserShow from '../users/show.js';
-import TopicNew from '../topics/new.js';
-import TopicShow from '../topics/show.js';
+import User from '../users/view.js';
+import Topic from '../topics/view.js';
 
 class MainLayout extends Component {
   constructor(props) {
@@ -25,12 +22,13 @@ class MainLayout extends Component {
         <Header />
         <div className='wrapper'>
           <Switch>
-            <Route exact path='/' component={Home} />
-            <Route exact path='/user/edit' component={UserEdit} />
-            <Route path='/users/:id' component={UserShow} />
-            <Route exact path='/topics/new' component={TopicNew} />
-            <Route path='/topics/:id/edit' component={TopicNew} />
-            <Route path='/topics/:id' component={TopicShow} />
+            <Route exact path='/' component={Topic.Index} />
+            <Route exact path='/user/edit' component={User.Edit} />
+            <Route path='/users/:id' component={User.Show} />
+            <Route exact path='/community' component={Topic.Index} />
+            <Route exact path='/topics/new' component={Topic.New} />
+            <Route path='/topics/:id/edit' component={Topic.New} />
+            <Route path='/topics/:id' component={Topic.Show} />
             <Redirect to={`/404?p=${this.state.p}`} />
           </Switch>
         </div>
