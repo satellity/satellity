@@ -7,8 +7,9 @@ import axios from 'axios';
 import Noty from 'noty';
 import Config from '../components/config.js';
 import Category from './category.js';
-import Comment from './comment.js';
 import Topic from './topic.js';
+import Comment from './comment.js';
+import Group from './group.js';
 import User from './user.js';
 
 Noty.overrideDefaults({
@@ -124,8 +125,9 @@ class API {
   constructor() {
     this.axios = axios;
     this.category = new Category(this);
-    this.comment = new Comment(this);
     this.topic = new Topic(this);
+    this.comment = new Comment(this);
+    this.group = new Group(this);
     this.user = new User(this);
   }
 }

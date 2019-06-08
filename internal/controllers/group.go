@@ -25,6 +25,7 @@ func registerGroup(database *durable.Database, router *httptreemux.TreeMux) {
 	impl := &groupImpl{database: database}
 
 	router.POST("/groups", impl.create)
+	router.POST("/groups/:id", impl.update)
 	router.POST("/groups/:id/join", impl.join)
 	router.POST("/groups/:id/exit", impl.exit)
 	router.GET("/groups/:id", impl.show)
@@ -39,6 +40,20 @@ func (impl *groupImpl) create(w http.ResponseWriter, r *http.Request, _ map[stri
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
 	if group, err := middleware.CurrentUser(r).CreateGroup(mctx, body.Name, body.Description); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderGroup(w, r, group)
+	}
+}
+
+func (impl *groupImpl) update(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	var body groupRequest
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
+		return
+	}
+	mctx := models.WrapContext(r.Context(), impl.database)
+	if group, err := middleware.CurrentUser(r).UpdateGroup(mctx, params["id"], body.Name, body.Description); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderGroup(w, r, group)

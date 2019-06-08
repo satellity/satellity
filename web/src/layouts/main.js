@@ -6,6 +6,7 @@ import Config from '../components/config.js';
 import API from '../api/index.js'
 import User from '../users/view.js';
 import Topic from '../topics/view.js';
+import Group from '../groups/view.js';
 
 class MainLayout extends Component {
   constructor(props) {
@@ -29,6 +30,8 @@ class MainLayout extends Component {
             <Route exact path='/topics/new' component={Topic.New} />
             <Route path='/topics/:id/edit' component={Topic.New} />
             <Route path='/topics/:id' component={Topic.Show} />
+            <Route exact path='/groups/new' component={Group.New} />
+            <Route exact path='/groups/:id/edit' component={Group.New} />
             <Redirect to={`/404?p=${this.state.p}`} />
           </Switch>
         </div>

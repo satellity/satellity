@@ -46,7 +46,7 @@ class New extends Component {
 
   componentDidMount() {
     if (validate(this.state.topic_id)) {
-      this.api.topic.show(this.props.match.params.id).then((data) => {
+      this.api.topic.show(this.state.topic_id).then((data) => {
         data.loading = false;
         this.setState(data);
       });
@@ -179,15 +179,15 @@ class New extends Component {
             <CodeMirror
               className='editor'
               value={state.body}
-            options={{
-              mode: 'markdown',
-              theme: 'xq-light',
-              lineNumbers: true,
-              lineWrapping: true,
-              placeholder: 'Text (optional)'
-            }}
-            onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
-          />
+              options={{
+                mode: 'markdown',
+                theme: 'xq-light',
+                lineNumbers: true,
+                lineWrapping: true,
+                placeholder: 'Text (optional)'
+              }}
+              onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
+            />
           }
       {
         state.preview &&
