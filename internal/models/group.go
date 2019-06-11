@@ -195,7 +195,40 @@ func (g *Group) Participants(mctx *Context) ([]*User, error) {
 	return users, nil
 }
 
-func (u *User) ReadGroups(mctx *Context) ([]*Group, error) {
+func ReadGroups(mctx *Context) ([]*Group, error) {
+	ctx := mctx.context
+
+	groups := make([]*Group, 0)
+	mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM groups ORDER BY created_at DESC LIMIT 99", strings.Join(groupColumns, ","))
+		rows, err := mctx.database.QueryContext(ctx, query)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		ids := make([]string, 0)
+		for rows.Next() {
+			group, err := groupFromRow(rows)
+			if err != nil {
+				return err
+			}
+			groups = append(groups, group)
+			ids = append(ids, group.UserID)
+		}
+		set, err := readUserSet(ctx, tx, ids)
+		if err != nil {
+			return err
+		}
+		for i, group := range groups {
+			groups[i].User = set[group.UserID]
+		}
+		return nil
+	})
+	return groups, nil
+}
+
+func (u *User) GroupsByUser(mctx *Context) ([]*Group, error) {
 	ctx := mctx.context
 	groups := make([]*Group, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {

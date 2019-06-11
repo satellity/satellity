@@ -28,6 +28,7 @@ func registerGroup(database *durable.Database, router *httptreemux.TreeMux) {
 	router.POST("/groups/:id", impl.update)
 	router.POST("/groups/:id/join", impl.join)
 	router.POST("/groups/:id/exit", impl.exit)
+	router.GET("/groups", impl.index)
 	router.GET("/groups/:id", impl.show)
 	router.GET("/groups/:id/participants", impl.participants)
 }
@@ -75,6 +76,15 @@ func (impl *groupImpl) exit(w http.ResponseWriter, r *http.Request, params map[s
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)
+	}
+}
+
+func (impl *groupImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	mctx := models.WrapContext(r.Context(), impl.database)
+	if groups, err := models.ReadGroups(mctx); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderGroups(w, r, groups)
 	}
 }
 

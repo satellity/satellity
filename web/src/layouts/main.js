@@ -30,6 +30,7 @@ class MainLayout extends Component {
             <Route exact path='/topics/new' component={Topic.New} />
             <Route path='/topics/:id/edit' component={Topic.New} />
             <Route path='/topics/:id' component={Topic.Show} />
+            <Route path='/groups' component={Group.Explore} />
             <Route exact path='/groups/new' component={Group.New} />
             <Route exact path='/groups/:id/edit' component={Group.New} />
             <Redirect to={`/404?p=${this.state.p}`} />
@@ -54,6 +55,12 @@ const Header = () => {
         <FontAwesomeIcon icon={['fa', 'home']} />
       </Link>
       <div className={style.site}><span className={style.name}>{Config.Name}</span></div>
+      <Link to='/groups' className={style.navi}>
+        Groups
+      </Link>
+      <Link to='/community' className={style.navi}>
+        Community
+      </Link>
       <Link to='/topics/new' className={style.navi}>
         <FontAwesomeIcon icon={['fa', 'plus']} />
       </Link>

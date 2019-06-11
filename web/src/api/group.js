@@ -17,6 +17,12 @@ class Group {
     });
   }
 
+  index() {
+    return this.api.axios.get('/groups').then((resp) => {
+      return resp.data;
+    });
+  }
+
   show(id) {
     return this.api.axios.get(`/groups/${id}`).then((resp) => {
       return resp.data;
