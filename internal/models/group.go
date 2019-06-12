@@ -200,7 +200,7 @@ func ReadGroups(mctx *Context) ([]*Group, error) {
 
 	groups := make([]*Group, 0)
 	mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM groups ORDER BY created_at DESC LIMIT 99", strings.Join(groupColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM groups ORDER BY created_at DESC LIMIT 12", strings.Join(groupColumns, ","))
 		rows, err := mctx.database.QueryContext(ctx, query)
 		if err != nil {
 			return err

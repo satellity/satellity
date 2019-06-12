@@ -16,9 +16,39 @@ class Explore extends Component {
   }
 
   render() {
+    const list = this.state.groups.map((group) => {
+      let user = group.user;
+      return (
+        <div key={group.group_id} className={style.item}>
+          <div className={style.group}>
+            <div className={style.profile}>
+              <img src={user.avatar_url} alt={user.nickname} className={style.avatar} />
+              {user.nickname}
+            </div>
+            <h2 className={style.name}>
+              {group.name}
+            </h2>
+            <div>
+              {group.description}
+            </div>
+            <div>
+              {group.users_count}
+            </div>
+          </div>
+        </div>
+      )
+    });
+
     return (
       <div className='wrapper container'>
-        Group List
+        <div className={style.explore}>
+          <h1>
+            {i18n.t('group.explore')}
+          </h1>
+          <div className={style.list}>
+            {list}
+          </div>
+        </div>
       </div>
     )
   }

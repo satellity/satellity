@@ -4,6 +4,9 @@
     "submit": "Submit",
     "draft": "Save Draft"
   },
+  "group": {
+    "explore": "Popular Groups"
+  },
   "topic": {
     "title": {
       "new": "Create a new topic",

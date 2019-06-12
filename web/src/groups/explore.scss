@@ -1,1 +1,35 @@
 @import '../assets/css/constant.scss';
+
+.explore {
+  padding: .8rem;
+  width: 100%;
+}
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.item {
+  box-sizing: border-box;
+  flex: 0 0 33.3333%;
+  padding: .8rem;
+  overflow: hidden;
+}
+.group {
+  background: white;
+  padding: .8rem;
+}
+.profile {
+  display: flex;
+  align-items: center;
+}
+.avatar {
+  border-radius: 1.6rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-right: .4rem;
+}
+.name {
+  overflow: hidden;
+  white-space: nowrap;
+}
