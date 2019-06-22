@@ -28,6 +28,24 @@ class Group {
       return resp.data;
     });
   }
+
+  join(id) {
+    return this.api.axios.post(`/groups/${id}/join`).then((resp) => {
+      return resp.data;
+    });
+  }
+
+  exit(id) {
+    return this.api.axios.post(`/groups/${id}/exit`).then((resp) => {
+      return resp.data;
+    });
+  }
+
+  members() {
+    return this.api.axios.post(`/groups/${id}/participants`).then((resp) => {
+      return resp.data;
+    });
+  }
 }
 
 export default Group;

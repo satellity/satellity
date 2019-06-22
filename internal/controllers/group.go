@@ -90,7 +90,7 @@ func (impl *groupImpl) index(w http.ResponseWriter, r *http.Request, _ map[strin
 
 func (impl *groupImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if group, err := models.ReadGroup(mctx, params["id"]); err != nil {
+	if group, err := models.ReadGroup(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderGroup(w, r, group)
@@ -99,7 +99,7 @@ func (impl *groupImpl) show(w http.ResponseWriter, r *http.Request, params map[s
 
 func (impl *groupImpl) participants(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if group, err := models.ReadGroup(mctx, params["id"]); err != nil {
+	if group, err := models.ReadGroup(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))

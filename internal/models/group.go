@@ -36,7 +36,8 @@ type Group struct {
 	CreatedAt   time.Time
 	UpdateAt    time.Time
 
-	User *User
+	Member bool
+	User   *User
 }
 
 var groupColumns = []string{"group_id", "name", "description", "user_id", "users_count", "created_at", "updated_at"}
@@ -131,7 +132,7 @@ func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Gro
 }
 
 // ReadGroup read group by an id
-func ReadGroup(mctx *Context, id string) (*Group, error) {
+func ReadGroup(mctx *Context, id string, current *User) (*Group, error) {
 	ctx := mctx.context
 	var group *Group
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
@@ -141,6 +142,15 @@ func ReadGroup(mctx *Context, id string) (*Group, error) {
 			return err
 		} else if group == nil {
 			return nil
+		}
+		if current != nil {
+			p, err := findParticipant(ctx, tx, group.GroupID, current.UserID)
+			if err != nil {
+				return err
+			}
+			if p != nil {
+				group.Member = true
+			}
 		}
 		user, err := findUserByID(ctx, tx, group.UserID)
 		group.User = user

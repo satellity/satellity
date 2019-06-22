@@ -1,13 +1,14 @@
 @import '../assets/css/constant.scss';
 
 .explore {
+  box-sizing: border-box;
   padding: .8rem;
   width: 100%;
 }
 .list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  margin: 0 -.8rem;
 }
 .item {
   box-sizing: border-box;
@@ -17,11 +18,13 @@
 }
 .group {
   background: white;
+  box-sizing: border-box;
   padding: .8rem;
 }
 .profile {
   display: flex;
   align-items: center;
+  margin-bottom: .8rem;
 }
 .avatar {
   border-radius: 1.6rem;
@@ -29,7 +32,23 @@
   height: 2.4rem;
   margin-right: .4rem;
 }
+.nickname {
+  flex-grow: 1;
+}
 .name {
   overflow: hidden;
   white-space: nowrap;
+  margin-bottom: .8rem;
+}
+
+@media only screen and (max-width: 64rem) {
+  .item {
+    flex: 0 0 50%;
+  }
+}
+
+@media only screen and (max-width: 48rem) {
+  .item {
+    flex: 0 0 100%;
+  }
 }

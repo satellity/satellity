@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import style from './index.scss';
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
 import API from '../api/index.js';

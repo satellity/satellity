@@ -118,7 +118,7 @@ class Index extends Component {
     const categories = state.categories.map((category) => {
       return (
         <Link
-          to={{ pathname: "/", search: `?c=${category.name}` }}
+          to={{ pathname: "/community", search: `?c=${category.name}` }}
           className={`${style.node} ${state.categoryId === category.category_id ? style.current : ''}`}
           key={category.category_id}>{category.alias}</Link>
       )
@@ -139,7 +139,7 @@ class Index extends Component {
         {!state.loading && seoView}
         <main className='column main'>
           <div className={style.nodes}>
-            <Link to='/'
+            <Link to='/community'
               className={`${style.node} ${state.categoryId === 'latest' ? style.current : ''}`}>{i18n.t('home.latest')}</Link>
             {categories}
           </div>

@@ -12,6 +12,7 @@ type GroupView struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	UsersCount  int64     `json:"users_count"`
+	Member      bool      `json:"member"`
 	CreatedAt   time.Time `json:"created_at"`
 	UserView    UserView  `json:"user"`
 }
@@ -23,6 +24,7 @@ func buildGroup(group *models.Group) GroupView {
 		Name:        group.Name,
 		Description: group.Description,
 		UsersCount:  group.UsersCount,
+		Member:      group.Member,
 		CreatedAt:   group.CreatedAt,
 	}
 	if group.User != nil {

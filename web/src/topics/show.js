@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import style from './show.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
@@ -6,7 +7,6 @@ import showdown from 'showdown';
 import { Helmet } from 'react-helmet';
 import API from '../api/index.js';
 import Config from '../components/config.js';
-import style from './style.scss';
 import SiteWidget from '../home/widget.js';
 import CommentList from '../comments/index.js';
 import LoadingView from '../loading/loading.js';

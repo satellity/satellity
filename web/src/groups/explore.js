@@ -1,5 +1,6 @@
 import style from './explore.scss';
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import API from '../api/index.js';
 
 class Explore extends Component {
@@ -23,16 +24,18 @@ class Explore extends Component {
           <div className={style.group}>
             <div className={style.profile}>
               <img src={user.avatar_url} alt={user.nickname} className={style.avatar} />
-              {user.nickname}
+              <div className={style.nickname}>
+                {user.nickname}
+              </div>
+              <div>
+                {group.users_count}
+              </div>
             </div>
             <h2 className={style.name}>
-              {group.name}
+              <Link to={`/groups/${group.group_id}`}>{group.name}</Link>
             </h2>
             <div>
-              {group.description}
-            </div>
-            <div>
-              {group.users_count}
+              {group.description.slice(0, 120)}
             </div>
           </div>
         </div>
