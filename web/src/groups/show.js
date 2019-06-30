@@ -46,6 +46,12 @@ class Show extends Component {
               {state.description}
             </div>
           </div>
+          <div>
+            <h4>{i18n.t('group.members')}</h4>
+          </div>
+          <div>
+            <h4>{i18n.t('group.lastest_discussions')}</h4>
+          </div>
         </main>
         <aside className='column aside'>
         </aside>

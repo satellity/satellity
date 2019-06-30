@@ -5,7 +5,9 @@
     "draft": "Save Draft"
   },
   "group": {
-    "explore": "Popular Groups"
+    "explore": "Popular Groups",
+    "members": "Members",
+    "lastest_discussions": "Lastest Discussions"
   },
   "topic": {
     "title": {

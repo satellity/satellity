@@ -179,9 +179,12 @@ func findGroup(ctx context.Context, tx *sql.Tx, id string) (*Group, error) {
 }
 
 // Participants return members of a group TODO should support pagination
-func (g *Group) Participants(mctx *Context, limit string) ([]*User, error) {
+func (g *Group) Participants(mctx *Context, offset time.Time, limit string) ([]*User, error) {
 	ctx := mctx.context
 
+	if offset.IsZero() {
+		offset = time.Now()
+	}
 	l, err := strconv.ParseInt(limit, 10, 64)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
@@ -191,8 +194,8 @@ func (g *Group) Participants(mctx *Context, limit string) ([]*User, error) {
 	}
 	users := make([]*User, 0)
 	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM users u INNER JOIN participants p ON u.user_id=p.user_id WHERE group_id=$1 ORDER BY p.created_at LIMIT %d", "u."+strings.Join(userColumns, ",u."), l)
-		rows, err := mctx.database.QueryContext(ctx, query, g.GroupID)
+		query := fmt.Sprintf("SELECT %s FROM users u INNER JOIN participants p ON u.user_id=p.user_id WHERE group_id=$1 AND p.created_at<$2 ORDER BY p.created_at LIMIT %d", "u."+strings.Join(userColumns, ",u."), l)
+		rows, err := mctx.database.QueryContext(ctx, query, g.GroupID, time.Now())
 		if err != nil {
 			return err
 		}

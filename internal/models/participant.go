@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS participants (
 );
 
 CREATE INDEX IF NOT EXISTS participant_createdx ON participants (created_at);
+CREATE INDEX IF NOT EXISTS participant_group_createdx ON participants (group_id,created_at);
 `
 
 // Roles of the participant

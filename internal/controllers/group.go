@@ -8,6 +8,7 @@ import (
 	"godiscourse/internal/session"
 	"godiscourse/internal/views"
 	"net/http"
+	"time"
 
 	"github.com/dimfeld/httptreemux"
 )
@@ -99,11 +100,13 @@ func (impl *groupImpl) show(w http.ResponseWriter, r *http.Request, params map[s
 
 func (impl *groupImpl) participants(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
+	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
+
 	if group, err := models.ReadGroup(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if users, err := group.Participants(mctx, r.URL.Query().Get("limit")); err != nil {
+	} else if users, err := group.Participants(mctx, offset, r.URL.Query().Get("limit")); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderUsers(w, r, users)
