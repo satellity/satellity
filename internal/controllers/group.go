@@ -103,7 +103,7 @@ func (impl *groupImpl) participants(w http.ResponseWriter, r *http.Request, para
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if users, err := group.Participants(mctx); err != nil {
+	} else if users, err := group.Participants(mctx, r.URL.Query().Get("limit")); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderUsers(w, r, users)
