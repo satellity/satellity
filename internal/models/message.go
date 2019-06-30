@@ -160,3 +160,60 @@ func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error
 	}
 	return messages, nil
 }
+
+func (user *User) UpdateMessage(mctx *Context, id, body string) (*Message, error) {
+	ctx := mctx.context
+	var message *Message
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		message, err = findMessageByID(ctx, tx, id)
+		if err != nil {
+			return err
+		} else if message == nil {
+			return session.ForbiddenError(ctx)
+		}
+		if message.UserID != user.UserID && !user.isAdmin() {
+			return session.ForbiddenError(ctx)
+		}
+
+		body = strings.TrimSpace(body)
+		if len(body) < 1 {
+			return session.BadDataError(ctx)
+		}
+		message.Body = body
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE messages SET body=$1 WHERE message_id=$2"), body, id)
+		return err
+	})
+	if err != nil {
+		if sessionErr, ok := err.(session.Error); ok {
+			return nil, sessionErr
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	message.User = user
+	return message, nil
+}
+
+func (user *User) DeleteMessage(mctx *Context, id string) error {
+	ctx := mctx.context
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		message, err := findMessageByID(ctx, tx, id)
+		if err != nil {
+			return err
+		} else if message == nil {
+			return session.ForbiddenError(ctx)
+		}
+		if message.UserID != user.UserID && !user.isAdmin() {
+			return session.ForbiddenError(ctx)
+		}
+		_, err = tx.ExecContext(ctx, fmt.Sprintf("DELETE FROM messages WHERE message_id=$1"), id)
+		return err
+	})
+	if err != nil {
+		if sessionErr, ok := err.(session.Error); ok {
+			return sessionErr
+		}
+		return session.TransactionError(ctx, err)
+	}
+	return nil
+}

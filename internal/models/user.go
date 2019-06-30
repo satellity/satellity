@@ -18,6 +18,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const (
+	UserRoleAdmin  = "admin"
+	UserRoleMember = "member"
+)
+
 const usersDDL = `
 CREATE TABLE IF NOT EXISTS users (
 	user_id               VARCHAR(36) PRIMARY KEY,
@@ -309,9 +314,9 @@ func ReadUserByUsernameOrEmail(mctx *Context, identity string) (*User, error) {
 // Role of an user, contains admin and member for now.
 func (u *User) Role() string {
 	if configs.GetOption().OperatorSet[u.Email.String] {
-		return "admin"
+		return UserRoleAdmin
 	}
-	return "member"
+	return UserRoleMember
 }
 
 // Name is nickname or username
@@ -323,7 +328,7 @@ func (u *User) Name() string {
 }
 
 func (u *User) isAdmin() bool {
-	return u.Role() == "admin"
+	return u.Role() == UserRoleAdmin
 }
 
 func findUserByID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {

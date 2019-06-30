@@ -17,6 +17,8 @@ func TestMessageCRUD(t *testing.T) {
 
 	user := createTestUser(mctx, "im.yuqlee@gmail.com", "username", "password")
 	assert.NotNil(user)
+	jade := createTestUser(mctx, "im.jadeydi@gmail.com", "username1", "password")
+	assert.NotNil(jade)
 	group, err := user.CreateGroup(mctx, "Group Name", "Group Description")
 	assert.Nil(err)
 	assert.NotNil(group)
@@ -47,6 +49,19 @@ func TestMessageCRUD(t *testing.T) {
 			messages, err := group.ReadMessages(mctx, time.Now())
 			assert.Nil(err)
 			assert.Len(messages, 1)
+			new, err = jade.UpdateMessage(mctx, message.MessageID, tc.Body)
+			assert.NotNil(err)
+			assert.Nil(new)
+			new, err = user.UpdateMessage(mctx, message.MessageID, "New"+tc.Body)
+			assert.Nil(err)
+			assert.NotNil(new)
+			err = jade.DeleteMessage(mctx, message.MessageID)
+			assert.NotNil(err)
+			err = user.DeleteMessage(mctx, message.MessageID)
+			assert.Nil(err)
+			new, err = ReadMessage(mctx, message.MessageID)
+			assert.Nil(err)
+			assert.Nil(new)
 		})
 	}
 }
