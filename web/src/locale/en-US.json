@@ -5,6 +5,8 @@
     "draft": "Save Draft"
   },
   "group": {
+    "new": "New Group",
+    "edit": "Edit: %{name}",
     "explore": "Popular Groups",
     "members": "Members",
     "lastest_discussions": "Lastest Discussions"

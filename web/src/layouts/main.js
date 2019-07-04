@@ -32,8 +32,8 @@ class MainLayout extends Component {
             <Route path='/topics/:id' component={Topic.Show} />
             <Route exact path='/groups' component={Group.Explore} />
             <Route exact path='/groups/new' component={Group.New} />
-            <Route path='/groups/:id' component={Group.Show} />
             <Route exact path='/groups/:id/edit' component={Group.New} />
+            <Route path='/groups/:id' component={Group.Show} />
             <Redirect to={`/404?p=${this.state.p}`} />
           </Switch>
         </div>

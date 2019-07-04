@@ -73,16 +73,21 @@ class New extends Component {
   }
 
   render() {
+    let state = this.state;
+
     if (!this.api.user.loggedIn()) {
       return (
         <Redirect to={{ pathname: "/" }} />
       )
     }
-    let state = this.state;
+
+    let title = state.group_id === '' ?
+    <h1>{i18n.t('group.new')}</h1> : <h1>{i18n.t('group.edit', {name: state.name})}</h1>;
 
     return (
       <div className='container'>
         <main className='column main'>
+          {title}
           <div className={style.form}>
             <form onSubmit={this.handleSubmit}>
               <div>

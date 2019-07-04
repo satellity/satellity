@@ -1,4 +1,5 @@
 import style from './explore.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
@@ -47,6 +48,9 @@ class Explore extends Component {
         <div className={style.explore}>
           <h1>
             {i18n.t('group.explore')}
+            <Link to='/groups/new' className={style.navi}>
+              <FontAwesomeIcon icon={['fa', 'plus']} />
+            </Link>
           </h1>
           <div className={style.list}>
             {list}
