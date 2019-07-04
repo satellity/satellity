@@ -84,7 +84,7 @@ func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) 
 }
 
 func fetchAccessToken(ctx context.Context, code string) (string, error) {
-	config := configs.GetOption()
+	config := configs.AppConfig
 	client := external.HTTPClient()
 	data, err := json.Marshal(map[string]interface{}{
 		"client_id":     config.Github.ClientID,

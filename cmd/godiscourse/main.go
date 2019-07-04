@@ -68,7 +68,7 @@ func main() {
 		log.Panicln(err)
 	}
 
-	config := configs.GetOption()
+	config := configs.AppConfig
 	db := durable.OpenDatabaseClient(context.Background(), &durable.ConnectionInfo{
 		User:     config.Database.User,
 		Password: config.Database.Password,

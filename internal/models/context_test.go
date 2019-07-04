@@ -50,7 +50,7 @@ func setupTestContext() *Context {
 	if err := configs.Init("./../configs", testEnvironment); err != nil {
 		log.Panicln(err)
 	}
-	config := configs.GetOption()
+	config := configs.AppConfig
 	if config.Environment != testEnvironment || config.Database.Name != testDatabase {
 		log.Panicln(config.Environment, config.Database.Name)
 	}
