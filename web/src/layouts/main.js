@@ -7,6 +7,7 @@ import API from '../api/index.js'
 import User from '../users/view.js';
 import Topic from '../topics/view.js';
 import Group from '../groups/view.js';
+import Message from '../messages/view.js';
 
 class MainLayout extends Component {
   constructor(props) {
@@ -33,7 +34,8 @@ class MainLayout extends Component {
             <Route exact path='/groups' component={Group.Explore} />
             <Route exact path='/groups/new' component={Group.New} />
             <Route exact path='/groups/:id/edit' component={Group.New} />
-            <Route path='/groups/:id' component={Group.Show} />
+            <Route exact path='/groups/:id' component={Group.Show} />
+            <Route exact path='/groups/:id/messages' component={Message.Index} />
             <Redirect to={`/404?p=${this.state.p}`} />
           </Switch>
         </div>
@@ -57,13 +59,10 @@ const Header = () => {
       </Link>
       <div className={style.site}><span className={style.name}>{Config.Name}</span></div>
       <Link to='/groups' className={style.navi}>
-        Groups
+        {i18n.t('group.name')}
       </Link>
       <Link to='/community' className={style.navi}>
-        Community
-      </Link>
-      <Link to='/topics/new' className={style.navi}>
-        <FontAwesomeIcon icon={['fa', 'plus']} />
+        {i18n.t('community.name')}
       </Link>
       {profile}
     </header>

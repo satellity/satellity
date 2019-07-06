@@ -21,6 +21,8 @@
 .path {
   display: inline-block;
   max-width: 17rem;
+  overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 .action {

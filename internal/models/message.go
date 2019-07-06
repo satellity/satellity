@@ -85,6 +85,7 @@ func (u *User) CreateMessage(mctx *Context, groupID, body string) (*Message, err
 		}
 		return nil, session.TransactionError(ctx, err)
 	}
+	message.User = u
 	return message, nil
 }
 

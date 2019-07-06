@@ -10,6 +10,7 @@ import Category from './category.js';
 import Topic from './topic.js';
 import Comment from './comment.js';
 import Group from './group.js';
+import Message from './message.js';
 import User from './user.js';
 
 Noty.overrideDefaults({
@@ -128,6 +129,7 @@ class API {
     this.topic = new Topic(this);
     this.comment = new Comment(this);
     this.group = new Group(this);
+    this.message = new Message(this);
     this.user = new User(this);
   }
 }

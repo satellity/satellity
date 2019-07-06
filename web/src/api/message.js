@@ -18,6 +18,13 @@ class Message {
       return resp.data;
     });
   }
+
+  update(id, params) {
+    const data = {body: params.body};
+    return this.api.axios.post(`/messages/${id}`, data).then((resp) => {
+      return resp.data;
+    })
+  }
 }
 
 export default Message;

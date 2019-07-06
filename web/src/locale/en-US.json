@@ -4,7 +4,11 @@
     "submit": "Submit",
     "draft": "Save Draft"
   },
+  "community": {
+    "name": "Community"
+  },
   "group": {
+    "name": "Group",
     "new": "New Group",
     "edit": "Edit: %{name}",
     "explore": "Popular Groups",
