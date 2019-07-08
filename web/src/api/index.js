@@ -12,6 +12,7 @@ import Comment from './comment.js';
 import Group from './group.js';
 import Message from './message.js';
 import User from './user.js';
+import Me from './me.js';
 
 Noty.overrideDefaults({
     type: 'error',
@@ -131,6 +132,7 @@ class API {
     this.group = new Group(this);
     this.message = new Message(this);
     this.user = new User(this);
+    this.me = new Me(this);
   }
 }
 

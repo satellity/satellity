@@ -5,10 +5,12 @@
     "draft": "Save Draft"
   },
   "community": {
-    "name": "Community"
+    "dashboard": "My topics",
+    "name": "Communities"
   },
   "group": {
-    "name": "Group",
+    "dashboard": "My Groups",
+    "name": "Groups",
     "new": "New Group",
     "edit": "Edit: %{name}",
     "explore": "Popular Groups",

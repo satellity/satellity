@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/index.js';
+import Item from './item.js';
 
 class Explore extends Component {
   constructor(props) {
@@ -18,27 +19,10 @@ class Explore extends Component {
   }
 
   render() {
-    const list = this.state.groups.map((group) => {
-      let user = group.user;
+    const groups = this.state.groups.map((group) => {
       return (
         <div key={group.group_id} className={style.item}>
-          <div className={style.group}>
-            <div className={style.profile}>
-              <img src={user.avatar_url} alt={user.nickname} className={style.avatar} />
-              <div className={style.nickname}>
-                {user.nickname}
-              </div>
-              <div>
-                {group.users_count}
-              </div>
-            </div>
-            <h2 className={style.name}>
-              <Link to={`/groups/${group.group_id}`}>{group.name}</Link>
-            </h2>
-            <div>
-              {group.description.slice(0, 120)}
-            </div>
-          </div>
+          <Item group={group} />
         </div>
       )
     });
@@ -53,7 +37,7 @@ class Explore extends Component {
             </Link>
           </h1>
           <div className={style.list}>
-            {list}
+            {groups}
           </div>
         </div>
       </div>

@@ -221,7 +221,7 @@ func ReadGroups(mctx *Context) ([]*Group, error) {
 	ctx := mctx.context
 
 	groups := make([]*Group, 0)
-	mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM groups ORDER BY created_at DESC LIMIT 12", strings.Join(groupColumns, ","))
 		rows, err := mctx.database.QueryContext(ctx, query)
 		if err != nil {
@@ -247,16 +247,80 @@ func ReadGroups(mctx *Context) ([]*Group, error) {
 		}
 		return nil
 	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
 	return groups, nil
 }
 
-func (u *User) GroupsByUser(mctx *Context) ([]*Group, error) {
+func ReadGroupsByUser(mctx *Context, userId string) ([]*Group, error) {
+	ctx := mctx.context
+	groups := make([]*Group, 0)
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		user, err := findUserByID(ctx, tx, userId)
+		if err != nil {
+			return err
+		} else if user == nil {
+			return session.NotFoundError(ctx)
+		}
+		groups, err = findGroupsByUser(ctx, tx, user)
+		return err
+	})
+	if err != nil {
+		if sessionErr, ok := err.(session.Error); ok {
+			return nil, sessionErr
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	return groups, nil
+}
+
+func (u *User) ReadGroups(mctx *Context) ([]*Group, error) {
 	ctx := mctx.context
 	groups := make([]*Group, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		groups, err = findGroupsByUser(ctx, tx, u)
 		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return groups, nil
+}
+
+func (u *User) RelatedGroups(mctx *Context, limit int64) ([]*Group, error) {
+	ctx := mctx.context
+
+	if limit < 1 || limit > 90 {
+		limit = 90
+	}
+	groups := make([]*Group, 0)
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM groups INNER JOIN participants ON participants.group_id=groups.group_id WHERE participants.user_id=$1 ORDER BY participants.user_id,participants.created_at LIMIT $2", "groups."+strings.Join(groupColumns, ",groups."))
+		rows, err := tx.QueryContext(ctx, query, u.UserID, limit)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		ids := make([]string, 0)
+		for rows.Next() {
+			group, err := groupFromRow(rows)
+			if err != nil {
+				return err
+			}
+			groups = append(groups, group)
+			ids = append(ids, group.UserID)
+		}
+		set, err := readUserSet(ctx, tx, ids)
+		if err != nil {
+			return err
+		}
+		for i, group := range groups {
+			groups[i].User = set[group.UserID]
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)

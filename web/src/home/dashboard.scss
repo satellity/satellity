@@ -1,0 +1,33 @@
+@import '../assets/css/constant.scss';
+
+.dashboard {
+  padding: 1.6rem 0;
+}
+.groups {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -.8rem;
+}
+.group {
+  box-sizing: border-box;
+  flex: 0 0 33.3333%;
+  padding: .8rem;
+  overflow: hidden;
+}
+.section {
+  margin: 1.6rem 0;
+  padding: .8rem;
+  background: white;
+}
+
+@media only screen and (max-width: 64rem) {
+  .group {
+    flex: 0 0 50%;
+  }
+}
+
+@media only screen and (max-width: 48rem) {
+  .group {
+    flex: 0 0 100%;
+  }
+}

@@ -1,0 +1,26 @@
+@import '../assets/css/constant.scss';
+
+.group {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+}
+.profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: .8rem;
+}
+.avatar {
+  border-radius: 1.6rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-right: .4rem;
+}
+.nickname {
+  flex-grow: 1;
+}
+.name {
+  overflow: hidden;
+  white-space: nowrap;
+  margin-bottom: .8rem;
+}
