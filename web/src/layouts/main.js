@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, Redirect } from 'react-router-dom';
 import Config from '../components/config.js';
 import API from '../api/index.js'
-import Dashboard from '../home/dashboard.js';
+import Home from '../home/view.js';
 import User from '../users/view.js';
 import Topic from '../topics/view.js';
 import Group from '../groups/view.js';
@@ -25,8 +25,8 @@ class MainLayout extends Component {
         <Header />
         <div className='wrapper'>
           <Switch>
-            <Route exact path='/' component={Topic.Index} />
-            <Route exact path='/dashboard' component={Dashboard} />
+            <Route exact path='/' component={Home.Index} />
+            <Route exact path='/dashboard' component={Home.Dashboard} />
             <Route exact path='/user/edit' component={User.Edit} />
             <Route path='/users/:id' component={User.Show} />
             <Route exact path='/community' component={Topic.Index} />
