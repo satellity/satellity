@@ -1,11 +1,14 @@
 {
+  "site": {
+    "slogan": "An open source tool for forum & community. (Pre Alpha)"
+  },
   "general": {
     "delete": "Delete",
     "submit": "Submit",
     "draft": "Save Draft"
   },
   "community": {
-    "dashboard": "My topics",
+    "dashboard": "My Topics",
     "name": "Communities"
   },
   "group": {
@@ -41,7 +44,9 @@
     "topics": "Topics"
   },
   "home": {
-    "latest": "Latest"
+    "latest": "Latest",
+    "forum": "Public forum, you can talk anything here.",
+    "group": "Private group, share your thoughts with couple of friends."
   },
   "login": {
     "github": "Sign in with GitHub"
