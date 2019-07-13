@@ -1,6 +1,6 @@
 @import '../assets/css/constant.scss';
 
-h1 {
+.slogan {
   font-size: 2rem;
   text-align: center;
   padding: 3.2rem 0 1.6rem;
@@ -19,5 +19,6 @@ h1 {
   width: 48%;
 }
 .desc {
+  color: black;
   font-size: 1.6rem;
 }

@@ -1,4 +1,4 @@
-import Style from './index.scss';
+import style from './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, {Component} from 'react';
 import {Redirect} from 'react-router-dom';
@@ -19,19 +19,19 @@ class Index extends Component {
 
     return (
       <div>
-        <h1>
+        <h1 className={style.slogan}>
           {i18n.t('site.slogan')}
         </h1>
-        <div className={Style.features}>
-          <div className={Style.section}>
+        <div className={style.features}>
+          <div className={style.section}>
             <FontAwesomeIcon icon={['fa', 'chalkboard']} />
-            <div className={Style.desc}>
+            <div className={style.desc}>
               {i18n.t('home.forum')}
             </div>
           </div>
-          <div className={Style.section}>
+          <div className={style.section}>
             <FontAwesomeIcon icon={['fa', 'users-cog']} />
-            <div className={Style.desc}>
+            <div className={style.desc}>
               {i18n.t('home.group')}
             </div>
           </div>
