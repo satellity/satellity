@@ -37,8 +37,8 @@ type Group struct {
 	CreatedAt   time.Time
 	UpdateAt    time.Time
 
-	Member bool
-	User   *User
+	IsMember bool
+	User     *User
 }
 
 var groupColumns = []string{"group_id", "name", "description", "user_id", "users_count", "created_at", "updated_at"}
@@ -150,7 +150,7 @@ func ReadGroup(mctx *Context, id string, current *User) (*Group, error) {
 				return err
 			}
 			if p != nil {
-				group.Member = true
+				group.IsMember = true
 			}
 		}
 		user, err := findUserByID(ctx, tx, group.UserID)

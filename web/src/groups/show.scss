@@ -1,6 +1,28 @@
 @import '../assets/css/constant.scss';
 
+.loading {
+  background: white;
+  text-align: center;
+}
 .group {
   background: white;
   padding: .8rem;
+}
+.head {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 1.6rem;
+}
+.title {
+  flex-grow: 2;
+  padding-left: .8rem;
+  font-size: .875rem;
+}
+.name {
+  margin: 0 0 .2rem;
+}
+.avatar {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 10%;
 }

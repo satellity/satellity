@@ -13,12 +13,16 @@
   },
   "group": {
     "dashboard": "My Groups",
-    "name": "Groups",
-    "new": "New Group",
     "edit": "Edit: %{name}",
     "explore": "Popular Groups",
+    "lastest_discussions": "Lastest Discussions",
     "members": "Members",
-    "lastest_discussions": "Lastest Discussions"
+    "name": "Groups",
+    "new": "New Group",
+    "navi": {
+      "members": "Members (%{count})",
+      "messages": "View Messages"
+    }
   },
   "topic": {
     "title": {

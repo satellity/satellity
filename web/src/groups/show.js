@@ -1,8 +1,10 @@
 import style from './show.scss';
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
+import {Link} from 'react-router-dom';
 import API from '../api/index.js';
 import Config from '../components/config.js';
+import LoadingView from '../loading/loading.js';
 
 class Show extends Component {
   constructor(props) {
@@ -14,14 +16,19 @@ class Show extends Component {
       group_id: id,
       name: '',
       description: '',
+      owner: false,
       user: {},
       loading: true
     }
   }
 
   componentDidMount() {
+    let me = this.api.user.me();
     this.api.group.show(this.state.group_id).then((data) => {
       data.loading = false;
+      if (me.user_id == data.user.user_id) {
+        data.owner = true;
+      }
       this.setState(data);
     });
   }
@@ -36,18 +43,41 @@ class Show extends Component {
       </Helmet>
     )
 
+    const loadingView = (
+      <div className={style.loading}>
+        <LoadingView style='md-ring'/>
+      </div>
+    )
+
+    const showView = (
+      <div className={style.group}>
+        <div className={style.head}>
+          <img src={state.user.avatar_url} className={style.avatar} />
+          <div className={style.title}>
+            <h1 className={style.name}>{state.name}</h1>
+            <div className={style.nickname}>{state.user.nickname}</div>
+          </div>
+        </div>
+        <div>
+          {state.description}
+        </div>
+      </div>
+    )
+
     return (
       <div className='container'>
         {!state.loading && seoView}
         <main className='column main'>
-          <div className={style.group}>
-            <h1>{state.name}</h1>
-            <div>
-              {state.description}
-            </div>
-          </div>
+          {state.loading && loadingView}
+          {!state.loading && showView}
         </main>
         <aside className='column aside'>
+          <div>
+            {i18n.t('group.navi.members', {count: state.users_count})}
+          </div>
+          <div>
+            <Link to={`/groups/${state.group_id}/messages`}>{i18n.t('group.navi.messages')}</Link>
+          </div>
         </aside>
       </div>
     )
