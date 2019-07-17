@@ -21,7 +21,7 @@ class Members extends Component {
     this.api.group.show(this.state.group_id).then((data) => {
       this.setState({name: data.name}, () => {
         this.api.group.members(this.state.group_id, 512).then((data) => {
-          this.setState({members: data});
+          this.setState({loading: false, members: data});
         })
       });
     });
