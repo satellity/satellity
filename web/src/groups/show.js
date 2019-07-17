@@ -26,7 +26,7 @@ class Show extends Component {
     let me = this.api.user.me();
     this.api.group.show(this.state.group_id).then((data) => {
       data.loading = false;
-      if (me.user_id == data.user.user_id) {
+      if (me && me.user_id == data.user.user_id) {
         data.owner = true;
       }
       this.setState(data);
@@ -73,10 +73,14 @@ class Show extends Component {
         </main>
         <aside className='column aside'>
           <div>
-            {i18n.t('group.navi.members', {count: state.users_count})}
+            <Link to={`/groups/${state.group_id}/members`}>
+              {i18n.t('group.navi.members', {count: state.users_count})}
+            </Link>
           </div>
           <div>
-            <Link to={`/groups/${state.group_id}/messages`}>{i18n.t('group.navi.messages')}</Link>
+            <Link to={`/groups/${state.group_id}/messages`}>
+              {i18n.t('group.navi.messages')}
+            </Link>
           </div>
         </aside>
       </div>

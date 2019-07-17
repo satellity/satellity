@@ -36,6 +36,7 @@ class MainLayout extends Component {
             <Route exact path='/groups' component={Group.Explore} />
             <Route exact path='/groups/new' component={Group.New} />
             <Route exact path='/groups/:id/edit' component={Group.New} />
+            <Route exact path='/groups/:id/members' component={Group.Members} />
             <Route exact path='/groups/:id' component={Group.Show} />
             <Route exact path='/groups/:id/messages' component={Message.Index} />
             <Redirect to={`/404?p=${this.state.p}`} />

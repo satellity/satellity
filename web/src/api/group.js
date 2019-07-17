@@ -41,8 +41,8 @@ class Group {
     });
   }
 
-  members() {
-    return this.api.axios.post(`/groups/${id}/participants`).then((resp) => {
+  members(id, limit) {
+    return this.api.axios.get(`/groups/${id}/participants?limit=${limit}`).then((resp) => {
       return resp.data;
     });
   }
