@@ -31,7 +31,7 @@ class Members extends Component {
     let state = this.state;
     let members = state.members.map((member) => {
       return (
-        <img src={member.avatar_url} key={member.member_id} className={style.item} />
+        <img src={member.avatar_url} key={member.user_id} className={style.item} />
       )
     });
     return (
