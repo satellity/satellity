@@ -37,23 +37,23 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.CreateCategory(ctx, body.Name, body.Alias, body.Description, body.Position)
+	mctx := models.WrapContext(r.Context(), impl.database)
+	category, err := models.CreateCategory(mctx, body.Name, body.Alias, body.Description, body.Position)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
-		return
+	} else {
+		views.RenderCategory(w, r, category)
 	}
-	views.RenderCategory(w, r, category)
 }
 
 func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
-	categories, err := models.ReadAllCategories(ctx)
+	mctx := models.WrapContext(r.Context(), impl.database)
+	categories, err := models.ReadAllCategories(mctx)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
-		return
+	} else {
+		views.RenderCategories(w, r, categories)
 	}
-	views.RenderCategories(w, r, categories)
 }
 
 func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, params map[string]string) {
@@ -62,21 +62,21 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	ctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.UpdateCategory(ctx, params["id"], body.Name, body.Alias, body.Description, body.Position)
+	mctx := models.WrapContext(r.Context(), impl.database)
+	category, err := models.UpdateCategory(mctx, params["id"], body.Name, body.Alias, body.Description, body.Position)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
-		return
+	} else {
+		views.RenderCategory(w, r, category)
 	}
-	views.RenderCategory(w, r, category)
 }
 
 func (impl *adminCategoryImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.ReadCategory(ctx, params["id"])
+	mctx := models.WrapContext(r.Context(), impl.database)
+	category, err := models.ReadCategory(mctx, params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
-		return
+	} else {
+		views.RenderCategory(w, r, category)
 	}
-	views.RenderCategory(w, r, category)
 }

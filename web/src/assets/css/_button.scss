@@ -30,6 +30,13 @@
     align-items: center;
     justify-content: center;
   }
+  &.topic {
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+    background: rgba($color-main-red, $color-main-red-alpha);
+    color: white;
+    width: 30rem;
+    max-width: 50%;
+  }
   &.submit.blue {
     border: 1px solid rgba($color-main-blue, $color-main-red-alpha);
     background: rgba($color-main-blue, $color-main-red-alpha);

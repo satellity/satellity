@@ -25,46 +25,66 @@ CREATE TABLE IF NOT EXISTS topics (
 	short_id              VARCHAR(255) NOT NULL,
 	title                 VARCHAR(512) NOT NULL,
 	body                  TEXT NOT NULL,
-	comments_count        INTEGER NOT NULL DEFAULT 0,
+	comments_count        BIGINT NOT NULL DEFAULT 0,
+	bookmarks_count       BIGINT NOT NULL DEFAULT 0,
+	likes_count           BIGINT NOT NULL DEFAULT 0,
 	category_id           VARCHAR(36) NOT NULL,
 	user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
 	score                 INTEGER NOT NULL DEFAULT 0,
+	draft                 BOOL NOT NULL DEFAULT false,
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
-CREATE UNIQUE INDEX ON topics (short_id);
-CREATE INDEX ON topics (created_at DESC);
-CREATE INDEX ON topics (user_id, created_at DESC);
-CREATE INDEX ON topics (category_id, created_at DESC);
-CREATE INDEX ON topics (score DESC, created_at DESC);
+
+CREATE UNIQUE INDEX IF NOT EXISTS topics_shortx ON topics(short_id);
+CREATE INDEX IF NOT EXISTS topics_draft_createdx ON topics(draft, created_at DESC);
+CREATE INDEX IF NOT EXISTS topics_user_draft_createdx ON topics(user_id, draft, created_at DESC);
+CREATE INDEX IF NOT EXISTS topics_category_draft_createdx ON topics(category_id, draft, created_at DESC);
+CREATE INDEX IF NOT EXISTS topics_score_draft_createdx ON topics(score DESC, draft, created_at DESC);
 `
 
-var topicColumns = []string{"topic_id", "short_id", "title", "body", "comments_count", "category_id", "user_id", "score", "created_at", "updated_at"}
+var topicColumns = []string{"topic_id", "short_id", "title", "body", "comments_count", "bookmarks_count", "likes_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
 
 func (t *Topic) values() []interface{} {
-	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.CommentsCount, t.CategoryID, t.UserID, t.Score, t.CreatedAt, t.UpdatedAt}
+	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.CommentsCount, t.BookmarksCount, t.LikesCount, t.CategoryID, t.UserID, t.Score, t.Draft, t.CreatedAt, t.UpdatedAt}
 }
 
 // Topic is what use talking about
 type Topic struct {
-	TopicID       string
-	ShortID       string
-	Title         string
-	Body          string
-	CommentsCount int64
-	CategoryID    string
-	UserID        string
-	Score         int
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	TopicID        string
+	ShortID        string
+	Title          string
+	Body           string
+	CommentsCount  int64
+	BookmarksCount int64
+	LikesCount     int64
+	CategoryID     string
+	UserID         string
+	Score          int
+	Draft          bool
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 
-	User     *User
-	Category *Category
+	IsLikedBy      bool
+	IsBookmarkedBy bool
+	User           *User
+	Category       *Category
 }
 
 //CreateTopic create a new Topic
-func (user *User) CreateTopic(mctx *Context, title, body, categoryID string) (*Topic, error) {
+func (user *User) CreateTopic(mctx *Context, title, body, categoryID string, draft bool) (*Topic, error) {
 	ctx := mctx.context
+
+	if draft {
+		t, err := user.DraftTopic(mctx)
+		if err != nil {
+			return nil, err
+		}
+		if t != nil {
+			return nil, session.BadDataError(ctx)
+		}
+	}
+
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
 	if len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
@@ -76,6 +96,7 @@ func (user *User) CreateTopic(mctx *Context, title, body, categoryID string) (*T
 		Title:     title,
 		Body:      body,
 		UserID:    user.UserID,
+		Draft:     draft,
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
@@ -102,16 +123,6 @@ func (user *User) CreateTopic(mctx *Context, title, body, categoryID string) (*T
 		category.TopicsCount, category.UpdatedAt = count+1, time.Now()
 		cols, params := durable.PrepareColumnsWithValues(topicColumns)
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO topics(%s) VALUES (%s)", cols, params), topic.values()...)
-		if err != nil {
-			return err
-		}
-		ccols, cparams := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
-		cvals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", ccols, cparams, category.CategoryID), cvals...)
-		if err != nil {
-			return err
-		}
-		_, err = upsertStatistic(ctx, tx, "topics")
 		return err
 	})
 	if err != nil {
@@ -120,11 +131,15 @@ func (user *User) CreateTopic(mctx *Context, title, body, categoryID string) (*T
 		}
 		return nil, session.TransactionError(ctx, err)
 	}
+	if !topic.Draft {
+		go transmitToCategory(mctx, topic.CategoryID)
+		go upsertStatistic(mctx, "topics")
+	}
 	return topic, nil
 }
 
 // UpdateTopic update a Topic by ID
-func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string) (*Topic, error) {
+func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string, draft bool) (*Topic, error) {
 	ctx := mctx.context
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
 	if title != "" && len(title) < minTitleSize {
@@ -133,6 +148,7 @@ func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string)
 
 	var topic *Topic
 	var prevCategoryID string
+	var prevDraft bool
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
@@ -143,6 +159,11 @@ func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string)
 		} else if topic.UserID != user.UserID && !user.isAdmin() {
 			return session.AuthorizationError(ctx)
 		}
+		prevDraft = topic.Draft
+		if !topic.Draft && draft {
+			return session.BadDataError(ctx)
+		}
+		topic.Draft = draft
 		if title != "" {
 			topic.Title = title
 		}
@@ -158,8 +179,8 @@ func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string)
 			topic.CategoryID = category.CategoryID
 			topic.Category = category
 		}
-		cols, params := durable.PrepareColumnsWithValues([]string{"title", "body", "category_id"})
-		vals := []interface{}{topic.Title, topic.Body, topic.CategoryID}
+		cols, params := durable.PrepareColumnsWithValues([]string{"title", "body", "category_id", "draft"})
+		vals := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft}
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), vals...)
 		return err
 	})
@@ -172,9 +193,19 @@ func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string)
 	if topic == nil {
 		return nil, session.NotFoundError(ctx)
 	}
+	err = fillTopicWithAction(mctx, topic, user)
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	if prevDraft && !topic.Draft {
+		go transmitToCategory(mctx, prevCategoryID)
+		go upsertStatistic(mctx, "topics")
+	}
 	if prevCategoryID != "" {
-		go dispersalCategory(mctx, prevCategoryID)
-		go dispersalCategory(mctx, topic.CategoryID)
+		if !prevDraft {
+			go transmitToCategory(mctx, prevCategoryID)
+		}
+		go transmitToCategory(mctx, topic.CategoryID)
 	}
 	topic.User = user
 	return topic, nil
@@ -215,6 +246,44 @@ func ReadTopic(mctx *Context, id string) (*Topic, error) {
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
+	}
+	return topic, nil
+}
+
+//DraftTopic read the draft topic
+func (user *User) DraftTopic(mctx *Context) (*Topic, error) {
+	ctx := mctx.context
+	var topic *Topic
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND draft=true LIMIT 1", strings.Join(topicColumns, ","))
+		row, err := mctx.database.QueryRowContext(ctx, query, user.UserID)
+		if err != nil {
+			return err
+		}
+		topic, err = topicFromRows(row)
+		if err == sql.ErrNoRows {
+			topic = nil
+			return nil
+		}
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return topic, nil
+}
+
+//ReadTopicWithRelation read a topic with user's status like and bookmark
+func ReadTopicWithRelation(mctx *Context, id string, user *User) (*Topic, error) {
+	ctx := mctx.context
+	topic, err := ReadTopic(mctx, id)
+	if err != nil || topic == nil {
+		return topic, err
+	}
+	err = fillTopicWithAction(mctx, topic, user)
+	if err != nil {
+		return topic, session.TransactionError(ctx, err)
 	}
 	return topic, nil
 }
@@ -287,7 +356,7 @@ func ReadTopics(mctx *Context, offset time.Time) ([]*Topic, error) {
 			return err
 		}
 
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE draft=false AND created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
 		if err != nil {
 			return err
@@ -335,7 +404,7 @@ func (user *User) ReadTopics(mctx *Context, offset time.Time) ([]*Topic, error) 
 		if err != nil {
 			return err
 		}
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND draft=false AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, user.UserID, offset, LIMIT)
 		if err != nil {
 			return err
@@ -368,7 +437,7 @@ func (category *Category) ReadTopics(mctx *Context, offset time.Time) ([]*Topic,
 
 	var topics []*Topic
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, category.CategoryID, offset, LIMIT)
 		if err != nil {
 			return err
@@ -404,7 +473,7 @@ func (category *Category) ReadTopics(mctx *Context, offset time.Time) ([]*Topic,
 }
 
 func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, error) {
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
 	t, err := topicFromRows(row)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -414,19 +483,19 @@ func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, er
 
 func topicsCountByCategory(ctx context.Context, tx *sql.Tx, id string) (int64, error) {
 	var count int64
-	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics WHERE category_id=$1", id).Scan(&count)
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics WHERE category_id=$1 AND draft=false", id).Scan(&count)
 	return count, err
 }
 
 func topicsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	var count int64
-	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics").Scan(&count)
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics WHERE draft=false").Scan(&count)
 	return count, err
 }
 
 func topicFromRows(row durable.Row) (*Topic, error) {
 	var t Topic
-	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.CommentsCount, &t.CategoryID, &t.UserID, &t.Score, &t.CreatedAt, &t.UpdatedAt)
+	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.CommentsCount, &t.BookmarksCount, &t.LikesCount, &t.CategoryID, &t.UserID, &t.Score, &t.Draft, &t.CreatedAt, &t.UpdatedAt)
 	return &t, err
 }
 
@@ -435,56 +504,4 @@ func generateShortID(table string, t time.Time) (string, error) {
 	hd.MinLength = 5
 	h, _ := hashids.NewWithData(hd)
 	return h.EncodeInt64([]int64{t.UnixNano()})
-}
-
-// MigrateTopics should be deleted after task TODO
-func MigrateTopics(mctx *Context, offset time.Time, limit int64) (int64, time.Time, error) {
-	ctx := mctx.context
-	if offset.IsZero() {
-		offset = time.Now()
-	}
-
-	last := offset
-	var count int64
-	set := make(map[string]string)
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := "SELECT topic_id,short_id,created_at FROM topics WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2"
-		rows, err := tx.QueryContext(ctx, query, offset, limit)
-		if err != nil {
-			return err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var topicID string
-			var shortID sql.NullString
-			var t time.Time
-			err = rows.Scan(&topicID, &shortID, &t)
-			if err != nil {
-				return err
-			}
-			count++
-			last = t
-			if shortID.Valid {
-				continue
-			}
-			id, _ := generateShortID("topics", last)
-			set[topicID] = id
-		}
-		if err := rows.Err(); err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
-		return 0, offset, session.TransactionError(ctx, err)
-	}
-	for k, v := range set {
-		query := fmt.Sprintf("UPDATE topics SET short_id='%s' WHERE topic_id='%s'", v, k)
-		_, err = mctx.database.ExecContext(ctx, query)
-		if err != nil {
-			return 0, offset, session.TransactionError(ctx, err)
-		}
-	}
-	return count, last, nil
 }

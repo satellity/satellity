@@ -30,9 +30,10 @@ CREATE TABLE IF NOT EXISTS users (
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
-CREATE UNIQUE INDEX ON users ((LOWER(email)));
-CREATE UNIQUE INDEX ON users ((LOWER(username)));
-CREATE INDEX ON users (created_at);
+
+CREATE UNIQUE INDEX IF NOT EXISTS users_emailx ON users ((LOWER(email)));
+CREATE UNIQUE INDEX IF NOT EXISTS users_usernamex ON users ((LOWER(username)));
+CREATE INDEX IF NOT EXISTS users_createdx ON users (created_at);
 `
 
 // User contains info of a register user

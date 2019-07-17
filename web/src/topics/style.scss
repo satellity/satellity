@@ -49,5 +49,20 @@
   margin-left: 0.8rem;
 }
 .body {
-  padding: .8rem .8rem 1.6rem;
+  padding: .8rem;
+}
+.actions {
+  font-size: 1.125rem;
+  text-align: right;
+  padding: .8rem;
+  .action {
+    margin-left: .8rem;
+    cursor: pointer;
+    &:hover {
+      opacity: .6;
+    }
+    span {
+      margin-right: .4rem;
+    }
+  }
 }
