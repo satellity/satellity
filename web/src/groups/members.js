@@ -46,7 +46,7 @@ class Members extends Component {
         </main>
         <aside className='column aside'>
           <Link to={`/groups/${state.group_id}`}>
-            {state.name}
+            {state.name} >>
           </Link>
         </aside>
       </div>
