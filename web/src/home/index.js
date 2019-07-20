@@ -1,5 +1,5 @@
 import style from './index.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import React, {Component} from 'react';
 import {Redirect} from 'react-router-dom';
 import API from '../api/index.js';

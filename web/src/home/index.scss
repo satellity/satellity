@@ -8,7 +8,7 @@
 .features {
   display: flex;
   justify-content: space-around;
-  font-size: 8rem;
+  font-size: 6rem;
   color: rgba($color-main-red, $color-main-red-alpha);
 }
 .section {
@@ -21,4 +21,5 @@
 .desc {
   color: black;
   font-size: 1.6rem;
+  padding: 1.6rem;
 }

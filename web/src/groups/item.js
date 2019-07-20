@@ -13,19 +13,18 @@ class Item extends Component {
     let user = group.user;
     return (
       <div className={style.group}>
-        <div className={style.profile}>
+        <div className={style.head}>
+          <div className={style.title}>
+            <h2 className={style.name}>
+              <Link to={`/groups/${group.group_id}`}>{group.name}</Link>
+            </h2>
+            <div className={style.nickname}>
+              BY {user.nickname}
+            </div>
+          </div>
           <img src={user.avatar_url} alt={user.nickname} className={style.avatar} />
-          <div className={style.nickname}>
-            {user.nickname}
-          </div>
-          <div>
-            {group.users_count}
-          </div>
         </div>
-        <h2 className={style.name}>
-          <Link to={`/groups/${group.group_id}`}>{group.name}</Link>
-        </h2>
-        <div>
+        <div className={style.description}>
           {group.description.slice(0, 120)}
         </div>
       </div>

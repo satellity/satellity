@@ -5,22 +5,33 @@
   box-sizing: border-box;
   padding: .8rem;
 }
+.head {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: .8rem;
+}
 .profile {
   display: flex;
   align-items: center;
-  margin-bottom: .8rem;
+  font-size: .875rem;
+  margin-top: .8rem;
+}
+.title {
+  flex-grow: 1;
 }
 .avatar {
-  border-radius: 1.6rem;
-  width: 2.4rem;
-  height: 2.4rem;
-  margin-right: .4rem;
-}
-.nickname {
-  flex-grow: 1;
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: .4rem;
 }
 .name {
   overflow: hidden;
   white-space: nowrap;
-  margin-bottom: .8rem;
+  margin-bottom: .4rem;
+}
+.nickname {
+  font-size: .875rem;
+}
+.description {
+  color: rgba(0,0,0,0.6);
 }

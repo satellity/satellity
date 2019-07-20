@@ -32,9 +32,6 @@ class Explore extends Component {
         <div className={style.explore}>
           <h1>
             {i18n.t('group.explore')}
-            <Link to='/groups/new' className={style.navi}>
-              <FontAwesomeIcon icon={['fa', 'plus']} />
-            </Link>
           </h1>
           <div className={style.list}>
             {groups}
