@@ -10,19 +10,18 @@
 }
 .head {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   margin-bottom: 1.6rem;
 }
 .title {
-  flex-grow: 2;
-  padding-left: .8rem;
+  flex-grow: 1;
   font-size: .875rem;
 }
 .name {
   margin: 0 0 .2rem;
 }
 .avatar {
-  width: 5rem;
-  height: 5rem;
-  border-radius: 10%;
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: .4rem;
 }

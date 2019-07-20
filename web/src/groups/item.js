@@ -19,7 +19,7 @@ class Item extends Component {
               <Link to={`/groups/${group.group_id}`}>{group.name}</Link>
             </h2>
             <div className={style.nickname}>
-              BY {user.nickname}
+              OWNER {user.nickname}
             </div>
           </div>
           <img src={user.avatar_url} alt={user.nickname} className={style.avatar} />

@@ -52,11 +52,11 @@ class Show extends Component {
     const showView = (
       <div className={style.group}>
         <div className={style.head}>
-          <img src={state.user.avatar_url} className={style.avatar} />
           <div className={style.title}>
             <h1 className={style.name}>{state.name}</h1>
             <div className={style.nickname}>{state.user.nickname}</div>
           </div>
+          <img src={state.user.avatar_url} className={style.avatar} />
         </div>
         <div>
           {state.description}
