@@ -16,9 +16,11 @@ class List extends Component {
   }
 
   componentDidMount() {
-    this.api.me.groups(90).then((data) => {
-      this.setState({groups: data});
-    });
+    if (this.state.isLoggedIn) {
+      this.api.me.groups(90).then((data) => {
+        this.setState({groups: data});
+      });
+    }
   }
 
   render() {
