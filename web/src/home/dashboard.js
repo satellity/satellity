@@ -52,6 +52,7 @@ class Dashboard extends Component {
     return (
       <div className={style.dashboard}>
         {i18n.t('group.dashboard')}
+        <Link to='/user/groups' className={style.view}>{i18n.t('general.all')}</Link>
         <div className={style.groups}>
           {groups}
         </div>

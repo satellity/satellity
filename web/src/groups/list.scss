@@ -1,36 +1,30 @@
 @import '../assets/css/constant.scss';
 
-.dashboard {
-  padding: 1.6rem .8rem;
-}
-.view {
-  margin-left: 1.6rem;
+.panel {
+  box-sizing: border-box;
+  padding: .8rem;
+  width: 100%;
 }
 .groups {
   display: flex;
   flex-wrap: wrap;
   margin: 0 -.8rem;
 }
-.group {
+.item {
   box-sizing: border-box;
   flex: 0 0 33.3333%;
   padding: .8rem;
   overflow: hidden;
 }
-.section {
-  margin: .8rem 0;
-  padding: .8rem;
-  background: white;
-}
 
 @media only screen and (max-width: 64rem) {
-  .group {
+  .item {
     flex: 0 0 50%;
   }
 }
 
 @media only screen and (max-width: 48rem) {
-  .group {
+  .item {
     flex: 0 0 100%;
   }
 }

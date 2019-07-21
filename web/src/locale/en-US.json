@@ -3,9 +3,10 @@
     "slogan": "An open source tool for forum & community. (Pre Alpha)"
   },
   "general": {
+    "all": "View all >>",
     "delete": "Delete",
-    "submit": "Submit",
-    "draft": "Save Draft"
+    "draft": "Save Draft",
+    "submit": "Submit"
   },
   "community": {
     "dashboard": "My Topics",
