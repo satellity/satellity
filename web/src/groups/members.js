@@ -1,6 +1,6 @@
 import style from './members.scss';
-import React, { Component } from 'react';
-import {Link} from 'react-router-dom';
+import React, {Component} from 'react';
+import {Link, Redirect} from 'react-router-dom';
 import API from '../api/index.js';
 
 class Members extends Component {
@@ -18,6 +18,10 @@ class Members extends Component {
   }
 
   componentDidMount() {
+    if (!this.api.user.loggedIn()) {
+      return
+    }
+
     this.api.group.show(this.state.group_id).then((data) => {
       this.setState({name: data.name}, () => {
         this.api.group.members(this.state.group_id, 512).then((data) => {
@@ -28,6 +32,12 @@ class Members extends Component {
   }
 
   render() {
+    if (!this.api.user.loggedIn()) {
+      return (
+        <Redirect to="/" />
+      )
+    }
+
     let state = this.state;
     let members = state.members.map((member) => {
       return (

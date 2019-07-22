@@ -16,7 +16,8 @@ var whitelist = [][2]string{
 	{"GET", "^/categories"},
 	{"GET", "^/topics"},
 	{"GET", "^/users"},
-	{"GET", "^/groups"},
+	{"GET", "^/groups$"},
+	{"GET", "^/groups/[a-z0-9-]+$"},
 	{"POST", "^/oauth"},
 }
 
@@ -26,6 +27,7 @@ var userWhitelist = [][2]string{
 	{"POST", "^/topics"},
 	{"POST", "^/me"},
 	{"POST", "^/groups"},
+	{"GET", "^/groups"},
 }
 
 type contextValueKey int

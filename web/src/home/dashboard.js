@@ -9,7 +9,7 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
-    let user = this.api.user.readMe();
+    let user = this.api.user.local();
     this.state = {
       user: user,
       groups: [],

@@ -27,7 +27,7 @@ class Show extends Component {
   }
 
   componentDidMount() {
-    const user = this.api.user.readMe();
+    const user = this.api.user.local();
     this.api.topic.show(this.props.match.params.id).then((data) => {
       data.loading = false;
       data.is_author = data.user.user_id === user.user_id;

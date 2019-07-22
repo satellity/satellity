@@ -9,7 +9,7 @@ class Edit extends Component {
     super(props);
 
     this.api = new API();
-    const user = this.api.user.readMe();
+    const user = this.api.user.local();
     this.state = {
       nickname: user.nickname,
       biography: user.biography,
@@ -21,7 +21,7 @@ class Edit extends Component {
   }
 
   componentDidMount() {
-    this.api.user.me().then((user) => {
+    this.api.user.remote().then((user) => {
       this.setState({nickname: user.nickname, biography: user.biography});
     });
   }

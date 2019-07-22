@@ -1,6 +1,6 @@
 import style from './index.scss';
 import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, Redirect} from 'react-router-dom';
 import API from '../api/index.js';
 import New from './new.js';
 import Avatar from '../users/avatar.js';
@@ -20,9 +20,13 @@ class Index extends Component {
   }
 
   componentDidMount() {
+    if (!this.api.user.loggedIn()) {
+      return
+    }
+
     this.api.group.show(this.state.group_id).then((data) => {
       this.setState({name: data.name}, () => {
-        this.api.message.index(this.state.group_id).then((data) => {
+        this.api.message.index(this.state.group_id, '').then((data) => {
           this.setState({loading: false, messages: data});
         });
       });
@@ -30,9 +34,14 @@ class Index extends Component {
   }
 
   render() {
-    const state = this.state;
+    if (!this.api.user.loggedIn()) {
+      return (
+        <Redirect to="/" />
+      )
+    }
 
-    const messages = state.messages.map((message) => {
+    let state = this.state;
+    let messages = state.messages.map((message) => {
       return (
         <li key={message.message_id}>
           <div className={style.profile}>

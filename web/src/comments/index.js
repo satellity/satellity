@@ -12,7 +12,7 @@ class CommentIndex extends Component {
     this.api = new API();
     this.converter = new showdown.Converter();
     this.state = {
-      user: this.api.user.readMe(),
+      user: this.api.user.local(),
       comments: [],
       comments_count: props.commentsCount
     };

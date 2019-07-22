@@ -29,9 +29,11 @@ func registerGroup(database *durable.Database, router *httptreemux.TreeMux) {
 	router.POST("/groups/:id", impl.update)
 	router.POST("/groups/:id/join", impl.join)
 	router.POST("/groups/:id/exit", impl.exit)
+	router.GET("/groups/:id/participants", impl.participants)
+	router.GET("/groups/:id/messages", impl.messages)
+
 	router.GET("/groups", impl.index)
 	router.GET("/groups/:id", impl.show)
-	router.GET("/groups/:id/participants", impl.participants)
 }
 
 func (impl *groupImpl) create(w http.ResponseWriter, r *http.Request, _ map[string]string) {
@@ -110,5 +112,21 @@ func (impl *groupImpl) participants(w http.ResponseWriter, r *http.Request, para
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderUsers(w, r, users)
+	}
+}
+
+func (impl *groupImpl) messages(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	mctx := models.WrapContext(r.Context(), impl.database)
+	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
+
+	group, err := models.ReadGroup(mctx, params["id"], middleware.CurrentUser(r))
+	if err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else if group == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
+	} else if messages, err := group.ReadMessages(mctx, offset); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderMessages(w, r, messages)
 	}
 }
