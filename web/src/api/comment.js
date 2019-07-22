@@ -28,7 +28,7 @@ class Comment {
   }
 
   delete(id) {
-    return this.api.axios.post(`/comments/${id}/delete`).then((resp) => {
+    return this.api.axios.delete(`/comments/${id}`).then((resp) => {
       return resp;
     });
   }

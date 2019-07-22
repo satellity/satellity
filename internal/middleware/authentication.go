@@ -24,6 +24,7 @@ var whitelist = [][2]string{
 var userWhitelist = [][2]string{
 	{"GET", "^/me"},
 	{"POST", "^/comments"},
+	{"DELETE", "^/comments"},
 	{"POST", "^/topics"},
 	{"POST", "^/me"},
 	{"POST", "^/groups"},

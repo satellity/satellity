@@ -27,7 +27,7 @@ func registerComment(database *durable.Database, router *httptreemux.TreeMux) {
 
 	router.POST("/comments", impl.create)
 	router.POST("/comments/:id", impl.update)
-	router.POST("/comments/:id/delete", impl.destory)
+	router.DELETE("/comments/:id", impl.destory)
 	router.GET("/topics/:id/comments", impl.comments)
 }
 

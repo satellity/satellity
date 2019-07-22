@@ -15,7 +15,7 @@ class AdminCategoryEdit extends Component {
 
   componentDidMount() {
     const self = this;
-    this.api.category.show(self.id).then((data) => {
+    this.api.category.admin.show(self.id).then((data) => {
       self.setState(data);
     });
   }
@@ -32,7 +32,7 @@ class AdminCategoryEdit extends Component {
     e.preventDefault();
     this.setState({submitting: true});
     const history = this.props.history;
-    this.api.category.update(this.id, this.state).then(() => {
+    this.api.category.admin.update(this.id, this.state).then(() => {
       history.push('/admin/categories');
       this.setState({submitting: false});
     });
