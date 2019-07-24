@@ -36,14 +36,14 @@ class Dashboard extends Component {
       )
     }
 
-    const groups = state.groups.map((group) => {
+    let groups = state.groups.map((group) => {
       return (
         <div key={group.group_id} className={style.group}>
           <GroupItem group={group} />
         </div>
       )
     })
-    const topics = state.topics.map((topic) => {
+    let topics = state.topics.map((topic) => {
       return (
         <TopicItem topic={topic} key={topic.topic_id}/>
       )
@@ -51,16 +51,33 @@ class Dashboard extends Component {
 
     return (
       <div className={style.dashboard}>
-        {i18n.t('group.dashboard')}
-        <Link to='/user/groups' className={style.view}>{i18n.t('general.all')}</Link>
-        <div className={style.groups}>
-          {groups}
+        <div className={style.create}>
+          {
+            state.groups.length < 3 &&
+            <Link to='/groups/new'>{i18n.t('group.new')}</Link>
+          }
+          <Link to='/topics/new'>{i18n.t('topic.new')}</Link>
         </div>
+        {
+          state.groups.length != 0 &&
+          <div>
+            {i18n.t('group.dashboard')}
+            <Link to='/user/groups' className={style.view}>{i18n.t('general.all')}</Link>
+            <div className={style.groups}>
+              {groups}
+            </div>
+          </div>
+        }
 
-        {i18n.t('community.dashboard')}
-        <div className={style.section}>
-          {topics}
-        </div>
+        {
+          state.topics.length != 0 &&
+          <div>
+            {i18n.t('community.dashboard')}
+            <div className={style.section}>
+              {topics}
+            </div>
+          </div>
+        }
       </div>
     )
   }

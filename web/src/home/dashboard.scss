@@ -6,6 +6,18 @@
 .view {
   margin-left: 1.6rem;
 }
+.create {
+  margin-bottom: .8rem;
+  a {
+    background: rgba(218, 40, 16, 0.8);
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    color: white;
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    margin-right: .8rem;
+  }
+}
 .groups {
   display: flex;
   flex-wrap: wrap;

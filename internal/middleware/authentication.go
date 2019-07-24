@@ -29,6 +29,7 @@ var userWhitelist = [][2]string{
 	{"POST", "^/me"},
 	{"POST", "^/groups"},
 	{"GET", "^/groups"},
+	{"GET", "^/user"},
 }
 
 type contextValueKey int
