@@ -34,13 +34,13 @@ class Index extends Component {
   }
 
   render() {
+    let state = this.state;
     if (!this.api.user.loggedIn()) {
       return (
-        <Redirect to="/" />
+        <Redirect to={`/groups/${state.group_id}`} />
       )
     }
 
-    let state = this.state;
     let messages = state.messages.map((message) => {
       return (
         <li key={message.message_id}>

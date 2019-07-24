@@ -34,22 +34,22 @@ class Show extends Component {
   }
 
   render() {
-    const state = this.state;
+    let state = this.state;
 
-    const seoView = (
+    let seoView = (
       <Helmet>
         <title>{state.name} - {state.user.nickname} - {Config.Name}</title>
         <meta name='description' content={state.description.slice(0, 256)} />
       </Helmet>
     )
 
-    const loadingView = (
+    let loadingView = (
       <div className={style.loading}>
         <LoadingView style='md-ring'/>
       </div>
     )
 
-    const showView = (
+    let showView = (
       <div className={style.group}>
         <div className={style.head}>
           <div className={style.title}>
@@ -64,6 +64,21 @@ class Show extends Component {
       </div>
     )
 
+    let sideView = (
+      <div>
+        <div className={style.navi}>
+          <Link to={`/groups/${state.group_id}/members`}>
+            {i18n.t('group.navi.members', {count: state.users_count})}
+          </Link>
+        </div>
+        <div className={style.navi}>
+          <Link to={`/groups/${state.group_id}/messages`}>
+            {i18n.t('group.navi.messages')}
+          </Link>
+        </div>
+      </div>
+    )
+
     return (
       <div className='container'>
         {!state.loading && seoView}
@@ -72,16 +87,7 @@ class Show extends Component {
           {!state.loading && showView}
         </main>
         <aside className='column aside'>
-          <div className={style.navi}>
-            <Link to={`/groups/${state.group_id}/members`}>
-              {i18n.t('group.navi.members', {count: state.users_count})}
-            </Link>
-          </div>
-          <div className={style.navi}>
-            <Link to={`/groups/${state.group_id}/messages`}>
-              {i18n.t('group.navi.messages')}
-            </Link>
-          </div>
+          {this.api.user.loggedIn() && sideView}
         </aside>
       </div>
     )

@@ -32,13 +32,13 @@ class Members extends Component {
   }
 
   render() {
+    let state = this.state;
     if (!this.api.user.loggedIn()) {
       return (
-        <Redirect to="/" />
+        <Redirect to={`/groups/${state.group_id}`} />
       )
     }
 
-    let state = this.state;
     let members = state.members.map((member) => {
       return (
         <img src={member.avatar_url} key={member.user_id} className={style.item} />
