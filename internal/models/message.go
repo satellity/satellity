@@ -125,11 +125,16 @@ func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error
 	if offset.IsZero() {
 		offset = time.Now()
 	}
+	limit := 64
+	if !g.IsMember {
+		offset = time.Now()
+		limit = 8
+	}
 
 	var messages []*Message
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM messages WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(messageColumns, ","))
-		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
+		rows, err := tx.QueryContext(ctx, query, offset, limit)
 		if err != nil {
 			return err
 		}

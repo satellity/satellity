@@ -189,6 +189,10 @@ func (g *Group) Participants(mctx *Context, offset time.Time, limit string) ([]*
 	if l < 1 || l > 512 {
 		l = 512
 	}
+	if !g.IsMember {
+		offset = time.Now()
+		l = 64
+	}
 	users := make([]*User, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM users u INNER JOIN participants p ON u.user_id=p.user_id WHERE group_id=$1 AND p.created_at<$2 ORDER BY p.created_at LIMIT %d", "u."+strings.Join(userColumns, ",u."), l)
