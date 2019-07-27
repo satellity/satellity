@@ -1,5 +1,5 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import style from './show.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
@@ -14,9 +14,9 @@ import LoadingView from '../loading/loading.js';
 class Show extends Component {
   constructor(props) {
     super(props);
-
     this.api = new API();
     this.converter = new showdown.Converter();
+
     this.state = {
       loading: true,
       topic_id: props.match.params.id,
@@ -30,7 +30,7 @@ class Show extends Component {
     const user = this.api.user.local();
     this.api.topic.show(this.props.match.params.id).then((data) => {
       data.loading = false;
-      data.is_author = data.user.user_id === user.user_id;
+      data.is_owner = data.user.user_id === user.user_id;
       data.short_body = data.body.substring(0, 128);
       data.html_body = this.converter.makeHtml(data.body);
       this.setState(data);
@@ -65,7 +65,7 @@ class Show extends Component {
     )
 
     let editAction;
-    if (state.is_author) {
+    if (state.is_owner) {
       editAction = (
         <Link to={`/topics/${state.topic_id}/edit`} className={style.edit}>
           <FontAwesomeIcon icon={['far', 'edit']} />

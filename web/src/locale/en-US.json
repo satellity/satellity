@@ -20,6 +20,8 @@
     "members": "Members",
     "name": "Groups",
     "new": "New Group",
+    "join": "Join Group",
+    "exit": "Exit Group",
     "navi": {
       "members": "Members (%{count})",
       "messages": "View Messages"

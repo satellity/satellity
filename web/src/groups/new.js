@@ -87,8 +87,8 @@ class New extends Component {
     return (
       <div className='container'>
         <main className='column main'>
-          {title}
           <div className={style.form}>
+            {title}
             <form onSubmit={this.handleSubmit}>
               <div>
                 <input type='text' name='name' pattern='.{3,}' required value={state.name} autoComplete='off' placeholder='Name *' onChange={this.handleChange} />
