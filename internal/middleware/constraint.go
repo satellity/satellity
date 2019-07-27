@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"godiscourse/internal/views"
+	"satellity/internal/views"
 	"net/http"
 )
 

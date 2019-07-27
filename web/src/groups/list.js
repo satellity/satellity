@@ -34,7 +34,7 @@ class List extends Component {
     let list = state.groups.map((group) => {
       return (
         <div key={group.group_id} className={style.item}>
-          <GroupItem group={group} />
+          <GroupItem group={group} to='messages' />
         </div>
       )
     });

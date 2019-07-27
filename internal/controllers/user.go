@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/middleware"
-	"godiscourse/internal/models"
-	"godiscourse/internal/session"
-	"godiscourse/internal/views"
+	"satellity/internal/durable"
+	"satellity/internal/middleware"
+	"satellity/internal/models"
+	"satellity/internal/session"
+	"satellity/internal/views"
 	"net/http"
 	"strconv"
 	"time"

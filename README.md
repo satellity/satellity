@@ -1,5 +1,5 @@
-## GoDiscourse
-GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo, please visit [https://live.godiscourse.com/](https://live.godiscourse.com/). For feedback, you can submit [issues](https://github.com/godiscourse/godiscourse/issues) or join our [slack](https://join.slack.com/t/godiscourse/shared_invite/enQtNTcwMTIyODAwMDgxLWE4YjI4MWNiNGM0NDU5MGJiZTNjY2NiYzJhNjQ3NmUxZDA5NDU3ODg2NmY4ODM3NTcyZjIwYmM4OWFiZmEyNjE)([https://bit.ly/2IV6LCW](https://join.slack.com/t/godiscourse/shared_invite/enQtNTcwMTIyODAwMDgxLWE4YjI4MWNiNGM0NDU5MGJiZTNjY2NiYzJhNjQ3NmUxZDA5NDU3ODg2NmY4ODM3NTcyZjIwYmM4OWFiZmEyNjE)), Let's learn Go together!
+## Satellity
+Satellity is a 100% open source, discourse-like forum written in Go. For demo, please visit [https://live.godiscourse.com/](https://live.godiscourse.com/). For feedback, you can submit [issues](https://github.com/satellity/satellity/issues) or join our [slack](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLWE4YjI4MWNiNGM0NDU5MGJiZTNjY2NiYzJhNjQ3NmUxZDA5NDU3ODg2NmY4ODM3NTcyZjIwYmM4OWFiZmEyNjE)([https://bit.ly/2IV6LCW](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLWE4YjI4MWNiNGM0NDU5MGJiZTNjY2NiYzJhNjQ3NmUxZDA5NDU3ODg2NmY4ODM3NTcyZjIwYmM4OWFiZmEyNjE)), Let's learn Go together!
 
 ## Built With
 1. Go version go1.12.1 darwin/amd64
@@ -29,7 +29,7 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 ### Backend
 1. `cd ./internal`, copy `config/config.yaml.example` to `config/config.yaml`. Replace config with yours.
 2. Prepare and start database, the database schema under `./internal/models/schema.sql`, [how to install postgresql](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04).
-3. `cd ./ && make install && make build && ./bin/godiscourse` to start Golang server
+3. `cd ./ && make install && make build && ./bin/satellity` to start Golang server
 
 ### Frontend
 1. `cd ./web`, copy `.env.example` to `.env` and `.env.development` and change the following fields:
@@ -43,7 +43,7 @@ GoDiscourse is a 100% open source, discourse-like forum written in Go. For demo,
 3. `npm run dev` and open `http://localhost:1234`
 
 ## Docker
-1. go to godiscourse folder
+1. go to satellity folder
 2. type `docker-compose up` 
 
 ## License

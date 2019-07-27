@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"godiscourse/internal/session"
+	"satellity/internal/session"
 	"net/http"
 
 	"github.com/unrolled/render"

@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"bytes"
-	"godiscourse/internal/configs"
-	"godiscourse/internal/session"
-	"godiscourse/internal/views"
+	"satellity/internal/configs"
+	"satellity/internal/session"
+	"satellity/internal/views"
 	"io/ioutil"
 	"net/http"
 	"runtime"

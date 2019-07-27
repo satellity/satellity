@@ -2,14 +2,14 @@ package models
 
 import (
 	"context"
-	"godiscourse/internal/configs"
-	"godiscourse/internal/durable"
+	"satellity/internal/configs"
+	"satellity/internal/durable"
 	"log"
 )
 
 const (
 	testEnvironment = "test"
-	testDatabase    = "godiscourse_test"
+	testDatabase    = "satellity_test"
 )
 
 const (

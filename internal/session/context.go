@@ -2,7 +2,7 @@ package session
 
 import (
 	"context"
-	"godiscourse/internal/durable"
+	"satellity/internal/durable"
 
 	"github.com/unrolled/render"
 )

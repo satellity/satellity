@@ -4,7 +4,7 @@ default: &default
     host: http://localhost
     port: 4000
   database:
-    user: godiscourse
+    user: satellity
     password: ""
     host: localhost
     port: 5432
@@ -18,14 +18,14 @@ default: &default
 development:
   <<: *default
   database:
-    name: godiscourse_dev
+    name: satellity_dev
 
 test:
   <<: *default
   database:
-    name: godiscourse_test
+    name: satellity_test
 
 production:
   <<: *default
   database:
-    name: godiscourse_production
+    name: satellity_production

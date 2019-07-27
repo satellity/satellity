@@ -39,7 +39,7 @@ class Dashboard extends Component {
     let groups = state.groups.map((group) => {
       return (
         <div key={group.group_id} className={style.group}>
-          <GroupItem group={group} />
+          <GroupItem group={group} to='messages' />
         </div>
       )
     })

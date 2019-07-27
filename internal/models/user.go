@@ -7,9 +7,9 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
-	"godiscourse/internal/configs"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/session"
+	"satellity/internal/configs"
+	"satellity/internal/durable"
+	"satellity/internal/session"
 	"strings"
 	"time"
 

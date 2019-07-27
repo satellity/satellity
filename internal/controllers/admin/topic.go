@@ -1,9 +1,9 @@
 package admin
 
 import (
-	"godiscourse/internal/durable"
-	"godiscourse/internal/models"
-	"godiscourse/internal/views"
+	"satellity/internal/durable"
+	"satellity/internal/models"
+	"satellity/internal/views"
 	"net/http"
 	"time"
 

@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/middleware"
-	"godiscourse/internal/models"
-	"godiscourse/internal/views"
+	"satellity/internal/durable"
+	"satellity/internal/middleware"
+	"satellity/internal/models"
+	"satellity/internal/views"
 	"net/http"
 
 	"github.com/dimfeld/httptreemux"

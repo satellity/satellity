@@ -3,8 +3,8 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/session"
+	"satellity/internal/durable"
+	"satellity/internal/session"
 	"strings"
 	"time"
 )

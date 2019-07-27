@@ -19,7 +19,7 @@
     "lastest_discussions": "Lastest Discussions",
     "members": "Members",
     "name": "Groups",
-    "new": "New Group",
+    "new": "Create a new group",
     "join": "Join Group",
     "exit": "Exit Group",
     "navi": {
@@ -59,6 +59,6 @@
     "github": "Sign in with GitHub"
   },
   "aside": {
-    "rules": "<li>1. Open Source on <a href='https://github.com/godiscourse/godiscourse' target='blank' class='soft'>Github</a>.</li><li> 2. Based on Golang, React and PostgreSQL. </li> <li> 3. Model tested. </li> <li> 4. Project <a href='https://github.com/godiscourse/godiscourse/projects/1' target='_blank'>Roadmap</a>. </li>"
+    "rules": "<li>1. Open Source on <a href='https://github.com/satellity/satellity' target='blank' class='soft'>Github</a>.</li><li> 2. Based on Golang, React and PostgreSQL. </li> <li> 3. Model tested. </li> <li> 4. Project <a href='https://github.com/satellity/satellity/projects/1' target='_blank'>Roadmap</a>. </li>"
   }
 }
