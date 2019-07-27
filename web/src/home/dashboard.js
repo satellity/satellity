@@ -61,8 +61,12 @@ class Dashboard extends Component {
         {
           state.groups.length != 0 &&
           <div>
-            {i18n.t('group.dashboard')}
-            <Link to='/user/groups' className={style.view}>{i18n.t('general.all')}</Link>
+            <div className={style.head}>
+              <div className={style.name}>
+                {i18n.t('group.dashboard')}
+              </div>
+              <Link to='/user/groups' className={style.view}>{i18n.t('general.all')}</Link>
+            </div>
             <div className={style.groups}>
               {groups}
             </div>

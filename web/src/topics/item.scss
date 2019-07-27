@@ -5,15 +5,6 @@
   display: flex;
   align-items: flex-start;
   padding: .8rem 0 .8rem;
-  &:hover {
-    border-bottom: 1px solid white;
-    border-top: 1px solid white;
-    margin-top: -1px;
-    box-shadow:
-    0px .32rem .32rem -.3rem rgba($color-main-red, .2),
-    0px -.32rem .32rem -.3rem rgba($color-main-red, .2);
-    transition: box-shadow 0.3s ease-in-out;
-  }
 }
 .avatar {
   border-radius: .4rem;
