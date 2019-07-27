@@ -11,6 +11,8 @@ class Item extends Component {
   render() {
     let group = this.state;
     let user = group.user;
+    let membersView = group.users_count>1 ? <span className={style.count}>+{group.users_count-1 }</span> : '';
+
     return (
       <div className={style.group}>
         <div className={style.head}>
@@ -19,7 +21,8 @@ class Item extends Component {
               <Link to={`/groups/${group.group_id}`}>{group.name}</Link>
             </h2>
             <div className={style.nickname}>
-              OWNER {user.nickname}
+              By {user.nickname}
+              {membersView}
             </div>
           </div>
           <img src={user.avatar_url} alt={user.nickname} className={style.avatar} />

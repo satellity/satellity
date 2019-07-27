@@ -8,7 +8,7 @@
 .head {
   display: flex;
   align-items: flex-start;
-  margin-bottom: .8rem;
+  margin-bottom: .4rem;
 }
 .profile {
   display: flex;
@@ -27,7 +27,10 @@
 .name {
   overflow: hidden;
   white-space: nowrap;
-  margin-bottom: .4rem;
+  margin-bottom: 0rem;
+}
+.count {
+  margin-left: .4rem;
 }
 .nickname {
   font-size: .875rem;
