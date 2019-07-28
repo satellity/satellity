@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/middleware"
-	"godiscourse/internal/models"
-	"godiscourse/internal/session"
-	"godiscourse/internal/views"
+	"satellity/internal/durable"
+	"satellity/internal/middleware"
+	"satellity/internal/models"
+	"satellity/internal/session"
+	"satellity/internal/views"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/dimfeld/httptreemux"
@@ -32,6 +33,8 @@ func registerUser(database *durable.Database, router *httptreemux.TreeMux) {
 	router.GET("/me", impl.current)
 	router.GET("/users/:id", impl.show)
 	router.GET("/users/:id/topics", impl.topics)
+	router.GET("/users/:id/groups", impl.groups)
+	router.GET("/user/groups", impl.relatedGroups)
 }
 
 func (impl *userImpl) oauth(w http.ResponseWriter, r *http.Request, params map[string]string) {
@@ -90,5 +93,27 @@ func (impl *userImpl) topics(w http.ResponseWriter, r *http.Request, params map[
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)
+	}
+}
+
+func (impl *userImpl) groups(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	mctx := models.WrapContext(r.Context(), impl.database)
+	groups, err := models.ReadGroupsByUser(mctx, params["id"])
+	if err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderGroups(w, r, groups)
+	}
+}
+
+func (impl *userImpl) relatedGroups(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	mctx := models.WrapContext(r.Context(), impl.database)
+
+	limit, _ := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
+	groups, err := middleware.CurrentUser(r).RelatedGroups(mctx, limit)
+	if err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderGroups(w, r, groups)
 	}
 }

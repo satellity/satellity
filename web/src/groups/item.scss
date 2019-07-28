@@ -1,0 +1,40 @@
+@import '../assets/css/constant.scss';
+
+.group {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+}
+.head {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: .4rem;
+}
+.profile {
+  display: flex;
+  align-items: center;
+  font-size: .875rem;
+  margin-top: .8rem;
+}
+.title {
+  flex-grow: 1;
+}
+.avatar {
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: .4rem;
+}
+.name {
+  overflow: hidden;
+  white-space: nowrap;
+  margin-bottom: 0rem;
+}
+.count {
+  margin-left: .4rem;
+}
+.nickname {
+  font-size: .875rem;
+}
+.description {
+  color: rgba(0,0,0,0.6);
+}

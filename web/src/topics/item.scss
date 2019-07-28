@@ -5,9 +5,6 @@
   display: flex;
   align-items: flex-start;
   padding: .8rem 0 .8rem;
-  &:first-child {
-    padding-top: 0;
-  }
 }
 .avatar {
   border-radius: .4rem;

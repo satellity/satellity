@@ -1,0 +1,58 @@
+@import '../assets/css/constant.scss';
+
+.dashboard {
+  padding: 1.6rem .8rem;
+}
+.head {
+  display: flex;
+  align-items: center;
+  .name {
+    flex-grow: 1;
+  }
+}
+.view {
+  border: 1px solid rgba(0, 0, 0, .1);
+  border-radius: 1.2rem;
+  display: inline-block;
+  padding: .2rem .8rem;
+}
+.create {
+  margin-bottom: .8rem;
+  a {
+    background: rgba(218, 40, 16, 0.8);
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    color: white;
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    margin-right: .8rem;
+  }
+}
+.groups {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -.8rem;
+}
+.group {
+  box-sizing: border-box;
+  flex: 0 0 33.3333%;
+  padding: .8rem;
+  overflow: hidden;
+}
+.section {
+  margin: .8rem 0;
+  padding: .8rem;
+  background: white;
+}
+
+@media only screen and (max-width: 64rem) {
+  .group {
+    flex: 0 0 50%;
+  }
+}
+
+@media only screen and (max-width: 48rem) {
+  .group {
+    flex: 0 0 100%;
+  }
+}

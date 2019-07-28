@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/middleware"
-	"godiscourse/internal/models"
-	"godiscourse/internal/session"
-	"godiscourse/internal/views"
+	"satellity/internal/durable"
+	"satellity/internal/middleware"
+	"satellity/internal/models"
+	"satellity/internal/session"
+	"satellity/internal/views"
 	"net/http"
 	"time"
 
@@ -27,7 +27,7 @@ func registerComment(database *durable.Database, router *httptreemux.TreeMux) {
 
 	router.POST("/comments", impl.create)
 	router.POST("/comments/:id", impl.update)
-	router.POST("/comments/:id/delete", impl.destory)
+	router.DELETE("/comments/:id", impl.destory)
 	router.GET("/topics/:id/comments", impl.comments)
 }
 

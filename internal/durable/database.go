@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" //
 )
 
 type ConnectionInfo struct {
@@ -127,7 +127,9 @@ func (d *Database) RunInTransaction(ctx context.Context, fn func(*sql.Tx) error)
 		}
 	}()
 	if err := fn(tx); err != nil {
-		_ = tx.Rollback()
+		if err := tx.Rollback(); err != nil {
+			return err
+		}
 		return err
 	}
 	return tx.Commit()

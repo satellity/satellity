@@ -13,17 +13,13 @@
   border-bottom: 1px solid rgb(240, 240, 240);
 }
 .profile {
+  align-items: flex-start;
   display: flex;
-}
-.avatar {
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 2.4rem;
+  margin-bottom: .4rem;
 }
 .detail {
   flex-grow: 1;
   line-height: 1rem;
-  padding-left: 0.8rem;
 }
 .time {
   font-size: .875rem;

@@ -2,14 +2,14 @@ package models
 
 import (
 	"context"
-	"godiscourse/internal/configs"
-	"godiscourse/internal/durable"
+	"satellity/internal/configs"
+	"satellity/internal/durable"
 	"log"
 )
 
 const (
 	testEnvironment = "test"
-	testDatabase    = "godiscourse_test"
+	testDatabase    = "satellity_test"
 )
 
 const (
@@ -21,12 +21,14 @@ const (
 	dropCommentsDDL     = `DROP TABLE IF EXISTS comments;`
 	dropGroupsDDL       = `DROP TABLE IF EXISTS groups`
 	dropParticipantsDDL = `DROP TABLE IF EXISTS participants`
+	dropMessagesDDL     = `DROP TABLE IF EXISTS messages`
 	dropStatisticsDDL   = `DROP TABLE IF EXISTS statistics;`
 )
 
 func teardownTestContext(mctx *Context) {
 	tables := []string{
 		dropStatisticsDDL,
+		dropMessagesDDL,
 		dropParticipantsDDL,
 		dropGroupsDDL,
 		dropCommentsDDL,
@@ -48,7 +50,7 @@ func setupTestContext() *Context {
 	if err := configs.Init("./../configs", testEnvironment); err != nil {
 		log.Panicln(err)
 	}
-	config := configs.GetOption()
+	config := configs.AppConfig
 	if config.Environment != testEnvironment || config.Database.Name != testDatabase {
 		log.Panicln(config.Environment, config.Database.Name)
 	}
@@ -68,6 +70,7 @@ func setupTestContext() *Context {
 		commentsDDL,
 		groupsDDL,
 		participantsDDL,
+		messagesDDL,
 		statisticsDDL,
 	}
 	for _, q := range tables {

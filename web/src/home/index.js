@@ -1,159 +1,46 @@
 import style from './index.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import Config from '../components/config.js';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import React, {Component} from 'react';
+import {Redirect} from 'react-router-dom';
 import API from '../api/index.js';
-import SiteWidget from './widget.js';
-import TopicItem from '../topics/item.js';
-import LoadingView from '../loading/loading.js';
 
-class Home extends Component {
+class Index extends Component {
   constructor(props) {
     super(props);
-
     this.api = new API();
-    this.params = new URLSearchParams(props.location.search);
-    this.pagination = 50;
-    let categories = [];
-    let d = window.localStorage.getItem('categories');
-    if (d !== null && d !== undefined && d !== '') {
-      categories = JSON.parse(atob(d));
-    }
-    this.state = {
-      topics: [],
-      categories: categories,
-      category: {},
-      categoryId: 'latest',
-      loading: true,
-      offset: ''
-    };
-
-    this.loadTopics = this.loadTopics.bind(this);
-  }
-
-  componentDidMount() {
-    this.api.category.index().then((data) => {
-      this.setState({categories: data});
-      let categoryId = 'latest';
-      this.setState({category: {}});
-      let category = this.params.get('c');
-      if (!!category) {
-        for (let i = 0; i < this.state.categories.length; i++) {
-          let c = this.state.categories[i];
-          if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-            categoryId = c.category_id;
-            this.setState({category: c});
-            break;
-          }
-        }
-      }
-      this.fetchTopics(categoryId, true);
-    });
-  }
-
-  componentDidUpdate(prevProps) {
-    let props = this.props;
-    if (props.location.search !== prevProps.location.search) {
-      let categoryId = 'latest';
-      this.setState({category: {}});
-      let params = new URLSearchParams(props.location.search);
-      let category = params.get('c');
-      if (!!category) {
-        // TODO better method?
-        for (let i = 0; i < this.state.categories.length; i++) {
-          let c = this.state.categories[i];
-          if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-            categoryId = c.category_id;
-            this.setState({category: c});
-            break;
-          }
-        }
-      }
-      this.fetchTopics(categoryId, true);
-    }
-  }
-
-  loadTopics(e) {
-    e.preventDefault();
-    this.fetchTopics(this.state.categoryId, false);
-  }
-
-  fetchTopics(categoryId, replace) {
-    this.setState({loading: replace, offset: ''});
-    let request;
-    if (categoryId === 'latest') {
-      request = this.api.topic.index(this.state.offset);
-    } else {
-      request = this.api.category.topics(categoryId, this.state.offset);
-    }
-
-    request.then((data) => {
-      let offset = '';
-      if (data.length > this.pagination) {
-        offset = data[data.length-1].created_at;
-      }
-      if (!replace) {
-        data = this.state.topics.concat(data);
-      }
-      this.setState({categoryId: categoryId, loading: false, offset: offset, topics: data});
-    });
   }
 
   render() {
-    let state = this.state;
-
-    const loadingView = (
-      <div className={style.loading}>
-        <LoadingView style='md-ring'/>
-      </div>
-    )
-
-    const topics = state.topics.map((topic) => {
+    if (this.api.user.loggedIn()) {
       return (
-        <TopicItem topic={topic} key={topic.topic_id}/>
-      )
-    });
-
-    const categories = state.categories.map((category) => {
-      return (
-        <Link
-          to={{ pathname: "/", search: `?c=${category.name}` }}
-          className={`${style.node} ${state.categoryId === category.category_id ? style.current : ''}`}
-          key={category.category_id}>{category.alias}</Link>
-      )
-    });
-
-    let seoView;
-    if (!!state.category.name) {
-      seoView = (
-        <Helmet>
-          <title>{state.category.alias} - {Config.Name}</title>
-          <meta name='description' content={state.category.description} />
-        </Helmet>
+        <Redirect to={{pathname: "/dashboard"}} />
       )
     }
 
     return (
-      <div className='container'>
-        {!state.loading && seoView}
-        <main className='column main'>
-          <div className={style.nodes}>
-            <Link to='/'
-              className={`${style.node} ${state.categoryId === 'latest' ? style.current : ''}`}>{i18n.t('home.latest')}</Link>
-            {categories}
+      <div>
+        <h1 className={style.slogan}>
+          {i18n.t('site.slogan')}
+        </h1>
+        <div className={style.features}>
+          <div className={style.section}>
+            <FontAwesomeIcon icon={['fa', 'chalkboard']} />
+            <div className={style.desc}>
+              {i18n.t('home.forum')}
+            </div>
           </div>
-          {state.loading && loadingView}
-          {!state.loading && <ul className={style.topics}> {topics} </ul>}
-          {state.offset !== '' && <div className={style.load}><a href='javascript:;' onClick={this.loadTopics}>Load More</a></div>}
-        </main>
-        <aside className='column aside'>
-          <SiteWidget />
-        </aside>
+          <div className={style.section}>
+            <FontAwesomeIcon icon={['fa', 'users-cog']} />
+            <div className={style.desc}>
+              {i18n.t('home.group')}
+            </div>
+          </div>
+        </div>
+        <div>
+        </div>
       </div>
-    );
+    )
   }
 }
 
-export default Home;
+export default Index;

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"godiscourse/internal/views"
+	"satellity/internal/views"
 	"net/http"
 )
 
@@ -11,7 +11,7 @@ func Constraint(handler http.Handler) http.Handler {
 		if origin := r.Header.Get("Origin"); origin != "" {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Authorization")
-			w.Header().Set("Access-Control-Allow-Methods", "OPTIONS,GET,POST")
+			w.Header().Set("Access-Control-Allow-Methods", "OPTIONS,GET,POST,DELETE")
 			w.Header().Set("Access-Control-Max-Age", "86400")
 		}
 		if r.Method == "OPTIONS" {

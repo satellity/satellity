@@ -14,4 +14,4 @@ production:
 
 start:
 	go build -o $(GOBIN)/$(PROJECTNAME) ./cmd/$(PROJECTNAME)/main.go || exit
-	./bin/godiscourse
+	./bin/satellity

@@ -4,11 +4,11 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, Redirect } from 'react-router-dom';
 import Config from '../components/config.js';
 import API from '../api/index.js'
-import Home from '../home/index.js';
-import UserEdit from '../users/edit.js';
-import UserShow from '../users/show.js';
-import TopicNew from '../topics/new.js';
-import TopicShow from '../topics/show.js';
+import Home from '../home/view.js';
+import User from '../users/view.js';
+import Topic from '../topics/view.js';
+import Group from '../groups/view.js';
+import Message from '../messages/view.js';
 
 class MainLayout extends Component {
   constructor(props) {
@@ -25,12 +25,21 @@ class MainLayout extends Component {
         <Header />
         <div className='wrapper'>
           <Switch>
-            <Route exact path='/' component={Home} />
-            <Route exact path='/user/edit' component={UserEdit} />
-            <Route path='/users/:id' component={UserShow} />
-            <Route exact path='/topics/new' component={TopicNew} />
-            <Route path='/topics/:id/edit' component={TopicNew} />
-            <Route path='/topics/:id' component={TopicShow} />
+            <Route exact path='/' component={Home.Index} />
+            <Route exact path='/dashboard' component={Home.Dashboard} />
+            <Route exact path='/user/edit' component={User.Edit} />
+            <Route exact path='/user/groups' component={Group.List} />
+            <Route path='/users/:id' component={User.Show} />
+            <Route exact path='/community' component={Topic.Index} />
+            <Route exact path='/topics/new' component={Topic.New} />
+            <Route path='/topics/:id/edit' component={Topic.New} />
+            <Route path='/topics/:id' component={Topic.Show} />
+            <Route exact path='/groups' component={Group.Explore} />
+            <Route exact path='/groups/new' component={Group.New} />
+            <Route exact path='/groups/:id/edit' component={Group.New} />
+            <Route exact path='/groups/:id/members' component={Group.Members} />
+            <Route exact path='/groups/:id' component={Group.Show} />
+            <Route exact path='/groups/:id/messages' component={Message.Index} />
             <Redirect to={`/404?p=${this.state.p}`} />
           </Switch>
         </div>
@@ -44,7 +53,7 @@ const Header = () => {
   let profile;
   if (user.loggedIn()) {
     profile = (
-      <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {user.readMe().nickname} </Link>
+      <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {user.local().nickname} </Link>
     );
   }
   return (
@@ -53,8 +62,11 @@ const Header = () => {
         <FontAwesomeIcon icon={['fa', 'home']} />
       </Link>
       <div className={style.site}><span className={style.name}>{Config.Name}</span></div>
-      <Link to='/topics/new' className={style.navi}>
-        <FontAwesomeIcon icon={['fa', 'plus']} />
+      <Link to='/groups' className={style.navi}>
+        {i18n.t('group.name')}
+      </Link>
+      <Link to='/community' className={style.navi}>
+        {i18n.t('community.name')}
       </Link>
       {profile}
     </header>

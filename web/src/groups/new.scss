@@ -1,0 +1,19 @@
+@import '../assets/css/constant.scss';
+
+.form {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+}
+
+.body {
+  border: 1px solid #ccc;
+  margin-bottom: 1rem;
+  min-height: 24rem;
+  overflow: hidden;
+  pre {
+    font-size: 1rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+}

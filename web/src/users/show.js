@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import API from '../api/index.js';
 import TopicItem from '../topics/item.js';
 
-class UserShow extends Component {
+class Show extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
@@ -70,4 +70,4 @@ class UserShow extends Component {
   }
 }
 
-export default UserShow;
+export default Show;

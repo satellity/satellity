@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"godiscourse/internal/durable"
+	"satellity/internal/durable"
 
 	"github.com/dimfeld/httptreemux"
 )

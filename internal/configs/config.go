@@ -34,6 +34,8 @@ type Option struct {
 	OperatorSet map[string]bool
 }
 
+var AppConfig *Option
+
 func Init(dir, env string) error {
 	data, err := ioutil.ReadFile(path.Join(dir, "./config.yaml"))
 	if err != nil {
@@ -51,12 +53,6 @@ func Init(dir, env string) error {
 	for _, operator := range opt.Operators {
 		opt.OperatorSet[operator] = true
 	}
-	option = &opt
+	AppConfig = &opt
 	return nil
-}
-
-var option *Option
-
-func GetOption() *Option {
-	return option
 }

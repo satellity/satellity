@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/session"
+	"satellity/internal/durable"
+	"satellity/internal/session"
 	"strings"
 	"time"
 )
@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS participants (
 );
 
 CREATE INDEX IF NOT EXISTS participant_createdx ON participants (created_at);
+CREATE INDEX IF NOT EXISTS participant_user_createdx ON participants (user_id,created_at);
+CREATE INDEX IF NOT EXISTS participant_group_createdx ON participants (group_id,created_at);
 `
 
 // Roles of the participant

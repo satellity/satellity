@@ -14,6 +14,27 @@ class Category {
     });
   }
 
+  topics(id, offset) {
+    if (!!offset) {
+      offset = offset.replace('+', '%2B')
+    }
+    return this.api.axios.get(`/categories/${id}/topics?offset=${offset}`).then((resp) => {
+      return resp.data;
+    });
+  }
+}
+
+class Admin {
+  constructor(api) {
+    this.api = api;
+  }
+
+  index() {
+    return this.api.axios.get('/admin/categories').then((resp) => {
+      return resp.data;
+    })
+  }
+
   create(params) {
     if (params['position'] === '') {
       params['position'] = 0;
@@ -38,27 +59,6 @@ class Category {
     return this.api.axios.get(`/admin/categories/${id}`).then((resp) => {
       return resp.data;
     });
-  }
-
-  topics(id, offset) {
-    if (!!offset) {
-      offset = offset.replace('+', '%2B')
-    }
-    return this.api.axios.get(`/categories/${id}/topics?offset=${offset}`).then((resp) => {
-      return resp.data;
-    });
-  }
-}
-
-class Admin {
-  constructor(api) {
-    this.api = api;
-  }
-
-  index() {
-    return this.api.axios.get('/admin/categories').then((resp) => {
-      return resp.data;
-    })
   }
 }
 

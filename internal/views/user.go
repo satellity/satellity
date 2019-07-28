@@ -3,7 +3,7 @@ package views
 import (
 	"crypto/md5"
 	"fmt"
-	"godiscourse/internal/models"
+	"satellity/internal/models"
 	"net/http"
 	"strings"
 	"time"

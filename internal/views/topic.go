@@ -1,7 +1,7 @@
 package views
 
 import (
-	"godiscourse/internal/models"
+	"satellity/internal/models"
 	"net/http"
 	"time"
 )

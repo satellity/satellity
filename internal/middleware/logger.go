@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"godiscourse/internal/durable"
-	"godiscourse/internal/session"
+	"satellity/internal/durable"
+	"satellity/internal/session"
 	"net/http"
 )
 

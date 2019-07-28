@@ -1,7 +1,7 @@
 package views
 
 import (
-	"godiscourse/internal/session"
+	"satellity/internal/session"
 	"net/http"
 )
 

@@ -7,15 +7,20 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
-	"godiscourse/internal/configs"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/session"
+	"satellity/internal/configs"
+	"satellity/internal/durable"
+	"satellity/internal/session"
 	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
+)
+
+const (
+	UserRoleAdmin  = "admin"
+	UserRoleMember = "member"
 )
 
 const usersDDL = `
@@ -308,10 +313,10 @@ func ReadUserByUsernameOrEmail(mctx *Context, identity string) (*User, error) {
 
 // Role of an user, contains admin and member for now.
 func (u *User) Role() string {
-	if configs.GetOption().OperatorSet[u.Email.String] {
-		return "admin"
+	if configs.AppConfig.OperatorSet[u.Email.String] {
+		return UserRoleAdmin
 	}
-	return "member"
+	return UserRoleMember
 }
 
 // Name is nickname or username
@@ -323,7 +328,7 @@ func (u *User) Name() string {
 }
 
 func (u *User) isAdmin() bool {
-	return u.Role() == "admin"
+	return u.Role() == UserRoleAdmin
 }
 
 func findUserByID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {

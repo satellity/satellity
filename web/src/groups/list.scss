@@ -1,0 +1,30 @@
+@import '../assets/css/constant.scss';
+
+.panel {
+  box-sizing: border-box;
+  padding: .8rem;
+  width: 100%;
+}
+.groups {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -.8rem;
+}
+.item {
+  box-sizing: border-box;
+  flex: 0 0 33.3333%;
+  padding: .8rem;
+  overflow: hidden;
+}
+
+@media only screen and (max-width: 64rem) {
+  .item {
+    flex: 0 0 50%;
+  }
+}
+
+@media only screen and (max-width: 48rem) {
+  .item {
+    flex: 0 0 100%;
+  }
+}

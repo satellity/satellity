@@ -1,7 +1,7 @@
 package views
 
 import (
-	"godiscourse/internal/models"
+	"satellity/internal/models"
 	"net/http"
 	"time"
 )
@@ -11,6 +11,8 @@ type GroupView struct {
 	GroupID     string    `json:"group_id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	UsersCount  int64     `json:"users_count"`
+	IsMember    bool      `json:"is_member"`
 	CreatedAt   time.Time `json:"created_at"`
 	UserView    UserView  `json:"user"`
 }
@@ -21,6 +23,8 @@ func buildGroup(group *models.Group) GroupView {
 		GroupID:     group.GroupID,
 		Name:        group.Name,
 		Description: group.Description,
+		UsersCount:  group.UsersCount,
+		IsMember:    group.IsMember,
 		CreatedAt:   group.CreatedAt,
 	}
 	if group.User != nil {

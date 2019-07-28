@@ -1,10 +1,10 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import style from './index.scss';
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
 import API from '../api/index.js';
+import Avatar from '../users/avatar.js';
 import CommentNew from './new.js';
 
 class CommentIndex extends Component {
@@ -13,7 +13,7 @@ class CommentIndex extends Component {
     this.api = new API();
     this.converter = new showdown.Converter();
     this.state = {
-      user: this.api.user.readMe(),
+      user: this.api.user.local(),
       comments: [],
       comments_count: props.commentsCount
     };
@@ -86,7 +86,7 @@ class CommentIndex extends Component {
       return (
         <li className={style.comment} key={comment.comment_id}>
           <div className={style.profile}>
-            <img src={comment.user.avatar_url} alt={comment.user.nickname} className={style.avatar} />
+            <Avatar user={comment.user} />
             <div className={style.detail}>
               {comment.user.nickname}
               <div className={style.time}>

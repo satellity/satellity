@@ -1,37 +1,25 @@
 @import '../assets/css/constant.scss';
 
-.loading {
+.slogan {
+  font-size: 2rem;
+  text-align: center;
+  padding: 3.2rem 0 1.6rem;
+}
+.features {
+  display: flex;
+  justify-content: space-around;
+  font-size: 6rem;
+  color: rgba($color-main-red, $color-main-red-alpha);
+}
+.section {
+  box-sizing: border-box;
   background: white;
   text-align: center;
+  padding: 1.6rem;
+  width: 48%;
 }
-.nodes {
-  background: $color-bg-light-grey;
-  padding: 0.8rem;
-}
-.node {
-  border-radius: .2rem;
-  display: inline-block;
-  font-size: 1rem;
-  padding: .2rem .8rem;
-  margin-right: .4rem;
-  &:hover, &.current {
-    color: white;
-    background: rgba($color-main-red, 0.8);
-  }
-}
-.topics {
-  background: white;
-  padding: 0.8rem;
-}
-.load {
-  background: white;
-  text-align: center;
-  padding: 0.8rem 0;
-}
-@media only screen and (max-width: 64rem) {
-  .node {
-    font-size: 1rem;
-    padding: .2rem .6rem .2rem;
-    margin-right: .2rem;
-  }
+.desc {
+  color: black;
+  font-size: 1.6rem;
+  padding: 1.6rem;
 }

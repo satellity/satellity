@@ -81,6 +81,12 @@ func PasswordTooSimpleError(ctx context.Context) Error {
 	return createError(ctx, http.StatusAccepted, 10013, description, nil)
 }
 
+// TooManyGroupsError means groups count is out of size.
+func TooManyGroupsError(ctx context.Context) Error {
+	description := "Too many groups."
+	return createError(ctx, http.StatusAccepted, 10014, description, nil)
+}
+
 // ServerError means some server error are occurred.
 func ServerError(ctx context.Context, err error) Error {
 	description := http.StatusText(http.StatusInternalServerError)

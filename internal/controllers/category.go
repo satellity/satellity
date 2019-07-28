@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"godiscourse/internal/durable"
-	"godiscourse/internal/models"
-	"godiscourse/internal/session"
-	"godiscourse/internal/views"
+	"satellity/internal/durable"
+	"satellity/internal/models"
+	"satellity/internal/session"
+	"satellity/internal/views"
 	"net/http"
 	"time"
 

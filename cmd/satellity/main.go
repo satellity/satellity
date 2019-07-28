@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"godiscourse/internal/configs"
-	"godiscourse/internal/controllers"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/middleware"
+	"satellity/internal/configs"
+	"satellity/internal/controllers"
+	"satellity/internal/durable"
+	"satellity/internal/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -68,7 +68,7 @@ func main() {
 		log.Panicln(err)
 	}
 
-	config := configs.GetOption()
+	config := configs.AppConfig
 	db := durable.OpenDatabaseClient(context.Background(), &durable.ConnectionInfo{
 		User:     config.Database.User,
 		Password: config.Database.Password,

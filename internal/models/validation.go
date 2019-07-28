@@ -2,7 +2,7 @@ package models
 
 import (
 	"context"
-	"godiscourse/internal/session"
+	"satellity/internal/session"
 	"net"
 	"regexp"
 	"strings"

@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -41,14 +42,24 @@ func TestGroupCRUD(t *testing.T) {
 			assert.Nil(err)
 			assert.NotNil(group)
 
-			new, err := ReadGroup(mctx, uuid.Must(uuid.NewV4()).String())
+			new, err := ReadGroup(mctx, uuid.Must(uuid.NewV4()).String(), nil)
 			assert.Nil(err)
 			assert.Nil(new)
-			new, err = ReadGroup(mctx, group.GroupID)
+			new, err = ReadGroup(mctx, group.GroupID, nil)
 			assert.Nil(err)
 			assert.NotNil(new)
-			users, err := new.Participants(mctx)
+			users, err := new.Participants(mctx, time.Now(), "100")
+			assert.Nil(err)
 			assert.Len(users, 1)
+			groups, err := user.ReadGroups(mctx)
+			assert.Nil(err)
+			assert.Len(groups, 1)
+			groups, err = ReadGroups(mctx)
+			assert.Nil(err)
+			assert.Len(groups, 1)
+			groups, err = user.RelatedGroups(mctx, 100)
+			assert.Nil(err)
+			assert.Len(groups, 1)
 
 			name := "new" + tc.name
 			description := "new" + tc.description
@@ -57,7 +68,7 @@ func TestGroupCRUD(t *testing.T) {
 			assert.NotNil(group)
 			assert.Equal(name, group.Name)
 			assert.Equal(description, group.Description)
-			new, err = ReadGroup(mctx, group.GroupID)
+			new, err = ReadGroup(mctx, group.GroupID, nil)
 			assert.Nil(err)
 			assert.NotNil(new)
 			assert.Equal(name, new.Name)
@@ -67,15 +78,15 @@ func TestGroupCRUD(t *testing.T) {
 			assert.NotNil(err)
 			err = jason.JoinGroup(mctx, group.GroupID, ParticipantRoleMember)
 			assert.Nil(err)
-			new, _ = ReadGroup(mctx, group.GroupID)
+			new, _ = ReadGroup(mctx, group.GroupID, nil)
 			assert.Equal(int64(2), new.UsersCount)
-			users, err = group.Participants(mctx)
+			users, err = group.Participants(mctx, time.Now(), "100")
 			assert.Len(users, 2)
 			err = jason.ExitGroup(mctx, group.GroupID)
 			assert.Nil(err)
-			new, _ = ReadGroup(mctx, group.GroupID)
+			new, _ = ReadGroup(mctx, group.GroupID, nil)
 			assert.Equal(int64(1), new.UsersCount)
-			users, err = group.Participants(mctx)
+			users, err = group.Participants(mctx, time.Now(), "100")
 			assert.Len(users, 1)
 		})
 	}

@@ -2,7 +2,7 @@ package models
 
 import (
 	"context"
-	"godiscourse/internal/durable"
+	"satellity/internal/durable"
 )
 
 type Context struct {

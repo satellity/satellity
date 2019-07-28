@@ -4,12 +4,12 @@ import { Redirect } from 'react-router-dom';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
 
-class UserEdit extends Component {
+class Edit extends Component {
   constructor(props) {
     super(props);
 
     this.api = new API();
-    const user = this.api.user.readMe();
+    const user = this.api.user.local();
     this.state = {
       nickname: user.nickname,
       biography: user.biography,
@@ -21,7 +21,7 @@ class UserEdit extends Component {
   }
 
   componentDidMount() {
-    this.api.user.me().then((user) => {
+    this.api.user.remote().then((user) => {
       this.setState({nickname: user.nickname, biography: user.biography});
     });
   }
@@ -88,4 +88,4 @@ class UserEdit extends Component {
   }
 }
 
-export default UserEdit;
+export default Edit;

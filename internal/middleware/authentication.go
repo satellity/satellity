@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"context"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/models"
-	"godiscourse/internal/session"
-	"godiscourse/internal/views"
+	"satellity/internal/durable"
+	"satellity/internal/models"
+	"satellity/internal/session"
+	"satellity/internal/views"
 	"net/http"
 	"regexp"
 	"strings"
@@ -16,16 +16,20 @@ var whitelist = [][2]string{
 	{"GET", "^/categories"},
 	{"GET", "^/topics"},
 	{"GET", "^/users"},
-	{"GET", "^/groups"},
+	{"GET", "^/groups$"},
+	{"GET", "^/groups/[a-z0-9-]+$"},
 	{"POST", "^/oauth"},
 }
 
 var userWhitelist = [][2]string{
 	{"GET", "^/me"},
 	{"POST", "^/comments"},
+	{"DELETE", "^/comments"},
 	{"POST", "^/topics"},
 	{"POST", "^/me"},
 	{"POST", "^/groups"},
+	{"GET", "^/groups"},
+	{"GET", "^/user"},
 }
 
 type contextValueKey int

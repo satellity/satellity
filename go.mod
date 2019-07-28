@@ -1,4 +1,4 @@
-module godiscourse
+module satellity
 
 go 1.12
 

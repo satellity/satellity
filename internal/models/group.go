@@ -4,8 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"godiscourse/internal/durable"
-	"godiscourse/internal/session"
+	"satellity/internal/durable"
+	"satellity/internal/session"
+	"strconv"
 	"strings"
 	"time"
 
@@ -36,7 +37,8 @@ type Group struct {
 	CreatedAt   time.Time
 	UpdateAt    time.Time
 
-	User *User
+	IsMember bool
+	User     *User
 }
 
 var groupColumns = []string{"group_id", "name", "description", "user_id", "users_count", "created_at", "updated_at"}
@@ -70,9 +72,16 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 	}
 
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		groups, err := findGroupsByUser(ctx, tx, user)
+		if err != nil {
+			return err
+		}
+		if len(groups) > 2 {
+			return session.TooManyGroupsError(ctx)
+		}
 		gcols, gparams := durable.PrepareColumnsWithValues(groupColumns)
 		query := fmt.Sprintf("INSERT INTO groups(%s) VALUES (%s)", gcols, gparams)
-		_, err := tx.ExecContext(ctx, query, group.values()...)
+		_, err = tx.ExecContext(ctx, query, group.values()...)
 		if err != nil {
 			return err
 		}
@@ -80,6 +89,9 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 		return err
 	})
 	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	group.User = user
@@ -121,7 +133,7 @@ func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Gro
 }
 
 // ReadGroup read group by an id
-func ReadGroup(mctx *Context, id string) (*Group, error) {
+func ReadGroup(mctx *Context, id string, current *User) (*Group, error) {
 	ctx := mctx.context
 	var group *Group
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
@@ -131,6 +143,15 @@ func ReadGroup(mctx *Context, id string) (*Group, error) {
 			return err
 		} else if group == nil {
 			return nil
+		}
+		if current != nil {
+			p, err := findParticipant(ctx, tx, group.GroupID, current.UserID)
+			if err != nil {
+				return err
+			}
+			if p != nil {
+				group.IsMember = true
+			}
 		}
 		user, err := findUserByID(ctx, tx, group.UserID)
 		group.User = user
@@ -158,12 +179,24 @@ func findGroup(ctx context.Context, tx *sql.Tx, id string) (*Group, error) {
 }
 
 // Participants return members of a group TODO should support pagination
-func (g *Group) Participants(mctx *Context) ([]*User, error) {
+func (g *Group) Participants(mctx *Context, offset time.Time, limit string) ([]*User, error) {
 	ctx := mctx.context
+
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	l, _ := strconv.ParseInt(limit, 10, 64)
+	if l < 1 || l > 512 {
+		l = 512
+	}
+	if !g.IsMember {
+		offset = time.Now()
+		l = 64
+	}
 	users := make([]*User, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM users u INNER JOIN participants p ON u.user_id=p.user_id WHERE group_id=$1 ORDER BY p.created_at LIMIT 512", "u."+strings.Join(userColumns, ",u."))
-		rows, err := mctx.database.QueryContext(ctx, query, g.GroupID)
+		query := fmt.Sprintf("SELECT %s FROM users u INNER JOIN participants p ON u.user_id=p.user_id WHERE group_id=$1 AND p.created_at<$2 ORDER BY p.created_at LIMIT %d", "u."+strings.Join(userColumns, ",u."), l)
+		rows, err := mctx.database.QueryContext(ctx, query, g.GroupID, time.Now())
 		if err != nil {
 			return err
 		}
@@ -183,4 +216,135 @@ func (g *Group) Participants(mctx *Context) ([]*User, error) {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return users, nil
+}
+
+func ReadGroups(mctx *Context) ([]*Group, error) {
+	ctx := mctx.context
+
+	groups := make([]*Group, 0)
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM groups ORDER BY created_at DESC LIMIT 12", strings.Join(groupColumns, ","))
+		rows, err := mctx.database.QueryContext(ctx, query)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		ids := make([]string, 0)
+		for rows.Next() {
+			group, err := groupFromRow(rows)
+			if err != nil {
+				return err
+			}
+			groups = append(groups, group)
+			ids = append(ids, group.UserID)
+		}
+		set, err := readUserSet(ctx, tx, ids)
+		if err != nil {
+			return err
+		}
+		for i, group := range groups {
+			groups[i].User = set[group.UserID]
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return groups, nil
+}
+
+func ReadGroupsByUser(mctx *Context, userId string) ([]*Group, error) {
+	ctx := mctx.context
+	groups := make([]*Group, 0)
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		user, err := findUserByID(ctx, tx, userId)
+		if err != nil {
+			return err
+		} else if user == nil {
+			return session.NotFoundError(ctx)
+		}
+		groups, err = findGroupsByUser(ctx, tx, user)
+		return err
+	})
+	if err != nil {
+		if sessionErr, ok := err.(session.Error); ok {
+			return nil, sessionErr
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	return groups, nil
+}
+
+func (u *User) ReadGroups(mctx *Context) ([]*Group, error) {
+	ctx := mctx.context
+	groups := make([]*Group, 0)
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		var err error
+		groups, err = findGroupsByUser(ctx, tx, u)
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return groups, nil
+}
+
+func (u *User) RelatedGroups(mctx *Context, limit int64) ([]*Group, error) {
+	ctx := mctx.context
+
+	if limit < 1 || limit > 90 {
+		limit = 90
+	}
+	groups := make([]*Group, 0)
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM groups INNER JOIN participants ON participants.group_id=groups.group_id WHERE participants.user_id=$1 ORDER BY participants.user_id,participants.created_at LIMIT $2", "groups."+strings.Join(groupColumns, ",groups."))
+		rows, err := tx.QueryContext(ctx, query, u.UserID, limit)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		ids := make([]string, 0)
+		for rows.Next() {
+			group, err := groupFromRow(rows)
+			if err != nil {
+				return err
+			}
+			groups = append(groups, group)
+			ids = append(ids, group.UserID)
+		}
+		set, err := readUserSet(ctx, tx, ids)
+		if err != nil {
+			return err
+		}
+		for i, group := range groups {
+			groups[i].User = set[group.UserID]
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return groups, nil
+}
+
+func findGroupsByUser(ctx context.Context, tx *sql.Tx, u *User) ([]*Group, error) {
+	groups := make([]*Group, 0)
+	query := fmt.Sprintf("SELECT %s FROM groups WHERE user_id=$1", strings.Join(groupColumns, ","))
+	rows, err := tx.QueryContext(ctx, query, u.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		group, err := groupFromRow(rows)
+		if err != nil {
+			return nil, err
+		}
+		group.User = u
+		groups = append(groups, group)
+	}
+	return groups, nil
 }

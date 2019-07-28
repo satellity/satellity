@@ -1,0 +1,45 @@
+@import '../assets/css/constant.scss';
+
+.loading {
+  background: white;
+  text-align: center;
+}
+.group {
+  background: white;
+  padding: .8rem;
+}
+.head {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.6rem;
+}
+.title {
+  flex-grow: 1;
+  font-size: .875rem;
+}
+.edit {
+  font-size: 1rem;
+  margin-left: 0.8rem;
+}
+.action {
+  a {
+    background: rgba(218, 40, 16, 0.8);
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    color: white;
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    margin-right: .8rem;
+  }
+}
+.name {
+  margin: 0 0 .2rem;
+}
+.avatar {
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: .4rem;
+}
+.navi {
+  margin-bottom: .8rem;
+}
