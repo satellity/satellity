@@ -1,6 +1,6 @@
 ## Satellity
 
-Satellity is a 100% open source, written in Go. For demo, please visit [https://live.godiscourse.com/](https://live.godiscourse.com/). For feedback, you can submit [issues](https://github.com/satellity/satellity/issues) or join our [slack](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLWE4YjI4MWNiNGM0NDU5MGJiZTNjY2NiYzJhNjQ3NmUxZDA5NDU3ODg2NmY4ODM3NTcyZjIwYmM4OWFiZmEyNjE)([https://bit.ly/2IV6LCW](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLWE4YjI4MWNiNGM0NDU5MGJiZTNjY2NiYzJhNjQ3NmUxZDA5NDU3ODg2NmY4ODM3NTcyZjIwYmM4OWFiZmEyNjE)), Let's learn Go together!
+Satellity is a 100% open source, written in Go. For forum part demo, please visit [https://live.godiscourse.com/](https://live.godiscourse.com/). For feedback, you can submit [issues](https://github.com/satellity/satellity/issues) or join our [slack](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLWE4YjI4MWNiNGM0NDU5MGJiZTNjY2NiYzJhNjQ3NmUxZDA5NDU3ODg2NmY4ODM3NTcyZjIwYmM4OWFiZmEyNjE)([https://bit.ly/2IV6LCW](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLWE4YjI4MWNiNGM0NDU5MGJiZTNjY2NiYzJhNjQ3NmUxZDA5NDU3ODg2NmY4ODM3NTcyZjIwYmM4OWFiZmEyNjE)), Let's learn Go together!
 
 ## Futrue
 
