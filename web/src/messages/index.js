@@ -1,6 +1,7 @@
 import style from './index.scss';
 import React, {Component} from 'react';
 import {Link, Redirect} from 'react-router-dom';
+import TimeAgo from 'react-timeago';
 import API from '../api/index.js';
 import New from './new.js';
 import Avatar from '../users/avatar.js';
@@ -43,10 +44,15 @@ class Index extends Component {
 
     let messages = state.messages.map((message) => {
       return (
-        <li key={message.message_id}>
+        <li key={message.message_id} className={style.message}>
           <div className={style.profile}>
             <Avatar user={message.user} />
-            {message.user.nickname}
+            <div>
+              {message.user.nickname}
+              <div className={style.time}>
+                <TimeAgo date={message.created_at} />
+              </div>
+            </div>
           </div>
           {message.body}
         </li>

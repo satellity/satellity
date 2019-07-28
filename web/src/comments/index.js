@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
 import API from '../api/index.js';
+import Avatar from '../users/avatar.js';
 import CommentNew from './new.js';
 
 class CommentIndex extends Component {
@@ -85,7 +86,7 @@ class CommentIndex extends Component {
       return (
         <li className={style.comment} key={comment.comment_id}>
           <div className={style.profile}>
-            <img src={comment.user.avatar_url} alt={comment.user.nickname} className={style.avatar} />
+            <Avatar user={comment.user} />
             <div className={style.detail}>
               {comment.user.nickname}
               <div className={style.time}>
