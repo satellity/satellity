@@ -1,6 +1,6 @@
 {
   "site": {
-    "slogan": "An open source tool for forum & community. (Pre Alpha)"
+    "features": "Satellity is PRE-ALPHA now! Please be careful when you decide to use it!"
   },
   "general": {
     "all": "View all",
@@ -10,7 +10,7 @@
   },
   "community": {
     "dashboard": "My Topics",
-    "name": "Communities"
+    "name": "Community"
   },
   "group": {
     "dashboard": "My Groups",
@@ -52,8 +52,8 @@
   },
   "home": {
     "latest": "Latest",
-    "forum": "Public forum, you can talk anything here.",
-    "group": "Private group, share your thoughts with couple of friends."
+    "forum": "Forum is public, you can share your thoughts with the world.",
+    "group": "Group is private, share your thoughts with couple of devotee."
   },
   "login": {
     "github": "Sign in with GitHub"
