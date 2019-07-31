@@ -59,6 +59,7 @@
     "node-sass": "^4.12.0",
     "parcel-bundler": "^1.12.3",
     "postcss-modules": "^1.4.1",
+    "sass": "^1.22.9",
     "stylelint": "^10.0.1"
   }
 }
