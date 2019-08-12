@@ -2,9 +2,9 @@ package models
 
 import (
 	"context"
-	"satellity/internal/session"
 	"net"
 	"regexp"
+	"satellity/internal/session"
 	"strings"
 )
 
@@ -21,4 +21,11 @@ func validateEmailFormat(ctx context.Context, email string) error {
 		return session.InvalidEmailFormatError(ctx, email)
 	}
 	return nil
+}
+
+func validateGroupFields(name string) bool {
+	if len(name) < 3 {
+		return false
+	}
+	return true
 }

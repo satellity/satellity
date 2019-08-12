@@ -22,7 +22,7 @@ func TestMessageCRUD(t *testing.T) {
 	group, err := user.CreateGroup(mctx, "Group Name", "Group Description")
 	assert.Nil(err)
 	assert.NotNil(group)
-	users, err := group.Participants(mctx, time.Now(), "100")
+	users, err := group.Participants(mctx, nil, time.Now(), "100")
 	assert.Len(users, 1)
 
 	messageCases := []struct {

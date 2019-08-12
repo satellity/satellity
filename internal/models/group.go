@@ -27,6 +27,10 @@ CREATE TABLE IF NOT EXISTS groups (
 CREATE INDEX IF NOT EXISTS groups_userx ON groups (user_id);
 `
 
+const (
+	MaximumGroupCount = 3
+)
+
 // Group represent the struct of a group
 type Group struct {
 	GroupID     string
@@ -56,10 +60,10 @@ func groupFromRow(row durable.Row) (*Group, error) {
 // CreateGroup create a group by an user
 func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, error) {
 	ctx := mctx.context
-
-	if len(name) < 3 {
+	if !validateGroupFields(name) {
 		return nil, session.BadDataError(ctx)
 	}
+
 	t := time.Now()
 	group := &Group{
 		GroupID:     uuid.Must(uuid.NewV4()).String(),
@@ -76,11 +80,11 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 		if err != nil {
 			return err
 		}
-		if len(groups) > 2 {
+		if len(groups) >= MaximumGroupCount {
 			return session.TooManyGroupsError(ctx)
 		}
-		gcols, gparams := durable.PrepareColumnsWithValues(groupColumns)
-		query := fmt.Sprintf("INSERT INTO groups(%s) VALUES (%s)", gcols, gparams)
+		columns, values := durable.PrepareColumnsWithValues(groupColumns)
+		query := fmt.Sprintf("INSERT INTO groups(%s) VALUES (%s)", columns, values)
 		_, err = tx.ExecContext(ctx, query, group.values()...)
 		if err != nil {
 			return err
@@ -102,7 +106,7 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Group, error) {
 	ctx := mctx.context
 	name, description = strings.TrimSpace(name), strings.TrimSpace(description)
-	if name == "" && description == "" {
+	if len(name) < 3 && description == "" {
 		return nil, session.BadDataError(ctx)
 	}
 
@@ -113,14 +117,14 @@ func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Gro
 		if group.UserID != user.UserID {
 			return session.ForbiddenError(ctx)
 		}
-		if len(name) >= 3 {
+		if name != "" {
 			group.Name = name
 		}
 		if description != "" {
 			group.Description = description
 		}
-		query := "UPDATE groups SET (name, description)=($1,$2) WHERE group_id=$3"
-		_, err = tx.ExecContext(ctx, query, group.Name, group.Description, group.GroupID)
+		query := "UPDATE groups SET (name,description,updated_at)=($1,$2,$3) WHERE group_id=$4"
+		_, err = tx.ExecContext(ctx, query, group.Name, group.Description, time.Now(), group.GroupID)
 		return err
 	})
 	if err != nil {
@@ -141,7 +145,8 @@ func ReadGroup(mctx *Context, id string, current *User) (*Group, error) {
 		group, err = findGroup(ctx, tx, id)
 		if err != nil {
 			return err
-		} else if group == nil {
+		}
+		if group == nil {
 			return nil
 		}
 		if current != nil {
@@ -173,13 +178,13 @@ func findGroup(ctx context.Context, tx *sql.Tx, id string) (*Group, error) {
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
 	}
 	return group, nil
 }
 
 // Participants return members of a group TODO should support pagination
-func (g *Group) Participants(mctx *Context, offset time.Time, limit string) ([]*User, error) {
+func (g *Group) Participants(mctx *Context, current *User, offset time.Time, limit string) ([]*User, error) {
 	ctx := mctx.context
 
 	if offset.IsZero() {
@@ -193,9 +198,10 @@ func (g *Group) Participants(mctx *Context, offset time.Time, limit string) ([]*
 		offset = time.Now()
 		l = 64
 	}
+
 	users := make([]*User, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM users u INNER JOIN participants p ON u.user_id=p.user_id WHERE group_id=$1 AND p.created_at<$2 ORDER BY p.created_at LIMIT %d", "u."+strings.Join(userColumns, ",u."), l)
+		query := fmt.Sprintf("SELECT %s FROM participants p INNER JOIN users u ON u.user_id=p.user_id WHERE p.group_id=$1 AND p.created_at<$2 ORDER BY p.created_at LIMIT %d", "u."+strings.Join(userColumns, ",u."), l)
 		rows, err := mctx.database.QueryContext(ctx, query, g.GroupID, time.Now())
 		if err != nil {
 			return err
@@ -211,7 +217,6 @@ func (g *Group) Participants(mctx *Context, offset time.Time, limit string) ([]*
 		}
 		return nil
 	})
-
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}

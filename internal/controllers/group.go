@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"net/http"
 	"satellity/internal/durable"
 	"satellity/internal/middleware"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
-	"net/http"
 	"time"
 
 	"github.com/dimfeld/httptreemux"
@@ -104,11 +104,12 @@ func (impl *groupImpl) participants(w http.ResponseWriter, r *http.Request, para
 	mctx := models.WrapContext(r.Context(), impl.database)
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
 
-	if group, err := models.ReadGroup(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
+	current := middleware.CurrentUser(r)
+	if group, err := models.ReadGroup(mctx, params["id"], current); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if users, err := group.Participants(mctx, offset, r.URL.Query().Get("limit")); err != nil {
+	} else if users, err := group.Participants(mctx, current, offset, r.URL.Query().Get("limit")); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderUsers(w, r, users)
