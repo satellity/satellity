@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS groups (
 );
 
 CREATE INDEX IF NOT EXISTS groups_userx ON groups (user_id);
+CREATE INDEX IF NOT EXISTS groups_createdx ON groups (created_at);
 
 
 CREATE TABLE IF NOT EXISTS participants (

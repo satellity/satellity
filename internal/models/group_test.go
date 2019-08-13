@@ -54,7 +54,7 @@ func TestGroupCRUD(t *testing.T) {
 			groups, err := user.ReadGroups(mctx)
 			assert.Nil(err)
 			assert.Len(groups, 1)
-			groups, err = ReadGroups(mctx)
+			groups, err = ReadGroups(mctx, time.Now(), 64)
 			assert.Nil(err)
 			assert.Len(groups, 1)
 			groups, err = user.RelatedGroups(mctx, 100)

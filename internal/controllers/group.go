@@ -8,6 +8,7 @@ import (
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
+	"strconv"
 	"time"
 
 	"github.com/dimfeld/httptreemux"
@@ -84,7 +85,9 @@ func (impl *groupImpl) exit(w http.ResponseWriter, r *http.Request, params map[s
 
 func (impl *groupImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if groups, err := models.ReadGroups(mctx); err != nil {
+	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
+	limit, _ := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
+	if groups, err := models.ReadGroups(mctx, offset, limit); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderGroups(w, r, groups)

@@ -223,13 +223,21 @@ func (g *Group) Participants(mctx *Context, current *User, offset time.Time, lim
 	return users, nil
 }
 
-func ReadGroups(mctx *Context) ([]*Group, error) {
+//ReadGroups read groups by offset (time) and limit
+func ReadGroups(mctx *Context, offset time.Time, limit int64) ([]*Group, error) {
 	ctx := mctx.context
+
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	if limit < 0 || limit > 64 {
+		limit = 64
+	}
 
 	groups := make([]*Group, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM groups ORDER BY created_at DESC LIMIT 12", strings.Join(groupColumns, ","))
-		rows, err := mctx.database.QueryContext(ctx, query)
+		query := fmt.Sprintf("SELECT %s FROM groups WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(groupColumns, ","))
+		rows, err := mctx.database.QueryContext(ctx, query, offset, limit)
 		if err != nil {
 			return err
 		}
