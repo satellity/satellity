@@ -65,11 +65,6 @@ It'll be a patreon-like forum.
 2. run `npm install` to prepare front-end.
 3. `npm run dev` and open `http://localhost:1234`
 
-## Docker
-
-1. go to satellity folder
-2. type `docker-compose up` 
-
 ## License
 
 ![https://opensource.org/licenses/MIT](https://img.shields.io/github/license/mashape/apistatus.svg)
