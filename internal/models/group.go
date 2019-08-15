@@ -26,8 +26,10 @@ CREATE TABLE IF NOT EXISTS groups (
 CREATE INDEX IF NOT EXISTS groups_userx ON groups (user_id);
 `
 
+//Group related constants
 const (
-	MaximumGroupCount = 3
+	MaximumGroupCount    = 3
+	MaximumGroupNameSize = 7
 )
 
 // Group represent the struct of a group
@@ -105,7 +107,10 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Group, error) {
 	ctx := mctx.context
 	name, description = strings.TrimSpace(name), strings.TrimSpace(description)
-	if len(name) < 3 && description == "" {
+	if len(name) > 0 && len(name) < MaximumGroupNameSize {
+		return nil, session.BadDataError(ctx)
+	}
+	if len(name) == 0 && description == "" {
 		return nil, session.BadDataError(ctx)
 	}
 
@@ -113,7 +118,10 @@ func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Gro
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		group, err = findGroup(ctx, tx, id)
-		if group.UserID != user.UserID {
+		if err != nil || group == nil {
+			return err
+		}
+		if !isPermit(group.UserID, user) {
 			return session.ForbiddenError(ctx)
 		}
 		if name != "" {
@@ -142,11 +150,8 @@ func ReadGroup(mctx *Context, id string, current *User) (*Group, error) {
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		group, err = findGroup(ctx, tx, id)
-		if err != nil {
+		if err != nil || group == nil {
 			return err
-		}
-		if group == nil {
-			return nil
 		}
 		if current != nil {
 			p, err := findParticipant(ctx, tx, group.GroupID, current.UserID)

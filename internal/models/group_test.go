@@ -26,7 +26,7 @@ func TestGroupCRUD(t *testing.T) {
 		valid       bool
 	}{
 		{"iv", "invalid group name", false},
-		{"group", "valid group name", true},
+		{"valid group", "valid group name", true},
 	}
 
 	for _, tc := range groupCases {
@@ -51,7 +51,7 @@ func TestGroupCRUD(t *testing.T) {
 			users, err := new.Participants(mctx, nil, time.Now(), "100")
 			assert.Nil(err)
 			assert.Len(users, 1)
-			groups, err := user.ReadGroups(mctx)
+			groups, err := ReadGroupsByUser(mctx, user.UserID)
 			assert.Nil(err)
 			assert.Len(groups, 1)
 			groups, err = ReadGroups(mctx, time.Now(), 64)

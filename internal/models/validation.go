@@ -24,7 +24,7 @@ func validateEmailFormat(ctx context.Context, email string) error {
 }
 
 func validateGroupFields(name string) bool {
-	if len(name) < 3 {
+	if len(name) < MaximumGroupNameSize {
 		return false
 	}
 	return true

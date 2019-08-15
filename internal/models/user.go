@@ -364,6 +364,10 @@ func validateAndEncryptPassword(ctx context.Context, password string) (string, e
 	return string(hashedPassword), nil
 }
 
+func isPermit(userID string, user *User) bool {
+	return userID == user.UserID || user.isAdmin()
+}
+
 func userFromRows(row durable.Row) (*User, error) {
 	var u User
 	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.CreatedAt, &u.UpdatedAt)

@@ -60,6 +60,8 @@ func (impl *groupImpl) update(w http.ResponseWriter, r *http.Request, params map
 	mctx := models.WrapContext(r.Context(), impl.database)
 	if group, err := middleware.CurrentUser(r).UpdateGroup(mctx, params["id"], body.Name, body.Description); err != nil {
 		views.RenderErrorResponse(w, r, err)
+	} else if group == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 	} else {
 		views.RenderGroup(w, r, group)
 	}
@@ -98,6 +100,8 @@ func (impl *groupImpl) show(w http.ResponseWriter, r *http.Request, params map[s
 	mctx := models.WrapContext(r.Context(), impl.database)
 	if group, err := models.ReadGroup(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
+	} else if group == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 	} else {
 		views.RenderGroup(w, r, group)
 	}
