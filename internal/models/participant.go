@@ -143,7 +143,7 @@ func (user *User) ExitGroup(mctx *Context, groupID string) error {
 			return err
 		} else if p == nil {
 			return nil
-		} else if p.Role == ParticipantRoleAdmin {
+		} else if p.Role == ParticipantRoleOwner {
 			return nil
 		}
 
@@ -207,4 +207,45 @@ func (g *Group) Participants(mctx *Context, current *User, offset time.Time, lim
 		return nil, session.TransactionError(ctx, err)
 	}
 	return users, nil
+}
+
+func (g *Group) UpdateParticipant(mctx *Context, current *User, id, role string) error {
+	ctx := mctx.context
+	switch role {
+	case ParticipantRoleAdmin,
+		ParticipantRoleVIP,
+		ParticipantRoleMember:
+	default:
+		return session.BadDataError(ctx)
+	}
+	if current.UserID == id {
+		return session.BadDataError(ctx)
+	}
+
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		p, err := findParticipant(ctx, tx, g.GroupID, current.UserID)
+		if err != nil || p == nil {
+			return err
+		}
+		switch p.Role {
+		case ParticipantRoleOwner:
+		case ParticipantRoleAdmin:
+			if role == ParticipantRoleAdmin {
+				return nil
+			}
+		default:
+			return nil
+		}
+		p, err = findParticipant(ctx, tx, g.GroupID, id)
+		if err != nil || p == nil || p.Role == role {
+			return err
+		}
+		p.Role = role
+		_, err = tx.ExecContext(ctx, "UPDATE participants SET role=$1 WHERE group_id=$2 AND user_id=$3", role, p.GroupID, p.UserID)
+		return err
+	})
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
 }

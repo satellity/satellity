@@ -82,6 +82,8 @@ func TestGroupCRUD(t *testing.T) {
 			assert.Equal(int64(2), new.UsersCount)
 			users, err = group.Participants(mctx, nil, time.Now(), "100")
 			assert.Len(users, 2)
+			err = new.UpdateParticipant(mctx, user, jason.UserID, ParticipantRoleAdmin)
+			assert.Nil(err)
 			err = jason.ExitGroup(mctx, group.GroupID)
 			assert.Nil(err)
 			new, _ = ReadGroup(mctx, group.GroupID, nil)

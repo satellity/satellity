@@ -232,11 +232,11 @@ func ReadGroups(mctx *Context, offset time.Time, limit int64) ([]*Group, error) 
 }
 
 //ReadGroupsByUser read user's groups
-func ReadGroupsByUser(mctx *Context, userId string) ([]*Group, error) {
+func ReadGroupsByUser(mctx *Context, userID string) ([]*Group, error) {
 	ctx := mctx.context
 	groups := make([]*Group, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		user, err := findUserByID(ctx, tx, userId)
+		user, err := findUserByID(ctx, tx, userID)
 		if err != nil {
 			return err
 		} else if user == nil {
@@ -275,7 +275,7 @@ func findGroupsByUser(ctx context.Context, tx *sql.Tx, u *User) ([]*Group, error
 }
 
 //RelatedGroups read user's related groups
-func (u *User) RelatedGroups(mctx *Context, limit int64) ([]*Group, error) {
+func (user *User) RelatedGroups(mctx *Context, limit int64) ([]*Group, error) {
 	ctx := mctx.context
 
 	if limit < 1 || limit > 72 {
@@ -284,7 +284,7 @@ func (u *User) RelatedGroups(mctx *Context, limit int64) ([]*Group, error) {
 	groups := make([]*Group, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM groups INNER JOIN participants ON participants.group_id=groups.group_id WHERE participants.user_id=$1 ORDER BY participants.user_id,participants.created_at LIMIT $2", "groups."+strings.Join(groupColumns, ",groups."))
-		rows, err := tx.QueryContext(ctx, query, u.UserID, limit)
+		rows, err := tx.QueryContext(ctx, query, user.UserID, limit)
 		if err != nil {
 			return err
 		}
