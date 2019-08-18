@@ -31,6 +31,7 @@ const (
 	ParticipantRoleAdmin  = "ADMIN"
 	ParticipantRoleVIP    = "VIP"
 	ParticipantRoleMember = "MEMBER"
+	ParticipantRoleGuest  = "GUEST"
 )
 
 // Participant represents the struct of a group member

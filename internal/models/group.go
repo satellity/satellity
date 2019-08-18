@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS groups (
 	group_id               VARCHAR(36) PRIMARY KEY,
 	name                   VARCHAR(512) NOT NULL,
 	description            TEXT NOT NULL,
+	cover_url              VARCHAR(1024) NOT NULL,
 	user_id                VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
 	users_count            BIGINT NOT NULL DEFAULT 0,
 	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -25,8 +26,10 @@ CREATE TABLE IF NOT EXISTS groups (
 );
 
 CREATE INDEX IF NOT EXISTS groups_userx ON groups (user_id);
+CREATE INDEX IF NOT EXISTS groups_createdx ON groups (created_at);
 `
 
+// Group related constants
 const (
 	MaximumGroupCount = 3
 )
@@ -41,8 +44,8 @@ type Group struct {
 	CreatedAt   time.Time
 	UpdateAt    time.Time
 
-	IsMember bool
-	User     *User
+	Role string
+	User *User
 }
 
 var groupColumns = []string{"group_id", "name", "description", "user_id", "users_count", "created_at", "updated_at"}
@@ -155,7 +158,7 @@ func ReadGroup(mctx *Context, id string, current *User) (*Group, error) {
 				return err
 			}
 			if p != nil {
-				group.IsMember = true
+				group.Role = p.Role
 			}
 		}
 		user, err := findUserByID(ctx, tx, group.UserID)
@@ -194,7 +197,7 @@ func (g *Group) Participants(mctx *Context, current *User, offset time.Time, lim
 	if l < 1 || l > 512 {
 		l = 512
 	}
-	if !g.IsMember {
+	if g.Role == ParticipantRoleGuest {
 		offset = time.Now()
 		l = 64
 	}
@@ -230,7 +233,7 @@ func ReadGroups(mctx *Context, offset time.Time, limit int64) ([]*Group, error) 
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	if limit < 0 || limit > 64 {
+	if limit <= 0 || limit >= 64 {
 		limit = 64
 	}
 
@@ -360,4 +363,11 @@ func findGroupsByUser(ctx context.Context, tx *sql.Tx, u *User) ([]*Group, error
 		groups = append(groups, group)
 	}
 	return groups, nil
+}
+
+func (g *Group) GetRole() string {
+	if g.Role != "" {
+		return g.Role
+	}
+	return ParticipantRoleGuest
 }

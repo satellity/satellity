@@ -126,7 +126,7 @@ func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error
 		offset = time.Now()
 	}
 	limit := 64
-	if !g.IsMember {
+	if g.Role == ParticipantRoleGuest {
 		offset = time.Now()
 		limit = 8
 	}
