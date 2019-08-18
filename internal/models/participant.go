@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -143,7 +144,7 @@ func (user *User) ExitGroup(mctx *Context, groupID string) error {
 			return err
 		} else if p == nil {
 			return nil
-		} else if p.Role == ParticipantRoleAdmin {
+		} else if p.Role == ParticipantRoleOwner {
 			return nil
 		}
 
@@ -164,6 +165,87 @@ func (user *User) ExitGroup(mctx *Context, groupID string) error {
 		if _, ok := err.(session.Error); ok {
 			return err
 		}
+		return session.TransactionError(ctx, err)
+	}
+	return nil
+}
+
+// Participants return members of a group TODO should support pagination
+func (g *Group) Participants(mctx *Context, current *User, offset time.Time, limit string) ([]*User, error) {
+	ctx := mctx.context
+
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	l, _ := strconv.ParseInt(limit, 10, 64)
+	if l < 1 || l > 512 {
+		l = 512
+	}
+	if g.GetRole() == ParticipantRoleGuest {
+		offset = time.Now()
+		l = 64
+	}
+
+	users := make([]*User, 0)
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM participants p INNER JOIN users u ON u.user_id=p.user_id WHERE p.group_id=$1 AND p.created_at<$2 ORDER BY p.created_at LIMIT %d", "u."+strings.Join(userColumns, ",u."), l)
+		rows, err := mctx.database.QueryContext(ctx, query, g.GroupID, time.Now())
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			user, err := userFromRows(rows)
+			if err != nil {
+				return err
+			}
+			users = append(users, user)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return users, nil
+}
+
+func (g *Group) UpdateParticipant(mctx *Context, current *User, id, role string) error {
+	ctx := mctx.context
+	switch role {
+	case ParticipantRoleAdmin,
+		ParticipantRoleVIP,
+		ParticipantRoleMember:
+	default:
+		return session.BadDataError(ctx)
+	}
+	if current.UserID == id {
+		return session.BadDataError(ctx)
+	}
+
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		p, err := findParticipant(ctx, tx, g.GroupID, current.UserID)
+		if err != nil || p == nil {
+			return err
+		}
+		switch p.Role {
+		case ParticipantRoleOwner:
+		case ParticipantRoleAdmin:
+			if role == ParticipantRoleAdmin {
+				return nil
+			}
+		default:
+			return nil
+		}
+		p, err = findParticipant(ctx, tx, g.GroupID, id)
+		if err != nil || p == nil || p.Role == role {
+			return err
+		}
+		p.Role = role
+		_, err = tx.ExecContext(ctx, "UPDATE participants SET role=$1 WHERE group_id=$2 AND user_id=$3", role, p.GroupID, p.UserID)
+		return err
+	})
+	if err != nil {
 		return session.TransactionError(ctx, err)
 	}
 	return nil

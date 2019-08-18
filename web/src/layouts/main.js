@@ -48,29 +48,57 @@ class MainLayout extends Component {
   }
 }
 
-const Header = () => {
-  const user = new API().user;
-  let profile;
-  if (user.loggedIn()) {
-    profile = (
-      <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {user.local().nickname} </Link>
-    );
+class Header extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {logging: false};
+
+    this.handleLoginClick = this.handleLoginClick.bind(this);
   }
-  return (
-    <header className={style.header}>
-      <Link to='/' className={style.brand}>
-        <FontAwesomeIcon icon={['fa', 'home']} />
-      </Link>
-      <div className={style.site}><span className={style.name}>{Config.Name}</span></div>
-      <Link to='/groups' className={style.navi}>
-        {i18n.t('group.name')}
-      </Link>
-      <Link to='/community' className={style.navi}>
-        {i18n.t('community.name')}
-      </Link>
-      {profile}
-    </header>
-  )
+
+  handleLoginClick(e) {
+    this.setState({logging: !this.state.logging});
+  }
+
+  render() {
+    const user = new API().user;
+    let profile = <a className={style.navi} onClick={this.handleLoginClick}>Login</a>;
+    if (user.loggedIn()) {
+      profile = (
+        <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {user.local().nickname} </Link>
+      );
+    }
+    let modal;
+    if (!user.loggedIn()) {
+      modal = (
+        <div className={style.modal}>
+          <div className={style.modalContainer}>
+            <div onClick={this.handleLoginClick} className={style.action}>✕</div>
+            <div className={style.app}>Login Satellity</div>
+            <div className={style.content}>
+              <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`}>{i18n.t('login.github')}</a>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    return (
+      <header className={style.header}>
+        <Link to='/' className={style.brand}>
+          <FontAwesomeIcon icon={['fa', 'home']} />
+        </Link>
+        <div className={style.site}><span className={style.name}>{Config.Name}</span></div>
+        <Link to='/groups' className={style.navi}>
+            {i18n.t('group.name')}
+        </Link>
+        <Link to='/community' className={style.navi}>
+            {i18n.t('community.name')}
+        </Link>
+        {profile}
+        {this.state.logging && modal}
+      </header>
+    )
+  }
 }
 
 export default MainLayout;

@@ -34,6 +34,7 @@
   text-align: center;
 }
 .navi {
+  cursor: pointer;
   color: white;
   display: inline-block;
   font-size: 1rem;
@@ -51,6 +52,51 @@
   &.user {
     max-width: 6rem;
     overflow: hidden;
+  }
+}
+
+.modal {
+  background: rgba(0,0,0,.2);
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+}
+.modalContainer {
+  background: white;
+  border-radius: .2rem;
+  color: black;
+  width: 36rem;
+  max-width: 98%;
+  padding: 1.6rem 3.2rem;
+  position: relative;
+}
+.action {
+  cursor: pointer;
+  text-align: right;
+  position: absolute;
+  right: .8rem;
+  top: .6rem;
+}
+.app {
+  margin-bottom: 3.2rem;
+}
+.content {
+  text-align: center;
+  a {
+    background: rgba(218, 40, 16, 0.8);
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    color: white;
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    width: 16rem;
   }
 }
 

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
-	"strconv"
 	"strings"
 	"time"
 
@@ -29,9 +28,10 @@ CREATE INDEX IF NOT EXISTS groups_userx ON groups (user_id);
 CREATE INDEX IF NOT EXISTS groups_createdx ON groups (created_at);
 `
 
-// Group related constants
+//Group related constants
 const (
-	MaximumGroupCount = 3
+	MaximumGroupCount    = 3
+	MaximumGroupNameSize = 7
 )
 
 // Group represent the struct of a group
@@ -109,7 +109,10 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Group, error) {
 	ctx := mctx.context
 	name, description = strings.TrimSpace(name), strings.TrimSpace(description)
-	if len(name) < 3 && description == "" {
+	if len(name) > 0 && len(name) < MaximumGroupNameSize {
+		return nil, session.BadDataError(ctx)
+	}
+	if len(name) == 0 && description == "" {
 		return nil, session.BadDataError(ctx)
 	}
 
@@ -117,7 +120,10 @@ func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Gro
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		group, err = findGroup(ctx, tx, id)
-		if group.UserID != user.UserID {
+		if err != nil || group == nil {
+			return err
+		}
+		if !isPermit(group.UserID, user) {
 			return session.ForbiddenError(ctx)
 		}
 		if name != "" {
@@ -146,11 +152,8 @@ func ReadGroup(mctx *Context, id string, current *User) (*Group, error) {
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		group, err = findGroup(ctx, tx, id)
-		if err != nil {
+		if err != nil || group == nil {
 			return err
-		}
-		if group == nil {
-			return nil
 		}
 		if current != nil {
 			p, err := findParticipant(ctx, tx, group.GroupID, current.UserID)
@@ -184,46 +187,6 @@ func findGroup(ctx context.Context, tx *sql.Tx, id string) (*Group, error) {
 		return nil, err
 	}
 	return group, nil
-}
-
-// Participants return members of a group TODO should support pagination
-func (g *Group) Participants(mctx *Context, current *User, offset time.Time, limit string) ([]*User, error) {
-	ctx := mctx.context
-
-	if offset.IsZero() {
-		offset = time.Now()
-	}
-	l, _ := strconv.ParseInt(limit, 10, 64)
-	if l < 1 || l > 512 {
-		l = 512
-	}
-	if g.Role == ParticipantRoleGuest {
-		offset = time.Now()
-		l = 64
-	}
-
-	users := make([]*User, 0)
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM participants p INNER JOIN users u ON u.user_id=p.user_id WHERE p.group_id=$1 AND p.created_at<$2 ORDER BY p.created_at LIMIT %d", "u."+strings.Join(userColumns, ",u."), l)
-		rows, err := mctx.database.QueryContext(ctx, query, g.GroupID, time.Now())
-		if err != nil {
-			return err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			user, err := userFromRows(rows)
-			if err != nil {
-				return err
-			}
-			users = append(users, user)
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return users, nil
 }
 
 //ReadGroups read groups by offset (time) and limit
@@ -270,11 +233,12 @@ func ReadGroups(mctx *Context, offset time.Time, limit int64) ([]*Group, error) 
 	return groups, nil
 }
 
-func ReadGroupsByUser(mctx *Context, userId string) ([]*Group, error) {
+//ReadGroupsByUser read user's groups
+func ReadGroupsByUser(mctx *Context, userID string) ([]*Group, error) {
 	ctx := mctx.context
 	groups := make([]*Group, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		user, err := findUserByID(ctx, tx, userId)
+		user, err := findUserByID(ctx, tx, userID)
 		if err != nil {
 			return err
 		} else if user == nil {
@@ -292,30 +256,37 @@ func ReadGroupsByUser(mctx *Context, userId string) ([]*Group, error) {
 	return groups, nil
 }
 
-func (u *User) ReadGroups(mctx *Context) ([]*Group, error) {
-	ctx := mctx.context
+func findGroupsByUser(ctx context.Context, tx *sql.Tx, u *User) ([]*Group, error) {
 	groups := make([]*Group, 0)
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		groups, err = findGroupsByUser(ctx, tx, u)
-		return err
-	})
+	query := fmt.Sprintf("SELECT %s FROM groups WHERE user_id=$1", strings.Join(groupColumns, ","))
+	rows, err := tx.QueryContext(ctx, query, u.UserID)
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		group, err := groupFromRow(rows)
+		if err != nil {
+			return nil, err
+		}
+		group.User = u
+		groups = append(groups, group)
 	}
 	return groups, nil
 }
 
-func (u *User) RelatedGroups(mctx *Context, limit int64) ([]*Group, error) {
+//RelatedGroups read user's related groups
+func (user *User) RelatedGroups(mctx *Context, limit int64) ([]*Group, error) {
 	ctx := mctx.context
 
-	if limit < 1 || limit > 90 {
-		limit = 90
+	if limit < 1 || limit > 72 {
+		limit = 72
 	}
 	groups := make([]*Group, 0)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM groups INNER JOIN participants ON participants.group_id=groups.group_id WHERE participants.user_id=$1 ORDER BY participants.user_id,participants.created_at LIMIT $2", "groups."+strings.Join(groupColumns, ",groups."))
-		rows, err := tx.QueryContext(ctx, query, u.UserID, limit)
+		rows, err := tx.QueryContext(ctx, query, user.UserID, limit)
 		if err != nil {
 			return err
 		}
@@ -345,26 +316,7 @@ func (u *User) RelatedGroups(mctx *Context, limit int64) ([]*Group, error) {
 	return groups, nil
 }
 
-func findGroupsByUser(ctx context.Context, tx *sql.Tx, u *User) ([]*Group, error) {
-	groups := make([]*Group, 0)
-	query := fmt.Sprintf("SELECT %s FROM groups WHERE user_id=$1", strings.Join(groupColumns, ","))
-	rows, err := tx.QueryContext(ctx, query, u.UserID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		group, err := groupFromRow(rows)
-		if err != nil {
-			return nil, err
-		}
-		group.User = u
-		groups = append(groups, group)
-	}
-	return groups, nil
-}
-
+//GetRole get participant role in the group
 func (g *Group) GetRole() string {
 	if g.Role != "" {
 		return g.Role
