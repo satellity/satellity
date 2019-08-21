@@ -1,6 +1,7 @@
 import style from './dashboard.scss';
 import React, {Component} from 'react';
 import {Link, Redirect} from 'react-router-dom';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import API from '../api/index.js';
 import TopicItem from '../topics/item.js';
 import GroupItem from '../groups/item.js';
@@ -56,7 +57,6 @@ class Dashboard extends Component {
             state.groups.length < 3 &&
             <Link to='/groups/new'>{i18n.t('group.new')}</Link>
           }
-          <Link to='/topics/new'>{i18n.t('topic.new')}</Link>
         </div>
         {
           state.groups.length != 0 &&
@@ -76,7 +76,12 @@ class Dashboard extends Component {
         {
           state.topics.length != 0 &&
           <div>
-            {i18n.t('community.dashboard')}
+            <div className={style.title}>
+                {i18n.t('community.dashboard')}
+              <Link to='/topics/new'>
+                <FontAwesomeIcon icon={['fa', 'plus']} />
+              </Link>
+            </div>
             <div className={style.section}>
               {topics}
             </div>

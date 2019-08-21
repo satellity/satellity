@@ -39,6 +39,13 @@
   padding: .8rem;
   overflow: hidden;
 }
+.title {
+  display: flex;
+  a {
+    color: $color-main-red;
+    margin-left: .4rem;
+  }
+}
 .section {
   margin: .8rem 0;
   padding: .8rem;

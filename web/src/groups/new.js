@@ -91,7 +91,7 @@ class New extends Component {
             {title}
             <form onSubmit={this.handleSubmit}>
               <div>
-                <input type='text' name='name' pattern='.{3,}' required value={state.name} autoComplete='off' placeholder='Name *' onChange={this.handleChange} />
+                <input type='text' name='name' pattern='.{3,}' required value={state.name} autoComplete='off' placeholder='Group Name *' onChange={this.handleChange} />
               </div>
               <div className={style.body}>
                 <CodeMirror
