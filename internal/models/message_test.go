@@ -34,10 +34,10 @@ func TestMessageCRUD(t *testing.T) {
 
 	for _, tc := range messageCases {
 		t.Run(fmt.Sprintf("Message %s", tc.Body), func(t *testing.T) {
-			message, err := user.CreateMessage(mctx, uuid.Must(uuid.NewV4()).String(), tc.Body)
+			message, err := user.CreateMessage(mctx, uuid.Must(uuid.NewV4()).String(), tc.Body, "")
 			assert.NotNil(err)
 			assert.Nil(message)
-			message, err = user.CreateMessage(mctx, group.GroupID, tc.Body)
+			message, err = user.CreateMessage(mctx, group.GroupID, tc.Body, "")
 			assert.Nil(err)
 			assert.NotNil(message)
 			new, err := ReadMessage(mctx, message.MessageID)
@@ -55,6 +55,12 @@ func TestMessageCRUD(t *testing.T) {
 			new, err = user.UpdateMessage(mctx, message.MessageID, "New"+tc.Body)
 			assert.Nil(err)
 			assert.NotNil(new)
+			sub, err := user.CreateMessage(mctx, group.GroupID, tc.Body, new.MessageID)
+			assert.Nil(err)
+			assert.NotNil(sub)
+			messages, err = group.ReadMessages(mctx, time.Now())
+			assert.Nil(err)
+			assert.Len(messages, 2)
 			err = jade.DeleteMessage(mctx, message.MessageID)
 			assert.NotNil(err)
 			err = user.DeleteMessage(mctx, message.MessageID)

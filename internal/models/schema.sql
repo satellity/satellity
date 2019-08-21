@@ -135,8 +135,10 @@ CREATE TABLE IF NOT EXISTS messages (
 	body                 TEXT NOT NULL,
 	group_id             VARCHAR(36) NOT NULL REFERENCES groups ON DELETE CASCADE,
 	user_id              VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
+	parent_id            VARCHAR(36) NOT NULL,
 	created_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS messages_groupx ON messages (group_id);
+CREATE INDEX IF NOT EXISTS messages_parent_createdx ON messages (parent_id,created_at);

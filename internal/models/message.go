@@ -18,11 +18,13 @@ CREATE TABLE IF NOT EXISTS messages (
 	body                 TEXT NOT NULL,
 	group_id             VARCHAR(36) NOT NULL REFERENCES groups ON DELETE CASCADE,
 	user_id              VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
+	parent_id            VARCHAR(36) NOT NULL,
 	created_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	updated_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS messages_groupx ON messages (group_id);
+CREATE INDEX IF NOT EXISTS messages_parent_createdx ON messages (parent_id,created_at);
 `
 
 // Message represent the struct of a message
@@ -31,26 +33,27 @@ type Message struct {
 	Body      string
 	GroupID   string
 	UserID    string
+	ParentID  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
 	User *User
 }
 
-var messageColumns = []string{"message_id", "body", "group_id", "user_id", "created_at", "updated_at"}
+var messageColumns = []string{"message_id", "body", "group_id", "user_id", "parent_id", "created_at", "updated_at"}
 
 func (m *Message) values() []interface{} {
-	return []interface{}{m.MessageID, m.Body, m.GroupID, m.UserID, m.CreatedAt, m.UpdatedAt}
+	return []interface{}{m.MessageID, m.Body, m.GroupID, m.UserID, m.ParentID, m.CreatedAt, m.UpdatedAt}
 }
 
 func messageFromRow(row durable.Row) (*Message, error) {
 	var m Message
-	err := row.Scan(&m.MessageID, &m.Body, &m.GroupID, &m.UserID, &m.CreatedAt, &m.UpdatedAt)
+	err := row.Scan(&m.MessageID, &m.Body, &m.GroupID, &m.UserID, &m.ParentID, &m.CreatedAt, &m.UpdatedAt)
 	return &m, err
 }
 
 // CreateMessage create a message
-func (u *User) CreateMessage(mctx *Context, groupID, body string) (*Message, error) {
+func (u *User) CreateMessage(mctx *Context, groupID, body, parentID string) (*Message, error) {
 	ctx := mctx.context
 	body = strings.TrimSpace(body)
 	if len(body) < 1 {
@@ -65,12 +68,22 @@ func (u *User) CreateMessage(mctx *Context, groupID, body string) (*Message, err
 			return session.ForbiddenError(ctx)
 		}
 
+		id := uuid.Must(uuid.NewV4()).String()
+		parentID = id
+		parent, err := findMessageByID(ctx, tx, parentID)
+		if err != nil {
+			return err
+		} else if parent != nil {
+			parentID = parent.MessageID
+		}
+
 		t := time.Now()
 		message = &Message{
-			MessageID: uuid.Must(uuid.NewV4()).String(),
+			MessageID: id,
 			Body:      body,
 			GroupID:   groupID,
 			UserID:    u.UserID,
+			ParentID:  parentID,
 			CreatedAt: t,
 			UpdatedAt: t,
 		}
@@ -125,7 +138,7 @@ func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	limit := 64
+	limit := 16
 	if g.Role == ParticipantRoleGuest {
 		offset = time.Now()
 		limit = 8

@@ -39,6 +39,7 @@ type Group struct {
 	GroupID     string
 	Name        string
 	Description string
+	CoverURL    string
 	UserID      string
 	UsersCount  int64
 	CreatedAt   time.Time
@@ -48,15 +49,15 @@ type Group struct {
 	User *User
 }
 
-var groupColumns = []string{"group_id", "name", "description", "user_id", "users_count", "created_at", "updated_at"}
+var groupColumns = []string{"group_id", "name", "description", "cover_url", "user_id", "users_count", "created_at", "updated_at"}
 
 func (g *Group) values() []interface{} {
-	return []interface{}{g.GroupID, g.Name, g.Description, g.UserID, g.UsersCount, g.CreatedAt, g.UpdateAt}
+	return []interface{}{g.GroupID, g.Name, g.Description, g.CoverURL, g.UserID, g.UsersCount, g.CreatedAt, g.UpdateAt}
 }
 
 func groupFromRow(row durable.Row) (*Group, error) {
 	var g Group
-	err := row.Scan(&g.GroupID, &g.Name, &g.Description, &g.UserID, &g.UsersCount, &g.CreatedAt, &g.UpdateAt)
+	err := row.Scan(&g.GroupID, &g.Name, &g.Description, &g.CoverURL, &g.UserID, &g.UsersCount, &g.CreatedAt, &g.UpdateAt)
 	return &g, err
 }
 
@@ -72,6 +73,7 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 		GroupID:     uuid.Must(uuid.NewV4()).String(),
 		Name:        name,
 		Description: description,
+		CoverURL:    "",
 		UserID:      user.UserID,
 		UsersCount:  1,
 		CreatedAt:   t,

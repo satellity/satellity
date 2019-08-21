@@ -2,17 +2,18 @@ package controllers
 
 import (
 	"encoding/json"
+	"net/http"
 	"satellity/internal/durable"
 	"satellity/internal/middleware"
 	"satellity/internal/models"
 	"satellity/internal/views"
-	"net/http"
 
 	"github.com/dimfeld/httptreemux"
 )
 
 type messageRequest struct {
-	Body string `json:"body"`
+	ParentID string `json:"parent_id"`
+	Body     string `json:"body"`
 }
 
 type messageImpl struct {
@@ -34,7 +35,7 @@ func (impl *messageImpl) create(w http.ResponseWriter, r *http.Request, params m
 	}
 
 	mctx := models.WrapContext(r.Context(), impl.database)
-	message, err := middleware.CurrentUser(r).CreateMessage(mctx, params["id"], body.Body)
+	message, err := middleware.CurrentUser(r).CreateMessage(mctx, params["id"], body.Body, body.ParentID)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
