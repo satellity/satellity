@@ -11,6 +11,7 @@ type GroupView struct {
 	GroupID     string    `json:"group_id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	CoverURL    string    `json:"cover_url"`
 	UsersCount  int64     `json:"users_count"`
 	Role        string    `json:"role"`
 	CreatedAt   time.Time `json:"created_at"`
@@ -23,6 +24,7 @@ func buildGroup(group *models.Group) GroupView {
 		GroupID:     group.GroupID,
 		Name:        group.Name,
 		Description: group.Description,
+		CoverURL:    group.CoverURL,
 		UsersCount:  group.UsersCount,
 		Role:        group.GetRole(),
 		CreatedAt:   group.CreatedAt,

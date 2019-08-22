@@ -146,7 +146,7 @@ func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error
 
 	var messages []*Message
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM messages WHERE created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(messageColumns, ","))
+		query := "SELECT message_id FROM messages WHERE message_id=parent_id AND created_at<$1 ORDER BY parent_id,created_at DESC LIMIT $2"
 		rows, err := tx.QueryContext(ctx, query, offset, limit)
 		if err != nil {
 			return err
@@ -154,17 +154,38 @@ func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error
 		defer rows.Close()
 
 		userIds := make([]string, 0)
+		messageIds := make([]string, 0)
 		for rows.Next() {
-			msg, err := messageFromRow(rows)
+			var id string
+			err := rows.Scan(&id)
+			if err != nil {
+				return err
+			}
+			messageIds = append(messageIds, id)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+
+		query = fmt.Sprintf("SELECT %s FROM messages WHERE message_id=parent_id AND created_at<$1 ORDER BY parent_id,created_at DESC LIMIT $2", strings.Join(messageColumns, ","))
+		frows, err := tx.QueryContext(ctx, query, offset, limit)
+		if err != nil {
+			return err
+		}
+		defer frows.Close()
+
+		for frows.Next() {
+			msg, err := messageFromRow(frows)
 			if err != nil {
 				return err
 			}
 			userIds = append(userIds, msg.UserID)
 			messages = append(messages, msg)
 		}
-		if err := rows.Err(); err != nil {
+		if err := frows.Err(); err != nil {
 			return err
 		}
+
 		userSet, err := readUserSet(ctx, tx, userIds)
 		if err != nil {
 			return err
@@ -222,12 +243,16 @@ func (user *User) DeleteMessage(mctx *Context, id string) error {
 		if err != nil {
 			return err
 		} else if message == nil {
-			return session.ForbiddenError(ctx)
+			return nil
 		}
 		if message.UserID != user.UserID && !user.isAdmin() {
 			return session.ForbiddenError(ctx)
 		}
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("DELETE FROM messages WHERE message_id=$1"), id)
+		query := "DELETE FROM messages WHERE message_id=$1"
+		if message.ParentID == message.MessageID {
+			query = "DELETE FROM messages WHERE parent_id=$1"
+		}
+		_, err = tx.ExecContext(ctx, query, id)
 		return err
 	})
 	if err != nil {

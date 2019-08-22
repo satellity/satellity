@@ -1,8 +1,8 @@
 package views
 
 import (
-	"satellity/internal/models"
 	"net/http"
+	"satellity/internal/models"
 	"time"
 )
 
@@ -12,6 +12,7 @@ type MessageView struct {
 	Body      string    `json:"body"`
 	GroupID   string    `json:"group_id"`
 	UserID    string    `json:"user_id"`
+	ParentID  string    `json:"parent_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	User      UserView  `json:"user"`
@@ -24,6 +25,7 @@ func buildMessage(message *models.Message) MessageView {
 		Body:      message.Body,
 		GroupID:   message.GroupID,
 		UserID:    message.UserID,
+		ParentID:  message.ParentID,
 		CreatedAt: message.CreatedAt,
 		UpdatedAt: message.UpdatedAt,
 		User:      buildUser(message.User),
