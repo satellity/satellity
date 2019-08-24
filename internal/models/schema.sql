@@ -1,13 +1,14 @@
 CREATE TABLE IF NOT EXISTS users (
-  user_id               VARCHAR(36) PRIMARY KEY,
-  email                 VARCHAR(512),
-  username              VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
-  nickname              VARCHAR(64) NOT NULL DEFAULT '',
-  biography             VARCHAR(2048) NOT NULL DEFAULT '',
-  encrypted_password    VARCHAR(1024),
-  github_id             VARCHAR(1024) UNIQUE,
-  created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+  user_id                VARCHAR(36) PRIMARY KEY,
+  email                  VARCHAR(512),
+  username               VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
+  nickname               VARCHAR(64) NOT NULL DEFAULT '',
+  biography              VARCHAR(2048) NOT NULL DEFAULT '',
+  encrypted_password     VARCHAR(1024),
+  github_id              VARCHAR(1024) UNIQUE,
+  groups_count           BIGINT NOT NULL DEFAULT 0,
+  created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_emailx ON users ((LOWER(email)));

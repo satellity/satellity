@@ -3,21 +3,22 @@ package views
 import (
 	"crypto/md5"
 	"fmt"
-	"satellity/internal/models"
 	"net/http"
+	"satellity/internal/models"
 	"strings"
 	"time"
 )
 
 // UserView is the response body of user
 type UserView struct {
-	Type      string    `json:"type"`
-	UserID    string    `json:"user_id"`
-	Nickname  string    `json:"nickname"`
-	Biography string    `json:"biography"`
-	AvatarURL string    `json:"avatar_url"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Type        string    `json:"type"`
+	UserID      string    `json:"user_id"`
+	Nickname    string    `json:"nickname"`
+	Biography   string    `json:"biography"`
+	AvatarURL   string    `json:"avatar_url"`
+	GroupsCount int64     `json:"groups_count"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 // AccountView is the response body of a sign in user
@@ -31,13 +32,14 @@ type AccountView struct {
 
 func buildUser(user *models.User) UserView {
 	return UserView{
-		Type:      "user",
-		UserID:    user.UserID,
-		Nickname:  user.Name(),
-		Biography: user.Biography,
-		AvatarURL: fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=180&d=wavatar", md5.Sum([]byte(strings.ToLower(user.Email.String)))),
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
+		Type:        "user",
+		UserID:      user.UserID,
+		Nickname:    user.Name(),
+		Biography:   user.Biography,
+		AvatarURL:   fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=180&d=wavatar", md5.Sum([]byte(strings.ToLower(user.Email.String)))),
+		GroupsCount: user.GroupsCount,
+		CreatedAt:   user.CreatedAt,
+		UpdatedAt:   user.UpdatedAt,
 	}
 }
 

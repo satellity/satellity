@@ -25,15 +25,16 @@ const (
 
 const usersDDL = `
 CREATE TABLE IF NOT EXISTS users (
-	user_id               VARCHAR(36) PRIMARY KEY,
-	email                 VARCHAR(512),
-	username              VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
-	nickname              VARCHAR(64) NOT NULL DEFAULT '',
-	biography             VARCHAR(2048) NOT NULL DEFAULT '',
-	encrypted_password    VARCHAR(1024),
-	github_id             VARCHAR(1024) UNIQUE,
-	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+	user_id                VARCHAR(36) PRIMARY KEY,
+	email                  VARCHAR(512),
+	username               VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
+	nickname               VARCHAR(64) NOT NULL DEFAULT '',
+	biography              VARCHAR(2048) NOT NULL DEFAULT '',
+	encrypted_password     VARCHAR(1024),
+	github_id              VARCHAR(1024) UNIQUE,
+	groups_count           BIGINT NOT NULL DEFAULT 0,
+	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+	updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_emailx ON users ((LOWER(email)));
@@ -50,6 +51,7 @@ type User struct {
 	Biography         string
 	EncryptedPassword sql.NullString
 	GithubID          sql.NullString
+	GroupsCount       int64
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 
@@ -57,10 +59,16 @@ type User struct {
 	isNew     bool
 }
 
-var userColumns = []string{"user_id", "email", "username", "nickname", "biography", "encrypted_password", "github_id", "created_at", "updated_at"}
+var userColumns = []string{"user_id", "email", "username", "nickname", "biography", "encrypted_password", "github_id", "groups_count", "created_at", "updated_at"}
 
 func (u *User) values() []interface{} {
-	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.Biography, u.EncryptedPassword, u.GithubID, u.CreatedAt, u.UpdatedAt}
+	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.Biography, u.EncryptedPassword, u.GithubID, u.GroupsCount, u.CreatedAt, u.UpdatedAt}
+}
+
+func userFromRows(row durable.Row) (*User, error) {
+	var u User
+	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.GroupsCount, &u.CreatedAt, &u.UpdatedAt)
+	return &u, err
 }
 
 // CreateUser create a new user
@@ -366,10 +374,4 @@ func validateAndEncryptPassword(ctx context.Context, password string) (string, e
 
 func isPermit(userID string, user *User) bool {
 	return userID == user.UserID || user.isAdmin()
-}
-
-func userFromRows(row durable.Row) (*User, error) {
-	var u User
-	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.CreatedAt, &u.UpdatedAt)
-	return &u, err
 }

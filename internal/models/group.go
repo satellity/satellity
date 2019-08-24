@@ -61,7 +61,7 @@ func groupFromRow(row durable.Row) (*Group, error) {
 	return &g, err
 }
 
-// CreateGroup create a group by an user
+// CreateGroup create a group by an user TODO should add cover
 func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, error) {
 	ctx := mctx.context
 	if !validateGroupFields(name) {
