@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"satellity/internal/durable"
-	"satellity/internal/middleware"
+	"satellity/internal/middlewares"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
@@ -45,7 +45,7 @@ func (impl *topicImpl) create(w http.ResponseWriter, r *http.Request, _ map[stri
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := middleware.CurrentUser(r).CreateTopic(mctx, body.Title, body.Body, body.CategoryID, body.Draft); err != nil {
+	if topic, err := middlewares.CurrentUser(r).CreateTopic(mctx, body.Title, body.Body, body.CategoryID, body.Draft); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopic(w, r, topic)
@@ -59,7 +59,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := middleware.CurrentUser(r).UpdateTopic(mctx, params["id"], body.Title, body.Body, body.CategoryID, body.Draft); err != nil {
+	if topic, err := middlewares.CurrentUser(r).UpdateTopic(mctx, params["id"], body.Title, body.Body, body.CategoryID, body.Draft); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopic(w, r, topic)
@@ -67,7 +67,7 @@ func (impl *topicImpl) update(w http.ResponseWriter, r *http.Request, params map
 }
 
 func (impl *topicImpl) draft(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	user := middleware.CurrentUser(r)
+	user := middlewares.CurrentUser(r)
 	if user == nil {
 		views.RenderErrorResponse(w, r, session.AuthorizationError(r.Context()))
 		return
@@ -84,7 +84,7 @@ func (impl *topicImpl) draft(w http.ResponseWriter, r *http.Request, params map[
 
 func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if topic, err := models.ReadTopicWithRelation(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
+	if topic, err := models.ReadTopicWithRelation(mctx, params["id"], middlewares.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
@@ -125,7 +125,7 @@ func (impl *topicImpl) action(w http.ResponseWriter, r *http.Request, id, action
 		views.RenderErrorResponse(w, r, err)
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if topic, err = topic.ActiondBy(mctx, middleware.CurrentUser(r), action, state); err != nil {
+	} else if topic, err = topic.ActiondBy(mctx, middlewares.CurrentUser(r), action, state); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopic(w, r, topic)

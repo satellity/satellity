@@ -1,13 +1,13 @@
-package middleware
+package middlewares
 
 import (
 	"bytes"
-	"satellity/internal/configs"
-	"satellity/internal/session"
-	"satellity/internal/views"
 	"io/ioutil"
 	"net/http"
 	"runtime"
+	"satellity/internal/configs"
+	"satellity/internal/session"
+	"satellity/internal/views"
 	"time"
 )
 

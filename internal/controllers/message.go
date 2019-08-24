@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"satellity/internal/durable"
-	"satellity/internal/middleware"
+	"satellity/internal/middlewares"
 	"satellity/internal/models"
 	"satellity/internal/views"
 
@@ -35,7 +35,7 @@ func (impl *messageImpl) create(w http.ResponseWriter, r *http.Request, params m
 	}
 
 	mctx := models.WrapContext(r.Context(), impl.database)
-	message, err := middleware.CurrentUser(r).CreateMessage(mctx, params["id"], body.Body, body.ParentID)
+	message, err := middlewares.CurrentUser(r).CreateMessage(mctx, params["id"], body.Body, body.ParentID)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
@@ -51,7 +51,7 @@ func (impl *messageImpl) update(w http.ResponseWriter, r *http.Request, params m
 	}
 
 	mctx := models.WrapContext(r.Context(), impl.database)
-	message, err := middleware.CurrentUser(r).UpdateMessage(mctx, params["id"], body.Body)
+	message, err := middlewares.CurrentUser(r).UpdateMessage(mctx, params["id"], body.Body)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
@@ -67,7 +67,7 @@ func (impl *messageImpl) destroy(w http.ResponseWriter, r *http.Request, params 
 	}
 
 	mctx := models.WrapContext(r.Context(), impl.database)
-	err := middleware.CurrentUser(r).DeleteMessage(mctx, params["id"])
+	err := middlewares.CurrentUser(r).DeleteMessage(mctx, params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {

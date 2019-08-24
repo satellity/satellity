@@ -1,8 +1,8 @@
-package middleware
+package middlewares
 
 import (
-	"satellity/internal/session"
 	"net/http"
+	"satellity/internal/session"
 
 	"github.com/unrolled/render"
 )

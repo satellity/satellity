@@ -1,9 +1,9 @@
-package middleware
+package middlewares
 
 import (
+	"net/http"
 	"satellity/internal/durable"
 	"satellity/internal/session"
-	"net/http"
 )
 
 // Logger put logger in r.Context

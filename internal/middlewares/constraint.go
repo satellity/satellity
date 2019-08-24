@@ -1,8 +1,8 @@
-package middleware
+package middlewares
 
 import (
-	"satellity/internal/views"
 	"net/http"
+	"satellity/internal/views"
 )
 
 // Constraint process OPTIONS request.

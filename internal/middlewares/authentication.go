@@ -1,13 +1,13 @@
-package middleware
+package middlewares
 
 import (
 	"context"
+	"net/http"
+	"regexp"
 	"satellity/internal/durable"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
-	"net/http"
-	"regexp"
 	"strings"
 )
 

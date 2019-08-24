@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"net/http"
 	"satellity/internal/durable"
-	"satellity/internal/middleware"
+	"satellity/internal/middlewares"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
-	"net/http"
 	"time"
 
 	"github.com/dimfeld/httptreemux"
@@ -38,7 +38,7 @@ func (impl *commentImpl) create(w http.ResponseWriter, r *http.Request, _ map[st
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if comment, err := middleware.CurrentUser(r).CreateComment(mctx, body.TopicID, body.Body); err != nil {
+	if comment, err := middlewares.CurrentUser(r).CreateComment(mctx, body.TopicID, body.Body); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComment(w, r, comment)
@@ -53,7 +53,7 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 	}
 
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if comment, err := middleware.CurrentUser(r).CreateComment(mctx, params["id"], body.Body); err != nil {
+	if comment, err := middlewares.CurrentUser(r).CreateComment(mctx, params["id"], body.Body); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComment(w, r, comment)
@@ -62,7 +62,7 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 
 func (impl *commentImpl) destory(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if err := middleware.CurrentUser(r).DeleteComment(mctx, params["id"]); err != nil {
+	if err := middlewares.CurrentUser(r).DeleteComment(mctx, params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)

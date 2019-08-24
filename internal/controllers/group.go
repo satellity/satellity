@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"satellity/internal/durable"
-	"satellity/internal/middleware"
+	"satellity/internal/middlewares"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
@@ -44,7 +44,7 @@ func (impl *groupImpl) create(w http.ResponseWriter, r *http.Request, _ map[stri
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if group, err := middleware.CurrentUser(r).CreateGroup(mctx, body.Name, body.Description); err != nil {
+	if group, err := middlewares.CurrentUser(r).CreateGroup(mctx, body.Name, body.Description); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderGroup(w, r, group)
@@ -58,7 +58,7 @@ func (impl *groupImpl) update(w http.ResponseWriter, r *http.Request, params map
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if group, err := middleware.CurrentUser(r).UpdateGroup(mctx, params["id"], body.Name, body.Description); err != nil {
+	if group, err := middlewares.CurrentUser(r).UpdateGroup(mctx, params["id"], body.Name, body.Description); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
@@ -69,7 +69,7 @@ func (impl *groupImpl) update(w http.ResponseWriter, r *http.Request, params map
 
 func (impl *groupImpl) join(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if err := middleware.CurrentUser(r).JoinGroup(mctx, params["id"], models.ParticipantRoleMember); err != nil {
+	if err := middlewares.CurrentUser(r).JoinGroup(mctx, params["id"], models.ParticipantRoleMember); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)
@@ -78,7 +78,7 @@ func (impl *groupImpl) join(w http.ResponseWriter, r *http.Request, params map[s
 
 func (impl *groupImpl) exit(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if err := middleware.CurrentUser(r).ExitGroup(mctx, params["id"]); err != nil {
+	if err := middlewares.CurrentUser(r).ExitGroup(mctx, params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)
@@ -98,7 +98,7 @@ func (impl *groupImpl) index(w http.ResponseWriter, r *http.Request, _ map[strin
 
 func (impl *groupImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if group, err := models.ReadGroup(mctx, params["id"], middleware.CurrentUser(r)); err != nil {
+	if group, err := models.ReadGroup(mctx, params["id"], middlewares.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
@@ -111,7 +111,7 @@ func (impl *groupImpl) participants(w http.ResponseWriter, r *http.Request, para
 	mctx := models.WrapContext(r.Context(), impl.database)
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
 
-	current := middleware.CurrentUser(r)
+	current := middlewares.CurrentUser(r)
 	if group, err := models.ReadGroup(mctx, params["id"], current); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {
@@ -127,7 +127,7 @@ func (impl *groupImpl) messages(w http.ResponseWriter, r *http.Request, params m
 	mctx := models.WrapContext(r.Context(), impl.database)
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
 
-	group, err := models.ReadGroup(mctx, params["id"], middleware.CurrentUser(r))
+	group, err := models.ReadGroup(mctx, params["id"], middlewares.CurrentUser(r))
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {

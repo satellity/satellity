@@ -4,15 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"satellity/internal/configs"
-	"satellity/internal/controllers"
-	"satellity/internal/durable"
-	"satellity/internal/middleware"
 	"log"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+	"satellity/internal/configs"
+	"satellity/internal/controllers"
+	"satellity/internal/durable"
+	"satellity/internal/middlewares"
 	"strings"
 
 	"github.com/dimfeld/httptreemux"
@@ -28,11 +28,11 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 	controllers.RegisterHanders(router)
 	controllers.RegisterRoutes(database, router)
 
-	handler := middleware.Authenticate(database, router)
-	handler = middleware.Constraint(handler)
-	handler = middleware.Context(handler, render.New())
-	handler = middleware.State(handler)
-	handler = middleware.Logger(handler, durable.NewLogger(logger))
+	handler := middlewares.Authenticate(database, router)
+	handler = middlewares.Constraint(handler)
+	handler = middlewares.Context(handler, render.New())
+	handler = middlewares.State(handler)
+	handler = middlewares.Logger(handler, durable.NewLogger(logger))
 	handler = handlers.ProxyHeaders(handler)
 
 	return http.ListenAndServe(fmt.Sprintf(":%s", port), handler)

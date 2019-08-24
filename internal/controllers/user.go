@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"satellity/internal/durable"
-	"satellity/internal/middleware"
+	"satellity/internal/middlewares"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
@@ -58,7 +58,7 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	current := middleware.CurrentUser(r)
+	current := middlewares.CurrentUser(r)
 	if err := current.UpdateProfile(mctx, body.Nickname, body.Biography); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
@@ -67,7 +67,7 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 }
 
 func (impl *userImpl) current(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	views.RenderAccount(w, r, middleware.CurrentUser(r))
+	views.RenderAccount(w, r, middlewares.CurrentUser(r))
 }
 
 func (impl *userImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
@@ -110,7 +110,7 @@ func (impl *userImpl) relatedGroups(w http.ResponseWriter, r *http.Request, _ ma
 	mctx := models.WrapContext(r.Context(), impl.database)
 
 	limit, _ := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
-	groups, err := middleware.CurrentUser(r).RelatedGroups(mctx, limit)
+	groups, err := middlewares.CurrentUser(r).RelatedGroups(mctx, limit)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
