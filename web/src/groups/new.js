@@ -1,7 +1,7 @@
-import style from './new.scss';
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/xq-light.css');
 require('codemirror/mode/markdown/markdown.js');
+import style from './new.scss';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import {Controlled as CodeMirror} from 'react-codemirror2'

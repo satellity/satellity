@@ -1,0 +1,43 @@
+import style from './profile.scss';
+import React, {Component} from 'react';
+import { Link } from 'react-router-dom';
+import API from '../api/index.js';
+
+class Profile extends Component {
+  constructor(props) {
+    super(props);
+    this.api = new API();
+    this.state = this.api.user.local();
+  }
+
+  componentDidMount() {
+    this.api.user.remote().then((user) => {
+      this.setState(user);
+    });
+  }
+
+  render() {
+    let state = this.state;
+    return (
+      <div className={style.profile}>
+        <div className={style.user}>
+          <img src={state.avatar_url} className={style.avatar} />
+          <div className={style.nickname}>
+              {state.nickname}
+          </div>
+        </div>
+        {
+          state.groups_count < 3 &&
+          <div className={style.new}>
+            <Link to='/groups/new'>{i18n.t('group.new')}</Link>
+          </div>
+        }
+        <div className={style.new}>
+          <Link to='/topics/new'>{i18n.t('topic.new')}</Link>
+        </div>
+      </div>
+    )
+  }
+}
+
+export default Profile;

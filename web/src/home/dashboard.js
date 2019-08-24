@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import API from '../api/index.js';
 import TopicItem from '../topics/item.js';
 import GroupItem from '../groups/item.js';
+import Profile from '../users/profile.js';
 
 class Dashboard extends Component {
   constructor(props) {
@@ -51,42 +52,40 @@ class Dashboard extends Component {
     });
 
     return (
-      <div className={style.dashboard}>
-        <div className={style.create}>
-          {
-            state.groups.length < 3 &&
-            <Link to='/groups/new'>{i18n.t('group.new')}</Link>
-          }
-        </div>
-        {
-          state.groups.length != 0 &&
-          <div>
-            <div className={style.head}>
-              <div className={style.name}>
-                {i18n.t('group.dashboard')}
+      <div className='container'>
+        <main className='column main'>
+          <div className={style.dashboard}>
+            {
+              state.groups.length != 0 &&
+              <div>
+                <div className={style.head}>
+                  <div className={style.name}>
+                    {i18n.t('group.dashboard')}
+                  </div>
+                  <Link to='/user/groups' className={style.view}>{i18n.t('general.all')}</Link>
+                </div>
+                <div className={style.groups}>
+                  {groups}
+                </div>
               </div>
-              <Link to='/user/groups' className={style.view}>{i18n.t('general.all')}</Link>
-            </div>
-            <div className={style.groups}>
-              {groups}
-            </div>
-          </div>
-        }
+            }
 
-        {
-          state.topics.length != 0 &&
-          <div>
-            <div className={style.title}>
-                {i18n.t('community.dashboard')}
-              <Link to='/topics/new'>
-                <FontAwesomeIcon icon={['fa', 'plus']} />
-              </Link>
-            </div>
-            <div className={style.section}>
-              {topics}
-            </div>
+            {
+              state.topics.length != 0 &&
+              <div>
+                <div className={style.title}>
+                  {i18n.t('community.dashboard')}
+                </div>
+                <div className={style.section}>
+                  {topics}
+                </div>
+              </div>
+            }
           </div>
-        }
+        </main>
+        <aside className='column aside'>
+          <Profile />
+        </aside>
       </div>
     )
   }
