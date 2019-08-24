@@ -94,6 +94,10 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 		if err != nil {
 			return err
 		}
+		_, err = tx.ExecContext(ctx, "UPDATE users SET groups_count=$1 WHERE user_id=$2", len(groups)+1, user.UserID)
+		if err != nil {
+			return err
+		}
 		_, err = createParticipant(ctx, tx, group.GroupID, group.UserID, ParticipantRoleOwner)
 		return err
 	})
