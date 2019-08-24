@@ -69,8 +69,8 @@ func (u *User) CreateMessage(mctx *Context, groupID, body, parentID string) (*Me
 		}
 
 		id := uuid.Must(uuid.NewV4()).String()
-		parentID = id
 		parent, err := findMessageByID(ctx, tx, parentID)
+		parentID = id
 		if err != nil {
 			return err
 		} else if parent != nil {

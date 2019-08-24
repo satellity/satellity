@@ -13,7 +13,7 @@ class Message {
   }
 
   create(id, params) {
-    const data = {body: params.body};
+    const data = {body: params.body, parent_id: params.parent_id};
     return this.api.axios.post(`/groups/${id}/messages`, data).then((resp) => {
       return resp.data;
     });
