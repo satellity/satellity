@@ -1,10 +1,9 @@
 import style from './index.scss';
 import React, {Component} from 'react';
 import {Link, Redirect} from 'react-router-dom';
-import TimeAgo from 'react-timeago';
 import API from '../api/index.js';
 import New from './new.js';
-import Avatar from '../users/avatar.js';
+import Item from './item.js';
 
 class Index extends Component {
   constructor(props) {
@@ -15,7 +14,8 @@ class Index extends Component {
     this.state = {
       group_id: id,
       name: '',
-      messages: [],
+      messages: {},
+      current: {},
       loading: true
     };
   }
@@ -28,7 +28,19 @@ class Index extends Component {
     this.api.group.show(this.state.group_id).then((data) => {
       this.setState({name: data.name}, () => {
         this.api.message.index(this.state.group_id, '').then((data) => {
-          this.setState({loading: false, messages: data});
+          let map = {};
+          for (let i=0;i<data.length;i++) {
+            let item = data[i];
+            if (item.parent_id == item.message_id)  {
+              item.children = [];
+              map[item.message_id] = item;
+            } else {
+              if (item[item.parent_id].children) {
+                item.children.concat(item)
+              }
+            }
+          }
+          this.setState({loading: false, messages: map});
         });
       });
     });
@@ -42,20 +54,10 @@ class Index extends Component {
       )
     }
 
-    let messages = state.messages.map((message) => {
+    let messages = Object.keys(state.messages).map((key) => {
+      let message = state.messages[key];
       return (
-        <li key={message.message_id} className={style.message}>
-          <div className={style.profile}>
-            <Avatar user={message.user} />
-            <div>
-              {message.user.nickname}
-              <div className={style.time}>
-                <TimeAgo date={message.created_at} />
-              </div>
-            </div>
-          </div>
-          {message.body}
-        </li>
+        <Item message={message}  key={message.message_id} />
       )
     });
 
