@@ -57,7 +57,7 @@ class Index extends Component {
     let messages = Object.keys(state.messages).map((key) => {
       let message = state.messages[key];
       return (
-        <Item message={message}  key={message.message_id} />
+        <Item message={message} current={state.current} key={message.message_id} />
       )
     });
 

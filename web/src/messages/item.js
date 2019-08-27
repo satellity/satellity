@@ -7,7 +7,10 @@ import Avatar from '../users/avatar.js';
 class Item extends Component {
   constructor(props) {
     super(props);
-    this.state = props.message;
+    this.state = {
+      message: props.message,
+      current: props.current,
+    }
   }
 
   render() {
@@ -15,15 +18,15 @@ class Item extends Component {
     return (
       <li className={style.message}>
         <div className={style.profile}>
-          <Avatar user={state.user} />
+          <Avatar user={state.message.user} />
           <div>
-              {state.user.nickname}
+              {state.message.user.nickname}
             <div className={style.time}>
-              <TimeAgo date={state.created_at} />
+              <TimeAgo date={state.message.created_at} />
             </div>
           </div>
         </div>
-        {state.body}
+        {state.message.body}
       </li>
     )
   }
