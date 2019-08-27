@@ -40,16 +40,12 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 
 func main() {
 	var options struct {
-		Dir         string `short:"d" long:"dir" env:"GO_DIR" description:"The config file directory"`
-		Environment string `short:"e" long:"environment" env:"GO_ENV" default:"development"`
+		Dir         string `short:"d" long:"dir" description:"Where's the config file place, default ./internal/configs/config.yaml"`
+		Environment string `short:"e" long:"environment" default:"development"`
 	}
 	p := flags.NewParser(&options, flags.Default)
 	if _, err := p.Parse(); err != nil {
-		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
-			os.Exit(0)
-		} else {
-			os.Exit(1)
-		}
+		log.Panicln(err)
 	}
 
 	if options.Dir == "" {
@@ -83,7 +79,7 @@ func main() {
 		logger, err = zap.NewProduction()
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Panicln(err)
 	}
 
 	if err := startHTTP(db, logger, config.HTTP.Port); err != nil {
