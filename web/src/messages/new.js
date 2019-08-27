@@ -6,14 +6,13 @@ import LoadingView from '../loading/loading.js';
 class New extends Component {
   constructor(props) {
     super(props);
-    this.api = new API();
-
     this.state = {
       group_id: props.groupId,
       body: '',
       submitting: false
     }
 
+    this.api = new API();
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }

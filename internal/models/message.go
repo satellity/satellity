@@ -167,7 +167,7 @@ func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error
 			return err
 		}
 
-		query = fmt.Sprintf("SELECT %s FROM messages WHERE message_id=parent_id AND created_at<$1 ORDER BY parent_id,created_at DESC LIMIT $2", strings.Join(messageColumns, ","))
+		query = fmt.Sprintf("SELECT %s FROM messages WHERE parent_id IN ('%s') AND created_at<$1 ORDER BY parent_id,created_at DESC LIMIT $2", strings.Join(messageColumns, ","), strings.Join(messageIds, "','"))
 		frows, err := tx.QueryContext(ctx, query, offset, limit)
 		if err != nil {
 			return err

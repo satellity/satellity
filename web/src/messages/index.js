@@ -31,13 +31,17 @@ class Index extends Component {
           let map = {};
           for (let i=0;i<data.length;i++) {
             let item = data[i];
-            if (item.parent_id == item.message_id)  {
-              item.children = [];
-              map[item.message_id] = item;
-            } else {
-              if (item[item.parent_id].children) {
-                item.children.concat(item)
+            if (!map[item.parent_id] || !map[item.parent_id].children) {
+              if (!map[item.parent_id]) {
+                map[item.parent_id] = {};
               }
+              map[item.parent_id].children = [];
+            }
+            if (item.parent_id == item.message_id)  {
+              item.children = map[item.parent_id].children;
+              map[item.parent_id] = item;
+            } else {
+              map[item.parent_id].children.push(item);
             }
           }
           this.setState({loading: false, messages: map});
