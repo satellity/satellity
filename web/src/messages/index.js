@@ -8,16 +8,17 @@ import Item from './item.js';
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.api = new API();
-
     let id = this.props.match.params.id;
     this.state = {
       group_id: id,
       name: '',
-      messages: {},
+      messages: [],
       current: {},
       loading: true
     };
+
+    this.api = new API();
+    this.handleCommentClick = this.handleCommentClick.bind(this);
   }
 
   componentDidMount() {
@@ -28,26 +29,26 @@ class Index extends Component {
     this.api.group.show(this.state.group_id).then((data) => {
       this.setState({name: data.name}, () => {
         this.api.message.index(this.state.group_id, '').then((data) => {
-          let map = {};
+          let array = [];
+          let mid = {children: []};
           for (let i=0;i<data.length;i++) {
             let item = data[i];
-            if (!map[item.parent_id] || !map[item.parent_id].children) {
-              if (!map[item.parent_id]) {
-                map[item.parent_id] = {};
-              }
-              map[item.parent_id].children = [];
-            }
             if (item.parent_id == item.message_id)  {
-              item.children = map[item.parent_id].children;
-              map[item.parent_id] = item;
+              item.children = mid.children;
+              array.push(item);
+              mid.children = [];
             } else {
-              map[item.parent_id].children.push(item);
+              mid.children.push(item);
             }
           }
-          this.setState({loading: false, messages: map});
+          this.setState({loading: false, messages: array});
         });
       });
     });
+  }
+
+  handleCommentClick(id) {
+    this.setState({current: {message_id: id}});
   }
 
   render() {
@@ -58,10 +59,9 @@ class Index extends Component {
       )
     }
 
-    let messages = Object.keys(state.messages).map((key) => {
-      let message = state.messages[key];
+    let messages = state.messages.map((message) => {
       return (
-        <Item message={message} current={state.current} key={message.message_id} />
+        <Item message={message} current={state.current} key={message.message_id} handleComment={this.handleCommentClick} />
       )
     });
 

@@ -141,5 +141,5 @@ CREATE TABLE IF NOT EXISTS messages (
 	updated_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS messages_groupx ON messages (group_id);
-CREATE INDEX IF NOT EXISTS messages_parent_createdx ON messages (parent_id,created_at);
+CREATE INDEX IF NOT EXISTS messages_group_created_parentx ON messages (group_id, created_at DESC, parent_id);
+CREATE INDEX IF NOT EXISTS messages_parent_createdx ON messages (parent_id, created_at DESC);

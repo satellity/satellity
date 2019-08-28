@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS messages (
 	updated_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS messages_groupx ON messages (group_id);
-CREATE INDEX IF NOT EXISTS messages_parent_createdx ON messages (parent_id,created_at);
+CREATE INDEX IF NOT EXISTS messages_group_created_parentx ON messages (group_id, created_at DESC, parent_id);
+CREATE INDEX IF NOT EXISTS messages_parent_createdx ON messages (parent_id, created_at DESC);
 `
 
 // Message represent the struct of a message
@@ -146,8 +146,8 @@ func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error
 
 	var messages []*Message
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := "SELECT message_id FROM messages WHERE message_id=parent_id AND created_at<$1 ORDER BY parent_id,created_at DESC LIMIT $2"
-		rows, err := tx.QueryContext(ctx, query, offset, limit)
+		query := "SELECT message_id FROM messages WHERE group_id=$1 AND created_at<$2 AND message_id=parent_id ORDER BY group_id,created_at DESC,parent_id LIMIT $3"
+		rows, err := tx.QueryContext(ctx, query, g.GroupID, offset, limit)
 		if err != nil {
 			return err
 		}
@@ -167,8 +167,8 @@ func (g *Group) ReadMessages(mctx *Context, offset time.Time) ([]*Message, error
 			return err
 		}
 
-		query = fmt.Sprintf("SELECT %s FROM messages WHERE parent_id IN ('%s') AND created_at<$1 ORDER BY parent_id,created_at DESC LIMIT $2", strings.Join(messageColumns, ","), strings.Join(messageIds, "','"))
-		frows, err := tx.QueryContext(ctx, query, offset, limit)
+		query = fmt.Sprintf("SELECT %s FROM messages WHERE parent_id IN ('%s') ORDER BY created_at DESC LIMIT $1", strings.Join(messageColumns, ","), strings.Join(messageIds, "','"))
+		frows, err := tx.QueryContext(ctx, query, limit)
 		if err != nil {
 			return err
 		}

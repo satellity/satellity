@@ -11,9 +11,8 @@ class Item extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      body: '',
       message: props.message,
-      current: props.current,
+      body: '',
       submitting: false
     }
 
@@ -77,7 +76,12 @@ class Item extends Component {
         <div>
           {children}
         </div>
+        <div onClick={() => this.props.handleComment(state.message.message_id)} className={style.commit}>
+          add a comment
+        </div>
         <div>
+          {
+          this.props.current.message_id == state.message.message_id &&
           <form onSubmit={this.handleSubmit}>
             <input type='hidden' name='group_id' defaultValue={state.message.group_id} />
             <input type='hidden' name='parent_id' defaultValue={state.message.message_id} />
@@ -98,6 +102,7 @@ class Item extends Component {
               </button>
             </div>
           </form>
+          }
         </div>
       </li>
     )
