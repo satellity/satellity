@@ -83,20 +83,22 @@ class Header extends Component {
       )
     }
     return (
-      <header className={style.header}>
-        <Link to='/' className={style.brand}>
-          <FontAwesomeIcon icon={['fa', 'home']} />
-        </Link>
-        <div className={style.site}><span className={style.name}>{Config.Name}</span></div>
-        <Link to='/groups' className={style.navi}>
-            {i18n.t('group.name')}
-        </Link>
-        <Link to='/community' className={style.navi}>
-            {i18n.t('community.name')}
-        </Link>
-        {profile}
+      <div>
+        <header className={style.header}>
+          <Link to='/' className={style.brand}>
+            <FontAwesomeIcon icon={['fa', 'home']} />
+          </Link>
+          <div className={style.site}><span className={style.name}>{Config.Name}</span></div>
+          <Link to='/groups' className={style.navi}>
+              {i18n.t('group.name')}
+          </Link>
+          <Link to='/community' className={style.navi}>
+              {i18n.t('community.name')}
+          </Link>
+            {profile}
+        </header>
         {this.state.logging && modal}
-      </header>
+      </div>
     )
   }
 }

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS groups (
 	group_id               VARCHAR(36) PRIMARY KEY,
 	name                   VARCHAR(512) NOT NULL,
 	description            TEXT NOT NULL,
-	cover_url              VARCHAR(1024) NOT NULL,
+	cover_url              VARCHAR(1024) NOT NULL DEFAULT '',
 	user_id                VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
 	users_count            BIGINT NOT NULL DEFAULT 0,
 	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
