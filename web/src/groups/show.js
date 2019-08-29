@@ -20,7 +20,7 @@ class Show extends Component {
       name: '',
       description: '',
       users_count: 0,
-      is_member: false,
+      role: 'GUEST',
       created_at: '',
       user: {},
       is_owner: false,
@@ -49,8 +49,8 @@ class Show extends Component {
     if (this.state.handling) {
       return
     }
-    this.api.group.join(this.state.group_id).then(() => {
-      this.setState({is_member: true, handling: false});
+    this.api.group.join(this.state.group_id).then((group) => {
+      this.setState({role: group.role, handling: false});
     });
   }
 
@@ -59,8 +59,8 @@ class Show extends Component {
     if (this.state.handling) {
       return
     }
-    this.api.group.exit(this.state.group_id).then(() => {
-      this.setState({is_member: false, handling: false});
+    this.api.group.exit(this.state.group_id).then((group) => {
+      this.setState({role: group.role, handling: false});
     });
   }
 
@@ -91,8 +91,8 @@ class Show extends Component {
 
     let actionView = '';
     if (!state.is_owner) {
-      actionView = state.is_member ? <Link onClick={(e) => this.handleExit(e)}>{i18n.t('group.exit')}</Link>
-        : <Link onClick={(e) => this.handleJoin(e)}>{i18n.t('group.join')}</Link>
+      actionView = state.role == "GUEST" ? <button onClick={(e) => this.handleJoin(e)}>{i18n.t('group.join')}</button>
+        : <button onClick={(e) => this.handleExit(e)}>{i18n.t('group.exit')}</button>
     }
 
     let showView = (

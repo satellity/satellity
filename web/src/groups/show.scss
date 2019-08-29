@@ -22,7 +22,11 @@
   margin-left: 0.8rem;
 }
 .action {
-  a {
+  button:focus {
+    outline: none;
+  }
+  a, button {
+    border: none;
     background: rgba(218, 40, 16, 0.8);
     border-radius: 0.2rem;
     box-sizing: border-box;

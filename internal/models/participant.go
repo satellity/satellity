@@ -84,21 +84,23 @@ func findParticipant(ctx context.Context, tx *sql.Tx, groupID, userID string) (*
 }
 
 // JoinGroup join the group by id
-func (user *User) JoinGroup(mctx *Context, groupID, role string) error {
+func (user *User) JoinGroup(mctx *Context, groupID, role string) (*Group, error) {
 	ctx := mctx.context
 	switch role {
 	case ParticipantRoleAdmin,
 		ParticipantRoleVIP,
 		ParticipantRoleMember:
 	default:
-		return session.BadDataError(ctx)
+		return nil, session.BadDataError(ctx)
 	}
+	var group *Group
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		group, err := findGroup(ctx, tx, groupID)
+		var err error
+		group, err = findGroup(ctx, tx, groupID)
 		if err != nil {
 			return err
 		} else if group == nil {
-			return session.NotFoundError(ctx)
+			return nil
 		}
 		p, err := findParticipant(ctx, tx, groupID, user.UserID)
 		if err != nil {
@@ -106,6 +108,11 @@ func (user *User) JoinGroup(mctx *Context, groupID, role string) error {
 		} else if p != nil {
 			return nil
 		}
+		owner, err := findUserByID(ctx, tx, group.UserID)
+		if err != nil {
+			return err
+		}
+		group.User = owner
 
 		var count int64
 		err = tx.QueryRowContext(ctx, "SELECT count(*) FROM participants WHERE group_id=$1", groupID).Scan(&count)
@@ -117,27 +124,27 @@ func (user *User) JoinGroup(mctx *Context, groupID, role string) error {
 		if err != nil {
 			return err
 		}
+		group.Role = role
 		_, err = createParticipant(ctx, tx, groupID, user.UserID, role)
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return err
-		}
-		return session.TransactionError(ctx, err)
+		return nil, session.TransactionError(ctx, err)
 	}
-	return nil
+	return group, nil
 }
 
 // ExitGroup exit the group by id
-func (user *User) ExitGroup(mctx *Context, groupID string) error {
+func (user *User) ExitGroup(mctx *Context, groupID string) (*Group, error) {
 	ctx := mctx.context
+	var group *Group
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		group, err := findGroup(ctx, tx, groupID)
+		var err error
+		group, err = findGroup(ctx, tx, groupID)
 		if err != nil {
 			return err
 		} else if group == nil {
-			return session.NotFoundError(ctx)
+			return nil
 		}
 		p, err := findParticipant(ctx, tx, groupID, user.UserID)
 		if err != nil {
@@ -147,6 +154,11 @@ func (user *User) ExitGroup(mctx *Context, groupID string) error {
 		} else if p.Role == ParticipantRoleOwner {
 			return nil
 		}
+		owner, err := findUserByID(ctx, tx, group.UserID)
+		if err != nil {
+			return err
+		}
+		group.User = owner
 
 		var count int64
 		err = tx.QueryRowContext(ctx, "SELECT count(*) FROM participants WHERE group_id=$1", groupID).Scan(&count)
@@ -158,16 +170,14 @@ func (user *User) ExitGroup(mctx *Context, groupID string) error {
 		if err != nil {
 			return err
 		}
+		group.Role = ParticipantRoleGuest
 		_, err = tx.ExecContext(ctx, "DELETE FROM participants WHERE group_id=$1 AND user_id=$2", group.GroupID, user.UserID)
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return err
-		}
-		return session.TransactionError(ctx, err)
+		return nil, session.TransactionError(ctx, err)
 	}
-	return nil
+	return group, nil
 }
 
 // Participants return members of a group TODO should support pagination

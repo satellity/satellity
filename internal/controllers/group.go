@@ -69,19 +69,23 @@ func (impl *groupImpl) update(w http.ResponseWriter, r *http.Request, params map
 
 func (impl *groupImpl) join(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if err := middlewares.CurrentUser(r).JoinGroup(mctx, params["id"], models.ParticipantRoleMember); err != nil {
+	if group, err := middlewares.CurrentUser(r).JoinGroup(mctx, params["id"], models.ParticipantRoleMember); err != nil {
 		views.RenderErrorResponse(w, r, err)
+	} else if group == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 	} else {
-		views.RenderBlankResponse(w, r)
+		views.RenderGroup(w, r, group)
 	}
 }
 
 func (impl *groupImpl) exit(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if err := middlewares.CurrentUser(r).ExitGroup(mctx, params["id"]); err != nil {
+	if group, err := middlewares.CurrentUser(r).ExitGroup(mctx, params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
+	} else if group == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 	} else {
-		views.RenderBlankResponse(w, r)
+		views.RenderGroup(w, r, group)
 	}
 }
 
