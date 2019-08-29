@@ -11,7 +11,7 @@ class Index extends Component {
     let id = this.props.match.params.id;
     this.state = {
       group_id: id,
-      name: '',
+      group: {},
       messages: [],
       current: {},
       loading: true
@@ -26,8 +26,8 @@ class Index extends Component {
       return
     }
 
-    this.api.group.show(this.state.group_id).then((data) => {
-      this.setState({name: data.name}, () => {
+    this.api.group.show(this.state.group_id).then((group) => {
+      this.setState({group: group}, () => {
         this.api.message.index(this.state.group_id, '').then((data) => {
           let array = [];
           let mid = {children: []};
@@ -75,8 +75,13 @@ class Index extends Component {
         </main>
         <aside className='column aside'>
           <Link to={`/groups/${state.group_id}`}>
-            {state.name} >>
+              {state.group.name} >>
           </Link>
+          <div>
+            <Link to={`/groups/${state.group_id}/members`}>
+                {i18n.t('group.navi.members', {count: state.group.users_count})}
+            </Link>
+          </div>
         </aside>
       </div>
     )
