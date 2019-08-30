@@ -43,7 +43,7 @@ It'll be a patreon-like forum.
 
 ## Screenshot
 
-![Go Discourse](/screenshots/aspect.png "Hello Go Discourse")
+![Satellity](/screenshots/aspect.png "Hello Satellity")
 
 ## Getting Started
 
