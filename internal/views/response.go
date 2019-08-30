@@ -1,8 +1,8 @@
 package views
 
 import (
-	"satellity/internal/session"
 	"net/http"
+	"satellity/internal/session"
 )
 
 // ResponseView is the struct of response

@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// GroupView is the response body of group
 type GroupView struct {
 	Type        string    `json:"type"`
 	GroupID     string    `json:"group_id"`

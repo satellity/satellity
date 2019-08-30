@@ -33,7 +33,7 @@ func AuthorizationError(ctx context.Context) Error {
 	return createError(ctx, http.StatusAccepted, 401, description, nil)
 }
 
-// AuthorizationError return 401 for unauthorized request
+// ForbiddenError return 401 for unauthorized request
 func ForbiddenError(ctx context.Context) Error {
 	description := http.StatusText(http.StatusForbidden)
 	return createError(ctx, http.StatusAccepted, http.StatusForbidden, description, nil)

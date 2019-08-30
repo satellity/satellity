@@ -1,8 +1,8 @@
 package views
 
 import (
-	"satellity/internal/models"
 	"net/http"
+	"satellity/internal/models"
 	"time"
 )
 

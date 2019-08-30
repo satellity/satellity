@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// MessageView is the response body of message
 type MessageView struct {
 	Type      string    `json:"type"`
 	MessageID string    `json:"message_id"`
@@ -32,10 +33,12 @@ func buildMessage(message *models.Message) MessageView {
 	}
 }
 
+// RenderMessage response a message view
 func RenderMessage(w http.ResponseWriter, r *http.Request, message *models.Message) {
 	RenderResponse(w, r, buildMessage(message))
 }
 
+// RenderMessages response a bundle of messages view
 func RenderMessages(w http.ResponseWriter, r *http.Request, messages []*models.Message) {
 	views := make([]MessageView, len(messages))
 	for i, message := range messages {
