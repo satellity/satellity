@@ -32,13 +32,13 @@ func TestGroupCRUD(t *testing.T) {
 	for _, tc := range groupCases {
 		t.Run(fmt.Sprintf("group name %s", tc.name), func(t *testing.T) {
 			if !tc.valid {
-				group, err := user.CreateGroup(mctx, tc.name, tc.description)
+				group, err := user.CreateGroup(mctx, tc.name, tc.description, "")
 				assert.NotNil(err)
 				assert.Nil(group)
 				return
 			}
 
-			group, err := user.CreateGroup(mctx, tc.name, tc.description)
+			group, err := user.CreateGroup(mctx, tc.name, tc.description, "")
 			assert.Nil(err)
 			assert.NotNil(group)
 
@@ -67,7 +67,7 @@ func TestGroupCRUD(t *testing.T) {
 
 			name := "new" + tc.name
 			description := "new" + tc.description
-			group, err = user.UpdateGroup(mctx, group.GroupID, name, description)
+			group, err = user.UpdateGroup(mctx, group.GroupID, name, description, "")
 			assert.Nil(err)
 			assert.NotNil(group)
 			assert.Equal(name, group.Name)

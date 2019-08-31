@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"satellity/internal/durable"
+	"satellity/internal/handlers"
 	"satellity/internal/session"
 	"strings"
 	"time"
@@ -62,7 +63,7 @@ func groupFromRow(row durable.Row) (*Group, error) {
 }
 
 // CreateGroup create a group by an user TODO should add cover
-func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, error) {
+func (user *User) CreateGroup(mctx *Context, name, description, cover string) (*Group, error) {
 	ctx := mctx.context
 	if !validateGroupFields(name) {
 		return nil, session.BadDataError(ctx)
@@ -108,11 +109,15 @@ func (user *User) CreateGroup(mctx *Context, name, description string) (*Group, 
 		return nil, session.TransactionError(ctx, err)
 	}
 	group.User = user
+	err = updateGroupCover(mctx, group, cover)
+	if err != nil {
+		return nil, err
+	}
 	return group, nil
 }
 
 // UpdateGroup update the group by id
-func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Group, error) {
+func (user *User) UpdateGroup(mctx *Context, id, name, description, cover string) (*Group, error) {
 	ctx := mctx.context
 	name, description = strings.TrimSpace(name), strings.TrimSpace(description)
 	if len(name) > 0 && len(name) < MaximumGroupNameSize {
@@ -147,6 +152,10 @@ func (user *User) UpdateGroup(mctx *Context, id, name, description string) (*Gro
 			return nil, err
 		}
 		return nil, session.TransactionError(ctx, err)
+	}
+	err = updateGroupCover(mctx, group, cover)
+	if err != nil {
+		return nil, err
 	}
 	return group, nil
 }
@@ -280,6 +289,21 @@ func findGroupsByUser(ctx context.Context, tx *sql.Tx, u *User) ([]*Group, error
 		groups = append(groups, group)
 	}
 	return groups, nil
+}
+
+func updateGroupCover(mctx *Context, group *Group, cover string) error {
+	if group == nil || len(cover) < 1 {
+		return nil
+	}
+	ctx := mctx.context
+	url, err := handlers.UploadImage(ctx, fmt.Sprintf("/groups/%s/cover", group.GroupID), cover)
+	if err != nil {
+		return err
+	}
+	group.CoverURL = url
+	query := "UPDATE groups SET cover_url=$1 WHERE group_id=$2"
+	_, err = mctx.database.ExecContext(ctx, query, group.CoverURL, group.GroupID)
+	return err
 }
 
 //RelatedGroups read user's related groups

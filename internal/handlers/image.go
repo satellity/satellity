@@ -14,6 +14,7 @@ import (
 	"satellity/internal/session"
 )
 
+// UploadImage upload image to storage
 func UploadImage(ctx context.Context, name, data string) (string, error) {
 	imageBytes, err := base64.StdEncoding.DecodeString(data)
 	cfg, fmt, err := image.DecodeConfig(bytes.NewReader(imageBytes))
@@ -43,5 +44,5 @@ func UploadImage(ctx context.Context, name, data string) (string, error) {
 	if err != nil {
 		return "", session.ServerError(ctx, err)
 	}
-	return fileName, nil
+	return configs.AppConfig.HTTP.Host + "/attachments" + fileName, nil
 }

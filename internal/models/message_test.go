@@ -19,7 +19,7 @@ func TestMessageCRUD(t *testing.T) {
 	assert.NotNil(user)
 	jade := createTestUser(mctx, "im.jadeydi@gmail.com", "username1", "password")
 	assert.NotNil(jade)
-	group, err := user.CreateGroup(mctx, "Group Name", "Group Description")
+	group, err := user.CreateGroup(mctx, "Group Name", "Group Description", "")
 	assert.Nil(err)
 	assert.NotNil(group)
 	users, err := group.Participants(mctx, nil, time.Now(), "100")

@@ -4,14 +4,14 @@ class Group {
   }
 
   create(params) {
-    const data = {name: params.name, description: params.description};
+    const data = {name: params.name, description: params.description, cover: params.cover};
     return this.api.axios.post('/groups', data).then((resp) => {
       return resp.data;
     });
   }
 
   update(id, params) {
-    const data = {name: params.name, description: params.description};
+    const data = {name: params.name, description: params.description, cover: params.cover};
     return this.api.axios.post(`/groups/${id}`, data).then((resp) => {
       return resp.data;
     });

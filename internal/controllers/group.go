@@ -21,6 +21,7 @@ type groupImpl struct {
 type groupRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Cover       string `json:"cover"`
 }
 
 func registerGroup(database *durable.Database, router *httptreemux.TreeMux) {
@@ -44,7 +45,7 @@ func (impl *groupImpl) create(w http.ResponseWriter, r *http.Request, _ map[stri
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if group, err := middlewares.CurrentUser(r).CreateGroup(mctx, body.Name, body.Description); err != nil {
+	if group, err := middlewares.CurrentUser(r).CreateGroup(mctx, body.Name, body.Description, body.Cover); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderGroup(w, r, group)
@@ -58,7 +59,7 @@ func (impl *groupImpl) update(w http.ResponseWriter, r *http.Request, params map
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if group, err := middlewares.CurrentUser(r).UpdateGroup(mctx, params["id"], body.Name, body.Description); err != nil {
+	if group, err := middlewares.CurrentUser(r).UpdateGroup(mctx, params["id"], body.Name, body.Description, body.Cover); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))

@@ -5,7 +5,6 @@
   box-sizing: border-box;
   padding: .8rem;
 }
-
 .body {
   border: 1px solid #ccc;
   margin-bottom: 1rem;
@@ -16,4 +15,28 @@
     white-space: pre-wrap;
     word-wrap: break-word;
   }
+}
+.cropContainer {
+  margin-bottom: 1rem;
+}
+.box {
+  background: rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  display: inline-block;
+  line-height: 4rem;
+  width: 8rem;
+  text-align: center;
+}
+.file {
+  display: none;
+}
+.crop {
+  display: none;
+}
+.cover {
+  width: 8rem;
+  height: 4rem;
+}
+.image {
+  font-size: 0;
 }
