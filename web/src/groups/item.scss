@@ -3,27 +3,24 @@
 .group {
   background: white;
   box-sizing: border-box;
-  padding: .8rem;
 }
 .head {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   margin-bottom: .4rem;
   overflow: hidden;
 }
-.profile {
-  display: flex;
-  align-items: center;
-  font-size: .875rem;
-  margin-top: .8rem;
+.cover {
+  width: 100%;
 }
 .title {
-  flex-grow: 1;
+  padding: .4rem;
 }
 .avatar {
-  width: 3.6rem;
-  height: 3.6rem;
-  border-radius: .4rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: .8rem;
+  margin-right: .3rem;
 }
 .name {
   overflow: hidden;
@@ -33,7 +30,9 @@
 .count {
   margin-left: .4rem;
 }
-.nickname {
+.profile {
+  display: flex;
+  align-items: center;
   font-size: .875rem;
 }
 .description {

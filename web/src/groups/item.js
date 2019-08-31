@@ -24,19 +24,17 @@ class Item extends Component {
     return (
       <div className={style.group}>
         <div className={style.head}>
+          <img src={group.cover_url} className={style.cover} />
           <div className={style.title}>
             <h2 className={style.name}>
               <Link to={link}>{group.name}</Link>
             </h2>
-            <div className={style.nickname}>
-              By {user.nickname}
-              {membersView}
+            <div className={style.profile}>
+              <img src={user.avatar_url} alt={user.nickname} className={style.avatar} />
+                By {user.nickname}
+                {membersView}
             </div>
           </div>
-          <img src={user.avatar_url} alt={user.nickname} className={style.avatar} />
-        </div>
-        <div className={style.description}>
-          {group.description.slice(0, 120)}
         </div>
       </div>
     )
