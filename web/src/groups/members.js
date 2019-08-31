@@ -58,6 +58,11 @@ class Members extends Component {
           <Link to={`/groups/${state.group_id}`}>
             {state.name} >>
           </Link>
+          <div>
+            <Link to={`/groups/${state.group_id}/messages`}>
+              {i18n.t('group.navi.messages')}
+            </Link>
+          </div>
         </aside>
       </div>
     )

@@ -123,7 +123,7 @@ class Show extends Component {
         <div className={style.navi}>
           <div className={style.navi}>
             <Link to={`/groups/${state.group_id}/messages`}>
-                {i18n.t('group.navi.messages')}
+              {i18n.t('group.navi.messages')}
             </Link>
           </div>
           <Link to={`/groups/${state.group_id}/members`}>

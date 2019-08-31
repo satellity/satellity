@@ -87,6 +87,12 @@ func TooManyGroupsError(ctx context.Context) Error {
 	return createError(ctx, http.StatusAccepted, 10014, description, nil)
 }
 
+// InvalidImageDataError means image is invalid
+func InvalidImageDataError(ctx context.Context) Error {
+	description := "Invalid image data."
+	return createError(ctx, http.StatusAccepted, 10015, description, nil)
+}
+
 // ServerError means some server error are occurred.
 func ServerError(ctx context.Context, err error) Error {
 	description := http.StatusText(http.StatusInternalServerError)

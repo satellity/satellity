@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"path"
 
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const (
@@ -28,6 +28,12 @@ type Option struct {
 		ClientID     string `yaml:"client_id"`
 		ClientSecret string `yaml:"client_secret"`
 	} `yaml:"github"`
+	System struct {
+		Attachments struct {
+			Storage string `yaml:"storage"`
+			Path    string `yaml:"path"`
+		} `yaml:"attachments"`
+	} `yaml:"system"`
 	Operators []string `yaml:"operators"`
 
 	Environment string

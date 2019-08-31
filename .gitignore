@@ -4,6 +4,7 @@ internal/configs/*
 !internal/configs/config.go
 !internal/configs/config.yaml.example
 publish
+public
 
 # web
 node_modules
