@@ -22,3 +22,24 @@
 .commit {
   cursor: pointer;
 }
+.subProfile {
+  display: flex;
+  align-items: center;
+  time {
+    font-size: 0.875rem;
+    opacity: 0.6;
+  }
+}
+.subName {
+  padding-right: .3rem;
+}
+.avatar {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: .8rem;
+  margin-right: .3rem;
+}
+.replies {
+  background: rgba(0,0,0,.05);
+  padding: .4rem;
+}

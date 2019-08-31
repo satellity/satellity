@@ -56,6 +56,11 @@ class Item extends Component {
     }).map((msg) => {
       return (
         <div key={msg.message_id}>
+          <div className={style.subProfile}>
+            <img src={msg.user.avatar_url} className={style.avatar} />
+            <div className={style.subName}>{msg.user.nickname}</div>
+            <TimeAgo date={msg.created_at} />
+          </div>
           {msg.body}
         </div>
       )
@@ -73,40 +78,44 @@ class Item extends Component {
           </div>
         </div>
         {state.message.body}
-        <div>
-          {children}
-        </div>
-        {
-        this.props.current.message_id !== state.message.message_id &&
-        <div onClick={() => this.props.handleComment(state.message.message_id)} className={style.commit}>
-          add a comment
-        </div>
-        }
-        {
-          this.props.current.message_id == state.message.message_id &&
-        <div>
-          <form onSubmit={this.handleSubmit}>
-            <input type='hidden' name='group_id' defaultValue={state.message.group_id} />
-            <input type='hidden' name='parent_id' defaultValue={state.message.message_id} />
+        <div className={style.replies}>
+          <div>
+            {children}
+          </div>
+          {
+            this.props.current.message_id !== state.message.message_id && (
+            <div onClick={() => this.props.handleComment(state.message.message_id)} className={style.commit}>
+              add a comment
+            </div>
+            )
+          }
+          {
+            this.props.current.message_id == state.message.message_id && (
             <div>
-              <textarea
-                className={style.input}
-                type='text'
-                name='body'
-                minLength='3'
-                required
-                value={state.body}
-                onChange={this.handleChange} />
+              <form onSubmit={this.handleSubmit}>
+                <input type='hidden' name='group_id' defaultValue={state.message.group_id} />
+                <input type='hidden' name='parent_id' defaultValue={state.message.message_id} />
+                <div>
+                  <textarea
+                    className={style.input}
+                    type='text'
+                    name='body'
+                    minLength='3'
+                    required
+                    value={state.body}
+                    onChange={this.handleChange} />
+                </div>
+                <div className='action'>
+                  <button className={`btn submit ${style.small}`} disabled={state.submitting}>
+                    { state.submitting && <LoadingView style='sm-ring blank'/> }
+                    &nbsp;{i18n.t('general.submit')}
+                  </button>
+                </div>
+              </form>
             </div>
-            <div className='action'>
-              <button className={`btn submit ${style.small}`} disabled={state.submitting}>
-                { state.submitting && <LoadingView style='sm-ring blank'/> }
-                &nbsp;{i18n.t('general.submit')}
-              </button>
-            </div>
-          </form>
+            )
+          }
         </div>
-        }
       </li>
     )
   }
