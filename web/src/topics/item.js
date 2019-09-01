@@ -1,8 +1,9 @@
+import style from './item.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
-import style from './item.scss';
 import ColorUtils from '../components/color.js';
+import Avatar from '../users/avatar.js';
 
 class TopicItem extends Component {
   constructor(props) {
@@ -25,7 +26,7 @@ class TopicItem extends Component {
     }
     return (
       <li className={style.topic} key={topic.topic_id}>
-        {!this.state.profile && <img src={topic.user.avatar_url} className={style.avatar} />}
+          {!this.state.profile && <Avatar user={topic.user} />}
         <div className={style.detail}>
           <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`}>
             <h2 className={style.title}>

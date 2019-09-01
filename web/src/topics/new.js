@@ -210,7 +210,7 @@ class New extends Component {
 
             &nbsp;{i18n.t('general.submit')}
           </button>
-          <a href="javascript:;" className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</a>
+          <a className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</a>
         </div>
       }
     </div>

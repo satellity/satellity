@@ -8,8 +8,12 @@ class Avatar extends Component {
   }
 
   render() {
+    let cls = style.avatar;
+    if (this.props.class == 'small') {
+      cls = cls + ' ' + style.small;
+    }
     return (
-      <img src={this.state.avatar_url} className={style.avatar} />
+      <img src={this.state.avatar_url} alt={this.state.nickname} className={cls} />
     )
   }
 }

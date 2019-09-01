@@ -1,6 +1,7 @@
 import style from './item.scss';
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
+import Avatar from '../users/avatar.js';
 
 class Item extends Component {
   constructor(props) {
@@ -30,9 +31,9 @@ class Item extends Component {
               <Link to={link}>{group.name}</Link>
             </h2>
             <div className={style.profile}>
-              <img src={user.avatar_url} alt={user.nickname} className={style.avatar} />
-                By {user.nickname}
-                {membersView}
+              <Avatar user={user} class="small" />
+              By {user.nickname}
+              {membersView}
             </div>
           </div>
         </div>

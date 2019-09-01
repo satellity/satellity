@@ -24,6 +24,7 @@
 .category {
   background: $color-bg-light-grey;
   border-radius: .2rem;
+  cursor: pointer;
   display: inline-block;
   padding: .2rem .8rem;
   margin-right: .8rem;
@@ -67,5 +68,6 @@
   }
 }
 .draft {
+  cursor: pointer;
   margin-left: 2rem;
 }
