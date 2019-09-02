@@ -1,13 +1,13 @@
 package controllers
 
 import (
+	"net/http"
+	"runtime"
 	"satellity/internal/configs"
 	"satellity/internal/controllers/admin"
 	"satellity/internal/durable"
 	"satellity/internal/session"
 	"satellity/internal/views"
-	"net/http"
-	"runtime"
 
 	"github.com/dimfeld/httptreemux"
 )
@@ -27,7 +27,7 @@ func RegisterRoutes(database *durable.Database, router *httptreemux.TreeMux) {
 func health(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	views.RenderResponse(w, r, map[string]string{
 		"build":      configs.BuildVersion + "-" + runtime.Version(),
-		"developers": "https://live.satellity.com",
+		"developers": "https://live.godiscourse.com",
 	})
 }
 

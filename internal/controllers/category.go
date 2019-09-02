@@ -1,11 +1,11 @@
 package controllers
 
 import (
+	"net/http"
 	"satellity/internal/durable"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
-	"net/http"
 	"time"
 
 	"github.com/dimfeld/httptreemux"

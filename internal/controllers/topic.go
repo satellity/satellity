@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"net/http"
 	"satellity/internal/durable"
 	"satellity/internal/middlewares"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
-	"net/http"
 	"time"
 
 	"github.com/dimfeld/httptreemux"

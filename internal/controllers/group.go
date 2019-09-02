@@ -33,7 +33,6 @@ func registerGroup(database *durable.Database, router *httptreemux.TreeMux) {
 	router.POST("/groups/:id/exit", impl.exit)
 	router.GET("/groups/:id/participants", impl.participants)
 	router.GET("/groups/:id/messages", impl.messages)
-
 	router.GET("/groups", impl.index)
 	router.GET("/groups/:id", impl.show)
 }

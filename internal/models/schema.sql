@@ -121,6 +121,7 @@ CREATE TABLE IF NOT EXISTS participants (
   group_id               VARCHAR(36) NOT NULL REFERENCES groups ON DELETE CASCADE,
   user_id                VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
   role                   VARCHAR(128) NOT NULL,
+  expired_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY (group_id, user_id)
