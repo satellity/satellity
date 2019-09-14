@@ -6,11 +6,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"satellity/internal/configs"
 	"satellity/internal/durable"
 	"satellity/internal/external"
 	"satellity/internal/session"
-	"net/http"
 	"strings"
 	"time"
 
@@ -49,7 +49,7 @@ func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) 
 		t := time.Now()
 		user = &User{
 			UserID:    uuid.Must(uuid.NewV4()).String(),
-			Username:  fmt.Sprintf("GH_%s", data.Login),
+			Username:  fmt.Sprintf("%s_GH", data.Login),
 			Nickname:  data.Name,
 			GithubID:  sql.NullString{String: data.NodeID, Valid: true},
 			CreatedAt: t,

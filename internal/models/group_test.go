@@ -19,6 +19,8 @@ func TestGroupCRUD(t *testing.T) {
 	assert.NotNil(user)
 	jason := createTestUser(mctx, "validfake@gmail.com", "usernamex", "passwordx")
 	assert.NotNil(jason)
+	david := createTestUser(mctx, "validfake02@gmail.com", "usernamexx", "passwordx")
+	assert.NotNil(david)
 
 	groupCases := []struct {
 		name        string
@@ -96,6 +98,26 @@ func TestGroupCRUD(t *testing.T) {
 			assert.Equal(int64(1), new.UsersCount)
 			users, err = group.Participants(mctx, nil, time.Now(), "100")
 			assert.Len(users, 1)
+
+			invitation, err := user.CreateGroupInvitation(mctx, uuid.Must(uuid.NewV4()).String(), "test@gmail.com")
+			assert.Nil(err)
+			assert.Nil(invitation)
+			invitation, err = jason.CreateGroupInvitation(mctx, group.GroupID, david.Email.String)
+			assert.NotNil(err)
+			assert.Nil(invitation)
+			invitation, err = user.CreateGroupInvitation(mctx, group.GroupID, jason.Email.String)
+			assert.Nil(err)
+			assert.NotNil(invitation)
+			new, err = david.JoinGroupByInvitation(mctx, group.GroupID, invitation.Code)
+			assert.Nil(err)
+			assert.NotNil(new)
+			assert.NotEqual(ParticipantRoleVIP, new.Role)
+			group, err = jason.JoinGroupByInvitation(mctx, group.GroupID, invitation.Code)
+			assert.Nil(err)
+			assert.NotNil(group)
+			assert.Equal(ParticipantRoleVIP, group.Role)
+			users, err = group.Participants(mctx, nil, time.Now(), "100")
+			assert.Len(users, 2)
 		})
 	}
 }

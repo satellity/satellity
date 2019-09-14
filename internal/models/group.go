@@ -99,7 +99,8 @@ func (user *User) CreateGroup(mctx *Context, name, description, cover string) (*
 		if err != nil {
 			return err
 		}
-		_, err = createParticipant(ctx, tx, group.GroupID, group.UserID, ParticipantRoleOwner)
+		group.Role = ParticipantRoleOwner
+		_, err = createParticipant(ctx, tx, group, group.UserID, ParticipantSourcePayment)
 		return err
 	})
 	if err != nil {
