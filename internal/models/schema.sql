@@ -121,6 +121,8 @@ CREATE TABLE IF NOT EXISTS participants (
   group_id               VARCHAR(36) NOT NULL REFERENCES groups ON DELETE CASCADE,
   user_id                VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
   role                   VARCHAR(128) NOT NULL,
+  source                 VARCHAR(128) NOT NULL,
+  expired_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY (group_id, user_id)
@@ -129,6 +131,20 @@ CREATE TABLE IF NOT EXISTS participants (
 CREATE INDEX IF NOT EXISTS participant_createdx ON participants (created_at);
 CREATE INDEX IF NOT EXISTS participant_user_createdx ON participants (user_id,created_at);
 CREATE INDEX IF NOT EXISTS participant_group_createdx ON participants (group_id,created_at);
+
+
+
+CREATE TABLE IF NOT EXISTS group_invitations (
+  invitation_id          VARCHAR(36) PRIMARY KEY,
+  group_id               VARCHAR(36) NOT NULL REFERENCES groups ON DELETE CASCADE,
+  email                  VARCHAR(512) NOT NULL,
+  code                   VARCHAR(128) NOT NULL,
+  sent_at                TIMESTAMP WITH TIME ZONE,
+  created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS group_invitations_group_emailx ON group_invitations (group_id, email);
+
 
 
 CREATE TABLE IF NOT EXISTS messages (

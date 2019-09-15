@@ -2,9 +2,9 @@ package models
 
 import (
 	"context"
+	"log"
 	"satellity/internal/configs"
 	"satellity/internal/durable"
-	"log"
 )
 
 const (
@@ -13,22 +13,24 @@ const (
 )
 
 const (
-	dropUsersDDL        = `DROP TABLE IF EXISTS users;`
-	dropSessionsDDL     = `DROP TABLE IF EXISTS sessions;`
-	dropCategoriesDDL   = `DROP TABLE IF EXISTS categories;`
-	dropTopicUsersDDL   = `DROP TABLE IF EXISTS topic_users;`
-	dropTopicsDDL       = `DROP TABLE IF EXISTS topics;`
-	dropCommentsDDL     = `DROP TABLE IF EXISTS comments;`
-	dropGroupsDDL       = `DROP TABLE IF EXISTS groups`
-	dropParticipantsDDL = `DROP TABLE IF EXISTS participants`
-	dropMessagesDDL     = `DROP TABLE IF EXISTS messages`
-	dropStatisticsDDL   = `DROP TABLE IF EXISTS statistics;`
+	dropUsersDDL            = `DROP TABLE IF EXISTS users;`
+	dropSessionsDDL         = `DROP TABLE IF EXISTS sessions;`
+	dropCategoriesDDL       = `DROP TABLE IF EXISTS categories;`
+	dropTopicUsersDDL       = `DROP TABLE IF EXISTS topic_users;`
+	dropTopicsDDL           = `DROP TABLE IF EXISTS topics;`
+	dropCommentsDDL         = `DROP TABLE IF EXISTS comments;`
+	dropGroupsDDL           = `DROP TABLE IF EXISTS groups`
+	dropParticipantsDDL     = `DROP TABLE IF EXISTS participants`
+	dropGroupInvitationsDDL = `DROP TABLE IF EXISTS group_invitations`
+	dropMessagesDDL         = `DROP TABLE IF EXISTS messages`
+	dropStatisticsDDL       = `DROP TABLE IF EXISTS statistics;`
 )
 
 func teardownTestContext(mctx *Context) {
 	tables := []string{
 		dropStatisticsDDL,
 		dropMessagesDDL,
+		dropGroupInvitationsDDL,
 		dropParticipantsDDL,
 		dropGroupsDDL,
 		dropCommentsDDL,
@@ -70,6 +72,7 @@ func setupTestContext() *Context {
 		commentsDDL,
 		groupsDDL,
 		participantsDDL,
+		groupInvitationsDDL,
 		messagesDDL,
 		statisticsDDL,
 	}

@@ -41,6 +41,13 @@ class Group {
     });
   }
 
+  invite(id, params) {
+    const data = {email: params.email};
+    return this.api.axios.post(`/groups/${id}/invitations`, data).then((resp) => {
+      return resp;
+    });
+  }
+
   members(id, limit) {
     return this.api.axios.get(`/groups/${id}/participants?limit=${limit}`).then((resp) => {
       return resp.data;

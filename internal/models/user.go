@@ -295,26 +295,23 @@ func ReadUserByUsernameOrEmail(mctx *Context, identity string) (*User, error) {
 
 	var user *User
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1", strings.Join(userColumns, ",")), identity)
-		defer rows.Close()
-
-		if !rows.Next() {
-			if err := rows.Err(); err != nil {
-				return err
-			}
-			return nil
-		}
-		user, err = userFromRows(rows)
-		if err != nil {
-			return err
-		}
-		return nil
+		var err error
+		user, err = findUserByIdentity(ctx, tx, identity)
+		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
-		return user, session.TransactionError(ctx, err)
+		return nil, session.TransactionError(ctx, err)
+	}
+	return user, nil
+}
+
+func findUserByIdentity(ctx context.Context, tx *sql.Tx, identity string) (*User, error) {
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1 LIMIT 1", strings.Join(userColumns, ",")), identity)
+	user, err := userFromRows(row)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
 	}
 	return user, nil
 }

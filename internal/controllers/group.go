@@ -22,6 +22,9 @@ type groupRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Cover       string `json:"cover"`
+
+	Email string `json:"email"`
+	Code  string `json:"code"`
 }
 
 func registerGroup(database *durable.Database, router *httptreemux.TreeMux) {
@@ -31,9 +34,9 @@ func registerGroup(database *durable.Database, router *httptreemux.TreeMux) {
 	router.POST("/groups/:id", impl.update)
 	router.POST("/groups/:id/join", impl.join)
 	router.POST("/groups/:id/exit", impl.exit)
+	router.POST("/groups/:id/invitations", impl.invitations)
 	router.GET("/groups/:id/participants", impl.participants)
 	router.GET("/groups/:id/messages", impl.messages)
-
 	router.GET("/groups", impl.index)
 	router.GET("/groups/:id", impl.show)
 }
@@ -44,6 +47,7 @@ func (impl *groupImpl) create(w http.ResponseWriter, r *http.Request, _ map[stri
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
+
 	mctx := models.WrapContext(r.Context(), impl.database)
 	if group, err := middlewares.CurrentUser(r).CreateGroup(mctx, body.Name, body.Description, body.Cover); err != nil {
 		views.RenderErrorResponse(w, r, err)
@@ -69,8 +73,22 @@ func (impl *groupImpl) update(w http.ResponseWriter, r *http.Request, params map
 }
 
 func (impl *groupImpl) join(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	var body groupRequest
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
+		return
+	}
+
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if group, err := middlewares.CurrentUser(r).JoinGroup(mctx, params["id"], models.ParticipantRoleMember); err != nil {
+	var group *models.Group
+	var err error
+	if len(body.Code) > 0 {
+		group, err = middlewares.CurrentUser(r).JoinGroupByInvitation(mctx, params["id"], body.Code)
+	} else {
+		group, err = middlewares.CurrentUser(r).JoinGroup(mctx, params["id"], models.ParticipantRoleMember)
+	}
+
+	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if group == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
@@ -109,6 +127,22 @@ func (impl *groupImpl) show(w http.ResponseWriter, r *http.Request, params map[s
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 	} else {
 		views.RenderGroup(w, r, group)
+	}
+}
+
+func (impl *groupImpl) invitations(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	mctx := models.WrapContext(r.Context(), impl.database)
+	var body groupRequest
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
+		return
+	}
+
+	_, err := middlewares.CurrentUser(r).CreateGroupInvitation(mctx, params["id"], body.Email)
+	if err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderBlankResponse(w, r)
 	}
 }
 

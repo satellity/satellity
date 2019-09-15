@@ -87,10 +87,22 @@ func TooManyGroupsError(ctx context.Context) Error {
 	return createError(ctx, http.StatusAccepted, 10014, description, nil)
 }
 
-// InvalidImageDataError means image is invalid
+// InvalidImageDataError means image is invalid.
 func InvalidImageDataError(ctx context.Context) Error {
 	description := "Invalid image data."
 	return createError(ctx, http.StatusAccepted, 10015, description, nil)
+}
+
+// TooManyGroupInvitationsError means group invitations count is out of size.
+func TooManyGroupInvitationsError(ctx context.Context) Error {
+	description := "Too Many Group Invitations."
+	return createError(ctx, http.StatusAccepted, 10016, description, nil)
+}
+
+// InvalidGroupInvitationCodeError means group invitation code is invalid.
+func InvalidGroupInvitationCodeError(ctx context.Context) Error {
+	description := "Invalid Group Invitation Code."
+	return createError(ctx, http.StatusAccepted, 10017, description, nil)
 }
 
 // ServerError means some server error are occurred.

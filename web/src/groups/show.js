@@ -7,6 +7,8 @@ import showdown from 'showdown';
 import API from '../api/index.js';
 import Config from '../components/config.js';
 import LoadingView from '../loading/loading.js';
+import Button from '../widgets/button.js';
+import Invitation from './invitation.js';
 
 class Show extends Component {
   constructor(props) {
@@ -95,6 +97,11 @@ class Show extends Component {
         : <button onClick={(e) => this.handleExit(e)}>{i18n.t('group.exit')}</button>
     }
 
+    let invitationView = '';
+    if (state.is_owner) {
+      invitationView = <Invitation groupId={state.group_id} />
+    }
+
     let showView = (
       <div className={style.group}>
         <div className={style.head}>
@@ -115,6 +122,7 @@ class Show extends Component {
         <div className={style.action}>
           {actionView}
         </div>
+        {invitationView}
       </div>
     )
 
@@ -122,13 +130,9 @@ class Show extends Component {
       <div>
         <div className={style.navi}>
           <div className={style.navi}>
-            <Link to={`/groups/${state.group_id}/messages`}>
-              {i18n.t('group.navi.messages')}
-            </Link>
+            <Button action={`/groups/${state.group_id}/messages`} text={i18n.t('group.navi.messages')} />
           </div>
-          <Link to={`/groups/${state.group_id}/members`}>
-            {i18n.t('group.navi.members', {count: state.users_count})}
-          </Link>
+          <Button action={`/groups/${state.group_id}/members`} text={i18n.t('group.navi.members', {count: state.users_count})} />
         </div>
       </div>
     )

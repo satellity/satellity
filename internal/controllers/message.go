@@ -24,7 +24,7 @@ func registerMessage(database *durable.Database, router *httptreemux.TreeMux) {
 	impl := &messageImpl{database: database}
 	router.POST("/groups/:id/messages", impl.create)
 	router.POST("/messages/:id", impl.update)
-	router.POST("/messages/:id/delete", impl.destroy)
+	router.DELETE("/messages/:id", impl.destroy)
 }
 
 func (impl *messageImpl) create(w http.ResponseWriter, r *http.Request, params map[string]string) {
