@@ -347,6 +347,20 @@ func (user *User) RelatedGroups(mctx *Context, limit int64) ([]*Group, error) {
 	return groups, nil
 }
 
+func updateGroupUsercount(ctx context.Context, tx *sql.Tx, group *Group, increase bool) error {
+	var count int64
+	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM participants WHERE group_id=$1", group.GroupID).Scan(&count)
+	if err != nil {
+		return err
+	}
+	group.UsersCount = count - 1
+	if increase {
+		group.UsersCount = count + 1
+	}
+	_, err = tx.ExecContext(ctx, "UPDATE groups SET users_count=$1 WHERE group_id=$2", group.UsersCount, group.GroupID)
+	return nil
+}
+
 //GetRole get participant role in the group
 func (g *Group) GetRole() string {
 	if g.Role != "" {

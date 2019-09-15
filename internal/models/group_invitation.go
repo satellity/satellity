@@ -85,9 +85,19 @@ func (user *User) CreateGroupInvitation(mctx *Context, groupID, email string) (*
 		}
 		group.Role = ParticipantRoleVIP
 		if customer != nil {
+			p, err := findParticipant(ctx, tx, group.GroupID, customer.UserID)
+			if err != nil || p != nil {
+				return err
+			}
+			err = updateGroupUsercount(ctx, tx, group, true)
+			if err != nil {
+				return err
+			}
 			_, err = createParticipant(ctx, tx, group, customer.UserID, ParticipantSourceInvitation)
 			return err
 		}
+		// TODO only invite register user
+		return nil
 
 		invitation = &GroupInvitation{
 			InvitationID: uuid.Must(uuid.NewV4()).String(),
@@ -135,17 +145,10 @@ func (user *User) JoinGroupByInvitation(mctx *Context, groupID, code string) (*G
 		}
 		group.User = owner
 
-		var count int64
-		err = tx.QueryRowContext(ctx, "SELECT count(*) FROM participants WHERE group_id=$1", groupID).Scan(&count)
+		err = updateGroupUsercount(ctx, tx, group, true)
 		if err != nil {
 			return err
 		}
-		group.UsersCount = count + 1
-		_, err = tx.ExecContext(ctx, "UPDATE groups SET users_count=$1 WHERE group_id=$2", group.UsersCount, group.GroupID)
-		if err != nil {
-			return err
-		}
-
 		group.Role = ParticipantRoleVIP
 		_, err = createParticipant(ctx, tx, group, user.UserID, ParticipantSourceInvitation)
 		if err != nil {
