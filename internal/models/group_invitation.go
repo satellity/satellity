@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS group_invitations (
 CREATE UNIQUE INDEX IF NOT EXISTS group_invitations_group_emailx ON group_invitations (group_id, email);
 `
 
+// Group Invitation related constants
 const (
 	MaxGroupInvitations = 7
 )
@@ -68,7 +69,7 @@ func (user *User) CreateGroupInvitation(mctx *Context, groupID, email string) (*
 		if err != nil {
 			return err
 		}
-		if count > 7 {
+		if count > MaxGroupInvitations {
 			return session.TooManyGroupInvitationsError(ctx)
 		}
 		group, err := findGroup(ctx, tx, groupID)
