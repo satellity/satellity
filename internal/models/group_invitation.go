@@ -73,12 +73,20 @@ func (user *User) CreateGroupInvitation(mctx *Context, groupID, email string) (*
 			return session.TooManyGroupInvitationsError(ctx)
 		}
 		group, err := findGroup(ctx, tx, groupID)
-		if err != nil {
+		if err != nil || group == nil {
 			return err
-		} else if group == nil {
-			return nil
 		} else if user.UserID != group.UserID {
 			return session.ForbiddenError(ctx)
+		}
+
+		customer, err := findUserByIdentity(ctx, tx, email)
+		if err != nil {
+			return err
+		}
+		group.Role = ParticipantRoleVIP
+		if customer != nil {
+			_, err = createParticipant(ctx, tx, group, customer.UserID, ParticipantSourceInvitation)
+			return err
 		}
 
 		invitation = &GroupInvitation{
