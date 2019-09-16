@@ -2,9 +2,7 @@ package models
 
 import (
 	"context"
-	"crypto/rand"
 	"database/sql"
-	"encoding/binary"
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
@@ -170,17 +168,4 @@ func findGroupInvitationByGroupIDAndEmail(ctx context.Context, tx *sql.Tx, group
 	query := fmt.Sprintf("SELECT %s FROM group_invitations WHERE group_id=$1 AND email=$2 LIMIT 1", strings.Join(groupInvitationColumns, ","))
 	row := tx.QueryRowContext(ctx, query, groupID, email)
 	return groupInvitationFromRows(row)
-}
-
-func generateVerificationCode(ctx context.Context) (string, error) {
-	var b [8]byte
-	_, err := rand.Read(b[:])
-	if err != nil {
-		return "", session.ServerError(ctx, err)
-	}
-	c := binary.LittleEndian.Uint64(b[:]) % 10000
-	if c < 1000 {
-		c = 1000 + c
-	}
-	return fmt.Sprint(c), nil
 }

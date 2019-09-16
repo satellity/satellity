@@ -25,7 +25,7 @@ type GithubUser struct {
 	Email  string `json:"email"`
 }
 
-// CreateGithubUser create a github user.
+// CreateGithubUser create a github user. TODO should use createUser
 func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) {
 	ctx := mctx.context
 	token, err := fetchAccessToken(ctx, code)

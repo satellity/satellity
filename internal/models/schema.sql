@@ -26,6 +26,14 @@ CREATE TABLE IF NOT EXISTS sessions (
 CREATE INDEX IF NOT EXISTS sessions_userx ON sessions (user_id);
 
 
+CREATE TABLE IF NOT EXISTS email_verifications (
+	verification_id        VARCHAR(36) PRIMARY KEY,
+	email                  VARCHAR(512),
+	code                   VARCHAR(512),
+	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+
 CREATE TABLE IF NOT EXISTS categories (
   category_id           VARCHAR(36) PRIMARY KEY,
   name                  VARCHAR(36) NOT NULL,

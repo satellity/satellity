@@ -105,6 +105,18 @@ func InvalidGroupInvitationCodeError(ctx context.Context) Error {
 	return createError(ctx, http.StatusAccepted, 10017, description, nil)
 }
 
+// RecaptchaVerifyError means recaptcha is invalid.
+func RecaptchaVerifyError(ctx context.Context) Error {
+	description := fmt.Sprintf("Recaptcha is invalid.")
+	return createError(ctx, http.StatusAccepted, 10018, description, nil)
+}
+
+// VerificationCodeInvalidError means verification code is invalid
+func VerificationCodeInvalidError(ctx context.Context) Error {
+	description := "Invalid verification code."
+	return createError(ctx, http.StatusAccepted, 10019, description, nil)
+}
+
 // ServerError means some server error are occurred.
 func ServerError(ctx context.Context, err error) Error {
 	description := http.StatusText(http.StatusInternalServerError)
