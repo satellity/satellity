@@ -34,6 +34,10 @@ type Option struct {
 			Path    string `yaml:"path"`
 		} `yaml:"attachments"`
 	} `yaml:"system"`
+	Recaptcha struct {
+		URL    string `yaml:"url"`
+		Secret string `yaml:"secret"`
+	} `yaml:"recaptcha"`
 	Operators []string `yaml:"operators"`
 
 	Environment string

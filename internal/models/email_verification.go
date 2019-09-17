@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"satellity/internal/configs"
 	"satellity/internal/durable"
 	"satellity/internal/session"
 	"strings"
@@ -65,7 +66,7 @@ func CreateEmailVerification(mctx *Context, email, recaptcha string) (*EmailVeri
 	}
 	ev := &EmailVerification{
 		VerificationID: uuid.Must(uuid.NewV4()).String(),
-		Email:          email,
+		Email:          strings.TrimSpace(email),
 		Code:           code,
 		CreatedAt:      time.Now(),
 	}
@@ -101,7 +102,7 @@ func VerifyEmailVerification(mctx *Context, verificationID, code, username, pass
 				return err
 			}
 		}
-		if ev.CreatedAt.Add(time.Hour * 24).After(time.Now()) {
+		if ev.CreatedAt.Add(time.Hour * 24).Before(time.Now()) {
 			return session.VerificationCodeInvalidError(ctx)
 		}
 		_, err = tx.ExecContext(ctx, "DELETE FROM email_verifications WHERE verification_id=$1", ev.VerificationID)
@@ -173,10 +174,14 @@ type recaptchaResp struct {
 }
 
 func verifyRecaptcha(ctx context.Context, recaptcha string) (bool, error) {
+	config := configs.AppConfig
+	if config.Environment == "test" {
+		return true, nil
+	}
 	if httpClient == nil {
 		httpClient = &http.Client{}
 	}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s?secret=%s&response=%s", "", "", recaptcha), nil)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s?secret=%s&response=%s", config.Recaptcha.URL, config.Recaptcha.Secret, recaptcha), nil)
 	if err != nil {
 		return false, err
 	}

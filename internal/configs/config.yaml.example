@@ -15,6 +15,9 @@ default: &default
     attachments:
       storage: "local"
       path: "/path/to/assets"
+  recaptcha:
+    url: "https://www.google.com/recaptcha/api/siteverify"
+    secret: "6Lf27bgUbbbbbKYLfp8bkqal29xqHcUzmAlfW1hR"
   operators:
     - hi@gmail.com
 

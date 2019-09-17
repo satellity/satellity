@@ -13,17 +13,18 @@ const (
 )
 
 const (
-	dropUsersDDL            = `DROP TABLE IF EXISTS users;`
-	dropSessionsDDL         = `DROP TABLE IF EXISTS sessions;`
-	dropCategoriesDDL       = `DROP TABLE IF EXISTS categories;`
-	dropTopicUsersDDL       = `DROP TABLE IF EXISTS topic_users;`
-	dropTopicsDDL           = `DROP TABLE IF EXISTS topics;`
-	dropCommentsDDL         = `DROP TABLE IF EXISTS comments;`
-	dropGroupsDDL           = `DROP TABLE IF EXISTS groups`
-	dropParticipantsDDL     = `DROP TABLE IF EXISTS participants`
-	dropGroupInvitationsDDL = `DROP TABLE IF EXISTS group_invitations`
-	dropMessagesDDL         = `DROP TABLE IF EXISTS messages`
-	dropStatisticsDDL       = `DROP TABLE IF EXISTS statistics;`
+	dropUsersDDL             = `DROP TABLE IF EXISTS users;`
+	dropSessionsDDL          = `DROP TABLE IF EXISTS sessions;`
+	dropEmailVerificationDDL = `DROP TABLE IF EXISTS email_verifications;`
+	dropCategoriesDDL        = `DROP TABLE IF EXISTS categories;`
+	dropTopicUsersDDL        = `DROP TABLE IF EXISTS topic_users;`
+	dropTopicsDDL            = `DROP TABLE IF EXISTS topics;`
+	dropCommentsDDL          = `DROP TABLE IF EXISTS comments;`
+	dropGroupsDDL            = `DROP TABLE IF EXISTS groups`
+	dropParticipantsDDL      = `DROP TABLE IF EXISTS participants`
+	dropGroupInvitationsDDL  = `DROP TABLE IF EXISTS group_invitations`
+	dropMessagesDDL          = `DROP TABLE IF EXISTS messages`
+	dropStatisticsDDL        = `DROP TABLE IF EXISTS statistics;`
 )
 
 func teardownTestContext(mctx *Context) {
@@ -37,6 +38,7 @@ func teardownTestContext(mctx *Context) {
 		dropTopicUsersDDL,
 		dropTopicsDDL,
 		dropCategoriesDDL,
+		dropEmailVerificationDDL,
 		dropSessionsDDL,
 		dropUsersDDL,
 	}
@@ -66,6 +68,7 @@ func setupTestContext() *Context {
 	tables := []string{
 		usersDDL,
 		sessionsDDL,
+		emailVerificationDDL,
 		categoriesDDL,
 		topicsDDL,
 		topicUsersDDL,
