@@ -9,6 +9,7 @@ import User from '../users/view.js';
 import Topic from '../topics/view.js';
 import Group from '../groups/view.js';
 import Message from '../messages/view.js';
+import Modal from './modal.js';
 
 class MainLayout extends Component {
   constructor(props) {
@@ -51,8 +52,8 @@ class MainLayout extends Component {
 class Header extends Component {
   constructor(props) {
     super(props);
-    this.state = {logging: false};
 
+    this.state = {logging: false};
     this.handleLoginClick = this.handleLoginClick.bind(this);
   }
 
@@ -68,20 +69,7 @@ class Header extends Component {
         <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {user.local().nickname} </Link>
       );
     }
-    let modal;
-    if (!user.loggedIn()) {
-      modal = (
-        <div className={style.modal}>
-          <div className={style.modalContainer}>
-            <div onClick={this.handleLoginClick} className={style.action}>✕</div>
-            <div className={style.app}>Login Satellity</div>
-            <div className={style.content}>
-              <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`}>{i18n.t('login.github')}</a>
-            </div>
-          </div>
-        </div>
-      )
-    }
+
     return (
       <div>
         <header className={style.header}>
@@ -97,7 +85,7 @@ class Header extends Component {
           </Link>
             {profile}
         </header>
-        {this.state.logging && modal}
+          {this.state.logging && <Modal handleLoginClick={this.handleLoginClick} />}
       </div>
     )
   }

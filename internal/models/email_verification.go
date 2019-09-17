@@ -170,7 +170,8 @@ func findEmailVerificationByEmailAndCode(ctx context.Context, tx *sql.Tx, email,
 var httpClient *http.Client
 
 type recaptchaResp struct {
-	Success bool `json:"success"`
+	Success bool    `json:"success"`
+	Score   float64 `json:"score"`
 }
 
 func verifyRecaptcha(ctx context.Context, recaptcha string) (bool, error) {
