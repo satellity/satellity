@@ -50,6 +50,7 @@ func emailVerificationFromRows(row durable.Row) (*EmailVerification, error) {
 	return &ev, err
 }
 
+// CreateEmailVerification create an email verification
 func CreateEmailVerification(mctx *Context, email, recaptcha string) (*EmailVerification, error) {
 	ctx := mctx.context
 
@@ -87,6 +88,7 @@ func CreateEmailVerification(mctx *Context, email, recaptcha string) (*EmailVeri
 	return ev, nil
 }
 
+// VerifyEmailVerification verify an email verification
 func VerifyEmailVerification(mctx *Context, verificationID, code, username, password, sessionSecret string) (*User, error) {
 	ctx := mctx.context
 
