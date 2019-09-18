@@ -15,7 +15,7 @@ default: &default
     attachments:
       storage: "local"
       path: "/path/to/assets"
-  recaptcha:
+  recaptcha: # will be ignore if url or secret is blank
     url: "https://www.google.com/recaptcha/api/siteverify"
     secret: "6Lf27bgUbbbbbKYLfp8bkqal29xqHcUzmAlfW1hR"
   operators:

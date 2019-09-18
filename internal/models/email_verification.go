@@ -5,11 +5,8 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"satellity/internal/configs"
+	"satellity/internal/clouds"
 	"satellity/internal/durable"
 	"satellity/internal/session"
 	"strings"
@@ -59,7 +56,7 @@ func CreateEmailVerification(mctx *Context, email, recaptcha string) (*EmailVeri
 		return nil, err
 	}
 
-	success, err := verifyRecaptcha(ctx, recaptcha)
+	success, err := clouds.VerifyRecaptcha(ctx, recaptcha)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
 	} else if !success {
@@ -167,44 +164,6 @@ func findEmailVerificationByEmailAndCode(ctx context.Context, tx *sql.Tx, email,
 		return nil, err
 	}
 	return ev, nil
-}
-
-var httpClient *http.Client
-
-type recaptchaResp struct {
-	Success bool    `json:"success"`
-	Score   float64 `json:"score"`
-}
-
-func verifyRecaptcha(ctx context.Context, recaptcha string) (bool, error) {
-	config := configs.AppConfig
-	if config.Environment == "test" {
-		return true, nil
-	}
-	if httpClient == nil {
-		httpClient = &http.Client{}
-	}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s?secret=%s&response=%s", config.Recaptcha.URL, config.Recaptcha.Secret, recaptcha), nil)
-	if err != nil {
-		return false, err
-	}
-	req.Close = true
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return false, err
-	}
-	defer resp.Body.Close()
-
-	bytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return false, err
-	}
-	var captcha recaptchaResp
-	err = json.Unmarshal(bytes, &captcha)
-	if err != nil {
-		return false, err
-	}
-	return captcha.Success, nil
 }
 
 func generateVerificationCode(ctx context.Context) (string, error) {
