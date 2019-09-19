@@ -1,6 +1,9 @@
+import Base64 from '../components/base64.js';
+
 class Category {
   constructor(api) {
     this.api = api;
+    this.base64 = new Base64();
     this.admin = new Admin(api);
   }
 
@@ -9,7 +12,7 @@ class Category {
       let categories = resp.data.map((o) => {
         return {category_id: o.category_id, name: o.name, alias: o.alias}
       });
-      window.localStorage.setItem('categories', btoa(JSON.stringify(categories)));
+      window.localStorage.setItem('categories', this.base64.encode(JSON.stringify(categories)));
       return resp.data;
     });
   }

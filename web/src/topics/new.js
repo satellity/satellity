@@ -7,6 +7,7 @@ import { Redirect } from 'react-router-dom';
 import {Controlled as CodeMirror} from 'react-codemirror2'
 import showdown from 'showdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Base64 from '../components/base64.js';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
 const validate = require('uuid-validate');
@@ -15,11 +16,12 @@ class New extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
+    this.base64 = new Base64();
     this.converter = new showdown.Converter();
     let categories = [];
     let d = window.localStorage.getItem('categories');
     if (!!d) {
-      categories = JSON.parse(atob(d));
+      categories = JSON.parse(this.base64.decode(d));
     }
     let id = this.props.match.params.id;
     // false , 0 , "" , null , undefined , and NaN

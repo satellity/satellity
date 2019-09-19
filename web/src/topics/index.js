@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Config from '../components/config.js';
+import Base64 from '../components/base64.js';
 import API from '../api/index.js';
 import TopicItem from './item.js';
 import LoadingView from '../loading/loading.js';
@@ -13,12 +14,13 @@ class Index extends Component {
     super(props);
 
     this.api = new API();
+    this.base64 = new Base64();
     this.params = new URLSearchParams(props.location.search);
     this.pagination = 50;
     let categories = [];
     let d = window.localStorage.getItem('categories');
     if (d !== null && d !== undefined && d !== '') {
-      categories = JSON.parse(atob(d));
+      categories = JSON.parse(this.base64.decode(d));
     }
     this.state = {
       topics: [],
