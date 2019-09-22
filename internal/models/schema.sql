@@ -33,6 +33,9 @@ CREATE TABLE IF NOT EXISTS email_verifications (
 	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX IF NOT EXISTS email_verifications_email_code_createdx ON email_verifications (email, code, created_at DESC);
+CREATE INDEX IF NOT EXISTS email_verifications_createdx ON email_verifications (created_at DESC);
+
 
 CREATE TABLE IF NOT EXISTS categories (
   category_id           VARCHAR(36) PRIMARY KEY,
