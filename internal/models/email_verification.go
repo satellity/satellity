@@ -140,6 +140,8 @@ func VerifyEmailVerification(mctx *Context, verificationID, code, username, pass
 			return nil, err
 		}
 		return nil, session.TransactionError(ctx, err)
+	} else if user == nil {
+		return nil, session.VerificationCodeInvalidError(ctx)
 	}
 	return user, nil
 }

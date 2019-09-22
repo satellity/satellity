@@ -19,6 +19,8 @@ var whitelist = [][2]string{
 	{"GET", "^/groups$"},
 	{"GET", "^/groups/[a-z0-9-]+$"},
 	{"POST", "^/oauth"},
+	{"POST", "^/sessions"},
+	{"POST", "^/email_verifications"},
 }
 
 var userWhitelist = [][2]string{

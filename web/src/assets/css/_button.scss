@@ -37,6 +37,12 @@
     width: 30rem;
     max-width: 50%;
   }
+  &.session {
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+    background: rgba($color-main-red, $color-main-red-alpha);
+    color: white;
+    width: 100%;
+  }
   &.invite {
     border: 1px solid rgba($color-main-red, $color-main-red-alpha);
     background: rgba($color-main-red, $color-main-red-alpha);

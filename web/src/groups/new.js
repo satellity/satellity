@@ -53,10 +53,9 @@ class New extends Component {
   }
 
   handleChange(e) {
-    const target = e.target;
-    const name = target.name;
+    const {target: {name, value}} = e;
     this.setState({
-      [name]: target.value
+      [name]: value
     });
   }
 

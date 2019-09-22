@@ -21,6 +21,7 @@ func RegisterRoutes(database *durable.Database, router *httptreemux.TreeMux) {
 	registerComment(database, router)
 	registerGroup(database, router)
 	registerMessage(database, router)
+	registerVerification(database, router)
 	admin.RegisterAdminRoutes(database, router)
 }
 

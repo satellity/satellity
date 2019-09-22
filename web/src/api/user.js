@@ -21,13 +21,19 @@ class User {
     return KJUR.KEYUTIL.getPEM(ec, 'PKCS1PRV');
   }
 
-  signIn(code) {
+  signIn(code, email, password) {
     let pwd = uuid().toLowerCase();
     let ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
     let pub = ec.generateKeyPairHex().ecpubhex;
     let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
-    let params = {'session_secret': this.fixed_schema_header + pub, 'code': code};
-    return this.api.axios.post('/oauth/github', params).then((resp) => {
+    let params = {'session_secret': this.fixed_schema_header + pub, 'code': code, email: email, password: password};
+    let request;
+    if (code != '') {
+      request = this.api.axios.post('/oauth/github', params);
+    } else {
+      request = this.api.axios.post('/sessions', params);
+    }
+    return request.then((resp) => {
       const data = resp.data;
       Cookies.set('sid', pwd, { expires: 365 });
       window.localStorage.setItem('token', priv);
@@ -35,6 +41,23 @@ class User {
       window.localStorage.setItem('sid', data.session_id);
       window.localStorage.setItem('user', this.base64.encode(JSON.stringify(data)));
       return data;
+    });
+  }
+
+  verify(params) {
+    let pwd = uuid().toLowerCase();
+    let ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
+    let pub = ec.generateKeyPairHex().ecpubhex;
+    let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
+    params = {'verification_id': params.verification_id, 'code': params.code, 'username': params.username, 'password': params.password, 'session_secret': this.fixed_schema_header + pub};
+    return this.api.axios.post(`/email_verifications/${params.verification_id}`, params).then((resp) => {
+      const data = resp.data;
+      Cookies.set('sid', pwd, { expires: 365 });
+      window.localStorage.setItem('token', priv);
+      window.localStorage.setItem('uid', data.user_id);
+      window.localStorage.setItem('sid', data.session_id);
+      window.localStorage.setItem('user', this.base64.encode(JSON.stringify(data)));
+      return resp.data;
     });
   }
 

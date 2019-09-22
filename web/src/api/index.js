@@ -13,6 +13,7 @@ import Group from './group.js';
 import Message from './message.js';
 import User from './user.js';
 import Me from './me.js';
+import Verification from './verification.js';
 
 Noty.overrideDefaults({
     type: 'error',
@@ -133,6 +134,7 @@ class API {
     this.message = new Message(this);
     this.user = new User(this);
     this.me = new Me(this);
+    this.verification = new Verification(this);
   }
 }
 

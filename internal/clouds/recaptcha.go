@@ -48,5 +48,5 @@ func VerifyRecaptcha(ctx context.Context, recaptcha string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return captcha.Success, nil
+	return captcha.Score > 0.6 && captcha.Success, nil
 }

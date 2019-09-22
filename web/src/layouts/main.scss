@@ -72,7 +72,7 @@
   background: white;
   border-radius: .2rem;
   color: black;
-  width: 36rem;
+  width: 24rem;
   max-width: 98%;
   padding: 1.6rem 3.2rem;
   position: relative;
@@ -85,7 +85,7 @@
   top: .6rem;
 }
 .app {
-  margin-bottom: 3.2rem;
+  margin-bottom: 1.6rem;
 }
 .content {
   text-align: center;
@@ -96,8 +96,17 @@
     color: white;
     display: inline-block;
     padding: 0.4rem 0.8rem;
-    width: 16rem;
+    width: 100%;
   }
+}
+.or {
+  text-align: center;
+  padding: 1.6rem 0;
+}
+.register {
+  cursor: pointer;
+  text-align: center;
+  margin-top: 1.6rem;
 }
 
 @media only screen and (max-width: 64rem) {

@@ -28,6 +28,7 @@ func registerVerification(database *durable.Database, router *httptreemux.TreeMu
 	impl := &verificationImpl{database: database}
 
 	router.POST("/email_verifications", impl.create)
+	router.POST("/email_verifications/:id", impl.verify)
 }
 
 func (impl *verificationImpl) create(w http.ResponseWriter, r *http.Request, _ map[string]string) {

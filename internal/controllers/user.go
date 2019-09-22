@@ -21,6 +21,8 @@ type userImpl struct {
 type userRequest struct {
 	Code          string `json:"code"`
 	SessionSecret string `json:"session_secret"`
+	Email         string `json:"email"`
+	Password      string `json:"password"`
 	Nickname      string `json:"nickname"`
 	Biography     string `json:"biography"`
 }
@@ -29,6 +31,7 @@ func registerUser(database *durable.Database, router *httptreemux.TreeMux) {
 	impl := &userImpl{database: database}
 
 	router.POST("/oauth/:provider", impl.oauth)
+	router.POST("/sessions", impl.create)
 	router.POST("/me", impl.update)
 	router.GET("/me", impl.current)
 	router.GET("/users/:id", impl.show)
@@ -45,6 +48,20 @@ func (impl *userImpl) oauth(w http.ResponseWriter, r *http.Request, params map[s
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
 	if user, err := models.CreateGithubUser(mctx, body.Code, body.SessionSecret); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderAccount(w, r, user)
+	}
+}
+
+func (impl *userImpl) create(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	var body userRequest
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
+		return
+	}
+	mctx := models.WrapContext(r.Context(), impl.database)
+	if user, err := models.CreateSession(mctx, body.Email, body.Password, body.SessionSecret); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderAccount(w, r, user)
