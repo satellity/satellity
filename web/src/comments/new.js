@@ -1,8 +1,8 @@
 import style from './index.scss';
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
+import Button from '../widgets/button.js';
 
 class CommentNew extends Component {
   constructor(props) {
@@ -55,10 +55,7 @@ class CommentNew extends Component {
             <textarea type='text' name='body' minLength='3' required placeholder={i18n.t('comment.form.body')} value={state.body} onChange={this.handleChange} />
           </div>
           <div className='action'>
-            <button className='btn submit' disabled={state.submitting}>
-              { state.submitting && <LoadingView style='sm-ring blank'/> }
-              &nbsp;{i18n.t('general.submit')}
-            </button>
+            <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')}/>
           </div>
         </form>
       </div>

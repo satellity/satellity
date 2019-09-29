@@ -1,0 +1,15 @@
+@import '../assets/css/constant.scss';
+
+.submit {
+  border-radius: 0.2rem;
+  border: 1px solid rgba(218, 40, 16, 0.8);
+  background: rgba(218, 40, 16, 0.8);
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  max-width: 100%;
+  padding: .6rem 1.6rem;
+  text-align: center;
+  transition: all 0.30s ease-in-out;
+  width: 30rem;
+}

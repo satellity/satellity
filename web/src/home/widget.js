@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import Config from '../components/config.js';
 import style from './widget.scss';
 import API from '../api/index.js';

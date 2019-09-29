@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
+import Button from '../widgets/button.js';
 
 class Edit extends Component {
   constructor(props) {
@@ -73,10 +74,7 @@ class Edit extends Component {
                 <textarea type='text' name='biography' value={state.biography} onChange={this.handleChange} />
               </div>
               <div className='action'>
-                <button className='btn submit' disabled={state.submitting}>
-                  {state.submitting && <LoadingView style='sm-ring blank'/>}
-                  &nbsp;{i18n.t('general.submit')}
-                </button>
+                <Button type='submit' class='submit' text={i18n.t('general.submit')} disabled={state.submitting} />
               </div>
             </form>
           </div>

@@ -1,5 +1,5 @@
+import style from './button.scss';
 import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
 
 class Button extends Component {
   constructor(props) {
@@ -7,8 +7,11 @@ class Button extends Component {
   }
 
   render() {
+    let classes = this.props.class.split(' ').map((name) => {
+      return style[[name]]
+    });
     return (
-      <Link to={this.props.action}>{this.props.text}</Link>
+      <button type={this.props.type} className={classes} disabled={this.props.disabled}>{this.props.text}</button>
     )
   }
 }

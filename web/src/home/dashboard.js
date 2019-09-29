@@ -1,6 +1,6 @@
 import style from './dashboard.scss';
 import React, {Component} from 'react';
-import {Link, Redirect} from 'react-router-dom';
+import {Redirect} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import API from '../api/index.js';
 import TopicItem from '../topics/item.js';

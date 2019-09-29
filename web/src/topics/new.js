@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Base64 from '../components/base64.js';
 import API from '../api/index.js';
 import LoadingView from '../loading/loading.js';
+import Button from '../widgets/button.js';
 const validate = require('uuid-validate');
 
 class New extends Component {
@@ -207,10 +208,7 @@ class New extends Component {
       {
         !state.submitting &&
         <div>
-          <button type="submit" className='btn topic' disabled={state.submitting}>
-
-            &nbsp;{i18n.t('general.submit')}
-          </button>
+          <Button type='submit' class='submit' disabled={state.submit} text={i18n.t('general.submit')} />
           <a className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</a>
         </div>
       }
