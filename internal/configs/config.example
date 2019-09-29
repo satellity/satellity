@@ -1,0 +1,41 @@
+default: &default
+  name: Yet another open source forum using Golang.
+  http:
+    host: http://localhost
+    port: 4000
+  database:
+    user: satellity
+    password: ""
+    host: localhost
+    port: 5432
+  github:
+    client_id: b9b78f
+    client_secret: d4e571ce
+  system:
+    attachments:
+      storage: "local"
+      path: "/path/to/assets"
+  recaptcha: # will be ignore if url or secret is blank
+    url: https://www.google.com/recaptcha/api/siteverify
+    secret: ""
+  operators:
+    - hi@satellity
+  email:
+    verification:
+      title: "Register An Satellity Account"
+      body: "Your verification code: <b>%s</b>"
+  mailgun:
+    domain: "mailgun.satellity.org"
+    key: "sandboxcf40b2"
+    sender: "no-replay@satellity.org"
+
+
+development:
+  <<: *default
+  database:
+    name: satellity_dev
+
+test:
+  <<: *default
+  database:
+    name: satellity_test

@@ -1,0 +1,37 @@
+@import '../assets/css/constant.scss';
+
+.loading {
+  background: white;
+  text-align: center;
+}
+.nodes {
+  background: $color-bg-light-grey;
+  padding: 0.8rem;
+}
+.node {
+  border-radius: .2rem;
+  display: inline-block;
+  font-size: 1rem;
+  padding: .2rem .8rem;
+  margin-right: .4rem;
+  &:hover, &.current {
+    color: white;
+    background: rgba($color-main-red, 0.8);
+  }
+}
+.topics {
+  background: white;
+  padding: 0.8rem;
+}
+.load {
+  background: white;
+  text-align: center;
+  padding: 0.8rem 0;
+}
+@media only screen and (max-width: 64rem) {
+  .node {
+    font-size: 1rem;
+    padding: .2rem .6rem .2rem;
+    margin-right: .2rem;
+  }
+}

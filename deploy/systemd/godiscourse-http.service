@@ -1,0 +1,14 @@
+[Unit]
+Description=GoDiscourse HTTP API
+After=network.target
+
+[Service]
+User=user
+Type=simple
+Environment=GO_ENV=production
+ExecStart=/path/to/satellity -d /path/to/satellity/config.yaml
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

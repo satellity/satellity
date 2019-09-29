@@ -1,0 +1,48 @@
+{
+  "site": {
+    "features": "Satellity is PRE-ALPHA now! Please be careful when you decide to use it!"
+  },
+  "general": {
+    "all": "View all",
+    "delete": "Delete",
+    "draft": "Save Draft",
+    "submit": "Submit"
+  },
+  "community": {
+    "dashboard": "My Topics",
+    "name": "Community"
+  },
+  "topic": {
+    "title": {
+      "new": "Create a new topic",
+      "edit": "Edit: %{name}"
+    },
+    "new": "New Topic",
+    "in": "IN",
+    "at": "AT",
+    "rules": "<li> 1. To be a kind human, keep goodwill towards others </li> <li> 2. It's a good habits to preview before posting.  </li> <li> 3. Welcome to share. Enjoy! </li>"
+  },
+  "comment": {
+    "custom": "You need login before you can leave a comment!",
+    "count": "%{count} Comments",
+    "form": {
+      "body": "Say something ..."
+    }
+  },
+  "user": {
+    "edit": "Update Profile",
+    "nickname": "Nickname",
+    "biography": "Biography",
+    "topics": "Topics"
+  },
+  "home": {
+    "latest": "Latest",
+    "forum": "Forum is public, you can share your thoughts with the world."
+  },
+  "login": {
+    "github": "Sign in with GitHub"
+  },
+  "aside": {
+    "rules": "<li>1. Open Source on <a href='https://github.com/satellity/satellity' target='blank' class='soft'>Github</a>.</li><li> 2. Based on Golang, React and PostgreSQL. </li> <li> 3. Model tested. </li> <li> 4. Project <a href='https://github.com/satellity/satellity/projects/1' target='_blank'>Roadmap</a>. </li>"
+  }
+}

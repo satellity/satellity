@@ -1,0 +1,68 @@
+@import '../assets/css/constant.scss';
+
+/* show page */
+.loading {
+  background: $color-bg-light-grey;
+  text-align: center;
+  padding: .8rem 0;
+}
+.content {
+  background: white;
+  box-sizing: border-box;
+}
+.header {
+  background: $color-bg-light-grey;
+  box-sizing: border-box;
+  display: flex;
+  font-size: 1rem;
+  padding: .8rem;
+  .heading {
+    flex-grow: 1;
+    padding-right: 1.6rem;
+  }
+  h1 {
+    margin: 0;
+    font-weight: normal;
+    line-height: 2.4rem;
+  }
+  .info {
+    font-size: .875rem;
+    color: $color-font-grey;
+  }
+  .sep {
+    padding: 0 .4rem;
+  }
+  .avatar {
+    border-radius: 2.4rem;
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+}
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.8rem;
+  word-break: break-all;
+}
+.edit {
+  font-size: 1rem;
+  margin-left: 0.8rem;
+}
+.body {
+  padding: .8rem;
+}
+.actions {
+  font-size: 1.125rem;
+  text-align: right;
+  padding: .8rem;
+  .action {
+    margin-left: .8rem;
+    cursor: pointer;
+    &:hover {
+      opacity: .6;
+    }
+    span {
+      margin-right: .4rem;
+    }
+  }
+}

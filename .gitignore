@@ -1,0 +1,15 @@
+.DS_Store
+bin
+internal/configs/*
+!internal/configs/config.go
+!internal/configs/config.example
+publish
+public
+
+# web
+node_modules
+dist
+.cache
+.env
+.env.development
+.env.production

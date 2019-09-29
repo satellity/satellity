@@ -1,0 +1,25 @@
+@import '../assets/css/constant.scss';
+
+.slogan {
+  font-size: 2rem;
+  text-align: center;
+  padding: 3.2rem 0 1.6rem;
+}
+.features {
+  display: flex;
+  justify-content: space-around;
+  font-size: 6rem;
+  color: rgba($color-main-red, $color-main-red-alpha);
+}
+.section {
+  box-sizing: border-box;
+  background: white;
+  text-align: center;
+  padding: 1.6rem;
+  width: 48%;
+}
+.desc {
+  color: black;
+  font-size: 1.6rem;
+  padding: 1.6rem;
+}
