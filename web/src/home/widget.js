@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Config from '../components/config.js';
 import style from './widget.scss';
 import API from '../api/index.js';
+import Href from '../widgets/href.js';
 
 class SiteWidget extends Component {
   constructor(props) {
@@ -12,12 +13,10 @@ class SiteWidget extends Component {
   }
 
   render() {
-    let action = <div className={style.newTopic}> <Link to='/topics/new'>{i18n.t('topic.new')}</Link> </div>;
+    let action = <Href action='/topics/new' text={i18n.t('topic.new')} class='button' />;
     if (!this.api.user.loggedIn()) {
       action = (
-        <div className={style.signIn}>
-          <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`}>{i18n.t('login.github')}</a>
-        </div>
+        <Href action={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`} class='button' text={i18n.t('login.github')} original />
       )
     }
 
@@ -30,7 +29,9 @@ class SiteWidget extends Component {
           <ul className={style.features} dangerouslySetInnerHTML={{__html: i18n.t('aside.rules')}}>
           </ul>
         </div>
-        {action}
+        <div className={style.action}>
+          {action}
+        </div>
         <div className={style.copyright}>
           © 2019 MIT license
         </div>

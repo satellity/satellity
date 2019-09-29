@@ -25,17 +25,9 @@
     padding: 0 0 .3rem;
   }
 }
-.signIn, .newTopic {
+.action {
   margin-top: 1.6rem;
   text-align: center;
-  a {
-    background: rgba(218, 40, 16, 0.8);
-    border-radius: 0.2rem;
-    box-sizing: border-box;
-    color: white;
-    display: block;
-    padding: 0.4rem 0.8rem;
-  }
 }
 .copyright {
   color: $color-font-light-grey;
