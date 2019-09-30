@@ -44,5 +44,20 @@
   },
   "aside": {
     "rules": "<li>1. Open Source on <a href='https://github.com/satellity/satellity' target='blank' class='soft'>Github</a>.</li><li> 2. Based on Golang, React and PostgreSQL. </li> <li> 3. Model tested. </li> <li> 4. Project <a href='https://github.com/satellity/satellity/projects/1' target='_blank'>Roadmap</a>. </li>"
+  },
+  "errors": {
+    "400": "Bad Request.",
+    "401": "Unauthorized.",
+    "403": "Access denied.",
+    "404": "Not found.",
+    "500": "Internal server error.",
+    "10002": "The request data has invalid field.",
+    "10010": "Invalid email format.",
+    "10011": "Email or Username is not exist.",
+    "10012": "Password invalid.",
+    "10013": "Password too simple.",
+    "10020": "Invalid verification code.",
+    "10101": "Invalid image data.",
+    "10102": "Recaptcha is invalid."
   }
 }

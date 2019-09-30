@@ -13,7 +13,9 @@ class Category {
         return {category_id: o.category_id, name: o.name, alias: o.alias}
       });
       window.localStorage.setItem('categories', this.base64.encode(JSON.stringify(categories)));
-      return resp.data;
+      return resp;
+    }).catch((error) => {
+      return error;
     });
   }
 

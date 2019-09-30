@@ -62,7 +62,11 @@ class New extends Component {
         this.setState(data);
       });
     }
-    this.api.category.index().then((data) => {
+    this.api.category.index().then((resp) => {
+      if (resp.error) {
+        return
+      }
+      const data = resp.data;
       let category_id = this.state.category_id;
       if (!category_id && data.length > 0) {
         category_id = data[0].category_id;

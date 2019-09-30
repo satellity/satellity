@@ -35,7 +35,11 @@ class Index extends Component {
   }
 
   componentDidMount() {
-    this.api.category.index().then((data) => {
+    this.api.category.index().then((resp) => {
+      if (resp.error) {
+        return
+      }
+      const data = resp.data;
       this.setState({categories: data});
       let categoryId = 'latest';
       this.setState({category: {}});

@@ -42,18 +42,14 @@ axios.interceptors.response.use(function(response) {
     let data = response.data;
     if (!!data.error) {
       let error = data.error;
+      new Noty({
+        text: i18n.t(`errors.${error.code}`)
+      }).show();
       if (error.code === 401) {
-        window.location.href = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${config.GithubClientId}`;
+        window.location.href = '/'
         return
       } else if (error.code === 404) {
         window.location.href = '/404'
-        return
-      }
-      new Noty({
-        text: error.code,
-      }).show();
-      if (error.code === 500) {
-        window.location.href = '/';
         return
       }
       return Promise.reject(error);
@@ -62,25 +58,21 @@ axios.interceptors.response.use(function(response) {
   }
   return response
 }, function(error) {
+  let status, data;
   if (error.response) {
-    if (error.response.status === 500) {
-      new Noty({
-        text: "Internal Server Error"
-      }).show();
-      return
-    }
+    status = error.response.status;
+    data = error.response.data;
   } else if (error.request) {
-    new Noty({
-      text: error.message
-    }).show();
-    return
+    status = 500;
+    data = 'Initialize request error';
   } else {
-    new Noty({
-      text: error.message
-    }).show();
-    return
+    status = 500;
+    data = error.message;
   }
-  return Promise.reject(error);
+  new Noty({
+    text: i18n.t(`errors.${status}`)
+  }).show();
+  return Promise.reject({error: {code: status, description: data}});
 });
 
 function token(method, uri, body) {

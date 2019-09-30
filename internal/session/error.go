@@ -27,22 +27,34 @@ func (sessionError Error) Error() string {
 	return string(str)
 }
 
+// BadRequestError means the request body is not a valid format.
+func BadRequestError(ctx context.Context) Error {
+	description := "The request body can’t be pasred as valid data."
+	return createError(ctx, http.StatusAccepted, http.StatusBadRequest, description, nil)
+}
+
 // AuthorizationError return 401 for unauthorized request
 func AuthorizationError(ctx context.Context) Error {
 	description := "Unauthorized, maybe invalid token."
 	return createError(ctx, http.StatusAccepted, http.StatusUnauthorized, description, nil)
 }
 
-// ForbiddenError return 401 for unauthorized request
+// ForbiddenError return 403 for unauthorized request
 func ForbiddenError(ctx context.Context) Error {
 	description := http.StatusText(http.StatusForbidden)
 	return createError(ctx, http.StatusAccepted, http.StatusForbidden, description, nil)
 }
 
-// BadRequestError means the request body is not a valid format.
-func BadRequestError(ctx context.Context) Error {
-	description := "The request body can’t be pasred as valid data."
-	return createError(ctx, http.StatusAccepted, http.StatusBadRequest, description, nil)
+// NotFoundError means resource is not found.
+func NotFoundError(ctx context.Context) Error {
+	description := http.StatusText(http.StatusNotFound)
+	return createError(ctx, http.StatusAccepted, http.StatusNotFound, description, nil)
+}
+
+// ServerError means some server error are occurred.
+func ServerError(ctx context.Context, err error) Error {
+	description := http.StatusText(http.StatusInternalServerError)
+	return createError(ctx, http.StatusInternalServerError, http.StatusInternalServerError, description, err)
 }
 
 // TransactionError means there is something wrong on database.
@@ -81,34 +93,22 @@ func PasswordTooSimpleError(ctx context.Context) Error {
 	return createError(ctx, http.StatusAccepted, 10013, description, nil)
 }
 
+// VerificationCodeInvalidError means verification code is invalid
+func VerificationCodeInvalidError(ctx context.Context) Error {
+	description := "Invalid verification code."
+	return createError(ctx, http.StatusAccepted, 10020, description, nil)
+}
+
 // InvalidImageDataError means image is invalid.
 func InvalidImageDataError(ctx context.Context) Error {
 	description := "Invalid image data."
-	return createError(ctx, http.StatusAccepted, 10015, description, nil)
+	return createError(ctx, http.StatusAccepted, 10101, description, nil)
 }
 
 // RecaptchaVerifyError means recaptcha is invalid.
 func RecaptchaVerifyError(ctx context.Context) Error {
 	description := fmt.Sprintf("Recaptcha is invalid.")
-	return createError(ctx, http.StatusAccepted, 10018, description, nil)
-}
-
-// VerificationCodeInvalidError means verification code is invalid
-func VerificationCodeInvalidError(ctx context.Context) Error {
-	description := "Invalid verification code."
-	return createError(ctx, http.StatusAccepted, 10019, description, nil)
-}
-
-// ServerError means some server error are occurred.
-func ServerError(ctx context.Context, err error) Error {
-	description := http.StatusText(http.StatusInternalServerError)
-	return createError(ctx, http.StatusInternalServerError, http.StatusInternalServerError, description, err)
-}
-
-// NotFoundError means resource is not found.
-func NotFoundError(ctx context.Context) Error {
-	description := http.StatusText(http.StatusNotFound)
-	return createError(ctx, http.StatusAccepted, http.StatusNotFound, description, nil)
+	return createError(ctx, http.StatusAccepted, 10102, description, nil)
 }
 
 func createError(ctx context.Context, status, code int, description string, err error) Error {
@@ -123,7 +123,6 @@ func createError(ctx context.Context, status, code int, description string, err 
 		}
 		trace = trace + "\n" + errors.Wrap(err, 1).ErrorStack()
 	}
-
 	if ctx != nil {
 		if logger := Logger(ctx); logger != nil {
 			logger.Error(trace)

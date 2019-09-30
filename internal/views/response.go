@@ -22,6 +22,9 @@ func RenderErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
 	if !ok {
 		sessionError = session.ServerError(r.Context(), err)
 	}
+	if sessionError.Code == 10001 {
+		sessionError.Code = 500
+	}
 	session.Render(r.Context()).JSON(w, sessionError.Status, ResponseView{Error: sessionError})
 }
 
