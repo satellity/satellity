@@ -4,6 +4,7 @@ import {Redirect} from 'react-router-dom';
 import { loadReCaptcha, ReCaptcha } from 'react-recaptcha-v3';
 import Config from '../components/config.js';
 import API from '../api/index.js';
+import Href from '../widgets/href.js';
 
 class Modal extends Component {
   constructor(props) {
@@ -72,6 +73,7 @@ class Modal extends Component {
     if (this.state.submitting) {
       return
     }
+    this.setState({submitting: true});
     this.api.user.verify(this.state).then((resp) => {
       if (resp.error) {
         this.setState({submitting: false});
@@ -79,11 +81,11 @@ class Modal extends Component {
       }
       this.setState({success: true, submitting: false});
     });
-    this.setState({submitting: true});
   }
 
   handleSignIn(e) {
     e.preventDefault();
+    this.setState({submitting: true});
     if (this.state.submitting) {
       return
     }
@@ -94,7 +96,6 @@ class Modal extends Component {
       }
       this.setState({success: true, submitting: false});
     });
-    this.setState({submitting: true});
   }
 
   render() {
@@ -108,26 +109,26 @@ class Modal extends Component {
     let signIn = (
       <div>
         <div className={style.content}>
-          <a href={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`}>{i18n.t('login.github')}</a>
+          <Href action={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`} class='button' text={i18n.t('login.github')} original />
         </div>
         <div className={style.or}>
           OR
         </div>
         <form onSubmit={this.handleSignIn}>
           <div>
-            <input type='text' name='email' required value={state.email} autoComplete='off' placeholder='Username or Email *' onChange={this.handleChange} />
+            <input type='text' name='email' required value={state.email} autoComplete='off' placeholder={i18n.t('account.identity')} onChange={this.handleChange} />
           </div>
           <div>
-            <input type='password' name='password' required value={state.password} autoComplete='off' placeholder='Password *' onChange={this.handleChange} />
+            <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
           </div>
           <div>
             <button type='submit' className='btn session' disabled={state.submitting}>
-                &nbsp;{i18n.t('general.submit')}
+              &nbsp;{i18n.t('general.submit')}
             </button>
           </div>
         </form>
         <div className={style.register} onClick={this.handleClick}>
-          Register A New Account
+          {i18n.t('account.new')}
         </div>
       </div>
     );
@@ -161,13 +162,13 @@ class Modal extends Component {
       <div>
         <form onSubmit={this.handleRegister}>
           <div>
-            <input type='text' name='username' required value={state.username} autoComplete='off' placeholder='Username *' onChange={this.handleChange} />
+            <input type='text' name='username' required value={state.username} autoComplete='off' placeholder={i18n.t('account.username')} onChange={this.handleChange} />
           </div>
           <div>
-            <input type='password' name='password' required value={state.password} autoComplete='off' placeholder='Password *' onChange={this.handleChange} />
+            <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
           </div>
           <div>
-            <input type='text' name='code' required value={state.code} autoComplete='off' placeholder='Verification Code *' onChange={this.handleChange} />
+            <input type='text' name='code' required value={state.code} autoComplete='off' placeholder={i18n.t('account.verification')} onChange={this.handleChange} />
           </div>
           <div>
             <button type='submit' className='btn session' disabled={state.submitting}>
@@ -182,7 +183,7 @@ class Modal extends Component {
       <div className={style.modal}>
         <div className={style.modalContainer}>
           <div onClick={this.props.handleLoginClick} className={style.action}>✕</div>
-          <div className={style.app}>Login</div>
+          <div className={style.app}>{i18n.t('account.sign.in')}</div>
           {state.purpose=='SESSION' && signIn}
           {state.purpose=='USER' && state.verification_id === '' && verification}
           {state.verification_id !== '' && register}

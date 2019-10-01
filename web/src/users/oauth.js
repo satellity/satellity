@@ -6,12 +6,14 @@ import API from '../api/index.js';
 class Oauth extends Component {
   constructor(props) {
     super(props);
+    // TODO
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
     document.body.classList.add('loading', 'layout');
   }
 
   componentDidMount() {
+    // TODO should use redirect
     const history = this.props.history;
     const code = new URLUtils().getUrlParameter('code');
     new API().user.signIn(code).then((resp) => {

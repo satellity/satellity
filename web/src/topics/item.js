@@ -17,10 +17,9 @@ class TopicItem extends Component {
   }
 
   render() {
-    let topic = this.state.topic;
-    let comment;
+    let topic = this.state.topic, comments;
     if (topic.comments_count > 0) {
-      comment = (
+      comments = (
         <span className={style.count} style={{backgroundColor: this.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
       )
     }
@@ -47,7 +46,7 @@ class TopicItem extends Component {
           </div>
         </div>
         <div className={style.comment}>
-          {comment}
+          {comments}
         </div>
       </li>
     )

@@ -68,7 +68,8 @@ class User {
   }
 
   update(params) {
-    return this.api.axios.post('/me', params).then((resp) => {
+    const data = {nickname: params.nickname, biography: params.biography}
+    return this.api.axios.post('/me', data).then((resp) => {
       if (resp.error) {
         return resp;
       }

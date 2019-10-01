@@ -26,17 +26,15 @@ class Edit extends Component {
       if (resp.error) {
         return
       }
-      let user = resp.data;
-      this.setState({nickname: user.nickname, biography: user.biography});
+      this.setState(resp.data);
     });
   }
 
   handleChange(e) {
     e.preventDefault();
-    const target = e.target;
-    const name = target.name;
+    const {name, value} = e.target;
     this.setState({
-      [name]: target.value
+      [name]: value
     });
   }
 
@@ -46,9 +44,9 @@ class Edit extends Component {
       return
     }
     this.setState({submitting: true});
+    // TODO should use redirect
     const history = this.props.history;
-    const data = {nickname: this.state.nickname, biography: this.state.biography};
-    this.api.user.update(data).then((resp) => {
+    this.api.user.update(this.state).then((resp) => {
       this.setState({submitting: false});
       if (resp.error) {
         return

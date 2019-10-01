@@ -17,6 +17,7 @@ class Index extends Component {
     this.base64 = new Base64();
     this.params = new URLSearchParams(props.location.search);
     this.pagination = 50;
+    // TODO decode should categories in api;
     let categories = [];
     let d = window.localStorage.getItem('categories');
     if (d !== null && d !== undefined && d !== '') {
@@ -39,44 +40,41 @@ class Index extends Component {
       if (resp.error) {
         return
       }
-      const data = resp.data;
-      this.setState({categories: data});
-      let categoryId = 'latest';
-      this.setState({category: {}});
-      let category = this.params.get('c');
-      if (!!category) {
-        for (let i = 0; i < this.state.categories.length; i++) {
-          let c = this.state.categories[i];
+      let categoryId = 'latest', current = {};
+      let category = this.params.get('c') || 'latest';
+      if (category !== 'latest') {
+        for (let i = 0; i < resp.data.length; i++) {
+          let c = resp.data[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-            categoryId = c.category_id;
-            this.setState({category: c});
+            categoryId = c.category_id, current = c;
             break;
           }
         }
       }
-      this.fetchTopics(categoryId, true);
+      this.setState({category: current, categories: resp.data}, () => {
+        this.fetchTopics(categoryId, true);
+      });
     });
   }
 
   componentDidUpdate(prevProps) {
     let props = this.props;
     if (props.location.search !== prevProps.location.search) {
-      let categoryId = 'latest';
-      this.setState({category: {}});
+      let categoryId = 'latest', current = {};
       let params = new URLSearchParams(props.location.search);
-      let category = params.get('c');
-      if (!!category) {
-        // TODO better method?
+      let category = params.get('c') || 'latest';
+      if (category !== 'latest') {
         for (let i = 0; i < this.state.categories.length; i++) {
           let c = this.state.categories[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-            categoryId = c.category_id;
-            this.setState({category: c});
+            categoryId = c.category_id, current = c;
             break;
           }
         }
       }
-      this.fetchTopics(categoryId, true);
+      this.setState({category: current}, () => {
+        this.fetchTopics(categoryId, true);
+      });
     }
   }
 
@@ -87,22 +85,14 @@ class Index extends Component {
 
   fetchTopics(categoryId, replace) {
     this.setState({loading: replace, offset: ''});
-    let request;
-    if (categoryId === 'latest') {
-      request = this.api.topic.index(this.state.offset);
-    } else {
-      request = this.api.category.topics(categoryId, this.state.offset);
-    }
+    let request = categoryId === 'latest' ? this.api.topic.index(this.state.offset) : this.api.category.topics(categoryId, this.state.offset);
 
     request.then((resp) => {
       if (resp.error) {
         return
       }
-      let data = resp.data;
-      let offset = '';
-      if (data.length > this.pagination) {
-        offset = data[data.length-1].created_at;
-      }
+      const data = resp.data;
+      let offset = data.length > this.pagination ? data[data.length-1].created_at : '' ;
       if (!replace) {
         data = this.state.topics.concat(data);
       }

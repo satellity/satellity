@@ -30,7 +30,7 @@ Noty.overrideDefaults({
 axios.defaults.baseURL = Config.ApiHost;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.interceptors.request.use(function(config) {
-  let method = config.method, url = config.url, data = config.data;
+  const {method, url, data} = config;
   config.headers.common['Authorization'] = `Bearer ${token(method, url, data)}`;
   return config
 }, function(error) {
@@ -39,18 +39,16 @@ axios.interceptors.request.use(function(config) {
 
 axios.interceptors.response.use(function(response) {
   if (!!response.status && (response.status >= 200 && response.status < 300)) {
-    let data = response.data;
+    const data = response.data;
     if (!!data.error) {
-      let error = data.error;
+      const error = data.error;
       new Noty({
         text: i18n.t(`errors.${error.code}`)
       }).show();
       if (error.code === 401) {
         window.location.href = '/'
-        return
       } else if (error.code === 404) {
         window.location.href = '/404'
-        return
       }
     }
     return data;
@@ -60,14 +58,11 @@ axios.interceptors.response.use(function(response) {
   let status, data;
   // TODO: should clear error.request and error
   if (error.response) {
-    status = error.response.status;
-    data = error.response.data;
+    status = error.response.status, data = error.response.data;
   } else if (error.request) {
-    status = 500;
-    data = 'Initialize request error';
+    status = 500, data = 'Initialize request error';
   } else {
-    status = 500;
-    data = error.message;
+    status = 500, data = error.message;
   }
   new Noty({
     text: i18n.t(`errors.${status}`)

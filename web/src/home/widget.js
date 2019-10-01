@@ -1,6 +1,6 @@
+import style from './widget.scss';
 import React, { Component } from 'react';
 import Config from '../components/config.js';
-import style from './widget.scss';
 import API from '../api/index.js';
 import Href from '../widgets/href.js';
 

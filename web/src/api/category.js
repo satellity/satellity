@@ -22,7 +22,7 @@ class Category {
 
   topics(id, offset) {
     if (!!offset) {
-      offset = offset.replace('+', '%2B')
+      offset = offset.replace('+', '%2B');
     }
     return this.api.axios.get(`/categories/${id}/topics?offset=${offset}`);
   }
@@ -39,13 +39,13 @@ class Admin {
 
   create(params) {
     params['position'] = params['position'] === '' ? 0 : parseInt(params['position']);
-    const data = {name: params.name, alias: params.alias, description: params.description, position: params.position}
+    const data = {name: params.name, alias: params.alias, description: params.description, position: params.position};
     return this.api.axios.post('/admin/categories', data);
   }
 
   update(id, params) {
     params['position'] = params['position'] === '' ? 0 : parseInt(params['position']);
-    const data = {name: params.name, alias: params.alias, description: params.description, position: params.position}
+    const data = {name: params.name, alias: params.alias, description: params.description, position: params.position};
     return this.api.axios.post(`/admin/categories/${id}`, data);
   }
 

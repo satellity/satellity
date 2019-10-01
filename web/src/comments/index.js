@@ -11,13 +11,13 @@ class CommentIndex extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
-    this.converter = new showdown.Converter();
     this.state = {
       user: this.api.user.local(),
       comments: [],
       comments_count: props.commentsCount
     };
 
+    this.converter = new showdown.Converter();
     this.handleClick = this.handleClick.bind(this);
     this.handleActionClick = this.handleActionClick.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -30,7 +30,7 @@ class CommentIndex extends Component {
       }
       const comments = resp.data.map((comment) => {
         comment.body = this.converter.makeHtml(comment.body);
-        comment.toggle = false;
+        comment.handling = false;
         return comment
       });
       this.setState({comments: comments});
@@ -41,9 +41,9 @@ class CommentIndex extends Component {
     e.preventDefault();
     const comments = this.state.comments.map((comment) => {
       if (comment.comment_id === id) {
-        comment.toggle = !comment.toggle;
+        comment.handling = !comment.handling;
       } else {
-        comment.toggle = false;
+        comment.handling = false;
       }
       return comment
     });
@@ -77,7 +77,7 @@ class CommentIndex extends Component {
           <span className={style.station}>
             <FontAwesomeIcon icon={['fas', 'ellipsis-v']} className={style.ellipsis} onClick={(e) => this.handleActionClick(e, comment.comment_id)} />
             {
-              comment.toggle &&
+              comment.handling &&
               <div className={style.actions}>
                 <div onClick={(e) => this.handleClick(e, comment.comment_id)} className={style.action}>
                   <FontAwesomeIcon icon={['far', 'trash-alt']} className={style.trash} />

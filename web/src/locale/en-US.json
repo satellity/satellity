@@ -8,11 +8,16 @@
     "draft": "Save Draft",
     "submit": "Submit"
   },
+  "category": {
+  },
   "community": {
     "dashboard": "My Topics",
     "name": "Community"
   },
   "topic": {
+    "action": {
+      "invalid": "Invalid action"
+    },
     "title": {
       "new": "Create a new topic",
       "edit": "Edit: %{name}"
@@ -27,6 +32,17 @@
     "count": "%{count} Comments",
     "form": {
       "body": "Say something ..."
+    }
+  },
+  "account": {
+    "new": "Register A New Account",
+    "identity": "Username or Email *",
+    "username": "Username *",
+    "password": "Password *",
+    "verification": "Verification Code *",
+    "sign": {
+      "in": "Sign In",
+      "up": "Sign Up"
     }
   },
   "user": {

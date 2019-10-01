@@ -6,7 +6,7 @@ class Topic {
 
   index(offset) {
     if (!!offset) {
-      offset = offset.replace('+', '%2B')
+      offset = offset.replace('+', '%2B');
     }
     return this.api.axios.get(`/topics?offset=${offset}`);
   }
@@ -26,9 +26,12 @@ class Topic {
   }
 
   action(action, id) {
-    if (action !== 'like' || action !== 'unlike' || action !== 'bookmark' || action !== 'unsave') {
+    if (action == 'like' || action == 'unlike' || action == 'bookmark' || action == 'unsave') {
       return this.api.axios.post(`/topics/${id}/${action}`, {});
     }
+    return new Promise((resolve) => {
+      resolve({error: i18n.t('topic.action.invalid')});
+    });
   }
 }
 

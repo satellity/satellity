@@ -14,15 +14,15 @@ import LoadingView from '../loading/loading.js';
 class Show extends Component {
   constructor(props) {
     super(props);
-    this.api = new API();
-    this.converter = new showdown.Converter();
-
     this.state = {
       loading: true,
       topic_id: props.match.params.id,
       user: {},
       category: {},
     };
+
+    this.api = new API();
+    this.converter = new showdown.Converter();
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -71,9 +71,9 @@ class Show extends Component {
       </Helmet>
     )
 
-    let editAction;
+    let action;
     if (state.is_owner) {
-      editAction = (
+      action = (
         <Link to={`/topics/${state.topic_id}/edit`} className={style.edit}>
           <FontAwesomeIcon icon={['far', 'edit']} />
         </Link>
@@ -96,7 +96,7 @@ class Show extends Component {
           <div className={style.heading}>
             <h1>
               {state.title}
-              {editAction}
+              {action}
             </h1>
             <div className={style.info}>
               {state.user.nickname}

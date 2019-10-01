@@ -10,24 +10,22 @@ class AdminCategoryEdit extends Component {
     this.id = props.match.params.id;
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.state = {type: 'category', name: '', alias: '', position: '', description: '', submitting: false};
+    this.state = {name: '', alias: '', position: '', description: '', submitting: false};
   }
 
   componentDidMount() {
-    const self = this;
-    this.api.category.admin.show(self.id).then((resp) => {
+    this.api.category.admin.show(this.id).then((resp) => {
       if (resp.error) {
         return
       }
-      self.setState(resp.data);
+      this.setState(resp.data);
     });
   }
 
   handleChange(e) {
-    const target = e.target;
-    const name = target.name;
+    const {name, value} = e.target;
     this.setState({
-      [name]: target.value
+      [name]: value
     });
   }
 

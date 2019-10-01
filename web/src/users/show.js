@@ -24,12 +24,13 @@ class Show extends Component {
       let user = resp.data;
       user.created_at = moment(user.created_at).format('l');
       user.biography = user.biography.slice(0, 256);
-      this.setState({user: user});
-      this.api.user.topics(this.state.id).then((resp) => {
-        if (resp.error) {
-          return
-        }
-        this.setState({topics: resp.data});
+      this.setState({user: user}, () => {
+        this.api.user.topics(this.state.id).then((resp) => {
+          if (resp.error) {
+            return
+          }
+          this.setState({topics: resp.data});
+        });
       });
     });
   }
