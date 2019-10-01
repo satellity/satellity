@@ -6,7 +6,7 @@ import (
 	"satellity/internal/configs"
 	"time"
 
-	"github.com/mailgun/mailgun-go/v3"
+	mailgun "github.com/mailgun/mailgun-go"
 )
 
 // SendVerificationEmail send an verification email

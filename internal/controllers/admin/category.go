@@ -26,8 +26,8 @@ func registerAdminCategory(database *durable.Database, router *httptreemux.TreeM
 	impl := &adminCategoryImpl{database: database}
 
 	router.POST("/admin/categories", impl.create)
-	router.GET("/admin/categories", impl.index)
 	router.POST("/admin/categories/:id", impl.update)
+	router.GET("/admin/categories", impl.index)
 	router.GET("/admin/categories/:id", impl.show)
 }
 

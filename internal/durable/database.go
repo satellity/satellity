@@ -10,6 +10,7 @@ import (
 	_ "github.com/lib/pq" //
 )
 
+// ConnectionInfo is the info of the postgres
 type ConnectionInfo struct {
 	User     string
 	Password string

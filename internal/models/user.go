@@ -19,6 +19,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Constants for user
 const (
 	UserRoleAdmin  = "admin"
 	UserRoleMember = "member"

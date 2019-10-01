@@ -1,5 +1,5 @@
 default: &default
-  name: Yet another open source forum using Golang.
+  name: Yet another open source forum using Golang, React and PostgreSQL..
   http:
     host: http://localhost
     port: 4000
