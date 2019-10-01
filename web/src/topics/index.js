@@ -94,7 +94,11 @@ class Index extends Component {
       request = this.api.category.topics(categoryId, this.state.offset);
     }
 
-    request.then((data) => {
+    request.then((resp) => {
+      if (resp.error) {
+        return
+      }
+      let data = resp.data;
       let offset = '';
       if (data.length > this.pagination) {
         offset = data[data.length-1].created_at;

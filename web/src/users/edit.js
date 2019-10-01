@@ -22,7 +22,11 @@ class Edit extends Component {
   }
 
   componentDidMount() {
-    this.api.user.remote().then((user) => {
+    this.api.user.remote().then((resp) => {
+      if (resp.error) {
+        return
+      }
+      let user = resp.data;
       this.setState({nickname: user.nickname, biography: user.biography});
     });
   }
@@ -44,8 +48,11 @@ class Edit extends Component {
     this.setState({submitting: true});
     const history = this.props.history;
     const data = {nickname: this.state.nickname, biography: this.state.biography};
-    this.api.user.update(data).then((user) => {
+    this.api.user.update(data).then((resp) => {
       this.setState({submitting: false});
+      if (resp.error) {
+        return
+      }
       history.push('/');
     });
   }

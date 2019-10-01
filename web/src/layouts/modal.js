@@ -55,7 +55,12 @@ class Modal extends Component {
     if (this.state.submitting) {
       return
     }
-    this.api.verification.create(this.state).then((data) => {
+    this.api.verification.create(this.state).then((resp) => {
+      if (resp.error) {
+        this.setState({submitting: false});
+        return
+      }
+      let data = resp.data;
       data.submitting = false;
       this.setState(data);
     });
@@ -67,7 +72,11 @@ class Modal extends Component {
     if (this.state.submitting) {
       return
     }
-    this.api.user.verify(this.state).then((data) => {
+    this.api.user.verify(this.state).then((resp) => {
+      if (resp.error) {
+        this.setState({submitting: false});
+        return
+      }
       this.setState({success: true, submitting: false});
     });
     this.setState({submitting: true});
@@ -78,7 +87,11 @@ class Modal extends Component {
     if (this.state.submitting) {
       return
     }
-    this.api.user.signIn('', this.state.email, this.state.password).then((data) => {
+    this.api.user.signIn('', this.state.email, this.state.password).then((resp) => {
+      if (resp.error) {
+        this.setState({submitting: false});
+        return
+      }
       this.setState({success: true, submitting: false});
     });
     this.setState({submitting: true});

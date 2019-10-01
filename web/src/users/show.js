@@ -17,12 +17,19 @@ class Show extends Component {
   }
 
   componentDidMount() {
-    this.api.user.show(this.state.id).then((user) => {
+    this.api.user.show(this.state.id).then((resp) => {
+      if (resp.error) {
+        return
+      }
+      let user = resp.data;
       user.created_at = moment(user.created_at).format('l');
       user.biography = user.biography.slice(0, 256);
       this.setState({user: user});
-      this.api.user.topics(this.state.id).then((data) => {
-        this.setState({topics: data});
+      this.api.user.topics(this.state.id).then((resp) => {
+        if (resp.error) {
+          return
+        }
+        this.setState({topics: resp.data});
       });
     });
   }

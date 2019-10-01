@@ -15,6 +15,9 @@ class Oauth extends Component {
     const history = this.props.history;
     const code = new URLUtils().getUrlParameter('code');
     new API().user.signIn(code).then((resp) => {
+      if (resp.error) {
+        return
+      }
       history.push('/');
     });
   }

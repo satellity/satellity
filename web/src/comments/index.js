@@ -24,8 +24,11 @@ class CommentIndex extends Component {
   }
 
   componentDidMount() {
-    this.api.comment.index(this.props.topicId).then((data) => {
-      let comments = data.map((comment) => {
+    this.api.comment.index(this.props.topicId).then((resp) => {
+      if (resp.error) {
+        return
+      }
+      const comments = resp.data.map((comment) => {
         comment.body = this.converter.makeHtml(comment.body);
         comment.toggle = false;
         return comment
@@ -36,7 +39,7 @@ class CommentIndex extends Component {
 
   handleActionClick(e, id) {
     e.preventDefault();
-    let comments = this.state.comments.map((comment) => {
+    const comments = this.state.comments.map((comment) => {
       if (comment.comment_id === id) {
         comment.toggle = !comment.toggle;
       } else {
@@ -49,8 +52,11 @@ class CommentIndex extends Component {
 
   handleClick(e, id) {
     e.preventDefault();
-    this.api.comment.delete(id).then(() => {
-      let comments = this.state.comments.filter(comment => comment.comment_id !== id);
+    this.api.comment.delete(id).then((resp) => {
+      if (resp.error) {
+        return
+      }
+      const comments = this.state.comments.filter(comment => comment.comment_id !== id);
       this.setState({comments: comments});
     })
   }

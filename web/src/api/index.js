@@ -52,13 +52,13 @@ axios.interceptors.response.use(function(response) {
         window.location.href = '/404'
         return
       }
-      return Promise.reject(error);
     }
     return data;
   }
   return response
 }, function(error) {
   let status, data;
+  // TODO: should clear error.request and error
   if (error.response) {
     status = error.response.status;
     data = error.response.data;
@@ -72,7 +72,7 @@ axios.interceptors.response.use(function(response) {
   new Noty({
     text: i18n.t(`errors.${status}`)
   }).show();
-  return Promise.reject({error: {code: status, description: data}});
+  return {error: {code: status, description: data}};
 });
 
 function token(method, uri, body) {

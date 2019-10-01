@@ -15,8 +15,11 @@ class AdminCategoryEdit extends Component {
 
   componentDidMount() {
     const self = this;
-    this.api.category.admin.show(self.id).then((data) => {
-      self.setState(data);
+    this.api.category.admin.show(self.id).then((resp) => {
+      if (resp.error) {
+        return
+      }
+      self.setState(resp.data);
     });
   }
 

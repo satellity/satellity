@@ -23,7 +23,7 @@ class SiteWidget extends Component {
       <div className={style.widget}>
         <div className={style.section}>
           <h2 className={style.site}>
-            Go Discourse
+            Satellity
           </h2>
           <ul className={style.features} dangerouslySetInnerHTML={{__html: i18n.t('aside.rules')}}>
           </ul>

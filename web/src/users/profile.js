@@ -11,8 +11,11 @@ class Profile extends Component {
   }
 
   componentDidMount() {
-    this.api.user.remote().then((user) => {
-      this.setState(user);
+    this.api.user.remote().then((resp) => {
+      if (resp.error) {
+        return
+      }
+      this.setState(resp.data);
     });
   }
 

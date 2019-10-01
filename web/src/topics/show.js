@@ -28,7 +28,11 @@ class Show extends Component {
 
   componentDidMount() {
     const user = this.api.user.local();
-    this.api.topic.show(this.props.match.params.id).then((data) => {
+    this.api.topic.show(this.props.match.params.id).then((resp) => {
+      if (resp.error) {
+        return
+      }
+      let data = resp.data;
       data.loading = false;
       data.is_owner = data.user.user_id === user.user_id;
       data.short_body = data.body.substring(0, 128);
@@ -44,8 +48,11 @@ class Show extends Component {
     if (action === 'bookmark' && this.state.is_bookmarked_by) {
       action = 'unsave';
     }
-    this.api.topic.action(action, this.state.topic_id).then((data) => {
-      this.setState(data);
+    this.api.topic.action(action, this.state.topic_id).then((resp) => {
+      if (resp.error) {
+        return
+      }
+      this.setState(resp.data);
     });
   }
 

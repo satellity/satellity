@@ -34,13 +34,16 @@ class User {
       request = this.api.axios.post('/sessions', data);
     }
     return request.then((resp) => {
+      if (resp.error) {
+        return resp;
+      }
       let data = resp.data;
       Cookies.set('sid', pwd, { expires: 365 });
       window.localStorage.setItem('token', priv);
       window.localStorage.setItem('uid', data.user_id);
       window.localStorage.setItem('sid', data.session_id);
       window.localStorage.setItem('user', this.base64.encode(JSON.stringify(data)));
-      return data;
+      return resp;
     });
   }
 
@@ -51,33 +54,40 @@ class User {
     let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
     let data = {verification_id: params.verification_id, code: params.code, username: params.username, password: params.password, session_secret: this.fixed_schema_header + pub};
     return this.api.axios.post(`/email_verifications/${params.verification_id}`, data).then((resp) => {
+      if (resp.error) {
+        return resp;
+      }
       let data = resp.data;
       Cookies.set('sid', pwd, { expires: 365 });
       window.localStorage.setItem('token', priv);
       window.localStorage.setItem('uid', data.user_id);
       window.localStorage.setItem('sid', data.session_id);
       window.localStorage.setItem('user', this.base64.encode(JSON.stringify(data)));
-      return resp.data;
+      return resp;
     });
   }
 
   update(params) {
     return this.api.axios.post('/me', params).then((resp) => {
+      if (resp.error) {
+        return resp;
+      }
       window.localStorage.setItem('user', this.base64.encode(JSON.stringify(resp.data)));
-      return resp.data;
+      return resp;
     });
   }
 
   show(id) {
-    return this.api.axios.get(`/users/${id}`).then((resp) => {
-      return resp.data;
-    });
+    return this.api.axios.get(`/users/${id}`);
   }
 
   remote() {
     return this.api.axios.get('/me').then((resp) => {
+      if (resp.error) {
+        return resp;
+      }
       window.localStorage.setItem('user', this.base64.encode(JSON.stringify(resp.data)));
-      return resp.data;
+      return resp;
     })
   }
 
@@ -99,9 +109,7 @@ class User {
   }
 
   topics(id) {
-    return this.api.axios.get(`/users/${id}/topics`).then((resp) => {
-      return resp.data;
-    })
+    return this.api.axios.get(`/users/${id}/topics`);
   }
 
   clear() {
@@ -115,9 +123,7 @@ class Admin {
   }
 
   index() {
-    return this.api.axios.get('/admin/users').then((resp) => {
-      return resp.data;
-    })
+    return this.api.axios.get('/admin/users');
   }
 }
 

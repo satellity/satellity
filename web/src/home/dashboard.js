@@ -19,8 +19,11 @@ class Dashboard extends Component {
 
   componentDidMount() {
     if (!!this.state.user.user_id) {
-      this.api.user.topics(this.state.user.user_id).then((data) => {
-        this.setState({topics: data});
+      this.api.user.topics(this.state.user.user_id).then((resp) => {
+        if (resp.error) {
+          return
+        }
+        this.setState({topics: resp.data});
       });
     }
   }

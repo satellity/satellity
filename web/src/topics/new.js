@@ -49,12 +49,20 @@ class New extends Component {
 
   componentDidMount() {
     if (validate(this.state.topic_id)) {
-      this.api.topic.show(this.state.topic_id).then((data) => {
+      this.api.topic.show(this.state.topic_id).then((resp) => {
+        if (resp.error) {
+          return
+        }
+        let data = resp.data;
         data.loading = false;
         this.setState(data);
       });
     } else {
-      this.api.topic.show('draft').then((data) => {
+      this.api.topic.show('draft').then((resp) => {
+        if (resp.error) {
+          return
+        }
+        let data = resp.data;
         if (!data) {
           data = {};
         }
@@ -131,13 +139,19 @@ class New extends Component {
     const data = {title: this.state.title, body: this.state.body, category_id: this.state.category_id, draft: this.state.draft};
     // TODO should update submitting always
     if (validate(this.state.topic_id)) {
-      this.api.topic.update(this.state.topic_id, data).then((data) => {
+      this.api.topic.update(this.state.topic_id, data).then((resp) => {
         this.setState({submitting: false});
+        if (resp.error) {
+          return
+        }
         history.push('/');
       });
       return
     }
-    this.api.topic.create(data).then((data) => {
+    this.api.topic.create(data).then((resp) => {
+      if (resp.error) {
+        return
+      }
       this.setState({submitting: false});
       history.push('/');
     });
