@@ -215,21 +215,9 @@ class New extends Component {
         </article>
       }
     </div>
-    <div>
-      {
-        state.submitting &&
-        <div className={style.submitting}>
-          <Loading class='small'/>
-          <span> Submitting </span>
-        </div>
-      }
-      {
-        !state.submitting &&
-        <div>
-          <Button type='submit' class='submit' disabled={state.submit} text={i18n.t('general.submit')} />
-          <a className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</a>
-        </div>
-      }
+    <div className={style.submit}>
+      <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
+      {!state.submitting && <a className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</a>}
     </div>
   </form>
     )

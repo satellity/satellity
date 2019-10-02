@@ -1,5 +1,6 @@
 import style from './button.scss';
 import React, {Component} from 'react';
+import Loading from './loading.js';
 
 class Button extends Component {
   constructor(props) {
@@ -11,7 +12,10 @@ class Button extends Component {
       return style[[name]]
     });
     return (
-      <button type={this.props.type} className={classes} disabled={this.props.disabled}>{this.props.text}</button>
+      <button type={this.props.type} className={classes} disabled={this.props.disabled}>
+        {this.props.disabled && <Loading class='small white' />}
+        &nbsp;{this.props.text}
+      </button>
     )
   }
 }
