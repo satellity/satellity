@@ -1,7 +1,8 @@
-import LoadingPage from '../loading/page.js';
+import style from './oauth.scss';
 import URLUtils from '../components/url.js';
 import React, { Component } from 'react';
 import API from '../api/index.js';
+import Loading from '../widgets/loading.js';
 
 class Oauth extends Component {
   constructor(props) {
@@ -26,7 +27,9 @@ class Oauth extends Component {
 
   render() {
     return (
-      <LoadingPage />
+      <div className={style.loading}>
+        <Loading class='default' />
+      </div>
     );
   }
 }

@@ -2,7 +2,6 @@ import style from './index.scss';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import API from '../api/index.js';
-import LoadingView from '../loading/loading.js';
 import Button from '../widgets/button.js';
 
 class Edit extends Component {

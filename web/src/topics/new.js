@@ -9,7 +9,7 @@ import showdown from 'showdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Base64 from '../components/base64.js';
 import API from '../api/index.js';
-import LoadingView from '../loading/loading.js';
+import Loading from '../widgets/loading.js';
 import Button from '../widgets/button.js';
 const validate = require('uuid-validate');
 
@@ -178,7 +178,7 @@ class New extends Component {
 
     const loadingView = (
       <div className={style.loading}>
-        <LoadingView style='md-ring'/>
+        <Loading class='medium'/>
       </div>
     )
 
@@ -219,7 +219,7 @@ class New extends Component {
       {
         state.submitting &&
         <div className={style.submitting}>
-          <LoadingView style='sm-ring'/>
+          <Loading class='small'/>
           <span> Submitting </span>
         </div>
       }

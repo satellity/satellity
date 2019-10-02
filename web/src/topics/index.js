@@ -6,7 +6,7 @@ import Config from '../components/config.js';
 import Base64 from '../components/base64.js';
 import API from '../api/index.js';
 import TopicItem from './item.js';
-import LoadingView from '../loading/loading.js';
+import Loading from '../widgets/loading.js';
 import Widget from '../home/widget.js';
 
 class Index extends Component {
@@ -105,7 +105,7 @@ class Index extends Component {
 
     const loadingView = (
       <div className={style.loading}>
-        <LoadingView style='md-ring'/>
+        <Loading style='medium'/>
       </div>
     )
 

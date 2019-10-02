@@ -1,7 +1,6 @@
 import style from './index.scss';
 import React, {Component} from 'react';
 import API from '../api/index.js';
-import LoadingView from '../loading/loading.js';
 import Button from '../widgets/button.js';
 
 class CommentNew extends Component {

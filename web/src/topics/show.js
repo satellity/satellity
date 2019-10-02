@@ -9,7 +9,7 @@ import API from '../api/index.js';
 import Config from '../components/config.js';
 import SiteWidget from '../home/widget.js';
 import CommentList from '../comments/index.js';
-import LoadingView from '../loading/loading.js';
+import Loading from '../widgets/loading.js';
 
 class Show extends Component {
   constructor(props) {
@@ -60,7 +60,7 @@ class Show extends Component {
     let state = this.state;
     const loadingView = (
       <div className={style.loading}>
-        <LoadingView style='md-ring' />
+        <Loading class='medium' />
       </div>
     )
 

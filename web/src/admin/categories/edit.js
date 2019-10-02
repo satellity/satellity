@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../../api/index.js';
-import LoadingView from '../../loading/loading.js';
+import Loading from '../../widgets/loading.js';
 
 class AdminCategoryEdit extends Component {
   constructor(props) {
@@ -71,7 +71,7 @@ const CategoryEdit = (props) => (
         </div>
         <div className='action'>
           <button className='btn submit blue' disabled={props.state.submitting}>
-            { props.state.submitting && <LoadingView style='sm-ring blank'/> }
+            { props.state.submitting && <Loading class='small white'/> }
             &nbsp;SUBMIT
           </button>
         </div>
