@@ -69,21 +69,32 @@ func CreateEmailVerification(mctx *Context, email, recaptcha string) (*EmailVeri
 		CreatedAt:      time.Now(),
 	}
 
+	var sent bool
 	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		_, err = tx.ExecContext(ctx, "DELETE FROM email_verifications WHERE created_at<$1", time.Now().Add(-24*time.Hour))
 		if err != nil {
 			return err
 		}
+		last, err := lastEmailVerification(ctx, tx)
+		if err != nil {
+			return err
+		}
+		if last.CreatedAt.Add(time.Minute).After(time.Now()) {
+			return nil
+		}
+		sent = true
 		columns, params := durable.PrepareColumnsWithValues(emailVerificationColumns)
 		query := fmt.Sprintf("INSERT INTO email_verifications(%s) VALUES (%s)", columns, params)
-		_, err := tx.ExecContext(ctx, query, ev.values()...)
+		_, err = tx.ExecContext(ctx, query, ev.values()...)
 		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	if err := clouds.SendVerificationEmail(ctx, ev.Email, ev.Code); err != nil {
-		return nil, session.ServerError(ctx, err)
+	if sent {
+		if err := clouds.SendVerificationEmail(ctx, ev.Email, ev.Code); err != nil {
+			return nil, session.ServerError(ctx, err)
+		}
 	}
 	return ev, nil
 }
@@ -130,6 +141,49 @@ func VerifyEmailVerification(mctx *Context, verificationID, code, username, pass
 	return user, nil
 }
 
+func Reset(mctx *Context, verificationID, code, password string) error {
+	ctx := mctx.context
+	var user *User
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		ev, err := findEmailVerification(ctx, tx, verificationID)
+		if err != nil || ev == nil {
+			return err
+		}
+		if ev.Code != code {
+			ev, err = findEmailVerificationByEmailAndCode(ctx, tx, ev.Email, code)
+			if err != nil || ev == nil {
+				return err
+			}
+		}
+		if ev.CreatedAt.Add(time.Hour * 24).Before(time.Now()) {
+			return session.VerificationCodeInvalidError(ctx)
+		}
+		_, err = tx.ExecContext(ctx, "DELETE FROM email_verifications WHERE verification_id=$1", ev.VerificationID)
+		if err != nil {
+			return err
+		}
+		password, err = validateAndEncryptPassword(ctx, password)
+		if err != nil {
+			return err
+		}
+		user, err = findUserByIdentity(ctx, tx, ev.Email)
+		if err != nil || user == nil {
+			return err
+		}
+		_, err = tx.ExecContext(ctx, "UPDATE users SET (encrypted_password, updated_at)=($2, $3) WHERE user_id=$1", user.UserID, sql.NullString{String: password, Valid: true}, time.Now())
+		return err
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return err
+		}
+		return session.TransactionError(ctx, err)
+	} else if user == nil {
+		return session.VerificationCodeInvalidError(ctx)
+	}
+	return nil
+}
+
 func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, password, sessionSecret, githubID string, user *User) (*User, error) {
 	if user == nil {
 		t := time.Now()
@@ -166,6 +220,17 @@ func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, pass
 
 func findEmailVerification(ctx context.Context, tx *sql.Tx, id string) (*EmailVerification, error) {
 	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM email_verifications WHERE verification_id=$1", strings.Join(emailVerificationColumns, ",")), id)
+	ev, err := emailVerificationFromRows(row)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+	return ev, nil
+}
+
+func lastEmailVerification(ctx context.Context, tx *sql.Tx) (*EmailVerification, error) {
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM email_verifications ORDER BY created_at DESC LIMIT 1", strings.Join(emailVerificationColumns, ",")))
 	ev, err := emailVerificationFromRows(row)
 	if err == sql.ErrNoRows {
 		return nil, nil

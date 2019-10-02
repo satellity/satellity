@@ -48,11 +48,15 @@ class User {
   }
 
   verify(params) {
+    if (params.purpose === 'PASSWORD') {
+      let data = {purpose: params.purpose, verification_id: params.verification_id, code: params.code, password: params.password};
+      return this.api.axios.post(`/email_verifications/${params.verification_id}`, data)
+    }
     let pwd = uuid().toLowerCase();
     let ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
     let pub = ec.generateKeyPairHex().ecpubhex;
     let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
-    let data = {verification_id: params.verification_id, code: params.code, username: params.username, password: params.password, session_secret: this.fixed_schema_header + pub};
+    let data = {purpose: purpose, verification_id: params.verification_id, code: params.code, username: params.username, password: params.password, session_secret: this.fixed_schema_header + pub};
     return this.api.axios.post(`/email_verifications/${params.verification_id}`, data).then((resp) => {
       if (resp.error) {
         return resp;

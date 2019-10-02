@@ -5,6 +5,7 @@ import { loadReCaptcha, ReCaptcha } from 'react-recaptcha-v3';
 import Config from '../components/config.js';
 import API from '../api/index.js';
 import Href from '../widgets/href.js';
+import Button from '../widgets/button.js';
 
 class Modal extends Component {
   constructor(props) {
@@ -29,11 +30,12 @@ class Modal extends Component {
     this.handleVerification = this.handleVerification.bind(this);
     this.handleSignIn = this.handleSignIn.bind(this);
     this.handleRegister = this.handleRegister.bind(this);
+    this.handleResetPassword = this.handleResetPassword.bind(this);
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick() {
-    this.setState({purpose: 'USER'}, () => {
+  handleClick(e, purpose) {
+    this.setState({password: '', purpose: purpose}, () => {
       if (Config.ReCAPTCHASiteKey !== '' && this.state.verification_id === '') {
         loadReCaptcha(Config.ReCAPTCHASiteKey);
       }
@@ -83,6 +85,21 @@ class Modal extends Component {
     });
   }
 
+  handleResetPassword(e) {
+    e.preventDefault();
+    if (this.state.submitting) {
+      return
+    }
+    this.api.user.verify(this.state).then((resp) => {
+      if (resp.error) {
+        this.setState({submitting: false});
+        return
+      }
+      this.setState({purpose: 'SESSION', verification_id: '', email: '', password: '', submitting: false});
+    });
+    this.setState({submitting: true});
+  }
+
   handleSignIn(e) {
     e.preventDefault();
     this.setState({submitting: true});
@@ -122,13 +139,14 @@ class Modal extends Component {
             <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
           </div>
           <div>
-            <button type='submit' className='btn session' disabled={state.submitting}>
-              &nbsp;{i18n.t('general.submit')}
-            </button>
+            <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
           </div>
         </form>
-        <div className={style.register} onClick={this.handleClick}>
+        <div className={style.register} onClick={(e) => this.handleClick(e, 'USER')}>
           {i18n.t('account.new')}
+        </div>
+        <div className={style.register} onClick={(e) => this.handleClick(e, 'PASSWORD')}>
+            {i18n.t('account.reset.password')}
         </div>
       </div>
     );
@@ -149,9 +167,7 @@ class Modal extends Component {
               <input type='text' name='email' required value={state.email} autoComplete='off' placeholder='Your Email *' onChange={this.handleChange} />
             </div>
             <div>
-              <button type='submit' className='btn session' disabled={state.submitting}>
-                  &nbsp;{i18n.t('general.submit')}
-              </button>
+              <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
             </div>
           </form>
         </div>
@@ -171,25 +187,42 @@ class Modal extends Component {
             <input type='text' name='code' required value={state.code} autoComplete='off' placeholder={i18n.t('account.verification')} onChange={this.handleChange} />
           </div>
           <div>
-            <button type='submit' className='btn session' disabled={state.submitting}>
-                &nbsp;{i18n.t('general.submit')}
-            </button>
+            <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
           </div>
         </form>
       </div>
     );
+
+    let password = (
+      <div>
+        <form onSubmit={this.handleResetPassword}>
+          <div>
+            <input type='text' name='code' required value={state.code} autoComplete='off' placeholder={i18n.t('account.verification')} onChange={this.handleChange} />
+          </div>
+          <div>
+            <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
+          </div>
+          <div>
+            <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
+          </div>
+        </form>
+      </div>
+    );
+
 
     return (
       <div className={style.modal}>
         <div className={style.modalContainer}>
           <div onClick={this.props.handleLoginClick} className={style.action}>✕</div>
           <div className={style.app}>
-            {state.purpose=='SESSION' && i18n.t('account.sign.in')}
-            {state.purpose=='USER' && i18n.t('account.sign.up')}
+              {state.purpose=='SESSION' && i18n.t('account.sign.in')}
+              {state.purpose=='USER' && i18n.t('account.sign.up')}
+              {state.purpose=='PASSWORD' && i18n.t('account.reset.password')}
           </div>
             {state.purpose=='SESSION' && signIn}
-            {state.purpose=='USER' && state.verification_id === '' && verification}
-            {state.verification_id !== '' && register}
+            {(state.purpose=='USER' || state.purpose=='PASSWORD') && state.verification_id === '' && verification}
+            {state.purpose=='SESSION' && state.verification_id !== '' && register}
+            {state.purpose=='PASSWORD' && state.verification_id !== '' && password}
         </div>
       </div>
     )

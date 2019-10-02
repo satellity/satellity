@@ -43,6 +43,9 @@
     "sign": {
       "in": "Sign In",
       "up": "Sign Up"
+    },
+    "reset": {
+      "password": "Reset Password"
     }
   },
   "user": {

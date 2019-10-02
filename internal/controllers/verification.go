@@ -11,6 +11,11 @@ import (
 	"github.com/dimfeld/httptreemux"
 )
 
+const (
+	purposeUser     = "USER"
+	purposePassword = "PASSWORD"
+)
+
 type verificationImpl struct {
 	database *durable.Database
 }
@@ -21,6 +26,7 @@ type verificationRequest struct {
 	Code          string `json:"code"`
 	Username      string `json:"username"`
 	Password      string `json:"password"`
+	Purpose       string `json:"purpose"`
 	SessionSecret string `json:"session_secret"`
 }
 
@@ -51,11 +57,24 @@ func (impl *verificationImpl) verify(w http.ResponseWriter, r *http.Request, par
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
+
 	mctx := models.WrapContext(r.Context(), impl.database)
-	user, err := models.VerifyEmailVerification(mctx, params["id"], body.Code, body.Username, body.Password, body.SessionSecret)
-	if err != nil {
-		views.RenderErrorResponse(w, r, err)
-	} else {
-		views.RenderAccount(w, r, user)
+	switch body.Purpose {
+	case purposeUser:
+		user, err := models.VerifyEmailVerification(mctx, params["id"], body.Code, body.Username, body.Password, body.SessionSecret)
+		if err != nil {
+			views.RenderErrorResponse(w, r, err)
+		} else {
+			views.RenderAccount(w, r, user)
+		}
+	case purposePassword:
+		err := models.Reset(mctx, params["id"], body.Code, body.Password)
+		if err != nil {
+			views.RenderErrorResponse(w, r, err)
+		} else {
+			views.RenderBlankResponse(w, r)
+		}
+	default:
+		views.RenderErrorResponse(w, r, session.BadDataError(r.Context()))
 	}
 }
