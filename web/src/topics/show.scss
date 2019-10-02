@@ -52,9 +52,15 @@
   padding: .8rem;
 }
 .actions {
+  display: flex;
+  justify-content: flex-end;
   font-size: 1.125rem;
   text-align: right;
   padding: .8rem;
+  .item {
+    display: flex;
+    align-items: center;
+  }
   .action {
     margin-left: .8rem;
     cursor: pointer;

@@ -15,6 +15,7 @@ class Show extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      actioning: '',
       loading: true,
       topic_id: props.match.params.id,
       user: {},
@@ -42,6 +43,7 @@ class Show extends Component {
   }
 
   handleClick(e, action) {
+    this.setState({actioning: action});
     if (action === 'like' && this.state.is_liked_by) {
       action = 'unlike';
     }
@@ -50,8 +52,10 @@ class Show extends Component {
     }
     this.api.topic.action(action, this.state.topic_id).then((resp) => {
       if (resp.error) {
+        this.setState({actioning: ''});
         return
       }
+      resp.data.actioning = '';
       this.setState(resp.data);
     });
   }
@@ -112,13 +116,25 @@ class Show extends Component {
           {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.html_body}} />}
         </div>
         <div className={style.actions}>
-          <span className={`${style.action} ${state.is_liked_by}`} onClick={(e) => this.handleClick(e, 'like')}>
-            {state.likes_count > 0 && <span>{state.likes_count}</span>}
-            <FontAwesomeIcon icon={['far', 'heart']} style={like}/>
+          <span className={style.item}>
+            {
+              state.actioning !== 'like' &&
+              <span className={`${style.action} ${state.is_liked_by}`} onClick={(e) => this.handleClick(e, 'like')}>
+                {state.likes_count > 0 && <span>{state.likes_count}</span>}
+                <FontAwesomeIcon icon={['far', 'heart']} style={like}/>
+              </span>
+            }
+            {state.actioning === 'like' && <Loading class='small' />}
           </span>
-          <span className={`${style.action} ${state.is_bookmarked_by}`} onClick={(e) => this.handleClick(e, 'bookmark')}>
-            {state.bookmarks_count > 0 && <span>{state.bookmarks_count}</span>}
-            <FontAwesomeIcon icon={['far', 'bookmark']} style={bookmark}/>
+          <span className={style.item}>
+            {
+              state.actioning !== 'bookmark' &&
+              <span className={`${style.action} ${state.is_bookmarked_by}`} onClick={(e) => this.handleClick(e, 'bookmark')}>
+                {state.bookmarks_count > 0 && <span>{state.bookmarks_count}</span>}
+                <FontAwesomeIcon icon={['far', 'bookmark']} style={bookmark}/>
+              </span>
+            }
+            {state.actioning === 'bookmark' && <Loading class='small' />}
           </span>
         </div>
       </div>

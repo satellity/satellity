@@ -183,10 +183,13 @@ class Modal extends Component {
       <div className={style.modal}>
         <div className={style.modalContainer}>
           <div onClick={this.props.handleLoginClick} className={style.action}>✕</div>
-          <div className={style.app}>{i18n.t('account.sign.in')}</div>
-          {state.purpose=='SESSION' && signIn}
-          {state.purpose=='USER' && state.verification_id === '' && verification}
-          {state.verification_id !== '' && register}
+          <div className={style.app}>
+            {state.purpose=='SESSION' && i18n.t('account.sign.in')}
+            {state.purpose=='USER' && i18n.t('account.sign.up')}
+          </div>
+            {state.purpose=='SESSION' && signIn}
+            {state.purpose=='USER' && state.verification_id === '' && verification}
+            {state.verification_id !== '' && register}
         </div>
       </div>
     )

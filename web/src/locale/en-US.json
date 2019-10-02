@@ -59,7 +59,7 @@
     "github": "Sign in with GitHub"
   },
   "aside": {
-    "rules": "<li>1. Open Source on <a href='https://github.com/satellity/satellity' target='blank' class='soft'>Github</a>.</li><li> 2. Based on Golang, React and PostgreSQL. </li> <li> 3. Model tested. </li> <li> 4. Project <a href='https://github.com/satellity/satellity/projects/1' target='_blank'>Roadmap</a>. </li>"
+    "rules": "<li>1. Open Source on <a href='https://github.com/satellity/satellity' target='blank' class='soft'>Github</a>.</li><li> 2. Based on Golang, React and PostgreSQL. </li> <li> 3. Model tested. </li> <li> 4. Project <a href='https://github.com/satellity/satellity/projects/1' target='_blank' class='soft'>Roadmap</a>. </li>"
   },
   "errors": {
     "400": "Bad Request.",
