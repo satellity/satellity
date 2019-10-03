@@ -4,6 +4,19 @@
   box-sizing: border-box;
   padding: .8rem;
 }
+.file, .crop {
+  display: none;
+}
+.image {
+  font-size: 0;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 3.6rem;
+}
+.group {
+  font-size: 0;
+  margin-bottom: .8rem;
+}
 
 /* topics */
 .user {

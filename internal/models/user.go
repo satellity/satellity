@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"satellity/internal/clouds"
 	"satellity/internal/configs"
 	"satellity/internal/durable"
 	"satellity/internal/session"
@@ -31,6 +32,7 @@ CREATE TABLE IF NOT EXISTS users (
 	email                  VARCHAR(512),
 	username               VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
 	nickname               VARCHAR(64) NOT NULL DEFAULT '',
+	avatar_url             VARCHAR(512) NOT NULL DEFAULT '',
 	biography              VARCHAR(2048) NOT NULL DEFAULT '',
 	encrypted_password     VARCHAR(1024),
 	github_id              VARCHAR(1024) UNIQUE,
@@ -49,6 +51,7 @@ type User struct {
 	Email             sql.NullString
 	Username          string
 	Nickname          string
+	AvatarURL         string
 	Biography         string
 	EncryptedPassword sql.NullString
 	GithubID          sql.NullString
@@ -59,15 +62,15 @@ type User struct {
 	isNew     bool
 }
 
-var userColumns = []string{"user_id", "email", "username", "nickname", "biography", "encrypted_password", "github_id", "created_at", "updated_at"}
+var userColumns = []string{"user_id", "email", "username", "nickname", "avatar_url", "biography", "encrypted_password", "github_id", "created_at", "updated_at"}
 
 func (u *User) values() []interface{} {
-	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.Biography, u.EncryptedPassword, u.GithubID, u.CreatedAt, u.UpdatedAt}
+	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.AvatarURL, u.Biography, u.EncryptedPassword, u.GithubID, u.CreatedAt, u.UpdatedAt}
 }
 
 func userFromRows(row durable.Row) (*User, error) {
 	var u User
-	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.CreatedAt, &u.UpdatedAt)
+	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.AvatarURL, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.CreatedAt, &u.UpdatedAt)
 	return &u, err
 }
 
@@ -119,7 +122,7 @@ func CreateUser(mctx *Context, email, username, nickname, biography, password st
 }
 
 // UpdateProfile update user's profile
-func (u *User) UpdateProfile(mctx *Context, nickname, biography string) error {
+func (u *User) UpdateProfile(mctx *Context, nickname, biography string, avatar string) error {
 	ctx := mctx.context
 	nickname, biography = strings.TrimSpace(nickname), strings.TrimSpace(biography)
 	if len(nickname) == 0 && len(biography) == 0 {
@@ -132,10 +135,21 @@ func (u *User) UpdateProfile(mctx *Context, nickname, biography string) error {
 		u.Biography = biography
 	}
 	u.UpdatedAt = time.Now()
-	cols, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
-	_, err := mctx.database.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, params, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
+	columns, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
+	_, err := mctx.database.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", columns, params, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
 	if err != nil {
 		return session.TransactionError(ctx, err)
+	}
+	if len(avatar) > 1024 {
+		url, err := clouds.UploadImage(ctx, fmt.Sprintf("/users/%s/cover", u.UserID), avatar)
+		if err != nil {
+			return session.ServerError(ctx, err)
+		}
+		_, err = mctx.database.ExecContext(ctx, "UPDATE users SET avatar_url=$1 WHERE user_id=$2", url, u.UserID)
+		if err != nil {
+			return session.TransactionError(ctx, err)
+		}
+		u.AvatarURL = url
 	}
 	return nil
 }
@@ -297,6 +311,9 @@ func findUserByIdentity(ctx context.Context, tx *sql.Tx, identity string) (*User
 
 // GetAvatar return the avatar of the user
 func (u *User) GetAvatar() string {
+	if len(u.AvatarURL) > 0 {
+		return u.AvatarURL
+	}
 	return fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=180&d=wavatar", md5.Sum([]byte(strings.ToLower(u.Email.String))))
 }
 

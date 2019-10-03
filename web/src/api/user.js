@@ -72,7 +72,8 @@ class User {
   }
 
   update(params) {
-    const data = {nickname: params.nickname, biography: params.biography}
+    let i = params.avatar_url.indexOf(",");
+    const data = {nickname: params.nickname, biography: params.biography, avatar: params.avatar_url.slice(i+1)}
     return this.api.axios.post('/me', data).then((resp) => {
       if (resp.error) {
         return resp;

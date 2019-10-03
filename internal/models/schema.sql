@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
   username               VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
   nickname               VARCHAR(64) NOT NULL DEFAULT '',
   biography              VARCHAR(2048) NOT NULL DEFAULT '',
+  avatar_url             VARCHAR(512) NOT NULL DEFAULT '',
   encrypted_password     VARCHAR(1024),
   github_id              VARCHAR(1024) UNIQUE,
   created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

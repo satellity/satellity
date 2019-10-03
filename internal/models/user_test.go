@@ -102,7 +102,7 @@ func TestUserCRUD(t *testing.T) {
 			new, err = AuthenticateUser(ctx, ss)
 			assert.Nil(err)
 			assert.NotNil(new)
-			err = new.UpdateProfile(ctx, "Jason", "")
+			err = new.UpdateProfile(ctx, "Jason", "", "")
 			assert.Nil(err)
 			assert.Equal("Jason", new.Name())
 			new, err = ReadUserByUsernameOrEmail(ctx, tc.username)

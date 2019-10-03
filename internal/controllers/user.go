@@ -23,6 +23,7 @@ type userRequest struct {
 	Email         string `json:"email"`
 	Password      string `json:"password"`
 	Nickname      string `json:"nickname"`
+	Avatar        string `json:"avatar"`
 	Biography     string `json:"biography"`
 }
 
@@ -73,7 +74,7 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
 	current := middlewares.CurrentUser(r)
-	if err := current.UpdateProfile(mctx, body.Nickname, body.Biography); err != nil {
+	if err := current.UpdateProfile(mctx, body.Nickname, body.Biography, body.Avatar); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderAccount(w, r, current)

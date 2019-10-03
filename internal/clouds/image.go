@@ -21,7 +21,7 @@ func UploadImage(ctx context.Context, name, data string) (string, error) {
 	if err != nil {
 		return "", session.ServerError(ctx, err)
 	}
-	if cfg.Width < 600 || cfg.Height < 300 {
+	if cfg.Width < 256 || cfg.Height < 256 {
 		return "", session.InvalidImageDataError(ctx)
 	}
 
