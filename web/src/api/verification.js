@@ -4,7 +4,7 @@ class Verification {
   }
 
   create(params) {
-    const data = {email: params.email, recaptcha: params.recaptcha};
+    const data = {purpose: params.purpose, email: params.email, recaptcha: params.recaptcha};
     return this.api.axios.post('/email_verifications', data);
   }
 }

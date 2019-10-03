@@ -44,7 +44,7 @@ func (impl *verificationImpl) create(w http.ResponseWriter, r *http.Request, _ m
 		return
 	}
 	mctx := models.WrapContext(r.Context(), impl.database)
-	if verification, err := models.CreateEmailVerification(mctx, body.Email, body.Recaptcha); err != nil {
+	if verification, err := models.CreateEmailVerification(mctx, body.Purpose, body.Email, body.Recaptcha); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderVerification(w, r, verification)

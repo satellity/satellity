@@ -48,7 +48,7 @@ func emailVerificationFromRows(row durable.Row) (*EmailVerification, error) {
 }
 
 // CreateEmailVerification create an email verification
-func CreateEmailVerification(mctx *Context, email, recaptcha string) (*EmailVerification, error) {
+func CreateEmailVerification(mctx *Context, purpose, email, recaptcha string) (*EmailVerification, error) {
 	ctx := mctx.context
 
 	code, err := generateVerificationCode(ctx)
@@ -92,7 +92,7 @@ func CreateEmailVerification(mctx *Context, email, recaptcha string) (*EmailVeri
 		return nil, session.TransactionError(ctx, err)
 	}
 	if sent {
-		if err := clouds.SendVerificationEmail(ctx, ev.Email, ev.Code); err != nil {
+		if err := clouds.SendVerificationEmail(ctx, purpose, ev.Email, ev.Code); err != nil {
 			return nil, session.ServerError(ctx, err)
 		}
 	}

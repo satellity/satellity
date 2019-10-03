@@ -44,6 +44,7 @@ type Option struct {
 	Email     struct {
 		Verification struct {
 			Title string `yaml:"title"`
+			Reset string `yaml:"reset"`
 			Body  string `yaml:"body"`
 		} `yaml:"verification"`
 	} `yaml:"email"`

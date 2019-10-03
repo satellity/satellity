@@ -23,6 +23,7 @@ default: &default
   email:
     verification:
       title: "Register An Satellity Account"
+      reset: "Reset Your Satellity Account"
       body: "Your verification code: <b>%s</b>"
   mailgun:
     domain: "mailgun.satellity.org"

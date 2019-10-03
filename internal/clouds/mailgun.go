@@ -10,9 +10,13 @@ import (
 )
 
 // SendVerificationEmail send an verification email
-func SendVerificationEmail(ctx context.Context, recipient, code string) error {
+func SendVerificationEmail(ctx context.Context, purpose, recipient, code string) error {
 	v := configs.AppConfig.Email.Verification
-	return sendEmail(ctx, v.Title, fmt.Sprintf(v.Body, code), recipient)
+	title := v.Title
+	if purpose == "PASSWORD" {
+		title = v.Reset
+	}
+	return sendEmail(ctx, title, fmt.Sprintf(v.Body, code), recipient)
 }
 
 func sendEmail(ctx context.Context, subject, body, recipient string) error {

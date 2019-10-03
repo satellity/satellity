@@ -17,7 +17,7 @@ func TestEmailVerification(t *testing.T) {
 	defer mctx.database.Close()
 	defer teardownTestContext(mctx)
 
-	ev, err := CreateEmailVerification(mctx, "im.yuqlee@gmail.com", "testrecaptcha")
+	ev, err := CreateEmailVerification(mctx, "USER", "im.yuqlee@gmail.com", "testrecaptcha")
 	assert.Nil(err)
 	assert.NotNil(ev)
 
