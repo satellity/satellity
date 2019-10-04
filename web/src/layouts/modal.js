@@ -221,7 +221,7 @@ class Modal extends Component {
           </div>
             {state.purpose=='SESSION' && signIn}
             {(state.purpose=='USER' || state.purpose=='PASSWORD') && state.verification_id === '' && verification}
-            {state.purpose=='SESSION' && state.verification_id !== '' && register}
+            {state.purpose=='USER' && state.verification_id !== '' && register}
             {state.purpose=='PASSWORD' && state.verification_id !== '' && password}
         </div>
       </div>
