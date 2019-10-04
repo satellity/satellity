@@ -79,7 +79,7 @@ func CreateEmailVerification(mctx *Context, purpose, email, recaptcha string) (*
 		if err != nil {
 			return err
 		}
-		if last.CreatedAt.Add(time.Minute).After(time.Now()) {
+		if last != nil && last.CreatedAt.Add(time.Minute).After(time.Now()) {
 			return nil
 		}
 		sent = true
