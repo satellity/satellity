@@ -83,7 +83,7 @@ func CreateEmailVerification(mctx *Context, purpose, email, recaptcha string) (*
 			return nil
 		}
 		sent = true
-		columns, params := durable.PrepareColumnsWithValues(emailVerificationColumns)
+		columns, params := durable.PrepareColumnsWithParams(emailVerificationColumns)
 		query := fmt.Sprintf("INSERT INTO email_verifications(%s) VALUES (%s)", columns, params)
 		_, err = tx.ExecContext(ctx, query, ev.values()...)
 		return err
@@ -204,7 +204,7 @@ func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, pass
 			user.GithubID = sql.NullString{String: githubID, Valid: true}
 		}
 
-		columns, params := durable.PrepareColumnsWithValues(userColumns)
+		columns, params := durable.PrepareColumnsWithParams(userColumns)
 		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", columns, params), user.values()...)
 		if err != nil {
 			return nil, err

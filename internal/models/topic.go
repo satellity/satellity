@@ -121,7 +121,7 @@ func (user *User) CreateTopic(mctx *Context, title, body, categoryID string, dra
 			return err
 		}
 		category.TopicsCount, category.UpdatedAt = count+1, time.Now()
-		cols, params := durable.PrepareColumnsWithValues(topicColumns)
+		cols, params := durable.PrepareColumnsWithParams(topicColumns)
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO topics(%s) VALUES (%s)", cols, params), topic.values()...)
 		return err
 	})
@@ -179,7 +179,7 @@ func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string,
 			topic.CategoryID = category.CategoryID
 			topic.Category = category
 		}
-		cols, params := durable.PrepareColumnsWithValues([]string{"title", "body", "category_id", "draft"})
+		cols, params := durable.PrepareColumnsWithParams([]string{"title", "body", "category_id", "draft"})
 		vals := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft}
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), vals...)
 		return err

@@ -13,7 +13,7 @@ type CommentView struct {
 	Body      string    `json:"body"`
 	TopicID   string    `json:"topic_id"`
 	UserID    string    `json:"user_id"`
-	Score     int       `json:"score,notnull"`
+	Score     int       `json:"score"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	User      UserView  `json:"user"`

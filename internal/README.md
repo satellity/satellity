@@ -1,8 +1,12 @@
-## api
+## API
 
-api is the back-end of [Satellity](https://live.godiscourse.com/), there isn't a convention for Go (maybe just I don't find), so I learned from RoR:
+API is the back-end of [Satellity](https://satellity.org), there isn't a convention for Go (maybe just I don't find), so I learned from RoR:
 
-1. `controllers` contains the routers of request.
-2. `models` contains the main methods, include operate data from database (CRUD).
-3. `views` is where to place the response body, we only have JSON format here.
-4. `middlewares` is unique Go.
+1. `clouds` includes third part services, like mailgun and recaptcha.
+2. `configs` contains server side configs.
+3. `controllers` contains the routers of requests.
+4. `durable` contains database.
+5. `middlewares` is unique Go.
+6. `models` contains the functions, include operate data from database (CRUD).
+7. `session` contains all errors.
+8. `views` is where place the response body, we only have JSON format here.

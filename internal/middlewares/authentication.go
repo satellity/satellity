@@ -48,8 +48,8 @@ func Authenticate(database *durable.Database, handler http.Handler) http.Handler
 			handleUnauthorized(handler, w, r)
 			return
 		}
-		mcontext := models.WrapContext(r.Context(), database)
-		user, err := models.AuthenticateUser(mcontext, header[7:])
+		mctx := models.WrapContext(r.Context(), database)
+		user, err := models.AuthenticateUser(mctx, header[7:])
 		if err != nil {
 			views.RenderErrorResponse(w, r, err)
 			return

@@ -10,12 +10,9 @@ import (
 type contextValueKey int
 
 const (
-	keyRequest           contextValueKey = 0
-	keyLogger            contextValueKey = 1
-	keyRender            contextValueKey = 2
-	keyRemoteAddress     contextValueKey = 11
-	keyAuthorizationInfo contextValueKey = 12
-	keyRequestBody       contextValueKey = 13
+	keyLogger      contextValueKey = 1
+	keyRender      contextValueKey = 2
+	keyRequestBody contextValueKey = 13
 )
 
 // Logger read logger from context

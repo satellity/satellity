@@ -73,7 +73,7 @@ func CreateCategory(mctx *Context, name, alias, description string, position int
 		UpdatedAt:   t,
 	}
 
-	cols, params := durable.PrepareColumnsWithValues(categoryColumns)
+	cols, params := durable.PrepareColumnsWithParams(categoryColumns)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		if position == 0 {
 			count, err := categoryCount(ctx, tx)
@@ -118,7 +118,7 @@ func UpdateCategory(mctx *Context, id, name, alias, description string, position
 		}
 		category.Position = position
 		category.UpdatedAt = time.Now()
-		cols, params := durable.PrepareColumnsWithValues([]string{"name", "alias", "description", "position", "updated_at"})
+		cols, params := durable.PrepareColumnsWithParams([]string{"name", "alias", "description", "position", "updated_at"})
 		vals := []interface{}{category.Name, category.Alias, category.Description, category.Position, category.UpdatedAt}
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
 		return err
@@ -227,7 +227,7 @@ func transmitToCategory(mctx *Context, id string) (*Category, error) {
 			category.TopicsCount = count
 		}
 		category.UpdatedAt = time.Now()
-		cols, params := durable.PrepareColumnsWithValues([]string{"last_topic_id", "topics_count", "updated_at"})
+		cols, params := durable.PrepareColumnsWithParams([]string{"last_topic_id", "topics_count", "updated_at"})
 		vals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
 		return err

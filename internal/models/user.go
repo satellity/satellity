@@ -135,7 +135,7 @@ func (u *User) UpdateProfile(mctx *Context, nickname, biography string, avatar s
 		u.Biography = biography
 	}
 	u.UpdatedAt = time.Now()
-	columns, params := durable.PrepareColumnsWithValues([]string{"nickname", "biography", "updated_at"})
+	columns, params := durable.PrepareColumnsWithParams([]string{"nickname", "biography", "updated_at"})
 	_, err := mctx.database.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", columns, params, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
 	if err != nil {
 		return session.TransactionError(ctx, err)

@@ -104,7 +104,7 @@ func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bo
 			return err
 		}
 		if tu.isNew {
-			params, positions := durable.PrepareColumnsWithValues(topicUserColumns)
+			params, positions := durable.PrepareColumnsWithParams(topicUserColumns)
 			query := fmt.Sprintf("INSERT INTO topic_users (%s) VALUES (%s)", params, positions)
 			if _, err := tx.ExecContext(ctx, query, tu.values()...); err != nil {
 				return err

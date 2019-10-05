@@ -136,8 +136,8 @@ func (d *Database) RunInTransaction(ctx context.Context, fn func(*sql.Tx) error)
 	return tx.Commit()
 }
 
-// PrepareColumnsWithValues prepare columns and placeholder
-func PrepareColumnsWithValues(columns []string) (string, string) {
+// PrepareColumnsWithParams prepare columns and placeholders
+func PrepareColumnsWithParams(columns []string) (string, string) {
 	if len(columns) < 1 {
 		return "", ""
 	}

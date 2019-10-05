@@ -84,7 +84,7 @@ func upsertStatistic(mctx *Context, name string) (*Statistic, error) {
 			Name:        name,
 			Count:       int64(count),
 		}
-		cols, params := durable.PrepareColumnsWithValues(statisticColumns)
+		cols, params := durable.PrepareColumnsWithParams(statisticColumns)
 		if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...); err != nil {
 			return err
 		}
