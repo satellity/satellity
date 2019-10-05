@@ -40,7 +40,7 @@ func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
 
 func main() {
 	var options struct {
-		Dir         string `short:"d" long:"dir" description:"Where's the config file place, default ./internal/configs/config.yaml"`
+		Config      string `short:"c" long:"config" description:"Where's the config file place, default ./internal/configs/config.yaml"`
 		Environment string `short:"e" long:"environment" default:"development"`
 	}
 	p := flags.NewParser(&options, flags.Default)
@@ -48,7 +48,7 @@ func main() {
 		log.Panicln(err)
 	}
 
-	if options.Dir == "" {
+	if options.Config == "" {
 		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
 			log.Panicln(err)
@@ -57,10 +57,10 @@ func main() {
 		if strings.Contains(dir, "cmd") {
 			back = "../.."
 		}
-		options.Dir = path.Join(dir, back, "internal/configs")
+		options.Config = path.Join(dir, back, "internal/configs/config.yaml")
 	}
 
-	if err := configs.Init(options.Dir, options.Environment); err != nil {
+	if err := configs.Init(options.Config, options.Environment); err != nil {
 		log.Panicln(err)
 	}
 

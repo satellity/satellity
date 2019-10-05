@@ -2,7 +2,6 @@ package configs
 
 import (
 	"io/ioutil"
-	"path"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -62,8 +61,8 @@ type Option struct {
 var AppConfig *Option
 
 // Init is using to initialize the configs
-func Init(dir, env string) error {
-	data, err := ioutil.ReadFile(path.Join(dir, "./config.yaml"))
+func Init(file, env string) error {
+	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
 	}
