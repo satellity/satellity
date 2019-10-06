@@ -85,8 +85,8 @@ class Edit extends Component {
       }
       const canvas = document.createElement("canvas");
       let w = crop.width > 512 ? 512 : crop.width;
-      canvas.width = crop.width;
-      canvas.height = crop.height;
+      canvas.width = w;
+      canvas.height = w;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(
         this.imageRef,

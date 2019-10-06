@@ -34,12 +34,12 @@ func UploadImage(ctx context.Context, name, data string) (string, error) {
 	if err != nil {
 		return "", session.ServerError(ctx, err)
 	}
-	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return "", session.ServerError(ctx, err)
 	}
 	defer f.Close()
-	_, err = f.Write(imageBytes)
+	_, err = f.WriteAt(imageBytes, 0)
 	if err != nil {
 		return "", session.ServerError(ctx, err)
 	}
