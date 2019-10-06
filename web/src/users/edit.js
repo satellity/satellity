@@ -84,6 +84,7 @@ class Edit extends Component {
         crop.height = crop.width;
       }
       const canvas = document.createElement("canvas");
+      let w = crop.width > 512 ? 512 : crop.width;
       canvas.width = crop.width;
       canvas.height = crop.height;
       const ctx = canvas.getContext("2d");
@@ -95,8 +96,8 @@ class Edit extends Component {
         crop.height,
         0,
         0,
-        crop.width,
-        crop.height
+        w,
+        w
       );
       this.setState({avatar_url: canvas.toDataURL()});
     }
