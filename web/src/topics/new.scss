@@ -40,6 +40,9 @@
 .actions {
   text-align: right;
 }
+.markdown {
+  margin-right: .8rem;
+}
 .eye {
   color: rgba($color-main-dark, .8);
   &:hover {
@@ -52,7 +55,6 @@
 .body {
   border: 1px solid #ccc;
   margin-bottom: 1rem;
-  min-height: 24rem;
   overflow: hidden;
   pre {
     font-size: 1rem;

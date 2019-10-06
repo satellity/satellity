@@ -48,28 +48,25 @@ class New extends Component {
   }
 
   componentDidMount() {
+    let id = 'draft'
     if (validate(this.state.topic_id)) {
-      this.api.topic.show(this.state.topic_id).then((resp) => {
-        if (resp.error) {
-          return
-        }
-        let data = resp.data;
-        data.loading = false;
-        this.setState(data);
-      });
-    } else {
-      this.api.topic.show('draft').then((resp) => {
-        if (resp.error) {
-          return
-        }
-        let data = resp.data;
-        if (!data) {
-          data = {};
-        }
-        data.loading = false;
-        this.setState(data);
-      });
+      id = this.state.topic_id;
     }
+    this.api.topic.show(id).then((resp) => {
+      if (resp.error) {
+        return
+      }
+      let data = resp.data;
+      if (!data) {
+        data = {body: '\n'.repeat(15)};
+      }
+      let l = data.body.split('\n').length;
+      if (l < 16) {
+        data.body += '\n'.repeat(16-l);
+      }
+      data.loading = false;
+      this.setState(data);
+    });
     this.api.category.index().then((resp) => {
       if (resp.error) {
         return
@@ -191,6 +188,9 @@ class New extends Component {
           <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' placeholder='Title *' onChange={this.handleChange} />
         </div>
         <div className={style.actions}>
+          <a className={style.markdown} href='https://guides.github.com/features/mastering-markdown/' target='_blank'>
+            <FontAwesomeIcon className={style.eye} icon={['fab', 'markdown']} />
+          </a>
           <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} />
         </div>
         <div className={style.body}>

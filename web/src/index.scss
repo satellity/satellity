@@ -100,9 +100,8 @@ img {
   padding: 0.8rem;
 }
 .editor {
-  min-height: 24rem;
   .CodeMirror {
-    height: 24rem;
+    height: auto;
   }
 }
 // TODO better choice?

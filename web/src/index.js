@@ -16,12 +16,13 @@ import Oauth from './users/oauth.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBookmark, faComment, faComments, faEdit, faEye, faTrashAlt, faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faChalkboard, faEllipsisV, faHome, faPlus, faUsersCog } from '@fortawesome/free-solid-svg-icons';
+import { faMarkdown } from '@fortawesome/free-brands-svg-icons';
 library.add(
   faBookmark, faComment, faComments,
   faEdit, faEye, faTrashAlt,
   faHeart,
   faChalkboard, faEllipsisV, faHome,
-  faPlus, faUsersCog
+  faPlus, faUsersCog, faMarkdown
 );
 
 showdown.setOption('customizedHeaderId', true);
