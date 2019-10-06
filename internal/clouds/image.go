@@ -3,7 +3,9 @@ package clouds
 import (
 	"bytes"
 	"context"
+	"crypto/md5"
 	"encoding/base64"
+	"fmt"
 	"image"
 	_ "image/gif" //
 	_ "image/jpeg"
@@ -17,7 +19,8 @@ import (
 // UploadImage upload image to storage
 func UploadImage(ctx context.Context, name, data string) (string, error) {
 	imageBytes, err := base64.StdEncoding.DecodeString(data)
-	cfg, fmt, err := image.DecodeConfig(bytes.NewReader(imageBytes))
+	h := fmt.Sprintf("%x", md5.Sum(imageBytes))
+	cfg, ext, err := image.DecodeConfig(bytes.NewReader(imageBytes))
 	if err != nil {
 		return "", session.ServerError(ctx, err)
 	}
@@ -25,7 +28,7 @@ func UploadImage(ctx context.Context, name, data string) (string, error) {
 		return "", session.InvalidImageDataError(ctx)
 	}
 
-	fileName := name + "." + fmt
+	fileName := name + "." + ext
 	file := filepath.Join(configs.AppConfig.System.Attachments.Path, fileName)
 	err = os.MkdirAll(filepath.Dir(file), os.ModePerm)
 	if err != nil {
@@ -44,5 +47,5 @@ func UploadImage(ctx context.Context, name, data string) (string, error) {
 	if err != nil {
 		return "", session.ServerError(ctx, err)
 	}
-	return configs.AppConfig.HTTP.Host + "/attachments" + fileName, nil
+	return fmt.Sprintf("%s/attachments%s?v=%s", configs.AppConfig.HTTP.Host, fileName, h), nil
 }

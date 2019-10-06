@@ -58,12 +58,13 @@ class New extends Component {
       }
       let data = resp.data;
       if (!data) {
-        data = {body: '\n'.repeat(15)};
+        data = {body: '\n'.repeat(12)};
       }
       let l = data.body.split('\n').length;
-      if (l < 16) {
-        data.body += '\n'.repeat(16-l);
+      if (l < 13) {
+        data.body += '\n'.repeat(13-l);
       }
+      data.body += '\n'.repeat(3)
       data.loading = false;
       this.setState(data);
     });
