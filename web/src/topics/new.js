@@ -61,10 +61,10 @@ class New extends Component {
         data = {body: '\n'.repeat(12)};
       }
       let l = data.body.split('\n').length;
-      if (l < 13) {
+      if (l < 16) {
         data.body += '\n'.repeat(13-l);
       }
-      data.body += '\n'.repeat(3)
+      data.body += '\n'.repeat(3);
       data.loading = false;
       this.setState(data);
     });
@@ -107,6 +107,11 @@ class New extends Component {
   }
 
   handleBodyChange(editor, data, value) {
+    let l = value.split('\n').length;
+    if (l < 16) {
+      value += '\n'.repeat(13-l);
+    }
+    value += '\n'.repeat(3);
     this.setState({body: value});
   }
 

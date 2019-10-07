@@ -23,7 +23,7 @@ class Show extends Component {
     };
 
     this.api = new API();
-    this.converter = new showdown.Converter();
+    this.converter = new showdown.Converter({ extensions: ['header-anchors'] });
     this.handleClick = this.handleClick.bind(this);
   }
 
