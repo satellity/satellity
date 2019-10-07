@@ -16,7 +16,7 @@ article.md {
     }
   }
   ul, ol {
-    margin: .8rem 0 0;
+    margin: 0 0 .8rem;
     list-style: disc;
     padding-left: 1.3em;
     padding-right: 1.5em;
@@ -59,6 +59,19 @@ article.md {
     }
     pre {
       margin: 1.6rem 0 0;
+    }
+  }
+  table {
+    thead {
+      text-align: left;
+    }
+    tbody {
+      tr:nth-child(odd) {
+        background: #f8f8f8;
+      }
+    }
+    td, th {
+      padding: .2rem .4rem;
     }
   }
   img, video {
