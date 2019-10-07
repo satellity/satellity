@@ -2,15 +2,11 @@
 
 :global {
 article.md {
-  padding: .8rem 1.6rem;
   h2 {
     margin: 1.6rem 0 .8rem;
-    position: relative;
     .anchor {
       display: none;
-      position: absolute;
-      left: -1rem;
-      padding-right: .2rem;
+      padding-left: .4rem;
     }
 
     &:hover {
