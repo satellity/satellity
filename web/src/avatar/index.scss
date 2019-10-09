@@ -8,12 +8,18 @@
   padding: .1rem;
 }
 .action {
-  box-sizing: border-box;
   background: rgba(218,40,16,.8);
+  box-sizing: border-box;
+  border-radius: .2rem;
   color: white;
+  cursor: pointer;
   display: inline-block;
   margin: 0 .4rem .4rem 0;
   padding: .4rem .8rem;
+  opacity: .8;
+  &:hover, &.current {
+    opacity: 1;
+  }
 }
 .canvas {
   display: flex;

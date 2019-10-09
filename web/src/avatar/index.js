@@ -1,12 +1,14 @@
 import style from './index.scss';
 import React, {Component} from 'react';
 import Avatar, {Piece} from 'avataaars';
+import Colors from 'avataaars/dist/avatar/top/facialHair/Colors.js';
 
 class Index extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      action: 'hair',
       avatar: 'Circle',
       top: 'ShortHairDreads01',
       accessory: 'Prescription02',
@@ -21,8 +23,11 @@ class Index extends Component {
       skin: 'Light',
       hair_shapes: ['NoHair','Eyepatch','Hat','Hijab','Turban','WinterHat1','WinterHat2','WinterHat3','WinterHat4','LongHairBigHair','LongHairBob','LongHairBun','LongHairCurly','LongHairCurvy','LongHairDreads','LongHairFrida','LongHairFro','LongHairFroBand','LongHairNotTooLong','LongHairShavedSides','LongHairMiaWallace','LongHairStraight','LongHairStraight2','LongHairStraightStrand','ShortHairDreads01','ShortHairDreads02','ShortHairFrizzle','ShortHairShaggyMullet','ShortHairShortCurly','ShortHairShortFlat','ShortHairShortRound','ShortHairShortWaved','ShortHairSides','ShortHairTheCaesar','ShortHairTheCaesarSidePart'],
       accessories: ['Blank','Kurt','Prescription01','Prescription02','Round','Sunglasses','Wayfarers'],
+      hat_colors: ['Black','Blue01','Blue02','Blue03','Gray01','Gray02','Heather','PastelBlue','PastelGreen','PastelOrange','PastelRed','PastelYellow','Pink','Red','White'],
+      hair_colors: ['Auburn','Black','Blonde','BlondeGolden','Brown','BrownDark','PastelPink','Platinum','Red','SilverGray'],
       facial_hairs: ['Blank','MoustacheFancy','MoustacheMagnum','BeardLight','BeardMedium', 'BeardMajestic'],
       clothes: ['BlazerShirt','BlazerSweater','CollarSweater','GraphicShirt','Hoodie','Overall','ShirtCrewNeck','ShirtScoopNeck','ShirtVNeck'],
+      clothe_colors: ['Black','Blue01','Blue02','Blue03','Gray01','Gray02','Heather','PastelBlue','PastelGreen','PastelOrange','PastelRed','PastelYellow','Pink','Red','White'],
       eyes: ['Close','Cry','Default','Dizzy','EyeRoll','Happy','Hearts','Side','Squint','Surprised','Wink','WinkWacky'],
       eyebrows: ['Angry','AngryNatural','Default','DefaultNatural','FlatNatural','RaisedExcited','RaisedExcitedNatural','SadConcerned','SadConcernedNatural','UnibrowNatural','UpDown','UpDownNatural'],
       mouths: ['Concerned','Default','Disbelief','Eating','Grimace','Sad','ScreamOpen','Serious','Smile','Tongue','Twinkle','Vomit'],
@@ -31,6 +36,7 @@ class Index extends Component {
     };
 
     this.handleClick = this.handleClick.bind(this);
+    this.handleActionClick = this.handleActionClick.bind(this);
   }
 
   handleClick(e, k, v) {
@@ -40,14 +46,26 @@ class Index extends Component {
     });
   }
 
+  handleActionClick(e, v) {
+    e.preventDefault();
+    this.setState({
+      action: v
+    });
+  }
+
   render () {
     const state = this.state;
 
-    const actions = ['hair','accessory','beard','clothe','eye','eyebrow','mouth', 'skin'].map((o) => {
+    console.log(Colors);
+
+    const actions = ['hair', 'hairColor','accessory','beard','clothe','eye','eyebrow','mouth', 'skin'].map((o) => {
+      if (o === 'hairColor' && !state.top.includes('Hat')) {
+        return;
+      }
       return (
-        <span key={o} className={style.action}>{o}</span>
+        <span key={o} className={`${style.action} ${state.action === o ? style.current : ''}`} onClick={(e) => this.handleActionClick(e, o)}>{o}</span>
       )
-    })
+    });
 
     const hairShapes = state.hair_shapes.map((o) => {
       return (
@@ -144,35 +162,18 @@ class Index extends Component {
             <div className={style.actions}>
                 {actions}
             </div>
-            <div>
-                {hairShapes}
-            </div>
-            <div>
-                {accessories}
-            </div>
-            <div>
-                {facialHairs}
-            </div>
-            <div>
-                {clothes}
-            </div>
-            <div>
-                {graphics}
-            </div>
-            <div>
-                {eyes}
-            </div>
-            <div>
-                {eyebrows}
-            </div>
-            <div>
-                {mouths}
-            </div>
-            <div>
-                {skins}
-            </div>
+            {state.action === 'hair' && <div> {hairShapes} </div>}
+            {state.action === 'accessory' && <div> {accessories} </div>}
+            {state.action === 'beard' && <div> {facialHairs} </div>}
+            {state.action === 'clothe' && <div> {clothes} </div>}
+            {state.action === 'clothe' && state.clothe.includes('Graphic') && <div> {graphics} </div>}
+            {state.action === 'eye' && <div> {eyes} </div>}
+            {state.action === 'eyebrow' && <div> {eyebrows} </div>}
+            {state.action === 'mouth' && <div> {mouths} </div>}
+            {state.action === 'skin' && <div> {skins} </div>}
           </div>
         </div>
+        <Piece pieceType='hairColor' pieceSize='100' hairColor='Red'/>
       </div>
     )
   }
