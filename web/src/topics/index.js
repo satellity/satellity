@@ -120,7 +120,9 @@ class Index extends Component {
         <Link
           to={{ pathname: "/", search: `?c=${category.name}` }}
           className={`${style.node} ${state.categoryId === category.category_id ? style.current : ''}`}
-          key={category.category_id}>{category.alias}</Link>
+          key={category.category_id}>
+          {category.alias}
+        </Link>
       )
     });
 

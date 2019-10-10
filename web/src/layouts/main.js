@@ -7,6 +7,7 @@ import API from '../api/index.js'
 import Home from '../home/view.js';
 import User from '../users/view.js';
 import Topic from '../topics/view.js';
+import Avatar from '../avatar/view.js';
 import Modal from './modal.js';
 
 class MainLayout extends Component {
@@ -25,6 +26,7 @@ class MainLayout extends Component {
         <div className='wrapper'>
           <Switch>
             <Route exact path='/' component={Topic.Index} />
+            <Route exact path='/avatar' component={Avatar.Index} />
             <Route exact path='/dashboard' component={Home.Dashboard} />
             <Route exact path='/user/edit' component={User.Edit} />
             <Route path='/users/:id' component={User.Show} />

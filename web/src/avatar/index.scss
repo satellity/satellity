@@ -1,0 +1,40 @@
+.container {
+  background: white;
+  padding: 1.6rem;
+  margin-top: 1.6rem;
+}
+.actions {
+  margin-bottom: .8rem;
+  padding: .1rem;
+}
+.action {
+  background: rgba(218,40,16,.8);
+  box-sizing: border-box;
+  border-radius: .2rem;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  margin: 0 .4rem .4rem 0;
+  padding: .4rem .8rem;
+  opacity: .8;
+  &:hover, &.current {
+    opacity: 1;
+  }
+}
+.canvas {
+  display: flex;
+}
+.profile {
+  padding: 0 1.6rem 1.6rem 0;
+}
+.avatar {
+  margin-bottom: 1.6rem;
+}
+.item {
+  background: rgba(236,240,245,.5);
+  border: .1rem solid white;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  padding: .4rem;
+}
