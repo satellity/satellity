@@ -1,7 +1,6 @@
 import style from './index.scss';
 import React, {Component} from 'react';
 import Avatar, {Piece} from 'avataaars';
-import Colors from 'avataaars/dist/avatar/top/facialHair/Colors.js';
 
 class Index extends Component {
   constructor(props) {
@@ -92,7 +91,7 @@ class Index extends Component {
     const clothes = state.clothes.map((o) => {
       return (
         <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'clothe', o)}>
-          <Piece pieceType='clothe' pieceSize='100' clotheType={o}/>
+          <Piece pieceType='clothe' pieceSize='100' clotheType={o} clotheColor="Blank"/>
         </div>
       )
     });
