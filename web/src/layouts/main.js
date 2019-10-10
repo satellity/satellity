@@ -58,7 +58,10 @@ class Header extends Component {
     let profile = <a className={style.navi} onClick={this.handleLoginClick}>Login</a>;
     if (user.loggedIn()) {
       profile = (
-        <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {user.local().nickname} </Link>
+        <div className={style.navis}>
+          <Link to='/topics/new' className={`${style.navi}`}> <FontAwesomeIcon icon={['fa', 'plus']} /> </Link>
+          <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {user.local().nickname} </Link>
+        </div>
       );
     }
 

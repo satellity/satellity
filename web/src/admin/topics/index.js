@@ -33,7 +33,7 @@ const TopicIndex = (props) => {
       <li key={topic.topic_id}>
         {topic.user.nickname} | {topic.title}
         <div className={style.time}>
-          {topic.topic_id} | {topic.created_at}
+          {topic.topic_id} | {topic.created_at} | <Link to={`/topics/${topic.topic_id}/edit`} >EIDT</Link>
         </div>
       </li>
     )
