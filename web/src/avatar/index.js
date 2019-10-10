@@ -13,7 +13,9 @@ class Index extends Component {
       top: 'ShortHairDreads01',
       accessory: 'Prescription02',
       hairColor: 'BrownDark',
+      hatColor: 'PastelBlue',
       facialHair: 'BeardLight',
+      facialHairColor: 'Red',
       clothe: 'GraphicShirt',
       clotheColor: 'PastelBlue',
       graphic: 'Resist',
@@ -26,6 +28,7 @@ class Index extends Component {
       hat_colors: ['Black','Blue01','Blue02','Blue03','Gray01','Gray02','Heather','PastelBlue','PastelGreen','PastelOrange','PastelRed','PastelYellow','Pink','Red','White'],
       hair_colors: ['Auburn','Black','Blonde','BlondeGolden','Brown','BrownDark','PastelPink','Platinum','Red','SilverGray'],
       facial_hairs: ['Blank','MoustacheFancy','MoustacheMagnum','BeardLight','BeardMedium', 'BeardMajestic'],
+      facial_hair_colors: ['Auburn','Black','Blonde','BlondeGolden','Brown','BrownDark','Platinum','Red'],
       clothes: ['BlazerShirt','BlazerSweater','CollarSweater','GraphicShirt','Hoodie','Overall','ShirtCrewNeck','ShirtScoopNeck','ShirtVNeck'],
       clothe_colors: ['Black','Blue01','Blue02','Blue03','Gray01','Gray02','Heather','PastelBlue','PastelGreen','PastelOrange','PastelRed','PastelYellow','Pink','Red','White'],
       eyes: ['Close','Cry','Default','Dizzy','EyeRoll','Happy','Hearts','Side','Squint','Surprised','Wink','WinkWacky'],
@@ -56,12 +59,7 @@ class Index extends Component {
   render () {
     const state = this.state;
 
-    console.log(Colors);
-
-    const actions = ['hair', 'hairColor','accessory','beard','clothe','eye','eyebrow','mouth', 'skin'].map((o) => {
-      if (o === 'hairColor' && !state.top.includes('Hat')) {
-        return;
-      }
+    const actions = ['hair','accessory','beard','clothe','eye','eyebrow','mouth', 'skin'].map((o) => {
       return (
         <span key={o} className={`${style.action} ${state.action === o ? style.current : ''}`} onClick={(e) => this.handleActionClick(e, o)}>{o}</span>
       )
@@ -139,17 +137,52 @@ class Index extends Component {
       )
     });
 
+    const hairColors = state.hair_colors.map((o) => {
+      return (
+        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'hairColor', o)}>
+          <Piece pieceType='hairColor' pieceSize='48' hairColor={o}/>
+        </div>
+      )
+    });
+
+    const hatColors = state.hat_colors.map((o) => {
+      return (
+        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'hatColor', o)}>
+          <Piece pieceType='hatColor' pieceSize='48' hatColor={o}/>
+        </div>
+      )
+    });
+
+    const facialHairColors = state.facial_hair_colors.map((o) => {
+      return (
+        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'facialHairColor', o)}>
+          <Piece pieceType='facialHairColor' pieceSize='48' facialHairColor={o}/>
+        </div>
+      )
+    });
+
+    const clotheColors = state.clothe_colors.map((o) => {
+      return (
+        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'clotheColor', o)}>
+          <Piece pieceType='clotheColor' pieceSize='48' clotheColor={o}/>
+        </div>
+      )
+    });
+
     return (
       <div className={style.container}>
         <div className={style.canvas}>
-          <div className={style.avatar}>
+          <div className={style.profile}>
+            <div className={style.avatar}>
             <Avatar
               style={{width: '24rem', height: '24rem'}}
               avatarStyle={state.avatar}
               topType={state.top}
               accessoriesType={state.accessory}
               hairColor={state.hairColor}
+              hatColor={state.hatColor}
               facialHairType={state.facialHair}
+              facialHairColor={state.facialHairColor}
               clotheType={state.clothe}
               clotheColor={state.clotheColor}
               graphicType={state.graphic}
@@ -157,10 +190,13 @@ class Index extends Component {
               eyebrowType={state.eyebrow}
               mouthType={state.mouth}
               skinColor={state.skin} />
+            </div>
+            {state.action === 'hair' && state.top !== 'NoHair' && state.top !== 'LongHairFrida' && state.top.includes('Hair') && <div> {hairColors} </div>}
+              {state.action === 'hair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && !state.top.includes('Hair') && <div> {hatColors} </div>}
           </div>
           <div>
             <div className={style.actions}>
-                {actions}
+              {actions}
             </div>
             {state.action === 'hair' && <div> {hairShapes} </div>}
             {state.action === 'accessory' && <div> {accessories} </div>}
@@ -171,9 +207,10 @@ class Index extends Component {
             {state.action === 'eyebrow' && <div> {eyebrows} </div>}
             {state.action === 'mouth' && <div> {mouths} </div>}
             {state.action === 'skin' && <div> {skins} </div>}
+            {state.action === 'beard' && state.facialHair !== 'Blank' && <div> {facialHairColors} </div>}
+            {state.action === 'clothe' && !state.clothe.includes('Blazer') && <div> {clotheColors} </div>}
           </div>
         </div>
-        <Piece pieceType='hairColor' pieceSize='100' hairColor='Red'/>
       </div>
     )
   }

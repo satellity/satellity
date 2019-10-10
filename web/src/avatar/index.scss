@@ -24,8 +24,11 @@
 .canvas {
   display: flex;
 }
-.avatar {
+.profile {
   padding: 0 1.6rem 1.6rem 0;
+}
+.avatar {
+  margin-bottom: 1.6rem;
 }
 .item {
   background: rgba(236,240,245,.5);
