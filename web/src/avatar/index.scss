@@ -3,6 +3,14 @@
   padding: 1.6rem;
   margin-top: 1.6rem;
 }
+.title {
+  text-align: center;
+  margin-bottom: .8rem;
+}
+.subtitle {
+  text-align: center;
+  margin-bottom: 3.2rem;
+}
 .actions {
   margin-bottom: .8rem;
   padding: .1rem;
@@ -36,5 +44,36 @@
   box-sizing: border-box;
   cursor: pointer;
   display: inline-block;
+  font-size: 0;
   padding: .4rem;
+}
+
+@media only screen and (max-width: 64rem) {
+  .canvas {
+    display: block;
+  }
+  .profile {
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 1.6rem;
+  }
+  .avatar {
+    text-align: center;
+  }
+  .colors {
+    display: flex;
+    justify-content: center;
+    overflow-x: scroll;
+    height: 4rem;
+  }
+  .parts {
+    display: flex;
+    justify-content: center;
+    overflow-x: scroll;
+    height: 7.25rem;
+    margin-bottom: .8rem;
+  }
+  .actions {
+    text-align: center;
+  }
 }

@@ -2,6 +2,12 @@
   "site": {
     "features": "Satellity is PRE-ALPHA now! Please be careful when you decide to use it!"
   },
+  "avatar": {
+    "title": "Make your own free avatar",
+    "description": "Make your own free avatar online, a free online avatar generator for anyone to make their beautiful personal avatar easily!",
+    "head": "Avatar Maker",
+    "subtitle": "Create Your Own Avatar For Free!"
+  },
   "general": {
     "all": "View all",
     "delete": "Delete",
