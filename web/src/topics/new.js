@@ -18,7 +18,7 @@ class New extends Component {
     super(props);
     this.api = new API();
     this.base64 = new Base64();
-    this.converter = new showdown.Converter();
+    this.converter = new showdown.Converter({ extensions: ['header-anchors', showdownHighlight] });
     let categories = [];
     let d = window.localStorage.getItem('categories');
     if (!!d) {
