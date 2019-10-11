@@ -62,16 +62,16 @@
   }
   .colors {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     overflow-x: scroll;
     height: 4rem;
   }
   .parts {
     display: flex;
-    justify-content: center;
-    overflow-x: scroll;
     height: 7.25rem;
+    justify-content: space-between;
     margin-bottom: .8rem;
+    overflow-x: scroll;
   }
   .actions {
     text-align: center;
