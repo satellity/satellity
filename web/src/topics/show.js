@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
+import showdownHighlight from 'showdown-highlight';
 import { Helmet } from 'react-helmet';
 import API from '../api/index.js';
 import Config from '../components/config.js';
@@ -23,7 +24,7 @@ class Show extends Component {
     };
 
     this.api = new API();
-    this.converter = new showdown.Converter({ extensions: ['header-anchors'] });
+    this.converter = new showdown.Converter({ extensions: ['header-anchors', showdownHighlight] });
     this.handleClick = this.handleClick.bind(this);
   }
 
