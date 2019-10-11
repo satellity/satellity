@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import {Controlled as CodeMirror} from 'react-codemirror2'
 import showdown from 'showdown';
+import showdownHighlight from 'showdown-highlight';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Base64 from '../components/base64.js';
 import API from '../api/index.js';
