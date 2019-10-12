@@ -243,7 +243,7 @@ class Index extends Component {
             </div>
 
             <div className={style.download}>
-              <Button type='button' class='button auto' text='Download' click={this.handleDownload} disabled={state.downloading} />
+              <Button type='button' class='button auto' text={i18n.t('general.download')} click={this.handleDownload} disabled={state.downloading} />
             </div>
             {state.action === 'hair' && state.top !== 'NoHair' && state.top !== 'LongHairFrida' && state.top.includes('Hair') && <div className={style.colors}> {hairColors} </div>}
               {state.action === 'hair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && !state.top.includes('Hair') && <div className={style.colors}> {hatColors} </div>}
