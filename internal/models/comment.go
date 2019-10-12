@@ -142,7 +142,7 @@ func (topic *Topic) ReadComments(mctx *Context, offset time.Time) ([]*Comment, e
 
 	var comments []*Comment
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at LIMIT $3", strings.Join(commentColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, topic.TopicID, offset, LIMIT)
 		if err != nil {
 			return err
