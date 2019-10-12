@@ -1,6 +1,8 @@
 import style from './index.scss';
 import React, {Component} from 'react';
 import Avatar, {Piece} from 'avataaars';
+import {Helmet} from 'react-helmet';
+import Config from '../components/config.js';
 
 class Index extends Component {
   constructor(props) {
@@ -168,8 +170,18 @@ class Index extends Component {
       )
     });
 
+    const seoView = (
+      <Helmet>
+        <title> {i18n.t('avatar.title')} - {Config.Name}</title>
+        <meta name='description' content={i18n.t('avatar.description')} />
+      </Helmet>
+    )
+
     return (
       <div className={style.container}>
+        <h1 className={style.title}>{i18n.t('avatar.head')}</h1>
+        <div className={style.subtitle}>{i18n.t('avatar.subtitle')}</div>
+        {seoView}
         <div className={style.canvas}>
           <div className={style.profile}>
             <div className={style.avatar}>
@@ -190,24 +202,24 @@ class Index extends Component {
               mouthType={state.mouth}
               skinColor={state.skin} />
             </div>
-            {state.action === 'hair' && state.top !== 'NoHair' && state.top !== 'LongHairFrida' && state.top.includes('Hair') && <div> {hairColors} </div>}
-              {state.action === 'hair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && !state.top.includes('Hair') && <div> {hatColors} </div>}
+            {state.action === 'hair' && state.top !== 'NoHair' && state.top !== 'LongHairFrida' && state.top.includes('Hair') && <div className={style.colors}> {hairColors} </div>}
+              {state.action === 'hair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && !state.top.includes('Hair') && <div className={style.colors}> {hatColors} </div>}
           </div>
           <div>
             <div className={style.actions}>
               {actions}
             </div>
-            {state.action === 'hair' && <div> {hairShapes} </div>}
-            {state.action === 'accessory' && <div> {accessories} </div>}
-            {state.action === 'beard' && <div> {facialHairs} </div>}
-            {state.action === 'clothe' && <div> {clothes} </div>}
-            {state.action === 'clothe' && state.clothe.includes('Graphic') && <div> {graphics} </div>}
-            {state.action === 'eye' && <div> {eyes} </div>}
-            {state.action === 'eyebrow' && <div> {eyebrows} </div>}
-            {state.action === 'mouth' && <div> {mouths} </div>}
-            {state.action === 'skin' && <div> {skins} </div>}
-            {state.action === 'beard' && state.facialHair !== 'Blank' && <div> {facialHairColors} </div>}
-            {state.action === 'clothe' && !state.clothe.includes('Blazer') && <div> {clotheColors} </div>}
+            {state.action === 'hair' && <div className={style.parts}> {hairShapes} </div>}
+            {state.action === 'accessory' && <div className={style.parts}> {accessories} </div>}
+            {state.action === 'beard' && <div className={style.parts}> {facialHairs} </div>}
+            {state.action === 'clothe' && <div className={style.parts}> {clothes} </div>}
+            {state.action === 'clothe' && state.clothe.includes('Graphic') && <div className={style.parts}> {graphics} </div>}
+            {state.action === 'eye' && <div className={style.parts}> {eyes} </div>}
+            {state.action === 'eyebrow' && <div className={style.parts}> {eyebrows} </div>}
+            {state.action === 'mouth' && <div className={style.parts}> {mouths} </div>}
+            {state.action === 'skin' && <div className={style.parts}> {skins} </div>}
+            {state.action === 'beard' && state.facialHair !== 'Blank' && <div className={style.colors}> {facialHairColors} </div>}
+            {state.action === 'clothe' && !state.clothe.includes('Blazer') && <div className={style.colors}> {clotheColors} </div>}
           </div>
         </div>
       </div>

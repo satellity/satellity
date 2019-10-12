@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import {Controlled as CodeMirror} from 'react-codemirror2'
 import showdown from 'showdown';
+import showdownHighlight from 'showdown-highlight';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Base64 from '../components/base64.js';
 import API from '../api/index.js';
@@ -18,7 +19,7 @@ class New extends Component {
     super(props);
     this.api = new API();
     this.base64 = new Base64();
-    this.converter = new showdown.Converter();
+    this.converter = new showdown.Converter({ extensions: ['header-anchors', showdownHighlight] });
     let categories = [];
     let d = window.localStorage.getItem('categories');
     if (!!d) {
