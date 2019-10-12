@@ -1,8 +1,11 @@
 import style from './index.scss';
 import React, {Component} from 'react';
+import * as ReactDOM from 'react-dom';
 import Avatar, {Piece} from 'avataaars';
 import {Helmet} from 'react-helmet';
+import {saveAs} from 'file-saver';
 import Config from '../components/config.js';
+import Button from '../widgets/button.js';
 
 class Index extends Component {
   constructor(props) {
@@ -36,11 +39,15 @@ class Index extends Component {
       eyebrows: ['Angry','AngryNatural','Default','DefaultNatural','FlatNatural','RaisedExcited','RaisedExcitedNatural','SadConcerned','SadConcernedNatural','UnibrowNatural','UpDown','UpDownNatural'],
       mouths: ['Concerned','Default','Disbelief','Eating','Grimace','Sad','ScreamOpen','Serious','Smile','Tongue','Twinkle','Vomit'],
       skins: ['Tanned','Yellow','Pale','Light','Brown','DarkBrown','Black'],
-      graphics: ['Blank','Skull','SkullOutline','Bat','Cumbia','Deer','Diamond','Hola','Selena','Pizza','Resist','Bear']
+      graphics: ['Blank','Skull','SkullOutline','Bat','Cumbia','Deer','Diamond','Hola','Selena','Pizza','Resist','Bear'],
+      downloading: false
     };
 
+    this.avatar = React.createRef();
+    this.canvas = React.createRef();
     this.handleClick = this.handleClick.bind(this);
     this.handleActionClick = this.handleActionClick.bind(this);
+    this.handleDownload = this.handleDownload.bind(this);
   }
 
   handleClick(e, k, v) {
@@ -54,6 +61,31 @@ class Index extends Component {
     e.preventDefault();
     this.setState({
       action: v
+    });
+  }
+
+  handleDownload(e)  {
+    e.preventDefault();
+    const svg = ReactDOM.findDOMNode(this.avatar.current);
+    const canvas = this.canvas.current;
+    this.setState({downloading: true}, () => {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const img = new Image();
+      const data = svg.outerHTML;
+      const blob = new Blob([data], { type: 'image/svg+xml' })
+      const url = URL.createObjectURL(blob);
+      img.onload = () => {
+        ctx.save();
+        ctx.scale(2, 2);
+        ctx.drawImage(img, 0, 0);
+        ctx.restore();
+        this.canvas.current.toBlob(imageBlob => {
+          saveAs(imageBlob, 'satellity.png');
+        });
+      };
+      this.setState({downloading: false});
+      img.src = url
     });
   }
 
@@ -186,6 +218,7 @@ class Index extends Component {
           <div className={style.profile}>
             <div className={style.avatar}>
             <Avatar
+              ref={this.avatar}
               style={{width: '24rem', height: '24rem'}}
               avatarStyle={state.avatar}
               topType={state.top}
@@ -201,6 +234,16 @@ class Index extends Component {
               eyebrowType={state.eyebrow}
               mouthType={state.mouth}
               skinColor={state.skin} />
+              <canvas
+                style={{ display: 'none' }}
+                width='528'
+                height='570'
+                ref={this.canvas}
+              />
+            </div>
+
+            <div className={style.download}>
+              <Button type='button' class='button auto' text='Download' click={this.handleDownload} disabled={state.downloading} />
             </div>
             {state.action === 'hair' && state.top !== 'NoHair' && state.top !== 'LongHairFrida' && state.top.includes('Hair') && <div className={style.colors}> {hairColors} </div>}
               {state.action === 'hair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && !state.top.includes('Hair') && <div className={style.colors}> {hatColors} </div>}
