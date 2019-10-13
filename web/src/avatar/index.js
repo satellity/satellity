@@ -94,7 +94,7 @@ class Index extends Component {
 
     const actions = ['hair','accessory','beard','clothe','eye','eyebrow','mouth', 'skin'].map((o) => {
       return (
-        <span key={o} className={`${style.action} ${state.action === o ? style.current : ''}`} onClick={(e) => this.handleActionClick(e, o)}>{o}</span>
+        <span key={o} className={`${style.action} ${state.action === o ? style.current : ''}`} onClick={(e) => this.handleActionClick(e, o)}>{i18n.t(`avatar.actions.${o}`)}</span>
       )
     });
 
@@ -264,6 +264,10 @@ class Index extends Component {
             {state.action === 'beard' && state.facialHair !== 'Blank' && <div className={style.colors}> {facialHairColors} </div>}
             {state.action === 'clothe' && !state.clothe.includes('Blazer') && <div className={style.colors}> {clotheColors} </div>}
           </div>
+        </div>
+        <h2 className={style.head2}>{i18n.t('avatar.page.title')}</h2>
+        <div>{i18n.t('avatar.page.description')}</div>
+        <div className={style.thanks} dangerouslySetInnerHTML={{__html: i18n.t('avatar.page.thanks')}}>
         </div>
       </div>
     )

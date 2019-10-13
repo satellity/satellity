@@ -4,11 +4,12 @@
   margin-top: 1.6rem;
 }
 .title {
-  text-align: center;
+  font-weight: bold;
+  text-align: left;
   margin-bottom: .8rem;
 }
 .subtitle {
-  text-align: center;
+  text-align: left;
   margin-bottom: 3.2rem;
 }
 .actions {
@@ -52,8 +53,20 @@
   font-size: 0;
   padding: .4rem;
 }
+.head2 {
+  margin-top: 3.2rem;
+}
+.thanks {
+  margin-top: 1.6rem;
+}
 
 @media only screen and (max-width: 64rem) {
+  .title {
+    text-align: center;
+  }
+  .subtitle {
+    text-align: center;
+  }
   .canvas {
     display: block;
   }
