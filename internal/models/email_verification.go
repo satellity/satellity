@@ -127,6 +127,19 @@ func VerifyEmailVerification(mctx *Context, verificationID, code, username, pass
 		if err != nil {
 			return err
 		}
+		user, err = findUserByIdentity(ctx, tx, ev.Email)
+		if err != nil {
+			return err
+		}
+		if user != nil {
+			s, err := user.addSession(ctx, tx, sessionSecret)
+			if err != nil {
+				return err
+			}
+			user.SessionID = s.SessionID
+			return nil
+		}
+
 		user, err = createUser(ctx, tx, ev.Email, username, username, password, sessionSecret, "", nil)
 		return err
 	})

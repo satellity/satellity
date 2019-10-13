@@ -43,7 +43,7 @@ func teardownTestContext(mctx *Context) {
 }
 
 func setupTestContext() *Context {
-	if err := configs.Init("./../configs", testEnvironment); err != nil {
+	if err := configs.Init("../configs/config.yaml", testEnvironment); err != nil {
 		log.Panicln(err)
 	}
 	config := configs.AppConfig
