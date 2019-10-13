@@ -26,7 +26,7 @@
   "general": {
     "all": "View all",
     "delete": "Delete",
-    "draft": "Save Draft",
+    "draft": "Draft",
     "download": "Download",
     "submit": "Submit"
   },
