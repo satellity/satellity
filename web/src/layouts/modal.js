@@ -178,13 +178,13 @@ class Modal extends Component {
       <div>
         <form onSubmit={this.handleRegister}>
           <div>
+            <input type='text' name='code' required value={state.code} autoComplete='off' placeholder={i18n.t('account.verification')} onChange={this.handleChange} />
+          </div>
+          <div>
             <input type='text' name='username' required value={state.username} autoComplete='off' placeholder={i18n.t('account.username')} onChange={this.handleChange} />
           </div>
           <div>
             <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
-          </div>
-          <div>
-            <input type='text' name='code' required value={state.code} autoComplete='off' placeholder={i18n.t('account.verification')} onChange={this.handleChange} />
           </div>
           <div>
             <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
