@@ -9,6 +9,7 @@
   background: white;
   box-sizing: border-box;
   padding: .8rem;
+  margin-bottom: 1.6rem;
   a {
     color: rgba(218, 40, 16, 0.8);
     &:after {
@@ -26,7 +27,6 @@
   }
 }
 .action {
-  margin-top: 1.6rem;
   text-align: center;
 }
 .copyright {

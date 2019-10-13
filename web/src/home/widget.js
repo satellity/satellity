@@ -1,5 +1,6 @@
 import style from './widget.scss';
 import React, { Component } from 'react';
+import {Link} from 'react-router-dom';
 import Config from '../components/config.js';
 import API from '../api/index.js';
 import Href from '../widgets/href.js';
@@ -23,10 +24,13 @@ class SiteWidget extends Component {
       <div className={style.widget}>
         <div className={style.section}>
           <h2 className={style.site}>
-            Satellity
+            {Config.Name}
           </h2>
           <ul className={style.features} dangerouslySetInnerHTML={{__html: i18n.t('aside.rules')}}>
           </ul>
+        </div>
+        <div className={style.section}>
+          <Link to='/avatar'>{i18n.t('avatar.title')}</Link>
         </div>
         <div className={style.action}>
           {action}
