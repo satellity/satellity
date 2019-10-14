@@ -73,7 +73,7 @@
   .profile {
     display: flex;
     flex-direction: column;
-    padding-right: 1.6rem;
+    padding-right: 0;
   }
   .avatar {
     text-align: center;
@@ -83,6 +83,9 @@
     justify-content: space-between;
     overflow-x: scroll;
     height: 4rem;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
   .parts {
     display: flex;
@@ -90,6 +93,9 @@
     justify-content: space-between;
     margin-bottom: .8rem;
     overflow-x: scroll;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
   .actions {
     text-align: center;

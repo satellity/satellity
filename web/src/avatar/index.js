@@ -93,9 +93,12 @@ class Index extends Component {
     const state = this.state;
 
     const actions = ['hair','accessory','beard','clothe','eye','eyebrow','mouth', 'skin'].map((o) => {
+      if (state.top === 'Hijab' && o === 'beard') {
+        return;
+      }
       return (
         <span key={o} className={`${style.action} ${state.action === o ? style.current : ''}`} onClick={(e) => this.handleActionClick(e, o)}>{i18n.t(`avatar.actions.${o}`)}</span>
-      )
+      );
     });
 
     const hairShapes = state.hair_shapes.map((o) => {
@@ -219,7 +222,7 @@ class Index extends Component {
             <div className={style.avatar}>
             <Avatar
               ref={this.avatar}
-              style={{width: '24rem', height: '24rem'}}
+              style={{width: '24rem', 'max-width': '100%', height: '24rem'}}
               avatarStyle={state.avatar}
               topType={state.top}
               accessoriesType={state.accessory}
