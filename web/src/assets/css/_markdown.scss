@@ -2,6 +2,7 @@
 
 :global {
 article.md {
+  word-break: break-all;
   h2 {
     margin: 1.6rem 0 .8rem;
     .anchor {
