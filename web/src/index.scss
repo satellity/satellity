@@ -104,6 +104,11 @@ img {
     height: auto;
   }
 }
+.beditor {
+  .CodeMirror {
+    height: 24rem;
+  }
+}
 // TODO better choice?
 div.container {
   display: flex;

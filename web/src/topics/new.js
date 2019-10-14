@@ -31,6 +31,7 @@ class New extends Component {
       id = ''
     }
     this.state = {
+      editor: 'deditor',
       topic_id: id,
       title: '',
       body: '',
@@ -59,13 +60,13 @@ class New extends Component {
       }
       let data = resp.data;
       if (!data) {
-        data = {body: '\n'.repeat(12)};
+        data = {body: ''};
       }
       let l = data.body.split('\n').length;
-      if (l < 16) {
-        data.body += '\n'.repeat(13-l);
+      if (l > 13) {
+        data.body += '\n'.repeat(3);
+        data.editor = 'editor';
       }
-      data.body += '\n'.repeat(3);
       data.loading = false;
       this.setState(data);
     });
@@ -109,11 +110,12 @@ class New extends Component {
 
   handleBodyChange(editor, data, value) {
     let l = value.split('\n').length;
-    if (l < 16) {
-      value += '\n'.repeat(13-l);
+    let style = 'deditor';
+    if (l > 13) {
+      value += '\n'.repeat(3);
+      style = 'editor'
     }
-    value += '\n'.repeat(3);
-    this.setState({body: value});
+    this.setState({body: value, editor: style});
   }
 
   handlePreview(e) {
@@ -204,7 +206,7 @@ class New extends Component {
           {
             !state.preview &&
             <CodeMirror
-              className='editor'
+              className={state.editor}
               value={state.body}
               options={{
                 mode: 'markdown',
