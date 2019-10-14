@@ -220,9 +220,8 @@ class Index extends Component {
         <div className={style.canvas}>
           <div className={style.profile}>
             <div className={style.avatar}>
-            <Avatar
+            <Avatar style={{'width': '100%'}}
               ref={this.avatar}
-              style={{width: '24rem', 'max-width': '100%', height: '24rem'}}
               avatarStyle={state.avatar}
               topType={state.top}
               accessoriesType={state.accessory}

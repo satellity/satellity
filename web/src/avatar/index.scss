@@ -34,9 +34,12 @@
   display: flex;
 }
 .profile {
+  box-sizing: border-box;
   padding: 0 1.6rem 1.6rem 0;
 }
 .avatar {
+  width: 24rem;
+  max-width: 100%;
   margin-bottom: 1.6rem;
 }
 .download {
@@ -76,26 +79,19 @@
     padding-right: 0;
   }
   .avatar {
+    width: 100%;
     text-align: center;
   }
   .colors {
     display: flex;
     justify-content: space-between;
     overflow-x: scroll;
-    height: 4rem;
-    &::-webkit-scrollbar {
-      display: none;
-    }
   }
   .parts {
     display: flex;
-    height: 7.25rem;
     justify-content: space-between;
     margin-bottom: .8rem;
     overflow-x: scroll;
-    &::-webkit-scrollbar {
-      display: none;
-    }
   }
   .actions {
     text-align: center;
