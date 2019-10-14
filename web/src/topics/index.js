@@ -92,7 +92,7 @@ class Index extends Component {
         return
       }
       const data = resp.data;
-      let offset = data.length > this.pagination ? data[data.length-1].created_at : '' ;
+      let offset = data.length > this.pagination ? data[data.length-1].updated_at : '' ;
       if (!replace) {
         data = this.state.topics.concat(data);
       }

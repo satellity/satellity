@@ -37,10 +37,9 @@ CREATE TABLE IF NOT EXISTS topics (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS topics_shortx ON topics(short_id);
-CREATE INDEX IF NOT EXISTS topics_draft_createdx ON topics(draft, created_at DESC);
+CREATE INDEX IF NOT EXISTS topics_draft_updatedx ON topics(draft, updated_at DESC);
+CREATE INDEX IF NOT EXISTS topics_category_draft_updatedx ON topics(category_id, draft, updated_at DESC);
 CREATE INDEX IF NOT EXISTS topics_user_draft_createdx ON topics(user_id, draft, created_at DESC);
-CREATE INDEX IF NOT EXISTS topics_category_draft_createdx ON topics(category_id, draft, created_at DESC);
-CREATE INDEX IF NOT EXISTS topics_score_draft_createdx ON topics(score DESC, draft, created_at DESC);
 `
 
 var topicColumns = []string{"topic_id", "short_id", "title", "body", "comments_count", "bookmarks_count", "likes_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
@@ -356,7 +355,7 @@ func ReadTopics(mctx *Context, offset time.Time) ([]*Topic, error) {
 			return err
 		}
 
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE draft=false AND created_at<$1 ORDER BY created_at DESC LIMIT $2", strings.Join(topicColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE draft=false AND updated_at<$1 ORDER BY updated_at DESC LIMIT $2", strings.Join(topicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
 		if err != nil {
 			return err
@@ -437,7 +436,7 @@ func (category *Category) ReadTopics(mctx *Context, offset time.Time) ([]*Topic,
 
 	var topics []*Topic
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND updated_at<$2 ORDER BY updated_at DESC LIMIT $3", strings.Join(topicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, category.CategoryID, offset, LIMIT)
 		if err != nil {
 			return err
