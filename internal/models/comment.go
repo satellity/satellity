@@ -78,7 +78,9 @@ func (user *User) CreateComment(mctx *Context, topicID, body string) (*Comment, 
 			return err
 		}
 		topic.CommentsCount = count + 1
-		topic.UpdatedAt = t
+		if topic.CreatedAt.Add(time.Hour * 24 * 60).After(time.Now()) {
+			topic.UpdatedAt = t
+		}
 		c.TopicID = topic.TopicID
 		cols, params := durable.PrepareColumnsWithParams(commentColumns)
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO comments (%s) VALUES (%s)", cols, params), c.values()...)
@@ -225,7 +227,9 @@ func (user *User) DeleteComment(mctx *Context, id string) error {
 			return err
 		}
 		topic.CommentsCount = count - 1
-		topic.UpdatedAt = time.Now()
+		if topic.CreatedAt.Add(time.Hour * 24 * 60).After(time.Now()) {
+			topic.UpdatedAt = time.Now()
+		}
 		cols, params := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
 		if err != nil {
