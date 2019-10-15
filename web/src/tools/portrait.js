@@ -1,4 +1,4 @@
-import style from './index.scss';
+import style from './portrait.scss';
 import React, {Component} from 'react';
 import * as ReactDOM from 'react-dom';
 import Avatar, {Piece} from 'avataaars';
@@ -7,7 +7,7 @@ import {saveAs} from 'file-saver';
 import Config from '../components/config.js';
 import Button from '../widgets/button.js';
 
-class Index extends Component {
+class Portrait extends Component {
   constructor(props) {
     super(props);
 
@@ -276,4 +276,4 @@ class Index extends Component {
   }
 }
 
-export default Index;
+export default Portrait;

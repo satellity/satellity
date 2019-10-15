@@ -78,7 +78,7 @@ func (user *User) CreateComment(mctx *Context, topicID, body string) (*Comment, 
 			return err
 		}
 		topic.CommentsCount = count + 1
-		if topic.CreatedAt.Add(time.Hour * 24 * 60).After(time.Now()) {
+		if topic.CreatedAt.Add(time.Hour * 24 * 30).After(time.Now()) {
 			topic.UpdatedAt = t
 		}
 		c.TopicID = topic.TopicID
@@ -227,7 +227,7 @@ func (user *User) DeleteComment(mctx *Context, id string) error {
 			return err
 		}
 		topic.CommentsCount = count - 1
-		if topic.CreatedAt.Add(time.Hour * 24 * 60).After(time.Now()) {
+		if topic.CreatedAt.Add(time.Hour * 24 * 30).After(time.Now()) {
 			topic.UpdatedAt = time.Now()
 		}
 		cols, params := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
