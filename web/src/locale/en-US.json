@@ -16,9 +16,9 @@
       "hair": "hair",
       "accessory": "accessory",
       "beard": "beard",
-      "clothe": "cloth",
-      "eye": "eye",
-      "eyebrow": "eyebrow",
+      "clothes": "clothes",
+      "eyes": "eyes",
+      "eyebrows": "eyebrows",
       "mouth": "mouth",
       "skin": "skin"
     }

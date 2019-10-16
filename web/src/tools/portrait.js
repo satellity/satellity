@@ -92,7 +92,7 @@ class Portrait extends Component {
   render () {
     const state = this.state;
 
-    const actions = ['hair','accessory','beard','clothe','eye','eyebrow','mouth', 'skin'].map((o) => {
+    const actions = ['hair','accessory','beard','clothes','eyes','eyebrows','mouth', 'skin'].map((o) => {
       if (state.top === 'Hijab' && o === 'beard') {
         return;
       }
@@ -257,14 +257,14 @@ class Portrait extends Component {
             {state.action === 'hair' && <div className={style.parts}> {hairShapes} </div>}
             {state.action === 'accessory' && <div className={style.parts}> {accessories} </div>}
             {state.action === 'beard' && <div className={style.parts}> {facialHairs} </div>}
-            {state.action === 'clothe' && <div className={style.parts}> {clothes} </div>}
-            {state.action === 'clothe' && state.clothe.includes('Graphic') && <div className={style.parts}> {graphics} </div>}
-            {state.action === 'eye' && <div className={style.parts}> {eyes} </div>}
-            {state.action === 'eyebrow' && <div className={style.parts}> {eyebrows} </div>}
+            {state.action === 'clothes' && <div className={style.parts}> {clothes} </div>}
+            {state.action === 'clothes' && state.clothe.includes('Graphic') && <div className={style.parts}> {graphics} </div>}
+            {state.action === 'eyes' && <div className={style.parts}> {eyes} </div>}
+            {state.action === 'eyebrows' && <div className={style.parts}> {eyebrows} </div>}
             {state.action === 'mouth' && <div className={style.parts}> {mouths} </div>}
             {state.action === 'skin' && <div className={style.parts}> {skins} </div>}
             {state.action === 'beard' && state.facialHair !== 'Blank' && <div className={style.colors}> {facialHairColors} </div>}
-            {state.action === 'clothe' && !state.clothe.includes('Blazer') && <div className={style.colors}> {clotheColors} </div>}
+            {state.action === 'clothes' && !state.clothe.includes('Blazer') && <div className={style.colors}> {clotheColors} </div>}
           </div>
         </div>
         <h2 className={style.head2}>{i18n.t('avatar.page.title')}</h2>
