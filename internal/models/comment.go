@@ -78,7 +78,7 @@ func (user *User) CreateComment(mctx *Context, topicID, body string) (*Comment, 
 			return err
 		}
 		topic.CommentsCount = count + 1
-		if topic.CreatedAt.Add(time.Hour * 24 * 30).After(time.Now()) {
+		if topic.UpdatedAt.Add(time.Hour * 24 * 30).After(time.Now()) {
 			topic.UpdatedAt = t
 		}
 		c.TopicID = topic.TopicID
@@ -227,9 +227,6 @@ func (user *User) DeleteComment(mctx *Context, id string) error {
 			return err
 		}
 		topic.CommentsCount = count - 1
-		if topic.CreatedAt.Add(time.Hour * 24 * 30).After(time.Now()) {
-			topic.UpdatedAt = time.Now()
-		}
 		cols, params := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
 		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
 		if err != nil {
