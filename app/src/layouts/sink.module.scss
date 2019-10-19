@@ -1,0 +1,31 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 0 1.6rem;
+  box-sizing: border-box;
+  &:after {
+    content: '404';
+    color: rgb(247, 247, 247);
+    font-size: 27rem;
+    position: absolute;
+    z-index: -1;
+  }
+}
+.body {
+  margin-top: -7rem;
+  font-weight: normal;
+  font-size: 1.6rem;
+}
+.path {
+  display: inline-block;
+  max-width: 17rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.action {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}

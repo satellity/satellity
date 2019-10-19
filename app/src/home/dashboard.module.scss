@@ -1,0 +1,42 @@
+@import '../assets/css/constant.scss';
+
+.dashboard {
+  padding: 0 0 1.6rem;
+}
+.head {
+  display: flex;
+  align-items: center;
+  .name {
+    flex-grow: 1;
+  }
+}
+.view {
+  border: 1px solid rgba(0, 0, 0, .1);
+  border-radius: 1.2rem;
+  display: inline-block;
+  padding: .2rem .8rem;
+}
+.create {
+  margin-bottom: .8rem;
+  a {
+    background: rgba(218, 40, 16, 0.8);
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    color: white;
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    margin-right: .8rem;
+  }
+}
+.title {
+  display: flex;
+  a {
+    color: $color-main-red;
+    margin-left: .4rem;
+  }
+}
+.section {
+  margin: .8rem 0;
+  padding: .8rem;
+  background: white;
+}

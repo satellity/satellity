@@ -1,0 +1,33 @@
+$color-dark-background: #25476A;
+
+.category {
+  border-bottom: 1px dashed #ccc;
+  font-size: 1.2rem;
+  padding: .6rem 0;
+  &:after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+.position {
+  background: $color-dark-background;
+  box-sizing: border-box;
+  color: white;
+  font-size: 1.6rem;
+  float: left;
+  text-align: center;
+  padding: .6rem 1.2rem;
+  min-width: 6rem;
+  margin-right: .8rem;
+}
+.description {
+  font-size: 1rem;
+  opacity: 0.6;
+  margin: 0;
+  padding: 0.2rem 0 0.6rem;
+}
+.actions {
+  font-size: 1rem;
+  float: right;
+}

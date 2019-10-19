@@ -1,0 +1,43 @@
+/* users#edit */
+.profile {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+}
+.file, .crop {
+  display: none !important;
+}
+.image {
+  font-size: 0;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 3.6rem;
+}
+.group {
+  font-size: 0;
+  margin-bottom: .8rem;
+}
+
+/* topics */
+.user {
+  padding: 1.6rem 0 0 .8rem;
+  display: flex;
+  align-items: flex-start;
+}
+.avatar {
+  border-radius: 3.6rem;
+  flex-shrink: 0;
+  width: 3.6rem;
+  height: 3.6rem;
+}
+.info {
+  padding-left: .8rem;
+  h1 {
+    font-size: 1.6rem;
+    margin: 0 0 .8rem;
+  }
+}
+.topics {
+  background: white;
+  padding: .8rem;
+}

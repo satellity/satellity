@@ -24,7 +24,7 @@ type topicRequest struct {
 	Draft      bool   `json:"draft"`
 }
 
-func registerTopic(database *durable.Database, router *httptreemux.TreeMux) {
+func registerTopic(database *durable.Database, router *httptreemux.Group) {
 	impl := &topicImpl{database: database}
 
 	router.POST("/topics", impl.create)
