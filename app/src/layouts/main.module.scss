@@ -1,3 +1,5 @@
+@import '../assets/css/constant.scss';
+
 .container {
   min-height: 100vh;
   background: rgb(236, 240, 245);
@@ -81,6 +83,9 @@
   padding: 1.6rem 3.2rem;
   position: relative;
 }
+.loading {
+  text-align: center;
+}
 .action {
   cursor: pointer;
   text-align: right;
@@ -89,6 +94,8 @@
   top: .6rem;
 }
 .app {
+  font-size: 1.25rem;
+  text-align: center;
   margin-bottom: 1.6rem;
 }
 .content {
@@ -108,6 +115,7 @@
   padding: 1.6rem 0;
 }
 .register {
+  color: $color-main-red;
   cursor: pointer;
   text-align: center;
   margin-top: 1.6rem;

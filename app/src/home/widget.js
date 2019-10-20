@@ -14,11 +14,9 @@ class SiteWidget extends Component {
 
   render() {
     const i18n = window.i18n;
-    let action = <Href action='/topics/new' text={i18n.t('topic.new')} class='button' />;
-    if (!this.api.user.loggedIn()) {
-      action = (
-        <Href action={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`} class='button' text={i18n.t('login.github')} original />
-      )
+    let action;
+    if (this.api.user.loggedIn()) {
+      action = <Href action='/topics/new' text={i18n.t('topic.new')} class='button' />;;
     }
 
     return (

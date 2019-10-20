@@ -2,9 +2,12 @@
 @import '~noty/src/themes/nest.scss';
 @import '~normalize.css/normalize.css';
 @import './assets/css/constant.scss';
-@import './assets/fonts/index.scss';
 @import './assets/css/button.scss';
 @import './assets/css/markdown.scss';
+
+html {
+  line-height: 1.6;
+}
 
 body {
   color: $color-font-dark;

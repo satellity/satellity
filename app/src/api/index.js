@@ -8,6 +8,7 @@ import Noty from 'noty';
 import Category from './category.js';
 import Topic from './topic.js';
 import Comment from './comment.js';
+import Client from './client.js';
 import User from './user.js';
 import Me from './me.js';
 import Verification from './verification.js';
@@ -120,6 +121,7 @@ class API {
     this.user = new User(this);
     this.me = new Me(this);
     this.verification = new Verification(this);
+    this.client = new Client(this);
   }
 }
 

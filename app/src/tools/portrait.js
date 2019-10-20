@@ -5,6 +5,7 @@ import Avatar, {Piece} from 'avataaars';
 import {Helmet} from 'react-helmet';
 import {saveAs} from 'file-saver';
 import Button from '../widgets/button.js';
+import Config from '../components/config.js';
 
 class Portrait extends Component {
   constructor(props) {
@@ -207,7 +208,7 @@ class Portrait extends Component {
 
     const seoView = (
       <Helmet>
-        <title> {`{i18n.t('avatar.title')} - {Config.Name}`}</title>
+        <title> {`${i18n.t('avatar.title')} - ${Config.Name}`}</title>
         <meta name='description' content={i18n.t('avatar.description')} />
       </Helmet>
     )

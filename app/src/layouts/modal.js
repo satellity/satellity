@@ -2,10 +2,10 @@ import style from './main.module.scss';
 import React, { Component } from 'react';
 import {Redirect} from 'react-router-dom';
 import { loadReCaptcha, ReCaptcha } from 'react-recaptcha-v3';
-import Config from '../components/config.js';
 import API from '../api/index.js';
 import Href from '../widgets/href.js';
 import Button from '../widgets/button.js';
+import Loading from '../widgets/loading.js';
 
 class Modal extends Component {
   constructor(props) {
@@ -20,8 +20,11 @@ class Modal extends Component {
       password: '',
       session_secret: '',
       code: '',
+      github_client_id: '',
+      recaptcha_site_key: '',
       success: false,
-      submitting: false
+      loading: true,
+      submitting: false,
     }
 
     this.api = new API();
@@ -34,11 +37,18 @@ class Modal extends Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
+  componentDidMount() {
+    this.api.client.configs().then((resp) => {
+      resp.data.loading = false;
+      this.setState(resp.data);
+    });
+  }
+
   handleClick(e, purpose) {
     this.setState({password: '', purpose: purpose}, () => {
-      if (Config.ReCAPTCHASiteKey !== '' && this.state.verification_id === '') {
-        loadReCaptcha(Config.ReCAPTCHASiteKey);
-      }
+      if (this.state.recaptcha_site_key !== '' && this.state.verification_id === '') {
+        loadReCaptcha(this.state.recaptcha_site_key);
+      };
     });
   }
 
@@ -127,7 +137,7 @@ class Modal extends Component {
     let signIn = (
       <div>
         <div className={style.content}>
-          <Href action={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${Config.GithubClientId}`} class='button' text={i18n.t('login.github')} original />
+          <Href action={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${state.github_client_id}`} class='button' text={i18n.t('login.github')} original />
         </div>
         <div className={style.or}>
           OR
@@ -155,9 +165,9 @@ class Modal extends Component {
     let verification = (
       <div>
         {
-          Config.ReCAPTCHASiteKey !== '' &&
+          state.recaptcha_site_key !== '' &&
           <ReCaptcha
-            sitekey={Config.ReCAPTCHASiteKey}
+            sitekey={state.recaptcha_site_key}
             action='login'
             verifyCallback={this.verifyCallback}
           />
@@ -215,15 +225,21 @@ class Modal extends Component {
       <div className={style.modal}>
         <div className={style.modalContainer}>
           <div onClick={this.props.handleLoginClick} className={style.action}>✕</div>
-          <div className={style.app}>
-              {state.purpose==='SESSION' && i18n.t('account.sign.in')}
-              {state.purpose==='USER' && i18n.t('account.sign.up')}
-              {state.purpose==='PASSWORD' && i18n.t('account.reset.password')}
-          </div>
-            {state.purpose==='SESSION' && signIn}
-            {(state.purpose==='USER' || state.purpose==='PASSWORD') && state.verification_id === '' && verification}
-            {state.purpose==='USER' && state.verification_id !== '' && register}
-            {state.purpose==='PASSWORD' && state.verification_id !== '' && password}
+          {state.loading && <div className={style.loading}><Loading /></div>}
+          {
+            !state.loading &&
+            <div>
+              <div className={style.app}>
+                {state.purpose==='SESSION' && i18n.t('account.sign.in')}
+                {state.purpose==='USER' && i18n.t('account.sign.up')}
+                {state.purpose==='PASSWORD' && i18n.t('account.reset.password')}
+              </div>
+              {state.purpose==='SESSION' && signIn}
+              {(state.purpose==='USER' || state.purpose==='PASSWORD') && state.verification_id === '' && verification}
+              {state.purpose==='USER' && state.verification_id !== '' && register}
+              {state.purpose==='PASSWORD' && state.verification_id !== '' && password}
+            </div>
+          }
         </div>
       </div>
     )
