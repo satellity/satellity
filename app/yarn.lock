@@ -1927,8 +1927,9 @@ autoprefixer@^9.6.1:
     postcss "^7.0.17"
     postcss-value-parser "^4.0.0"
 
-"avataaars@file:../../../Javascript/avataaars":
-  version "1.2.2"
+"avataaars@https://github.com/satellity/avataaars.git":
+  version "1.2.4"
+  resolved "https://github.com/satellity/avataaars.git#580f1326166bf4058e38b87f3ff9894f84fbda68"
   dependencies:
     lodash ">=4.17.11"
     prop-types "^15.6.0"
