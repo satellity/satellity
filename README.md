@@ -26,7 +26,7 @@ Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!
 ## Structure
 
 1. `./` is back-end service, we followed [golang-standards project-layout](https://github.com/golang-standards/project-layout).
-2. `./web` is front-end service, contains React, Parcel and etc.
+2. `./app` is front-end service, contains React, Parcel and etc.
 2. `./deploy` contains example of deploy, nginx and systemd.
 
 ## Screenshot
@@ -43,15 +43,13 @@ Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!
 
 ### Frontend
 
-1. `cd ./web`, copy `.env.example` to `.env` and `.env.development` and change the following fields:
+1. `cd ./app`, copy `.env.example` to `.env` and `.env.development` and change the following fields:
    
     ```
     SITE_NAME=your site name
-    API_HOST=http://localhost:4000 or production url
-    GITHUB_CLIENT_ID=put your client id
     ```
-2. run `npm install` to prepare front-end.
-3. `npm run dev` and open `http://localhost:1234`
+2. run `yarn install` to prepare front-end.
+3. `yarn start` and open `http://localhost:3000`
 
 ## License
 
