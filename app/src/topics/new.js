@@ -150,7 +150,7 @@ class New extends Component {
         if (resp.error) {
           return
         }
-        history.push('/');
+        history.push(`/topics/${resp.data.topic_id}`);
       });
       return
     }
@@ -159,7 +159,7 @@ class New extends Component {
         return
       }
       this.setState({submitting: false});
-      history.push('/');
+      history.push(`/topics/${resp.data.topic_id}`);
     });
   }
 

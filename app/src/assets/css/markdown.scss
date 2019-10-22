@@ -1,8 +1,7 @@
 @import './constant.scss';
 
-:global {
 article.md {
-  word-break: break-all;
+  word-break: break-word;
   h2 {
     margin: 1.6rem 0 .8rem;
     .anchor {
@@ -45,6 +44,9 @@ article.md {
       background: transparent;
       white-space: pre;
     }
+  }
+  code {
+    background: #ECF0F5;
   }
   hr {
     position: relative;
@@ -152,5 +154,4 @@ article.md {
   .hljs-link {
     text-decoration: underline;
   }
-}
 }

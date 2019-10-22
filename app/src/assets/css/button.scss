@@ -1,6 +1,5 @@
 @import './constant.scss';
 
-:global {
 .btn {
   border-radius: 0.2rem;
   cursor: pointer;
@@ -60,5 +59,4 @@
     align-items: center;
     justify-content: center;
   }
-}
 }
