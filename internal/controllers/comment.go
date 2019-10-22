@@ -22,7 +22,7 @@ type commentRequest struct {
 	Body    string `json:"body"`
 }
 
-func registerComment(database *durable.Database, router *httptreemux.TreeMux) {
+func registerComment(database *durable.Database, router *httptreemux.Group) {
 	impl := &commentImpl{database: database}
 
 	router.POST("/comments", impl.create)

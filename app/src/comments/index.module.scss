@@ -1,0 +1,88 @@
+@import '../assets/css/constant.scss';
+
+/* comment list */
+.container {
+  padding: 2rem 0 0;
+}
+.comments {
+  background: white;
+  box-sizing: border-box;
+  padding: 0 .8rem .8rem;
+}
+.comment {
+  border-bottom: 1px solid rgb(240, 240, 240);
+}
+.profile {
+  align-items: flex-start;
+  display: flex;
+  margin-bottom: .4rem;
+}
+.detail {
+  flex-grow: 1;
+  line-height: 1rem;
+}
+.time {
+  font-size: .875rem;
+  opacity: 0.6;
+  margin: .4rem 0;
+}
+.station {
+  position: relative;
+}
+.ellipsis {
+  cursor: pointer;
+}
+.actions {
+  position: absolute;
+  background: white;
+  top: 2rem;
+  right: -0.6rem;
+  z-index: 99;
+  div {
+    padding: .4rem .8rem;
+    cursor: pointer;
+  }
+}
+.action {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: .1rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+  &:before, &:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border: solid transparent;
+    position: absolute;
+    bottom: 100%;
+    right: 0.3rem;
+  }
+  &:before {
+    border-width: .5625rem;
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+  }
+  &:after {
+    border-width: .5rem;
+    border-bottom-color: white;
+    right: 0.3625rem;
+  }
+}
+.trash {
+  font-size: .875rem;
+}
+.delete {
+  padding-left: .4rem;
+}
+
+/*new & edit*/
+.custom {
+  text-align: center;
+  padding: 1.6rem 0;
+}
+.form {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+  margin-top: .8rem;
+}

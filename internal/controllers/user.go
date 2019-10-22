@@ -27,7 +27,7 @@ type userRequest struct {
 	Biography     string `json:"biography"`
 }
 
-func registerUser(database *durable.Database, router *httptreemux.TreeMux) {
+func registerUser(database *durable.Database, router *httptreemux.Group) {
 	impl := &userImpl{database: database}
 
 	router.POST("/oauth/:provider", impl.oauth)

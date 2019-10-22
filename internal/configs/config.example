@@ -18,6 +18,7 @@ default: &default
   recaptcha: # will be ignore if url or secret is blank
     url: https://www.google.com/recaptcha/api/siteverify
     secret: ""
+    site_key: ""
   operators:
     - hi@satellity
   email:

@@ -1,0 +1,42 @@
+@import '../assets/css/constant.scss';
+
+.widget {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 1.6rem;
+}
+.section {
+  background: white;
+  box-sizing: border-box;
+  padding: .8rem;
+  margin-bottom: 1.6rem;
+  a {
+    color: rgba(218, 40, 16, 0.8);
+    &:after {
+      background: rgba(218, 40, 16, 0.8);
+    }
+  }
+}
+.site {
+  margin: 0 0 .2rem;
+  font-weight: normal;
+}
+.features {
+  li {
+    padding: 0 0 .3rem;
+  }
+}
+.action {
+  text-align: center;
+}
+.copyright {
+  color: $color-font-light-grey;
+  font-family: America, sans-serif;
+  font-size: .875rem;
+  margin-top: 1.6rem;
+}
+@media only screen and (max-width: 64rem) {
+  .signIn, .newTopic {
+    padding: .8rem;
+  }
+}

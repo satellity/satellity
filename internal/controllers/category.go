@@ -15,7 +15,7 @@ type categoryImpl struct {
 	database *durable.Database
 }
 
-func registerCategory(database *durable.Database, router *httptreemux.TreeMux) {
+func registerCategory(database *durable.Database, router *httptreemux.Group) {
 	impl := &categoryImpl{database: database}
 
 	router.GET("/categories", impl.index)

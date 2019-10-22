@@ -5,6 +5,7 @@ internal/configs/*
 !internal/configs/config.example
 publish
 public
+!app/public
 
 # web
 node_modules

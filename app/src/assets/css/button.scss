@@ -1,0 +1,62 @@
+@import './constant.scss';
+
+.btn {
+  border-radius: 0.2rem;
+  cursor: pointer;
+  color: white;
+  display: inline-block;
+  transition: all 0.30s ease-in-out;
+  padding: .6rem 1.6rem;
+  &:after {
+    display: none;
+  }
+  &:hover {
+    opacity: 0.8;
+  }
+  &.primary {
+    background: $color-main-red;
+  }
+  &.info {
+    background: rgba($color-main-red, $color-main-red-alpha);
+  }
+  &.submit {
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+    background: rgba($color-main-red, $color-main-red-alpha);
+    color: white;
+    width: 30rem;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  &.topic {
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+    background: rgba($color-main-red, $color-main-red-alpha);
+    color: white;
+    width: 30rem;
+    max-width: 50%;
+  }
+  &.session {
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+    background: rgba($color-main-red, $color-main-red-alpha);
+    color: white;
+    width: 100%;
+  }
+  &.invite {
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+    background: rgba($color-main-red, $color-main-red-alpha);
+    color: white;
+    width: 30rem;
+    max-width: 20%;
+  }
+  &.submit.blue {
+    border: 1px solid rgba($color-main-blue, $color-main-red-alpha);
+    background: rgba($color-main-blue, $color-main-red-alpha);
+    color: white;
+    width: 30rem;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

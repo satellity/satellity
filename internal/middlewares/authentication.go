@@ -12,22 +12,23 @@ import (
 )
 
 var whitelist = [][2]string{
-	{"GET", "^/_hc$"},
-	{"GET", "^/categories"},
-	{"GET", "^/topics"},
-	{"GET", "^/users"},
-	{"POST", "^/oauth"},
-	{"POST", "^/sessions"},
-	{"POST", "^/email_verifications"},
+	{"GET", "^/api/_hc$"},
+	{"GET", "^/api/categories"},
+	{"GET", "^/api/client"},
+	{"GET", "^/api/topics"},
+	{"GET", "^/api/users"},
+	{"POST", "^/api/oauth"},
+	{"POST", "^/api/sessions"},
+	{"POST", "^/api/email_verifications"},
 }
 
 var userWhitelist = [][2]string{
-	{"GET", "^/me"},
-	{"POST", "^/comments"},
-	{"DELETE", "^/comments"},
-	{"POST", "^/topics"},
-	{"POST", "^/me"},
-	{"GET", "^/user"},
+	{"GET", "^/api/me"},
+	{"POST", "^/api/comments"},
+	{"DELETE", "^/api/comments"},
+	{"POST", "^/api/topics"},
+	{"POST", "^/api/me"},
+	{"GET", "^/api/user"},
 }
 
 type contextValueKey int

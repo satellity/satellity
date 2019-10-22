@@ -14,18 +14,30 @@ import (
 
 // RegisterRoutes register all routes
 func RegisterRoutes(database *durable.Database, router *httptreemux.TreeMux) {
-	router.GET("/_hc", health)
-	registerUser(database, router)
-	registerCategory(database, router)
-	registerTopic(database, router)
-	registerComment(database, router)
-	registerVerification(database, router)
-	admin.RegisterAdminRoutes(database, router)
+	api := router.NewGroup("/api")
+
+	api.GET("/_hc", health)
+	api.GET("/client", client)
+	registerUser(database, api)
+	registerCategory(database, api)
+	registerTopic(database, api)
+	registerComment(database, api)
+	registerVerification(database, api)
+	admin.RegisterAdminRoutes(database, api)
 }
 
 func health(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	views.RenderResponse(w, r, map[string]string{
 		"build": configs.BuildVersion + "-" + runtime.Version(),
+	})
+}
+
+func client(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	config := configs.AppConfig
+	views.RenderResponse(w, r, map[string]string{
+		"name":               config.Name,
+		"github_client_id":   config.Github.ClientID,
+		"recaptcha_site_key": config.Recaptcha.SiteKey,
 	})
 }
 

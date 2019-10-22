@@ -1,0 +1,30 @@
+@import '../assets/css/constant.scss';
+
+.profile {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 1.6rem;
+}
+.user {
+  box-sizing: border-box;
+  background: white;
+  text-align: center;
+  padding: 1rem;
+}
+.avatar {
+  border-radius: .2rem;
+  width: 8rem;
+  height: 8rem;
+}
+.new {
+  margin-top: 1.6rem;
+  text-align: center;
+  a {
+    background: rgba(218, 40, 16, 0.8);
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    color: white;
+    display: block;
+    padding: 0.4rem 0.8rem;
+  }
+}

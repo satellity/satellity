@@ -14,7 +14,7 @@ type userImpl struct {
 	database *durable.Database
 }
 
-func registerAdminUser(database *durable.Database, router *httptreemux.TreeMux) {
+func registerAdminUser(database *durable.Database, router *httptreemux.Group) {
 	impl := &userImpl{database: database}
 
 	router.GET("/admin/users", impl.index)

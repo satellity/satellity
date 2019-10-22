@@ -30,7 +30,7 @@ type verificationRequest struct {
 	SessionSecret string `json:"session_secret"`
 }
 
-func registerVerification(database *durable.Database, router *httptreemux.TreeMux) {
+func registerVerification(database *durable.Database, router *httptreemux.Group) {
 	impl := &verificationImpl{database: database}
 
 	router.POST("/email_verifications", impl.create)

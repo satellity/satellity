@@ -36,8 +36,9 @@ type Option struct {
 		} `yaml:"attachments"`
 	} `yaml:"system"`
 	Recaptcha struct {
-		URL    string `yaml:"url"`
-		Secret string `yaml:"secret"`
+		URL     string `yaml:"url"`
+		SiteKey string `yaml:"site_key"`
+		Secret  string `yaml:"secret"`
 	} `yaml:"recaptcha"`
 	Operators []string `yaml:"operators"`
 	Email     struct {

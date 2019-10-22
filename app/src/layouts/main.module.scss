@@ -1,0 +1,131 @@
+@import '../assets/css/constant.scss';
+
+.container {
+  min-height: 100vh;
+  background: rgb(236, 240, 245);
+}
+.header {
+  background-image: linear-gradient(90deg, rgba(218, 40, 16, 0.6), rgba(218, 40, 16, 0.8));
+  color: white;
+  display: flex;
+  font-size: 1.2rem;
+  text-align: center;
+  line-height: 1.8rem;
+  box-sizing: border-box;
+  padding: .8rem 1.6rem;
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
+.brand {
+  color: white;
+  float: left;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    opacity: 0.8;
+  }
+  &:after {
+    display: none;
+  }
+}
+.site {
+  font-size: 1.125rem;
+  flex-grow: 1;
+  text-align: center;
+}
+.navis {
+  display: flex;
+}
+.navi {
+  cursor: pointer;
+  color: white;
+  display: inline-block;
+  font-size: 1rem;
+  margin-right: .8rem;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    opacity: 0.8;
+  }
+  &:after {
+    display: none;
+  }
+  &:last-child {
+    margin-right: 0;
+  }
+  &.user {
+    max-width: 6rem;
+    overflow: hidden;
+  }
+}
+
+.modal {
+  background: rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+}
+.modalContainer {
+  background: white;
+  border-radius: .2rem;
+  box-sizing: border-box;
+  color: black;
+  width: 24rem;
+  max-width: 96%;
+  padding: 1.6rem 3.2rem;
+  position: relative;
+}
+.loading {
+  text-align: center;
+}
+.action {
+  cursor: pointer;
+  text-align: right;
+  position: absolute;
+  right: .8rem;
+  top: .6rem;
+}
+.app {
+  font-size: 1.25rem;
+  text-align: center;
+  margin-bottom: 1.6rem;
+}
+.content {
+  text-align: center;
+  a {
+    background: rgba(218, 40, 16, 0.8);
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    color: white;
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    width: 100%;
+  }
+}
+.or {
+  text-align: center;
+  padding: 1.6rem 0;
+}
+.register {
+  color: $color-main-red;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 1.6rem;
+}
+
+@media only screen and (max-width: 64rem) {
+  .header {
+    padding: .8rem;
+  }
+  .name {
+    display: none;
+  }
+}

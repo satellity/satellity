@@ -7,7 +7,7 @@ import (
 )
 
 // RegisterAdminRoutes register admin routes
-func RegisterAdminRoutes(database *durable.Database, router *httptreemux.TreeMux) {
+func RegisterAdminRoutes(database *durable.Database, router *httptreemux.Group) {
 	registerAdminUser(database, router)
 	registerAdminCategory(database, router)
 	registerAdminTopic(database, router)

@@ -14,7 +14,7 @@ type topicImpl struct {
 	database *durable.Database
 }
 
-func registerAdminTopic(database *durable.Database, router *httptreemux.TreeMux) {
+func registerAdminTopic(database *durable.Database, router *httptreemux.Group) {
 	impl := &topicImpl{database: database}
 
 	router.GET("/admin/topics", impl.index)

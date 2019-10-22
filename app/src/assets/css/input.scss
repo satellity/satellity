@@ -1,0 +1,66 @@
+@import './constant.scss';
+
+textarea,
+input[type] {
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  box-shadow: none;
+  border: 1px solid #ccc;
+  border-radius: 0.1rem;
+  font-size: 1rem;
+  outline-style: none;
+  margin-bottom: 1rem;
+  padding: .6rem .3rem;
+  transition: all 0.30s ease-in-out;
+  width: 100%;
+  &:focus {
+    box-shadow: 0 0 5px rgba($color-main-red, $color-main-red-alpha);
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+  }
+}
+
+textarea {
+  height: 12rem;
+}
+
+.action {
+  input[type='submit'] {
+    border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+    background: rgba($color-main-red, $color-main-red-alpha);
+    width: 30rem;
+    max-width: 100%;
+    color: white;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+label {
+  display: block;
+  margin-bottom: .3rem;
+}
+
+.select {
+  border: 1px solid #ccc;
+  border-radius: 0.1rem;
+  margin-bottom: 1rem;
+  position: relative;
+  width: 30rem;
+  max-width: 100%;
+  select {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    border-radius: 0.1rem;
+    background: white;
+    width: 100%;
+    outline: none;
+    padding: .625rem .3rem;
+    transition: all 0.30s ease-in-out;
+    &:focus {
+      border: 1px solid rgba($color-main-red, $color-main-red-alpha);
+      box-shadow: 0 0 5px rgba($color-main-red, $color-main-red-alpha);
+    }
+  }
+}

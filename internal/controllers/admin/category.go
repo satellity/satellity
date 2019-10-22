@@ -22,7 +22,7 @@ type categoryRequest struct {
 	Position    int64  `json:"position"`
 }
 
-func registerAdminCategory(database *durable.Database, router *httptreemux.TreeMux) {
+func registerAdminCategory(database *durable.Database, router *httptreemux.Group) {
 	impl := &adminCategoryImpl{database: database}
 
 	router.POST("/admin/categories", impl.create)
