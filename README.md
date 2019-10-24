@@ -19,9 +19,9 @@ Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!
 
 ## Built With
 
-1. Go version go1.12.5 darwin/amd64
-2. postgres (PostgreSQL) 11.1
-3. react ^16.8.4
+1. Go version go1.13.3 darwin/amd64
+2. postgres (PostgreSQL) 11.4
+3. react ^16.10.2
 
 ## Structure
 
@@ -43,15 +43,15 @@ Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!
 
 ### Frontend
 
-1. `cd ./app`, copy `.env.example` to `.env` and `.env.development` and change the following fields:
+1. Copy `env.example` to `.env`, and replace `Satellity` with your project name.
    
     ```
     SITE_NAME=your site name
     ```
-2. run `yarn install` to prepare front-end.
-3. `yarn start` and open `http://localhost:3000`
+2. run `yarn install`, then `yarn start`. It's running now.
 
 ## Contribution
+
 When contributing to this repository, please reach out to [@jadeydi](https://github.com/jadeydi) or other contributors via email, issue or any other means to discuss the changes you wish to make.
 
 You can also just clone the repository, create a new branch of the feature or issue and make adequate changes then push and create a pull-request and request a review from other contributors.
