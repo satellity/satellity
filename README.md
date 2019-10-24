@@ -51,6 +51,10 @@ Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!
 2. run `yarn install` to prepare front-end.
 3. `yarn start` and open `http://localhost:3000`
 
+## Contribution
+When contributing to this repository, please reach out to [@jadeydi](https://github.com/jadeydi) or other contributors via email, issue or any other means to discuss the changes you wish to make.
+You can also just clone the repository, create a new branch of the feature or issue and make adequate changes then push and create a pull-request and request a review from other contributors.
+
 ## License
 
 ![https://opensource.org/licenses/MIT](https://img.shields.io/github/license/mashape/apistatus.svg)
