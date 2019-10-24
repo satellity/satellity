@@ -47,7 +47,7 @@ ReactDOM.render((
   <Router>
     <div>
       <Switch>
-        <Route path='/oauth/callback' component={Oauth} />
+        <Route path='/oauth/:provider/callback' component={Oauth} />
         <Route path='/admin' component={AdminRoute} />
         <Route path='/404' component={NoMatch} />
         <MainLayout />

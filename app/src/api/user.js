@@ -21,7 +21,7 @@ class User {
     return KJUR.KEYUTIL.getPEM(ec, 'PKCS1PRV');
   }
 
-  signIn(code, email, password) {
+  signIn(email, password, provider, code) {
     let pwd = uuid().toLowerCase();
     let ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
     let pub = ec.generateKeyPairHex().ecpubhex;
@@ -29,7 +29,7 @@ class User {
     let data = {session_secret: this.fixed_schema_header + pub, code: code, email: email, password: password};
     let request;
     if (code !== '') {
-      request = this.api.axios.post('/oauth/github', data);
+      request = this.api.axios.post(`/oauth/${provider}`, data);
     } else {
       request = this.api.axios.post('/sessions', data);
     }

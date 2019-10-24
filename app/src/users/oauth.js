@@ -18,12 +18,12 @@ class Oauth extends Component {
 
   componentDidMount() {
     // TODO should use redirect
-    const history = this.props.history;
-    new API().user.signIn(this.state.code).then((resp) => {
+    const props = this.props;
+    new API().user.signIn('','', props.match.params.provider,this.state.code).then((resp) => {
       if (resp.error) {
         return
       }
-      history.push('/');
+      props.history.push('/');
     });
   }
 

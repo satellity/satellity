@@ -1,7 +1,7 @@
 import style from './main.module.scss';
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {Redirect} from 'react-router-dom';
-import { loadReCaptcha, ReCaptcha } from 'react-recaptcha-v3';
+import {loadReCaptcha, ReCaptcha} from 'react-recaptcha-v3';
 import API from '../api/index.js';
 import Href from '../widgets/href.js';
 import Button from '../widgets/button.js';
@@ -116,7 +116,7 @@ class Modal extends Component {
     if (this.state.submitting) {
       return
     }
-    this.api.user.signIn('', this.state.email, this.state.password).then((resp) => {
+    this.api.user.signIn(this.state.email, this.state.password).then((resp) => {
       if (resp.error) {
         this.setState({submitting: false});
         return
