@@ -53,6 +53,7 @@ Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!
 
 ## Contribution
 When contributing to this repository, please reach out to [@jadeydi](https://github.com/jadeydi) or other contributors via email, issue or any other means to discuss the changes you wish to make.
+
 You can also just clone the repository, create a new branch of the feature or issue and make adequate changes then push and create a pull-request and request a review from other contributors.
 
 ## License
