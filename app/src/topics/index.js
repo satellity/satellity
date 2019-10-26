@@ -15,7 +15,6 @@ class Index extends Component {
 
     this.api = new API();
     this.base64 = new Base64();
-    this.pagination = 50;
     // TODO decode should categories in api;
     let categories = [];
     let d = window.localStorage.getItem('categories');
@@ -29,6 +28,7 @@ class Index extends Component {
       category: {},
       category_id: 'latest',
       loading: true,
+      pagination: 30,
       offset: ''
     };
 
@@ -54,7 +54,7 @@ class Index extends Component {
         }
       }
       this.setState({category: current, category_id: category_id, categories: resp.data}, () => {
-        this.fetchTopics(category_id, true);
+        this.fetchTopics(category_id);
       });
     });
   }
@@ -75,18 +75,18 @@ class Index extends Component {
         }
       }
       this.setState({category: current, category_id: category_id}, () => {
-        this.fetchTopics(category_id, true);
+        this.fetchTopics(category_id);
       });
     }
   }
 
   loadTopics(e) {
     e.preventDefault();
-    this.fetchTopics(this.state.category_id, false);
+    this.fetchTopics(this.state.category_id);
   }
 
-  fetchTopics(category_id, replace) {
-    this.setState({loading: replace, offset: ''});
+  fetchTopics(category_id) {
+    this.setState({loading: true, offset: ''});
     let request = category_id === 'latest' ? this.api.topic.index(this.state.offset) : this.api.category.topics(category_id, this.state.offset);
 
     request.then((resp) => {
@@ -94,10 +94,7 @@ class Index extends Component {
         return
       }
       let data = resp.data;
-      let offset = data.length > this.pagination ? data[data.length-1].updated_at : '' ;
-      if (!replace) {
-        data = this.state.topics.concat(data);
-      }
+      let offset = data.length >= this.state.pagination ? data[data.length-1].updated_at : '' ;
       this.setState({category_id: category_id, loading: false, offset: offset, topics: data});
     });
   }
@@ -148,7 +145,7 @@ class Index extends Component {
           {state.loading && loadingView}
           {!state.loading && <ul className={style.topics}> {topics} </ul>}
           {/* TODO i18n */}
-          {state.offset !== '' && <div className={style.load}><span onClick={this.loadTopics}>Load More</span></div>}
+          {state.topics.length >= state.pagination && state.offset && <div className={style.load}><span onClick={this.loadTopics}>More</span></div>}
         </main>
         <aside className='column aside'>
           <Widget />

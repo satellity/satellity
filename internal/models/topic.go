@@ -16,7 +16,7 @@ import (
 // Topic related CONST
 const (
 	minTitleSize = 3
-	LIMIT        = 50
+	LIMIT        = 30
 )
 
 const topicsDDL = `
@@ -355,7 +355,7 @@ func ReadTopics(mctx *Context, offset time.Time) ([]*Topic, error) {
 			return err
 		}
 
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE draft=false AND updated_at<$1 ORDER BY updated_at DESC LIMIT $2", strings.Join(topicColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE draft=false AND updated_at<$1 ORDER BY draft,updated_at DESC LIMIT $2", strings.Join(topicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
 		if err != nil {
 			return err
@@ -403,7 +403,7 @@ func (user *User) ReadTopics(mctx *Context, offset time.Time) ([]*Topic, error) 
 		if err != nil {
 			return err
 		}
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND draft=false AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND draft=false AND created_at<$2 ORDER BY user_id,draft,created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, user.UserID, offset, LIMIT)
 		if err != nil {
 			return err
@@ -436,7 +436,7 @@ func (category *Category) ReadTopics(mctx *Context, offset time.Time) ([]*Topic,
 
 	var topics []*Topic
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND updated_at<$2 ORDER BY updated_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND updated_at<$2 ORDER BY category_id,draft,updated_at DESC LIMIT $3", strings.Join(topicColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, category.CategoryID, offset, LIMIT)
 		if err != nil {
 			return err
