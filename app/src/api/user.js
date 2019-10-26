@@ -28,7 +28,7 @@ class User {
     let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
     let data = {session_secret: this.fixed_schema_header + pub, code: code, email: email, password: password};
     let request;
-    if (code !== '') {
+    if (code) {
       request = this.api.axios.post(`/oauth/${provider}`, data);
     } else {
       request = this.api.axios.post('/sessions', data);
