@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 CREATE INDEX IF NOT EXISTS categories_positionx ON categories (position);
+CREATE UNIQUE INDEX IF NOT EXISTS categories_namex ON categories (name);
 
 
 CREATE TABLE IF NOT EXISTS topics (

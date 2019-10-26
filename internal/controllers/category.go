@@ -35,7 +35,7 @@ func (impl *categoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[st
 func (impl *categoryImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
 	mctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.ReadCategory(mctx, params["id"])
+	category, err := models.ReadCategoryByIDOrName(mctx, params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if category == nil {

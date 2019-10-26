@@ -15,7 +15,6 @@ class Index extends Component {
 
     this.api = new API();
     this.base64 = new Base64();
-    this.params = new URLSearchParams(props.location.search);
     this.pagination = 50;
     // TODO decode should categories in api;
     let categories = [];
@@ -24,10 +23,11 @@ class Index extends Component {
       categories = JSON.parse(this.base64.decode(d));
     }
     this.state = {
+      id: props.match.params.id || 'latest',
       topics: [],
       categories: categories,
       category: {},
-      categoryId: 'latest',
+      category_id: 'latest',
       loading: true,
       offset: ''
     };
@@ -40,54 +40,54 @@ class Index extends Component {
       if (resp.error) {
         return
       }
-      let categoryId = 'latest', current = {};
-      let category = this.params.get('c') || 'latest';
+      let category_id = 'latest';
+      let current = {};
+      let category = this.state.id;
       if (category !== 'latest') {
         for (let i = 0; i < resp.data.length; i++) {
           let c = resp.data[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-            categoryId = c.category_id;
+            category_id = c.category_id;
             current = c;
             break;
           }
         }
       }
-      this.setState({category: current, categories: resp.data}, () => {
-        this.fetchTopics(categoryId, true);
+      this.setState({category: current, category_id: category_id, categories: resp.data}, () => {
+        this.fetchTopics(category_id, true);
       });
     });
   }
 
   componentDidUpdate(prevProps) {
-    let props = this.props;
-    if (props.location.search !== prevProps.location.search) {
-      let categoryId = 'latest', current = {};
-      let params = new URLSearchParams(props.location.search);
-      let category = params.get('c') || 'latest';
+    if (this.props.match.params.id !== prevProps.match.params.id) {
+      let category_id = 'latest';
+      let current = {};
+      let category = this.props.match.params.id || 'latest';
       if (category !== 'latest') {
         for (let i = 0; i < this.state.categories.length; i++) {
           let c = this.state.categories[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-            categoryId = c.category_id;
+            category_id = c.category_id;
             current = c;
             break;
           }
         }
       }
-      this.setState({category: current}, () => {
-        this.fetchTopics(categoryId, true);
+      this.setState({category: current, category_id: category_id}, () => {
+        this.fetchTopics(category_id, true);
       });
     }
   }
 
   loadTopics(e) {
     e.preventDefault();
-    this.fetchTopics(this.state.categoryId, false);
+    this.fetchTopics(this.state.category_id, false);
   }
 
-  fetchTopics(categoryId, replace) {
+  fetchTopics(category_id, replace) {
     this.setState({loading: replace, offset: ''});
-    let request = categoryId === 'latest' ? this.api.topic.index(this.state.offset) : this.api.category.topics(categoryId, this.state.offset);
+    let request = category_id === 'latest' ? this.api.topic.index(this.state.offset) : this.api.category.topics(category_id, this.state.offset);
 
     request.then((resp) => {
       if (resp.error) {
@@ -98,7 +98,7 @@ class Index extends Component {
       if (!replace) {
         data = this.state.topics.concat(data);
       }
-      this.setState({categoryId: categoryId, loading: false, offset: offset, topics: data});
+      this.setState({category_id: category_id, loading: false, offset: offset, topics: data});
     });
   }
 
@@ -120,11 +120,8 @@ class Index extends Component {
 
     const categories = state.categories.map((category) => {
       return (
-        <Link
-          to={{ pathname: "/", search: `?c=${category.name}` }}
-          className={`${style.node} ${state.categoryId === category.category_id ? style.current : ''}`}
-          key={category.category_id}>
-          {category.alias}
+        <Link to={`/categories/${category.name}`} className={`${style.node} ${state.category_id === category.category_id ? style.current : ''}`} key={category.category_id} >
+            {category.alias}
         </Link>
       )
     });
@@ -145,7 +142,7 @@ class Index extends Component {
         <main className='column main'>
           <div className={style.nodes}>
             <Link to='/'
-              className={`${style.node} ${state.categoryId === 'latest' ? style.current : ''}`}>{i18n.t('home.latest')}</Link>
+              className={`${style.node} ${state.category_id === 'latest' ? style.current : ''}`}>{i18n.t('home.latest')}</Link>
             {categories}
           </div>
           {state.loading && loadingView}

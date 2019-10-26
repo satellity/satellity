@@ -28,6 +28,7 @@ class MainLayout extends Component {
             <Route exact path='/' component={Topic.Index} />
             <Route exact path='/avatar' component={Tool.Portrait} />
             <Route exact path='/dashboard' component={Home.Dashboard} />
+            <Route exact path='/categories/:id' component={Topic.Index} />
             <Route exact path='/user/edit' component={User.Edit} />
             <Route path='/users/:id' component={User.Show} />
             <Route exact path='/topics/new' component={Topic.New} />

@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 CREATE INDEX IF NOT EXISTS categories_positionx ON categories (position);
+CREATE UNIQUE INDEX IF NOT EXISTS categories_namex ON categories (name);
 `
 
 // Category is used to categorize topics.
@@ -145,6 +146,21 @@ func ReadCategory(mctx *Context, id string) (*Category, error) {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return category, nil
+}
+
+// ReadCategoryByIDOrName read a category by id or name
+func ReadCategoryByIDOrName(mctx *Context, identity string) (*Category, error) {
+	ctx := mctx.context
+	query := fmt.Sprintf("SELECT %s FROM categories WHERE category_id=$1 OR name=$1", strings.Join(categoryColumns, ","))
+	row, err := mctx.database.QueryRowContext(ctx, query, identity)
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	c, err := categoryFromRows(row)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return c, nil
 }
 
 // ReadAllCategories read categories order by position
