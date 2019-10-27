@@ -22,7 +22,7 @@ class Category {
 
   topics(id, offset) {
     if (!!offset) {
-      offset = offset.replace('+', '%2B');
+      offset = offset.replace('+', '%2B').replace(' ', '%2B');
     }
     return this.api.axios.get(`/categories/${id}/topics?offset=${offset}`);
   }

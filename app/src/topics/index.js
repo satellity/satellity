@@ -29,10 +29,8 @@ class Index extends Component {
       category_id: 'latest',
       loading: true,
       pagination: 30,
-      offset: ''
+      offset: new URLSearchParams(props.location.search).get('offset'),
     };
-
-    this.loadTopics = this.loadTopics.bind(this);
   }
 
   componentDidMount() {
@@ -60,7 +58,9 @@ class Index extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.match.params.id !== prevProps.match.params.id) {
+    let offset = new URLSearchParams(this.props.location.search).get('offset');
+    let prev = new URLSearchParams(prevProps.location.search).get('offset');
+    if (this.props.match.params.id !== prevProps.match.params.id || offset !== prev) {
       let category_id = 'latest';
       let current = {};
       let category = this.props.match.params.id || 'latest';
@@ -74,28 +74,26 @@ class Index extends Component {
           }
         }
       }
-      this.setState({category: current, category_id: category_id}, () => {
+      this.setState({category: current, category_id: category_id, offset: offset}, () => {
         this.fetchTopics(category_id);
       });
     }
   }
 
-  loadTopics(e) {
-    e.preventDefault();
-    this.fetchTopics(this.state.category_id);
-  }
-
   fetchTopics(category_id) {
-    this.setState({loading: true, offset: ''});
-    let request = category_id === 'latest' ? this.api.topic.index(this.state.offset) : this.api.category.topics(category_id, this.state.offset);
+    this.setState({loading: true}, () => {
+      let request = category_id === 'latest' ?
+        this.api.topic.index(this.state.offset) :
+        this.api.category.topics(category_id, this.state.offset);
 
-    request.then((resp) => {
-      if (resp.error) {
-        return
-      }
-      let data = resp.data;
-      let offset = data.length >= this.state.pagination ? data[data.length-1].updated_at : '' ;
-      this.setState({category_id: category_id, loading: false, offset: offset, topics: data});
+      request.then((resp) => {
+        if (resp.error) {
+          return
+        }
+        let data = resp.data;
+        let offset = data.length >= this.state.pagination ? data[data.length-1].updated_at : '' ;
+        this.setState({category_id: category_id, loading: false, offset: offset, topics: data});
+      });
     });
   }
 
@@ -145,7 +143,13 @@ class Index extends Component {
           {state.loading && loadingView}
           {!state.loading && <ul className={style.topics}> {topics} </ul>}
           {/* TODO i18n */}
-          {state.topics.length >= state.pagination && state.offset && <div className={style.load}><span onClick={this.loadTopics}>More</span></div>}
+            {
+              state.topics.length >= state.pagination &&
+                state.offset &&
+                <div className={style.load}>
+                  <Link to={`${this.props.match.url}?offset=${state.offset}`}>More</Link>
+                </div>
+            }
         </main>
         <aside className='column aside'>
           <Widget />
