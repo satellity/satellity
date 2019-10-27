@@ -2,6 +2,7 @@ import style from './item.module.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import TimeAgo from 'react-timeago';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ColorUtils from '../components/color.js';
 import Avatar from '../users/avatar.js';
 
@@ -28,11 +29,22 @@ class TopicItem extends Component {
       <li className={style.topic} key={topic.topic_id}>
           {!this.state.profile && <Avatar user={topic.user} />}
         <div className={style.detail}>
-          <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`}>
-            <h2 className={style.title}>
-              {topic.title}
-            </h2>
-          </Link>
+          {
+            topic.topic_type === 'POST' &&
+            <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`}>
+              <h2 className={style.title}>
+                  {topic.title}
+                </h2>
+            </Link>
+          }
+          {
+            topic.topic_type === 'LINK' &&
+            <a href={topic.body} target='_blank' rel='noopener noreferrer'>
+              <h2 className={style.title}>
+                  {topic.title} <FontAwesomeIcon icon={['fa', 'external-link-alt']} className={style.external} />
+              </h2>
+            </a>
+          }
           <div>
             {
               !this.state.profile &&
@@ -44,6 +56,7 @@ class TopicItem extends Component {
             <Link to={{pathname: "/", search: `?c=${topic.category.name}`}}>{topic.category.alias}</Link>
             <span className={style.sep}>{i18n.t('topic.at')}</span>
             <TimeAgo date={topic.created_at} />
+              {topic.topic_type === 'LINK' && <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} className={style.comments}>{i18n.t('topic.comments')}</Link>}
           </div>
         </div>
         <div className={style.comment}>

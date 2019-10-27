@@ -13,6 +13,7 @@ type TopicView struct {
 	ShortID        string       `json:"short_id"`
 	Title          string       `json:"title"`
 	Body           string       `json:"body"`
+	TopicType      string       `json:"topic_type"`
 	UserID         string       `json:"user_id"`
 	CategoryID     string       `json:"category_id"`
 	CommentsCount  int64        `json:"comments_count"`
@@ -35,6 +36,7 @@ func buildTopic(topic *models.Topic) TopicView {
 		ShortID:        topic.ShortID,
 		Title:          topic.Title,
 		Body:           topic.Body,
+		TopicType:      topic.TopicType,
 		UserID:         topic.UserID,
 		CategoryID:     topic.CategoryID,
 		IsLikedBy:      topic.IsLikedBy,
