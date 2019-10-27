@@ -237,7 +237,7 @@ class New extends Component {
         {
           state.topic_type === 'LINK' &&
           <div>
-            <textarea name='body' rows='2' onChange={this.handleChange} className={style.link} placeholder={i18n.t('topic.placeholder.url')}></textarea>
+            <textarea name='body' rows='2' value={state.body} onChange={this.handleChange} className={style.link} placeholder={i18n.t('topic.placeholder.url')}></textarea>
           </div>
         }
         <div className={style.submit}>
