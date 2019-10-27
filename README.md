@@ -59,7 +59,7 @@ You can also just clone the repository, create a new branch of the feature or is
 ## Donation
 If this project is helpful, you can also consider a small amount of credit.
 
-1. [My Payple](https://www.paypal.me/jadeydi/5usd)
+1. [Paypal](https://www.paypal.me/jadeydi/5usd)
 2. BTC Address: [1JXjQJ4tK7fsKf1biCisD4yKdm5PbWXkoD](https://imgur.com/a/TEtvQZ4)
 3. ETH (or other erc20 token) Address: [0xAE9EA2D22E49B4c845Bbe57B57aB7172e548cE0B](https://imgur.com/a/hxM8YeF)
 
