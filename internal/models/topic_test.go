@@ -41,13 +41,13 @@ func TestTopicCRUD(t *testing.T) {
 	for _, tc := range topicCases {
 		t.Run(fmt.Sprintf("topic title %s", tc.title), func(t *testing.T) {
 			if !tc.valid {
-				topic, err := user.CreateTopic(ctx, tc.title, tc.body, tc.categoryID, tc.draft)
+				topic, err := user.CreateTopic(ctx, tc.title, tc.body, TopicTypePost, tc.categoryID, tc.draft)
 				assert.NotNil(err)
 				assert.Nil(topic)
 				return
 			}
 
-			topic, err := user.CreateTopic(ctx, tc.title, tc.body, category.CategoryID, tc.draft)
+			topic, err := user.CreateTopic(ctx, tc.title, tc.body, TopicTypePost, category.CategoryID, tc.draft)
 			assert.Nil(err)
 			assert.NotNil(topic)
 			time.Sleep(100 * time.Millisecond)
@@ -83,21 +83,21 @@ func TestTopicCRUD(t *testing.T) {
 			assert.Nil(err)
 			assert.Len(topics, int(tc.topicsCount))
 
-			topic, err = user.UpdateTopic(ctx, topic.TopicID, "hell", "orld", "", tc.draft)
+			topic, err = user.UpdateTopic(ctx, topic.TopicID, "hell", "orld", TopicTypePost, "", tc.draft)
 			assert.Nil(err)
 			assert.NotNil(topic)
 			assert.Equal("hell", topic.Title)
 			assert.Equal("orld", topic.Body)
-			topic, err = user.UpdateTopic(ctx, topic.TopicID, "", "orld orld", "", tc.draft)
+			topic, err = user.UpdateTopic(ctx, topic.TopicID, "", "orld orld", TopicTypePost, "", tc.draft)
 			assert.Nil(err)
 			assert.NotNil(topic)
 			assert.Equal("hell", topic.Title)
 			assert.Equal("orld orld", topic.Body)
-			new, err = user.UpdateTopic(ctx, uuid.Must(uuid.NewV4()).String(), "hell", "orld", "", tc.draft)
+			new, err = user.UpdateTopic(ctx, uuid.Must(uuid.NewV4()).String(), "hell", "orld", TopicTypePost, "", tc.draft)
 			assert.NotNil(err)
 			assert.Nil(new)
 			u := &User{UserID: uuid.Must(uuid.NewV4()).String()}
-			new, err = u.UpdateTopic(ctx, topic.TopicID, "hell", "orld", "", tc.draft)
+			new, err = u.UpdateTopic(ctx, topic.TopicID, "hell", "orld", TopicTypePost, "", tc.draft)
 			assert.NotNil(err)
 			assert.Nil(new)
 
@@ -105,7 +105,7 @@ func TestTopicCRUD(t *testing.T) {
 				topic, err = user.DraftTopic(ctx)
 				assert.Nil(err)
 				assert.Nil(topic)
-				topic, err = user.CreateTopic(ctx, tc.title, tc.body, category.CategoryID, true)
+				topic, err = user.CreateTopic(ctx, tc.title, tc.body, TopicTypePost, category.CategoryID, true)
 				assert.Nil(err)
 				assert.NotNil(topic)
 				topic, err = user.DraftTopic(ctx)
@@ -117,7 +117,7 @@ func TestTopicCRUD(t *testing.T) {
 				topic, err = user.DraftTopic(ctx)
 				assert.Nil(err)
 				assert.NotNil(topic)
-				topic, err = user.CreateTopic(ctx, tc.title, tc.body, category.CategoryID, true)
+				topic, err = user.CreateTopic(ctx, tc.title, tc.body, TopicTypePost, category.CategoryID, true)
 				assert.NotNil(err)
 				assert.Nil(topic)
 			}
@@ -146,7 +146,7 @@ func TestTopicCRUD(t *testing.T) {
 
 	for _, tc := range topicCases {
 		t.Run(fmt.Sprintf("topic title %s", tc.title), func(t *testing.T) {
-			topic, err := user.CreateTopic(ctx, tc.title, tc.body, category.CategoryID, tc.draft)
+			topic, err := user.CreateTopic(ctx, tc.title, tc.body, TopicTypePost, category.CategoryID, tc.draft)
 			assert.Nil(err)
 			assert.NotNil(topic)
 			topics, err := ReadTopics(ctx, time.Time{})

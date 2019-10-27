@@ -1,7 +1,7 @@
 @import './constant.scss';
 
 textarea,
-input[type] {
+input[type='text'], input[type='password'] {
   -webkit-appearance: none;
   box-sizing: border-box;
   box-shadow: none;

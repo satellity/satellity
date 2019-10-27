@@ -14,7 +14,7 @@
     }
   }
   textarea,
-  input[type] {
+  input[type='text'], input[type='password'] {
     &:focus {
       box-shadow: 0 0 5px $color-main-blue;
       border: 1px solid $color-main-blue;

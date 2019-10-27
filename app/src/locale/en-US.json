@@ -44,6 +44,11 @@
       "new": "Create a new topic",
       "edit": "Edit: %{name}"
     },
+    "placeholder": {
+      "title": "Title *",
+      "url": "URL *"
+    },
+    "link": "Link Only",
     "new": "New Topic",
     "in": "IN",
     "at": "AT",

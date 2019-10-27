@@ -60,7 +60,8 @@ p {
 }
 
 textarea,
-input[type] {
+input[type='password'],
+input[type='text'] {
   -webkit-appearance: none;
   box-sizing: border-box;
   box-shadow: none;

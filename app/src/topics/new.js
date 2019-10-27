@@ -26,7 +26,7 @@ class New extends Component {
       categories = JSON.parse(this.base64.decode(d));
     }
     let id = this.props.match.params.id;
-    // false , 0 , "" , null , undefined , and NaN
+    // false , 0 , '' , null , undefined , and NaN
     if (!id) {
       id = ''
     }
@@ -35,6 +35,7 @@ class New extends Component {
       topic_id: id,
       title: '',
       body: '',
+      topic_type: 'POST',
       draft: false,
       categories: categories,
       preview: false,
@@ -97,7 +98,8 @@ class New extends Component {
   }
 
   handleChange(e) {
-    const {name, value} = e.target;
+    const name = e.target.name;
+    const value = e.target.type === 'checkbox' ? (e.target.checked ? 'LINK' : 'POST') : e.target.value;
     this.setState({
       [name]: value
     });
@@ -142,10 +144,8 @@ class New extends Component {
 
   submitForm() {
     const history = this.props.history;
-    const data = {title: this.state.title, body: this.state.body, category_id: this.state.category_id, draft: this.state.draft};
-    // TODO should update submitting always
     if (validate(this.state.topic_id)) {
-      this.api.topic.update(this.state.topic_id, data).then((resp) => {
+      this.api.topic.update(this.state.topic_id, this.state).then((resp) => {
         this.setState({submitting: false});
         if (resp.error) {
           return
@@ -154,7 +154,7 @@ class New extends Component {
       });
       return
     }
-    this.api.topic.create(data).then((resp) => {
+    this.api.topic.create(this.state).then((resp) => {
       if (resp.error) {
         return
       }
@@ -194,37 +194,52 @@ class New extends Component {
         <div className={style.categories}>
           {categories}
         </div>
+        <div className={style.type}>
+          <input name='topic_type' type='checkbox' checked={state.topic_type === 'LINK'} onChange={this.handleChange} /> {i18n.t('topic.link')}
+        </div>
         <div>
-          <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' placeholder='Title *' onChange={this.handleChange} />
+          <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' placeholder={i18n.t('topic.placeholder.title')} onChange={this.handleChange} />
         </div>
-        <div className={style.actions}>
-          <a className={style.markdown} href='https://guides.github.com/features/mastering-markdown/' target='_blank' rel='noopener noreferrer'>
-            <FontAwesomeIcon className={style.eye} icon={['fab', 'markdown']} />
-          </a>
-          <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} />
-        </div>
-        <div className={style.body}>
-          {
-            !state.preview &&
-            <CodeMirror
-              className={state.editor}
-              value={state.body}
-              options={{
-                mode: 'markdown',
-                theme: 'xq-light',
-                lineNumbers: true,
-                lineWrapping: true,
-                placeholder: 'Text (optional)'
-              }}
-              onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
-            />
-          }
-          {
-            state.preview &&
-            <article className={`md ${style.preview}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
-            </article>
-          }
-        </div>
+        {
+          state.topic_type === 'POST' &&
+            <div className={style.actions}>
+              <a className={style.markdown} href='https://guides.github.com/features/mastering-markdown/' target='_blank' rel='noopener noreferrer'>
+                <FontAwesomeIcon className={style.eye} icon={['fab', 'markdown']} />
+              </a>
+              <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} />
+            </div>
+        }
+        {
+          state.topic_type === 'POST' &&
+            <div className={style.body}>
+                {
+                  !state.preview &&
+                  <CodeMirror
+                    className={state.editor}
+                    value={state.body}
+                    options={{
+                      mode: 'markdown',
+                      theme: 'xq-light',
+                      lineNumbers: true,
+                      lineWrapping: true,
+                      placeholder: 'Text (optional)'
+                    }}
+                    onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
+                  />
+                }
+                    {
+                      state.preview &&
+                        <article className={`md ${style.preview}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
+                        </article>
+                    }
+                      </div>
+        }
+        {
+          state.topic_type === 'LINK' &&
+          <div>
+            <textarea name='body' rows='2' onChange={this.handleChange} className={style.link} placeholder={i18n.t('topic.placeholder.url')}></textarea>
+          </div>
+        }
         <div className={style.submit}>
           <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
           {!state.submitting && <span className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</span>}

@@ -37,6 +37,17 @@
     color: white;
   }
 }
+.type {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1rem;
+  input {
+    margin-right: .6rem;
+  }
+}
+.link {
+  height: 3.6rem;
+}
 .actions {
   text-align: right;
 }

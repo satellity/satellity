@@ -20,7 +20,8 @@ func TestCommentCRUD(t *testing.T) {
 	assert.NotNil(user)
 	category, _ := CreateCategory(mctx, "name", "alias", "Description", 0)
 	assert.NotNil(category)
-	topic, _ := user.CreateTopic(mctx, "title", "body", category.CategoryID, false)
+	topic, err := user.CreateTopic(mctx, "title", "body", TopicTypePost, category.CategoryID, false)
+	assert.Nil(err)
 	assert.NotNil(topic)
 
 	commentCases := []struct {

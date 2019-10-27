@@ -17,14 +17,18 @@ import (
 const (
 	minTitleSize = 3
 	LIMIT        = 30
+
+	TopicTypePost = "POST"
+	TopicTypeLink = "LINK"
 )
 
 const topicsDDL = `
 CREATE TABLE IF NOT EXISTS topics (
 	topic_id              VARCHAR(36) PRIMARY KEY,
-	short_id              VARCHAR(255) NOT NULL,
+	short_id              VARCHAR(256) NOT NULL,
 	title                 VARCHAR(512) NOT NULL,
 	body                  TEXT NOT NULL,
+	topic_type            VARCHAR(256) NOT NULL,
 	comments_count        BIGINT NOT NULL DEFAULT 0,
 	bookmarks_count       BIGINT NOT NULL DEFAULT 0,
 	likes_count           BIGINT NOT NULL DEFAULT 0,
@@ -42,10 +46,16 @@ CREATE INDEX IF NOT EXISTS topics_category_draft_updatedx ON topics(category_id,
 CREATE INDEX IF NOT EXISTS topics_user_draft_createdx ON topics(user_id, draft, created_at DESC);
 `
 
-var topicColumns = []string{"topic_id", "short_id", "title", "body", "comments_count", "bookmarks_count", "likes_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
+var topicColumns = []string{"topic_id", "short_id", "title", "body", "topic_type", "comments_count", "bookmarks_count", "likes_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
 
 func (t *Topic) values() []interface{} {
-	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.CommentsCount, t.BookmarksCount, t.LikesCount, t.CategoryID, t.UserID, t.Score, t.Draft, t.CreatedAt, t.UpdatedAt}
+	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.TopicType, t.CommentsCount, t.BookmarksCount, t.LikesCount, t.CategoryID, t.UserID, t.Score, t.Draft, t.CreatedAt, t.UpdatedAt}
+}
+
+func topicFromRows(row durable.Row) (*Topic, error) {
+	var t Topic
+	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.TopicType, &t.CommentsCount, &t.BookmarksCount, &t.LikesCount, &t.CategoryID, &t.UserID, &t.Score, &t.Draft, &t.CreatedAt, &t.UpdatedAt)
+	return &t, err
 }
 
 // Topic is what use talking about
@@ -54,6 +64,7 @@ type Topic struct {
 	ShortID        string
 	Title          string
 	Body           string
+	TopicType      string
 	CommentsCount  int64
 	BookmarksCount int64
 	LikesCount     int64
@@ -71,7 +82,7 @@ type Topic struct {
 }
 
 //CreateTopic create a new Topic
-func (user *User) CreateTopic(mctx *Context, title, body, categoryID string, draft bool) (*Topic, error) {
+func (user *User) CreateTopic(mctx *Context, title, body, typ, categoryID string, draft bool) (*Topic, error) {
 	ctx := mctx.context
 
 	if draft {
@@ -89,11 +100,22 @@ func (user *User) CreateTopic(mctx *Context, title, body, categoryID string, dra
 		return nil, session.BadDataError(ctx)
 	}
 
+	if !(typ == TopicTypePost || typ == TopicTypeLink) {
+		return nil, session.BadDataError(ctx)
+	}
+
+	if typ == TopicTypeLink {
+		if !strings.HasPrefix(body, "http") {
+			return nil, session.BadDataError(ctx)
+		}
+	}
+
 	t := time.Now()
 	topic := &Topic{
 		TopicID:   uuid.Must(uuid.NewV4()).String(),
 		Title:     title,
 		Body:      body,
+		TopicType: typ,
 		UserID:    user.UserID,
 		Draft:     draft,
 		CreatedAt: t,
@@ -138,11 +160,21 @@ func (user *User) CreateTopic(mctx *Context, title, body, categoryID string, dra
 }
 
 // UpdateTopic update a Topic by ID
-func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string, draft bool) (*Topic, error) {
+func (user *User) UpdateTopic(mctx *Context, id, title, body, typ, categoryID string, draft bool) (*Topic, error) {
 	ctx := mctx.context
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
 	if title != "" && len(title) < minTitleSize {
 		return nil, session.BadDataError(ctx)
+	}
+
+	if !(typ == TopicTypePost || typ == TopicTypeLink) {
+		return nil, session.BadDataError(ctx)
+	}
+
+	if typ == TopicTypeLink {
+		if !strings.HasPrefix(body, "http") {
+			return nil, session.BadDataError(ctx)
+		}
 	}
 
 	var topic *Topic
@@ -177,6 +209,9 @@ func (user *User) UpdateTopic(mctx *Context, id, title, body, categoryID string,
 			}
 			topic.CategoryID = category.CategoryID
 			topic.Category = category
+		}
+		if typ != "" {
+			topic.TopicType = typ
 		}
 		cols, params := durable.PrepareColumnsWithParams([]string{"title", "body", "category_id", "draft"})
 		vals := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft}
@@ -490,12 +525,6 @@ func topicsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	var count int64
 	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics WHERE draft=false").Scan(&count)
 	return count, err
-}
-
-func topicFromRows(row durable.Row) (*Topic, error) {
-	var t Topic
-	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.CommentsCount, &t.BookmarksCount, &t.LikesCount, &t.CategoryID, &t.UserID, &t.Score, &t.Draft, &t.CreatedAt, &t.UpdatedAt)
-	return &t, err
 }
 
 func generateShortID(table string, t time.Time) (string, error) {

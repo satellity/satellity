@@ -14,12 +14,12 @@ class Topic {
   }
 
   create(params) {
-    const data = {title: params.title, body: params.body.trim(), category_id: params.category_id, draft: params.draft};
+    const data = {title: params.title, body: params.body.trim(), topic_type: params.topic_type, category_id: params.category_id, draft: params.draft};
     return this.api.axios.post('/topics', data);
   }
 
   update(id, params) {
-    const data = {title: params.title, body: params.body.trim(), category_id: params.category_id, draft: params.draft};
+    const data = {title: params.title, body: params.body.trim(), topic_type: params.topic_type, category_id: params.category_id, draft: params.draft};
     return this.api.axios.post(`/topics/${id}`, data);
   }
 
