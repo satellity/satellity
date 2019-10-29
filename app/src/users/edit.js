@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import ReactCrop from 'react-image-crop';
 import API from '../api/index.js';
-import Button from '../widgets/button.js';
+import Button from '../components/button.js';
 
 class Edit extends Component {
   constructor(props) {
@@ -83,11 +83,11 @@ class Edit extends Component {
       } else {
         crop.height = crop.width;
       }
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       let w = crop.width > 512 ? 512 : crop.width;
       canvas.width = w;
       canvas.height = w;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
       ctx.drawImage(
         this.imageRef,
         0,
@@ -99,7 +99,12 @@ class Edit extends Component {
         w,
         w
       );
-      this.setState({avatar_url: canvas.toDataURL()});
+      var img = new Image();
+      img.crossOrigin='anonymous';
+      img.src = '';
+      img.onload = () => {
+        this.setState({avatar_url: canvas.toDataURL()});
+      }
     }
   }
 
@@ -124,7 +129,7 @@ class Edit extends Component {
     const i18n = window.i18n;
     if (!this.api.user.loggedIn()) {
       return (
-        <Redirect to={{ pathname: "/" }} />
+        <Redirect to={{ pathname: '/' }} />
       )
     }
 
@@ -149,7 +154,7 @@ class Edit extends Component {
                 <div className={style.image}>
                   {
                     state.avatar_url && (
-                      <img src={state.avatar_url} alt={state.nickname} onClick={this.handleClick} className={style.cover} />
+                      <img src={state.avatar_url} alt={state.nickname} onClick={this.handleClick} className={style.cover}/>
                     )
                   }
                 </div>
@@ -163,7 +168,7 @@ class Edit extends Component {
                 <textarea type='text' name='biography' value={state.biography} onChange={this.handleChange} />
               </div>
               <div className='action'>
-                <Button type='submit' class='submit' text={i18n.t('general.submit')} disabled={state.submitting} />
+                <Button type='submit' classes='submit' text={i18n.t('general.submit')} disabled={state.submitting} />
               </div>
             </form>
           </div>

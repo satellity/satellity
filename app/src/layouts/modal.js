@@ -3,9 +3,8 @@ import React, {Component} from 'react';
 import {Redirect} from 'react-router-dom';
 import {loadReCaptcha, ReCaptcha} from 'react-recaptcha-v3';
 import API from '../api/index.js';
-import Href from '../widgets/href.js';
-import Button from '../widgets/button.js';
-import Loading from '../widgets/loading.js';
+import Button from '../components/button.js';
+import Loading from '../components/loading.js';
 
 class Modal extends Component {
   constructor(props) {
@@ -137,7 +136,7 @@ class Modal extends Component {
     let signIn = (
       <div>
         <div className={style.content}>
-          <Href action={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${state.github_client_id}`} class='button' text={i18n.t('login.github')} original />
+          <Button type='link' action={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${state.github_client_id}`} classes='button' text={i18n.t('login.github')} original />
         </div>
         <div className={style.or}>
           OR
@@ -150,7 +149,7 @@ class Modal extends Component {
             <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
           </div>
           <div>
-            <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
+            <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
           </div>
         </form>
         <div className={style.register} onClick={(e) => this.handleClick(e, 'USER')}>
@@ -178,7 +177,7 @@ class Modal extends Component {
               <input type='text' name='email' required value={state.email} autoComplete='off' placeholder='Your Email *' onChange={this.handleChange} />
             </div>
             <div>
-              <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
+              <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
             </div>
           </form>
         </div>
@@ -198,7 +197,7 @@ class Modal extends Component {
             <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
           </div>
           <div>
-            <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
+            <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
           </div>
         </form>
       </div>
@@ -214,7 +213,7 @@ class Modal extends Component {
             <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
           </div>
           <div>
-            <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
+            <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
           </div>
         </form>
       </div>

@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import Avatar, {Piece} from 'avataaars';
 import {Helmet} from 'react-helmet';
 import {saveAs} from 'file-saver';
-import Button from '../widgets/button.js';
+import Button from '../components/button.js';
 import Config from '../components/config.js';
 
 class Portrait extends Component {
@@ -246,7 +246,7 @@ class Portrait extends Component {
             </div>
 
             <div className={style.download}>
-              <Button type='button' class='button auto' text={i18n.t('general.download')} click={this.handleDownload} disabled={state.downloading} />
+              <Button type='button' classes='button auto' text={i18n.t('general.download')} click={this.handleDownload} disabled={state.downloading} />
             </div>
             {state.action === 'hair' && state.top !== 'NoHair' && state.top !== 'LongHairFrida' && state.top.includes('Hair') && <div className={style.colors}> {hairColors} </div>}
               {state.action === 'hair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && !state.top.includes('Hair') && <div className={style.colors}> {hatColors} </div>}

@@ -2,8 +2,8 @@ import style from './widget.module.scss';
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 import Config from '../components/config.js';
+import Button from '../components/button.js';
 import API from '../api/index.js';
-import Href from '../widgets/href.js';
 
 class SiteWidget extends Component {
   constructor(props) {
@@ -16,7 +16,7 @@ class SiteWidget extends Component {
     const i18n = window.i18n;
     let action;
     if (this.api.user.loggedIn()) {
-      action = <Href action='/topics/new' text={i18n.t('topic.new')} class='button' />;;
+      action = <Button type='link' action='/topics/new' text={i18n.t('topic.new')} classes='button' />;;
     }
 
     return (

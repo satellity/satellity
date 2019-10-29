@@ -10,7 +10,7 @@ import API from '../api/index.js';
 import Config from '../components/config.js';
 import SiteWidget from '../home/widget.js';
 import CommentList from '../comments/index.js';
-import Loading from '../widgets/loading.js';
+import Loading from '../components/loading.js';
 
 class Show extends Component {
   constructor(props) {

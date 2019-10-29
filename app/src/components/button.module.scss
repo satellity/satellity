@@ -4,9 +4,10 @@
   border-radius: 0.2rem;
   border: 1px solid rgba(218, 40, 16, 0.8);
   background: rgba(218, 40, 16, 0.8);
+  box-sizing: border-box;
   color: white;
   cursor: pointer;
-  padding: .6rem 1.6rem;
+  padding: .4rem 1.6rem;
   text-align: center;
   transition: all 0.30s ease-in-out;
   width: 20rem;
@@ -14,6 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1.4rem;
 }
 
 .auto {

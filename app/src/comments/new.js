@@ -1,7 +1,7 @@
 import style from './index.module.scss';
 import React, {Component} from 'react';
 import API from '../api/index.js';
-import Button from '../widgets/button.js';
+import Button from '../components/button.js';
 
 class CommentNew extends Component {
   constructor(props) {
@@ -59,7 +59,7 @@ class CommentNew extends Component {
             <textarea type='text' name='body' minLength='3' required placeholder={i18n.t('comment.form.body')} value={state.body} onChange={this.handleChange} />
           </div>
           <div className='action'>
-            <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')}/>
+            <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')}/>
           </div>
         </form>
       </div>

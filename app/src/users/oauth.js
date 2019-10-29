@@ -1,7 +1,7 @@
 import style from './oauth.module.scss';
 import React, { Component } from 'react';
 import API from '../api/index.js';
-import Loading from '../widgets/loading.js';
+import Loading from '../components/loading.js';
 
 class Oauth extends Component {
   constructor(props) {

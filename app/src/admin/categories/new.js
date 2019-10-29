@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import API from '../../api/index.js';
-import Loading from '../../widgets/loading.js';
+import Loading from '../../components/loading.js';
 
 class AdminCategoryNew extends Component {
   constructor(props) {

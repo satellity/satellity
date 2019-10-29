@@ -7,8 +7,8 @@ import showdownHighlight from 'showdown-highlight';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Base64 from '../components/base64.js';
 import API from '../api/index.js';
-import Loading from '../widgets/loading.js';
-import Button from '../widgets/button.js';
+import Loading from '../components/loading.js';
+import Button from '../components/button.js';
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/xq-light.css');
 require('codemirror/mode/markdown/markdown.js');
@@ -241,7 +241,7 @@ class New extends Component {
           </div>
         }
         <div className={style.submit}>
-          <Button type='submit' class='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
+          <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
           {!state.submitting && <span className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</span>}
         </div>
       </form>
