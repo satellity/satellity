@@ -57,7 +57,7 @@ When contributing to this repository, please reach out to [@jadeydi](https://git
 You can also just clone the repository, create a new branch of the feature or issue and make adequate changes then push and create a pull-request and request a review from other contributors.
 
 ## Donation
-If this project is helpful, you can also consider a small amount of credit.
+If this project is helpful, you can also consider a small amount of donations.
 
 1. [Paypal](https://www.paypal.me/jadeydi/5usd)
 2. BTC Address: [1JXjQJ4tK7fsKf1biCisD4yKdm5PbWXkoD](https://imgur.com/a/TEtvQZ4)
