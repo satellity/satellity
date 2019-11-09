@@ -10,21 +10,22 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/lib/pq"
 )
 
 const (
-	minCommentBodySize = 6
+	commentBodySizeLimit = 6
 )
 
 // Comment is struct for comment of topic
 type Comment struct {
-	CommentID string    `sql:"comment_id,pk"`
-	Body      string    `sql:"body"`
-	TopicID   string    `sql:"topic_id"`
-	UserID    string    `sql:"user_id"`
-	Score     int       `sql:"score,notnull"`
-	CreatedAt time.Time `sql:"created_at"`
-	UpdatedAt time.Time `sql:"updated_at"`
+	CommentID string
+	Body      string
+	TopicID   string
+	UserID    string
+	Score     int
+	CreatedAt time.Time
+	UpdatedAt time.Time
 
 	User *User
 }
@@ -35,11 +36,17 @@ func (c *Comment) values() []interface{} {
 	return []interface{}{c.CommentID, c.Body, c.TopicID, c.UserID, c.Score, c.CreatedAt, c.UpdatedAt}
 }
 
+func commentFromRows(row durable.Row) (*Comment, error) {
+	var c Comment
+	err := row.Scan(&c.CommentID, &c.Body, &c.TopicID, &c.UserID, &c.Score, &c.CreatedAt, &c.UpdatedAt)
+	return &c, err
+}
+
 // CreateComment create a new comment
 func (user *User) CreateComment(mctx *Context, topicID, body string) (*Comment, error) {
 	ctx := mctx.context
 	body = strings.TrimSpace(body)
-	if len(body) < minCommentBodySize {
+	if len(body) < commentBodySizeLimit {
 		return nil, session.BadDataError(ctx)
 	}
 	t := time.Now()
@@ -66,13 +73,21 @@ func (user *User) CreateComment(mctx *Context, topicID, body string) (*Comment, 
 			topic.UpdatedAt = t
 		}
 		c.TopicID = topic.TopicID
-		cols, params := durable.PrepareColumnsWithParams(commentColumns)
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO comments (%s) VALUES (%s)", cols, params), c.values()...)
+		stmt, err := tx.PrepareContext(ctx, pq.CopyIn("comments", commentColumns...))
 		if err != nil {
 			return err
 		}
-		tcols, tparams := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", tcols, tparams, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
+		_, err = stmt.ExecContext(ctx, c.values()...)
+		if err != nil {
+			return err
+		}
+		err = stmt.Close()
+		if err != nil {
+			return err
+		}
+		cols, posits := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
+		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, posits, topic.TopicID)
+		_, err = tx.ExecContext(ctx, query, topic.CommentsCount, topic.UpdatedAt)
 		return err
 	})
 	if err != nil {
@@ -90,7 +105,7 @@ func (user *User) CreateComment(mctx *Context, topicID, body string) (*Comment, 
 func (user *User) UpdateComment(mctx *Context, id, body string) (*Comment, error) {
 	ctx := mctx.context
 	body = strings.TrimSpace(body)
-	if len(body) < minCommentBodySize {
+	if len(body) < commentBodySizeLimit {
 		return nil, session.BadDataError(ctx)
 	}
 	var comment *Comment
@@ -106,8 +121,13 @@ func (user *User) UpdateComment(mctx *Context, id, body string) (*Comment, error
 		}
 		comment.Body = body
 		comment.UpdatedAt = time.Now()
-		cols, params := durable.PrepareColumnsWithParams([]string{"body", "updated_at"})
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, params, comment.CommentID), comment.Body, comment.UpdatedAt)
+		cols, posits := durable.PrepareColumnsWithParams([]string{"body", "updated_at"})
+		stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, posits, comment.CommentID))
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+		_, err = stmt.ExecContext(ctx, comment.Body, comment.UpdatedAt)
 		return err
 	})
 	if err != nil {
@@ -211,8 +231,9 @@ func (user *User) DeleteComment(mctx *Context, id string) error {
 			return err
 		}
 		topic.CommentsCount = count - 1
-		cols, params := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), topic.CommentsCount, topic.UpdatedAt)
+		cols, posits := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
+		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, posits, topic.TopicID)
+		_, err = tx.ExecContext(ctx, query, topic.CommentsCount, topic.UpdatedAt)
 		if err != nil {
 			return err
 		}
@@ -250,12 +271,6 @@ func commentsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	var count int64
 	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM comments").Scan(&count)
 	return count, err
-}
-
-func commentFromRows(row durable.Row) (*Comment, error) {
-	var c Comment
-	err := row.Scan(&c.CommentID, &c.Body, &c.TopicID, &c.UserID, &c.Score, &c.CreatedAt, &c.UpdatedAt)
-	return &c, err
 }
 
 const commentsDDL = `
