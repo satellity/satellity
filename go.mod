@@ -15,7 +15,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/lib/pq v1.2.0
 	github.com/mailgun/mailgun-go v2.0.0+incompatible
-	github.com/mailgun/mailgun-go/v3 v3.6.0
+	github.com/mailgun/mailgun-go/v3 v3.6.1
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/speps/go-hashids v2.0.0+incompatible
