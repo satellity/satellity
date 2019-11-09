@@ -26,25 +26,6 @@ const (
 	UserRoleMember = "member"
 )
 
-const usersDDL = `
-CREATE TABLE IF NOT EXISTS users (
-	user_id                VARCHAR(36) PRIMARY KEY,
-	email                  VARCHAR(512),
-	username               VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
-	nickname               VARCHAR(64) NOT NULL DEFAULT '',
-	avatar_url             VARCHAR(512) NOT NULL DEFAULT '',
-	biography              VARCHAR(2048) NOT NULL DEFAULT '',
-	encrypted_password     VARCHAR(1024),
-	github_id              VARCHAR(1024) UNIQUE,
-	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-	updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
-CREATE UNIQUE INDEX IF NOT EXISTS users_emailx ON users ((LOWER(email)));
-CREATE UNIQUE INDEX IF NOT EXISTS users_usernamex ON users ((LOWER(username)));
-CREATE INDEX IF NOT EXISTS users_createdx ON users (created_at);
-`
-
 // User contains info of a register user
 type User struct {
 	UserID            string
@@ -373,3 +354,24 @@ func validateAndEncryptPassword(ctx context.Context, password string) (string, e
 func isPermit(userID string, user *User) bool {
 	return userID == user.UserID || user.isAdmin()
 }
+
+const usersDDL = `
+CREATE TABLE IF NOT EXISTS users (
+	user_id                VARCHAR(36) PRIMARY KEY,
+	email                  VARCHAR(512),
+	username               VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
+	nickname               VARCHAR(64) NOT NULL DEFAULT '',
+	avatar_url             VARCHAR(512) NOT NULL DEFAULT '',
+	biography              VARCHAR(2048) NOT NULL DEFAULT '',
+	encrypted_password     VARCHAR(1024),
+	github_id              VARCHAR(1024) UNIQUE,
+	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+	updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS users_emailx ON users ((LOWER(email)));
+CREATE UNIQUE INDEX IF NOT EXISTS users_usernamex ON users ((LOWER(username)));
+CREATE INDEX IF NOT EXISTS users_createdx ON users (created_at);
+`
+
+const dropUsersDDL = `DROP TABLE IF EXISTS users;`

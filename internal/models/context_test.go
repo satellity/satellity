@@ -12,17 +12,6 @@ const (
 	testDatabase    = "satellity_test"
 )
 
-const (
-	dropUsersDDL             = `DROP TABLE IF EXISTS users;`
-	dropSessionsDDL          = `DROP TABLE IF EXISTS sessions;`
-	dropEmailVerificationDDL = `DROP TABLE IF EXISTS email_verifications;`
-	dropCategoriesDDL        = `DROP TABLE IF EXISTS categories;`
-	dropTopicUsersDDL        = `DROP TABLE IF EXISTS topic_users;`
-	dropTopicsDDL            = `DROP TABLE IF EXISTS topics;`
-	dropCommentsDDL          = `DROP TABLE IF EXISTS comments;`
-	dropStatisticsDDL        = `DROP TABLE IF EXISTS statistics;`
-)
-
 func teardownTestContext(mctx *Context) {
 	tables := []string{
 		dropStatisticsDDL,

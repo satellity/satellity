@@ -15,18 +15,6 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-const emailVerificationDDL = `
-CREATE TABLE IF NOT EXISTS email_verifications (
-	verification_id        VARCHAR(36) PRIMARY KEY,
-	email                  VARCHAR(512),
-	code                   VARCHAR(512),
-	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS email_verifications_email_code_createdx ON email_verifications (email, code, created_at DESC);
-CREATE INDEX IF NOT EXISTS email_verifications_createdx ON email_verifications (created_at DESC);
-`
-
 // EmailVerification verify email
 type EmailVerification struct {
 	VerificationID string
@@ -276,3 +264,17 @@ func generateVerificationCode(ctx context.Context) (string, error) {
 	}
 	return fmt.Sprint(c), nil
 }
+
+const emailVerificationDDL = `
+CREATE TABLE IF NOT EXISTS email_verifications (
+	verification_id        VARCHAR(36) PRIMARY KEY,
+	email                  VARCHAR(512),
+	code                   VARCHAR(512),
+	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS email_verifications_email_code_createdx ON email_verifications (email, code, created_at DESC);
+CREATE INDEX IF NOT EXISTS email_verifications_createdx ON email_verifications (created_at DESC);
+`
+
+const dropEmailVerificationDDL = `DROP TABLE IF EXISTS email_verifications;`

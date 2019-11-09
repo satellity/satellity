@@ -16,16 +16,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const sessionsDDL = `
-CREATE TABLE IF NOT EXISTS sessions (
-	session_id            VARCHAR(36) PRIMARY KEY,
-	user_id               VARCHAR(36) NOT NULL,
-	secret                VARCHAR(1024) NOT NULL,
-	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-CREATE INDEX ON sessions (user_id);
-`
-
 // Session contains user's current login infomation
 type Session struct {
 	SessionID string    `sql:"session_id,pk"`
@@ -118,3 +108,15 @@ func sessionFromRows(row durable.Row) (*Session, error) {
 	err := row.Scan(&s.SessionID, &s.UserID, &s.Secret, &s.CreatedAt)
 	return &s, err
 }
+
+const sessionsDDL = `
+CREATE TABLE IF NOT EXISTS sessions (
+	session_id            VARCHAR(36) PRIMARY KEY,
+	user_id               VARCHAR(36) NOT NULL,
+	secret                VARCHAR(1024) NOT NULL,
+	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+CREATE INDEX ON sessions (user_id);
+`
+
+const dropSessionsDDL = `DROP TABLE IF EXISTS sessions;`
