@@ -13,7 +13,7 @@ require (
 	github.com/gorilla/handlers v1.4.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/lib/pq v1.0.0
+	github.com/lib/pq v1.2.0
 	github.com/mailgun/mailgun-go v2.0.0+incompatible
 	github.com/mailgun/mailgun-go/v3 v3.6.0
 	github.com/onsi/ginkgo v1.10.1 // indirect
