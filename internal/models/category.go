@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/lib/pq"
 )
 
 // Category is used to categorize topics.
@@ -29,6 +30,12 @@ var categoryColumns = []string{"category_id", "name", "alias", "description", "t
 
 func (c *Category) values() []interface{} {
 	return []interface{}{c.CategoryID, c.Name, c.Alias, c.Description, c.TopicsCount, c.LastTopicID, c.Position, c.CreatedAt, c.UpdatedAt}
+}
+
+func categoryFromRows(row durable.Row) (*Category, error) {
+	var c Category
+	err := row.Scan(&c.CategoryID, &c.Name, &c.Alias, &c.Description, &c.TopicsCount, &c.LastTopicID, &c.Position, &c.CreatedAt, &c.UpdatedAt)
+	return &c, err
 }
 
 // CreateCategory create a new category.
@@ -56,7 +63,6 @@ func CreateCategory(mctx *Context, name, alias, description string, position int
 		UpdatedAt:   t,
 	}
 
-	cols, params := durable.PrepareColumnsWithParams(categoryColumns)
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		if position == 0 {
 			count, err := categoryCount(ctx, tx)
@@ -65,7 +71,12 @@ func CreateCategory(mctx *Context, name, alias, description string, position int
 			}
 			category.Position = count
 		}
-		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO categories(%s) VALUES (%s)", cols, params), category.values()...)
+		stmt, err := tx.PrepareContext(ctx, pq.CopyIn("categories", categoryColumns...))
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+		_, err = stmt.ExecContext(ctx, category.values()...)
 		return err
 	})
 	if err != nil {
@@ -101,9 +112,14 @@ func UpdateCategory(mctx *Context, id, name, alias, description string, position
 		}
 		category.Position = position
 		category.UpdatedAt = time.Now()
-		cols, params := durable.PrepareColumnsWithParams([]string{"name", "alias", "description", "position", "updated_at"})
-		vals := []interface{}{category.Name, category.Alias, category.Description, category.Position, category.UpdatedAt}
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
+		cols, posits := durable.PrepareColumnsWithParams([]string{"name", "alias", "description", "position", "updated_at"})
+		values := []interface{}{category.Name, category.Alias, category.Description, category.Position, category.UpdatedAt}
+		stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, posits, category.CategoryID))
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+		_, err = stmt.ExecContext(ctx, values...)
 		return err
 	})
 	if err != nil {
@@ -225,9 +241,14 @@ func transmitToCategory(mctx *Context, id string) (*Category, error) {
 			category.TopicsCount = count
 		}
 		category.UpdatedAt = time.Now()
-		cols, params := durable.PrepareColumnsWithParams([]string{"last_topic_id", "topics_count", "updated_at"})
-		vals := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, params, category.CategoryID), vals...)
+		cols, posits := durable.PrepareColumnsWithParams([]string{"last_topic_id", "topics_count", "updated_at"})
+		values := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
+		stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, posits, category.CategoryID))
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+		_, err = stmt.ExecContext(ctx, values...)
 		return err
 	})
 	if err != nil {
@@ -260,12 +281,6 @@ func categoryCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 		return 0, session.TransactionError(ctx, err)
 	}
 	return count, nil
-}
-
-func categoryFromRows(row durable.Row) (*Category, error) {
-	var c Category
-	err := row.Scan(&c.CategoryID, &c.Name, &c.Alias, &c.Description, &c.TopicsCount, &c.LastTopicID, &c.Position, &c.CreatedAt, &c.UpdatedAt)
-	return &c, err
 }
 
 // topics_count should use pg int64

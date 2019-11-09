@@ -93,17 +93,6 @@ func (d *Database) QueryContext(ctx context.Context, query string, args ...inter
 	return stmt.QueryContext(ctx, args...)
 }
 
-// QueryRow executes a prepared query statement with the given arguments.
-func (d *Database) QueryRow(query string, args ...interface{}) (*sql.Row, error) {
-	stmt, err := d.db.Prepare(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	return stmt.QueryRow(args...), nil
-}
-
 // QueryRowContext executes a prepared query statement with the given arguments.
 func (d *Database) QueryRowContext(ctx context.Context, query string, args ...interface{}) (*sql.Row, error) {
 	stmt, err := d.db.Prepare(query)
