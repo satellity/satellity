@@ -10,7 +10,7 @@ require (
 	github.com/go-pg/pg v8.0.6+incompatible
 	github.com/gobuffalo/envy v1.7.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
-	github.com/gorilla/handlers v1.4.0
+	github.com/gorilla/handlers v1.4.2
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/lib/pq v1.2.0
