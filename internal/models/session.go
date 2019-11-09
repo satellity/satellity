@@ -79,11 +79,13 @@ func (user *User) addSession(ctx context.Context, tx *sql.Tx, secret string) (*S
 		CreatedAt: time.Now(),
 	}
 
-	cols, params := durable.PrepareColumnsWithParams(sessionColumns)
-	_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO sessions(%s) VALUES(%s)", cols, params), s.values()...)
+	cols, posits := durable.PrepareColumnsWithParams(sessionColumns)
+	stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("INSERT INTO sessions(%s) VALUES(%s)", cols, posits))
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
 	}
+	defer stmt.Close()
+	_, err = stmt.ExecContext(ctx, s.values()...)
 	return s, nil
 }
 
