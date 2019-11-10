@@ -10,29 +10,18 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/lib/pq"
 	hashids "github.com/speps/go-hashids"
 )
 
 // Topic related CONST
 const (
-	minTitleSize = 3
-	LIMIT        = 30
+	titleSizeLimit = 3
+	LIMIT          = 30
 
 	TopicTypePost = "POST"
 	TopicTypeLink = "LINK"
 )
-
-var topicColumns = []string{"topic_id", "short_id", "title", "body", "topic_type", "comments_count", "bookmarks_count", "likes_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
-
-func (t *Topic) values() []interface{} {
-	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.TopicType, t.CommentsCount, t.BookmarksCount, t.LikesCount, t.CategoryID, t.UserID, t.Score, t.Draft, t.CreatedAt, t.UpdatedAt}
-}
-
-func topicFromRows(row durable.Row) (*Topic, error) {
-	var t Topic
-	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.TopicType, &t.CommentsCount, &t.BookmarksCount, &t.LikesCount, &t.CategoryID, &t.UserID, &t.Score, &t.Draft, &t.CreatedAt, &t.UpdatedAt)
-	return &t, err
-}
 
 // Topic is what use talking about
 type Topic struct {
@@ -57,6 +46,18 @@ type Topic struct {
 	Category       *Category
 }
 
+var topicColumns = []string{"topic_id", "short_id", "title", "body", "topic_type", "comments_count", "bookmarks_count", "likes_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
+
+func (t *Topic) values() []interface{} {
+	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.TopicType, t.CommentsCount, t.BookmarksCount, t.LikesCount, t.CategoryID, t.UserID, t.Score, t.Draft, t.CreatedAt, t.UpdatedAt}
+}
+
+func topicFromRows(row durable.Row) (*Topic, error) {
+	var t Topic
+	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.TopicType, &t.CommentsCount, &t.BookmarksCount, &t.LikesCount, &t.CategoryID, &t.UserID, &t.Score, &t.Draft, &t.CreatedAt, &t.UpdatedAt)
+	return &t, err
+}
+
 //CreateTopic create a new Topic
 func (user *User) CreateTopic(mctx *Context, title, body, typ, categoryID string, draft bool) (*Topic, error) {
 	ctx := mctx.context
@@ -72,7 +73,7 @@ func (user *User) CreateTopic(mctx *Context, title, body, typ, categoryID string
 	}
 
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
-	if len(title) < minTitleSize {
+	if len(title) < titleSizeLimit {
 		return nil, session.BadDataError(ctx)
 	}
 
@@ -118,8 +119,12 @@ func (user *User) CreateTopic(mctx *Context, title, body, typ, categoryID string
 			return err
 		}
 		category.TopicsCount, category.UpdatedAt = count+1, time.Now()
-		cols, params := durable.PrepareColumnsWithParams(topicColumns)
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO topics(%s) VALUES (%s)", cols, params), topic.values()...)
+		stmt, err := tx.PrepareContext(ctx, pq.CopyIn("topics", topicColumns...))
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+		_, err = stmt.ExecContext(ctx, topic.values()...)
 		return err
 	})
 	if err != nil {
@@ -139,7 +144,7 @@ func (user *User) CreateTopic(mctx *Context, title, body, typ, categoryID string
 func (user *User) UpdateTopic(mctx *Context, id, title, body, typ, categoryID string, draft bool) (*Topic, error) {
 	ctx := mctx.context
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
-	if title != "" && len(title) < minTitleSize {
+	if title != "" && len(title) < titleSizeLimit {
 		return nil, session.BadDataError(ctx)
 	}
 
@@ -190,8 +195,13 @@ func (user *User) UpdateTopic(mctx *Context, id, title, body, typ, categoryID st
 			topic.TopicType = typ
 		}
 		cols, params := durable.PrepareColumnsWithParams([]string{"title", "body", "category_id", "draft"})
-		vals := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft}
-		_, err = tx.ExecContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), vals...)
+		values := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft}
+		stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID))
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+		_, err = stmt.ExecContext(ctx, values...)
 		return err
 	})
 	if err != nil {

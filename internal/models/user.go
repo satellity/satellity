@@ -116,8 +116,16 @@ func (u *User) UpdateProfile(mctx *Context, nickname, biography string, avatar s
 		u.Biography = biography
 	}
 	u.UpdatedAt = time.Now()
-	columns, params := durable.PrepareColumnsWithParams([]string{"nickname", "biography", "updated_at"})
-	_, err := mctx.database.ExecContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", columns, params, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		cols, posits := durable.PrepareColumnsWithParams([]string{"nickname", "biography", "updated_at"})
+		stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, posits, u.UserID))
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+		_, err = stmt.ExecContext(ctx, u.Nickname, u.Biography, u.UpdatedAt)
+		return err
+	})
 	if err != nil {
 		return session.TransactionError(ctx, err)
 	}
