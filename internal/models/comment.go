@@ -72,22 +72,19 @@ func (user *User) CreateComment(mctx *Context, topicID, body string) (*Comment, 
 		if topic.UpdatedAt.Add(time.Hour * 24 * 30).After(time.Now()) {
 			topic.UpdatedAt = t
 		}
+		cols, posits := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
+		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, posits, topic.TopicID)
+		_, err = tx.ExecContext(ctx, query, topic.CommentsCount, topic.UpdatedAt)
+		if err != nil {
+			return err
+		}
 		c.TopicID = topic.TopicID
 		stmt, err := tx.PrepareContext(ctx, pq.CopyIn("comments", commentColumns...))
 		if err != nil {
 			return err
 		}
+		defer stmt.Close()
 		_, err = stmt.ExecContext(ctx, c.values()...)
-		if err != nil {
-			return err
-		}
-		err = stmt.Close()
-		if err != nil {
-			return err
-		}
-		cols, posits := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
-		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, posits, topic.TopicID)
-		_, err = tx.ExecContext(ctx, query, topic.CommentsCount, topic.UpdatedAt)
 		return err
 	})
 	if err != nil {
