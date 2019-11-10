@@ -12,7 +12,7 @@ class AdminUser extends Component {
   componentDidMount() {
     this.api.user.admin.index().then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
       this.setState({users: resp.data});
     });
@@ -53,7 +53,7 @@ const UserIndex = (props) => {
         </ul>
       </div>
     </div>
-  )
+  );
 }
 
 export default AdminUser;

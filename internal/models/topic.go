@@ -134,7 +134,7 @@ func (user *User) CreateTopic(mctx *Context, title, body, typ, categoryID string
 		return nil, session.TransactionError(ctx, err)
 	}
 	if !topic.Draft {
-		go transmitToCategory(mctx, topic.CategoryID)
+		go emitToCategory(mctx, topic.CategoryID)
 		go upsertStatistic(mctx, "topics")
 	}
 	return topic, nil
@@ -218,14 +218,14 @@ func (user *User) UpdateTopic(mctx *Context, id, title, body, typ, categoryID st
 		return nil, session.TransactionError(ctx, err)
 	}
 	if prevDraft && !topic.Draft {
-		go transmitToCategory(mctx, prevCategoryID)
+		go emitToCategory(mctx, prevCategoryID)
 		go upsertStatistic(mctx, "topics")
 	}
 	if prevCategoryID != "" {
 		if !prevDraft {
-			go transmitToCategory(mctx, prevCategoryID)
+			go emitToCategory(mctx, prevCategoryID)
 		}
-		go transmitToCategory(mctx, topic.CategoryID)
+		go emitToCategory(mctx, topic.CategoryID)
 	}
 	topic.User = user
 	return topic, nil
@@ -268,6 +268,26 @@ func ReadTopic(mctx *Context, id string) (*Topic, error) {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topic, nil
+}
+
+func (user *User) DeleteTopic(mctx *Context, id string) error {
+	ctx := mctx.context
+	if !user.isAdmin() {
+		return session.ForbiddenError(ctx)
+	}
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		topic, err := findTopic(ctx, tx, id)
+		if err != nil || topic == nil {
+			return err
+		}
+
+		_, err = tx.ExecContext(ctx, "DELETE FROM topics WHERE topic_id=$1", topic.TopicID)
+		return err
+	})
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
 }
 
 //DraftTopic read the draft topic

@@ -206,8 +206,8 @@ func readCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
 	return categories, rows.Err()
 }
 
-// transmitToCategory update category's info, e.g.: LastTopicID, TopicsCount
-func transmitToCategory(mctx *Context, id string) (*Category, error) {
+// emitToCategory update category's info, e.g.: LastTopicID, TopicsCount
+func emitToCategory(mctx *Context, id string) (*Category, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}

@@ -45,6 +45,10 @@ class Admin {
   index() {
     return this.api.axios.get('/admin/topics');
   }
+
+  delete(id) {
+    return this.api.axios.delete(`/admin/topics/${id}`)
+  }
 }
 
 export default Topic;
