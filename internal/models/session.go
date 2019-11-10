@@ -30,6 +30,12 @@ func (s *Session) values() []interface{} {
 	return []interface{}{s.SessionID, s.UserID, s.Secret, s.CreatedAt}
 }
 
+func sessionFromRows(row durable.Row) (*Session, error) {
+	var s Session
+	err := row.Scan(&s.SessionID, &s.UserID, &s.Secret, &s.CreatedAt)
+	return &s, err
+}
+
 // CreateSession create a new user session
 func CreateSession(mctx *Context, identity, password, sessionSecret string) (*User, error) {
 	ctx := mctx.context
@@ -79,11 +85,13 @@ func (user *User) addSession(ctx context.Context, tx *sql.Tx, secret string) (*S
 		CreatedAt: time.Now(),
 	}
 
-	cols, params := durable.PrepareColumnsWithParams(sessionColumns)
-	_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO sessions(%s) VALUES(%s)", cols, params), s.values()...)
+	cols, posits := durable.PrepareColumnsWithParams(sessionColumns)
+	stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("INSERT INTO sessions(%s) VALUES(%s)", cols, posits))
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, err
 	}
+	defer stmt.Close()
+	_, err = stmt.ExecContext(ctx, s.values()...)
 	return s, nil
 }
 
@@ -101,12 +109,6 @@ func readSession(ctx context.Context, tx *sql.Tx, uid, sid string) (*Session, er
 		return nil, nil
 	}
 	return s, err
-}
-
-func sessionFromRows(row durable.Row) (*Session, error) {
-	var s Session
-	err := row.Scan(&s.SessionID, &s.UserID, &s.Secret, &s.CreatedAt)
-	return &s, err
 }
 
 const sessionsDDL = `

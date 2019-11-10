@@ -19,11 +19,11 @@ const SolidStatisticID = "540cbd3c-f4eb-479c-bcd8-b5629af57267"
 
 // Statistic is the body of statistic
 type Statistic struct {
-	StatisticID string    `sql:"statistic_id,pk"`
-	Name        string    `sql:"name,notnull"`
-	Count       int64     `sql:"count,notnull"`
-	CreatedAt   time.Time `sql:"created_at"`
-	UpdatedAt   time.Time `sql:"updated_at"`
+	StatisticID string
+	Name        string
+	Count       int64
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 var statisticColumns = []string{"statistic_id", "name", "count", "created_at", "updated_at"}

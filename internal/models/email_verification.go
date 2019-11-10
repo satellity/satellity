@@ -57,7 +57,7 @@ func CreateEmailVerification(mctx *Context, purpose, email, recaptcha string) (*
 		CreatedAt:      time.Now(),
 	}
 
-	var sent bool
+	var should bool
 	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
 		_, err = tx.ExecContext(ctx, "DELETE FROM email_verifications WHERE created_at<$1", time.Now().Add(-24*time.Hour))
 		if err != nil {
@@ -70,16 +70,21 @@ func CreateEmailVerification(mctx *Context, purpose, email, recaptcha string) (*
 		if last != nil && last.CreatedAt.Add(time.Minute).After(time.Now()) {
 			return nil
 		}
-		sent = true
-		columns, params := durable.PrepareColumnsWithParams(emailVerificationColumns)
-		query := fmt.Sprintf("INSERT INTO email_verifications(%s) VALUES (%s)", columns, params)
-		_, err = tx.ExecContext(ctx, query, ev.values()...)
+		should = true
+		cols, posits := durable.PrepareColumnsWithParams(emailVerificationColumns)
+		query := fmt.Sprintf("INSERT INTO email_verifications(%s) VALUES (%s)", cols, posits)
+		stmt, err := tx.PrepareContext(ctx, query)
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+		_, err = stmt.ExecContext(ctx, ev.values()...)
 		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	if sent {
+	if should {
 		if err := clouds.SendVerificationEmail(ctx, purpose, ev.Email, ev.Code); err != nil {
 			return nil, session.ServerError(ctx, err)
 		}
@@ -163,7 +168,7 @@ func Reset(mctx *Context, verificationID, code, password string) error {
 		if err != nil {
 			return err
 		}
-		password, err = validateAndEncryptPassword(ctx, password)
+		encryptedPassword, err := validateAndEncryptPassword(ctx, password)
 		if err != nil {
 			return err
 		}
@@ -171,7 +176,7 @@ func Reset(mctx *Context, verificationID, code, password string) error {
 		if err != nil || user == nil {
 			return err
 		}
-		_, err = tx.ExecContext(ctx, "UPDATE users SET (encrypted_password, updated_at)=($2, $3) WHERE user_id=$1", user.UserID, sql.NullString{String: password, Valid: true}, time.Now())
+		_, err = tx.ExecContext(ctx, "UPDATE users SET (encrypted_password, updated_at)=($2, $3) WHERE user_id=$1", user.UserID, sql.NullString{String: encryptedPassword, Valid: true}, time.Now())
 		return err
 	})
 	if err != nil {
@@ -205,8 +210,13 @@ func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, pass
 			user.GithubID = sql.NullString{String: githubID, Valid: true}
 		}
 
-		columns, params := durable.PrepareColumnsWithParams(userColumns)
-		_, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", columns, params), user.values()...)
+		cols, posits := durable.PrepareColumnsWithParams(userColumns)
+		stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, posits))
+		if err != nil {
+			return nil, err
+		}
+		defer stmt.Close()
+		_, err = stmt.ExecContext(ctx, user.values()...)
 		if err != nil {
 			return nil, err
 		}
