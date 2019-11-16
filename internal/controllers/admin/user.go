@@ -17,7 +17,7 @@ type userImpl struct {
 func registerAdminUser(database *durable.Database, router *httptreemux.Group) {
 	impl := &userImpl{database: database}
 
-	router.GET("/admin/users", impl.index)
+	router.GET("/users", impl.index)
 }
 
 func (impl *userImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {

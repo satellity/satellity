@@ -25,10 +25,10 @@ type categoryRequest struct {
 func registerAdminCategory(database *durable.Database, router *httptreemux.Group) {
 	impl := &adminCategoryImpl{database: database}
 
-	router.POST("/admin/categories", impl.create)
-	router.POST("/admin/categories/:id", impl.update)
-	router.GET("/admin/categories", impl.index)
-	router.GET("/admin/categories/:id", impl.show)
+	router.POST("/categories", impl.create)
+	router.POST("/categories/:id", impl.update)
+	router.GET("/categories", impl.index)
+	router.GET("/categories/:id", impl.show)
 }
 
 func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ map[string]string) {

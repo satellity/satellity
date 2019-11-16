@@ -18,8 +18,8 @@ type topicImpl struct {
 func registerAdminTopic(database *durable.Database, router *httptreemux.Group) {
 	impl := &topicImpl{database: database}
 
-	router.DELETE("/admin/topics/:id", impl.destroy)
-	router.GET("/admin/topics", impl.index)
+	router.DELETE("/topics/:id", impl.destroy)
+	router.GET("/topics", impl.index)
 }
 
 func (impl *topicImpl) destroy(w http.ResponseWriter, r *http.Request, params map[string]string) {
