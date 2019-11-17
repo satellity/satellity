@@ -53,7 +53,7 @@ func TestCategoryCRUD(t *testing.T) {
 			assert.Nil(err)
 			assert.NotNil(new)
 			assert.Equal(category.CategoryID, new.CategoryID)
-			new, err = transmitToCategory(ctx, category.CategoryID)
+			new, err = emitToCategory(ctx, category.CategoryID)
 			assert.Nil(err)
 			assert.NotNil(new)
 			categories, err := ReadAllCategories(ctx)

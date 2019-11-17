@@ -64,6 +64,10 @@ func CreateSession(mctx *Context, identity, password, sessionSecret string) (*Us
 	}
 
 	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		_, err := tx.ExecContext(ctx, "DELETE FROM sessions WHERE session_id IN (SELECT session_id FROM sessions WHERE user_id=$1 ORDER BY created_at DESC OFFSET 5)", user.UserID)
+		if err != nil {
+			return err
+		}
 		s, err := user.addSession(ctx, tx, sessionSecret)
 		if err != nil {
 			return err
