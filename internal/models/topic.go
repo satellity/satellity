@@ -539,29 +539,3 @@ func generateShortID(table string, t time.Time) (string, error) {
 	h, _ := hashids.NewWithData(hd)
 	return h.EncodeInt64([]int64{t.UnixNano()})
 }
-
-const topicsDDL = `
-CREATE TABLE IF NOT EXISTS topics (
-	topic_id              VARCHAR(36) PRIMARY KEY,
-	short_id              VARCHAR(256) NOT NULL,
-	title                 VARCHAR(512) NOT NULL,
-	body                  TEXT NOT NULL,
-	topic_type            VARCHAR(256) NOT NULL,
-	comments_count        BIGINT NOT NULL DEFAULT 0,
-	bookmarks_count       BIGINT NOT NULL DEFAULT 0,
-	likes_count           BIGINT NOT NULL DEFAULT 0,
-	category_id           VARCHAR(36) NOT NULL,
-	user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
-	score                 INTEGER NOT NULL DEFAULT 0,
-	draft                 BOOL NOT NULL DEFAULT false,
-	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
-CREATE UNIQUE INDEX IF NOT EXISTS topics_shortx ON topics(short_id);
-CREATE INDEX IF NOT EXISTS topics_draft_updatedx ON topics(draft, updated_at DESC);
-CREATE INDEX IF NOT EXISTS topics_category_draft_updatedx ON topics(category_id, draft, updated_at DESC);
-CREATE INDEX IF NOT EXISTS topics_user_draft_createdx ON topics(user_id, draft, created_at DESC);
-`
-
-const dropTopicsDDL = `DROP TABLE IF EXISTS topics;`

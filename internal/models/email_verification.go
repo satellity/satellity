@@ -286,5 +286,3 @@ CREATE TABLE IF NOT EXISTS email_verifications (
 CREATE INDEX IF NOT EXISTS email_verifications_email_code_createdx ON email_verifications (email, code, created_at DESC);
 CREATE INDEX IF NOT EXISTS email_verifications_createdx ON email_verifications (created_at DESC);
 `
-
-const dropEmailVerificationDDL = `DROP TABLE IF EXISTS email_verifications;`

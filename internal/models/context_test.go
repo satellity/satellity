@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"io/ioutil"
 	"log"
 	"satellity/internal/configs"
 	"satellity/internal/durable"
@@ -10,6 +11,15 @@ import (
 const (
 	testEnvironment = "test"
 	testDatabase    = "satellity_test"
+
+	dropCategoriesDDL        = `DROP TABLE IF EXISTS categories;`
+	dropCommentsDDL          = `DROP TABLE IF EXISTS comments;`
+	dropEmailVerificationDDL = `DROP TABLE IF EXISTS email_verifications;`
+	dropSessionsDDL          = `DROP TABLE IF EXISTS sessions;`
+	dropStatisticsDDL        = `DROP TABLE IF EXISTS statistics;`
+	dropTopicsDDL            = `DROP TABLE IF EXISTS topics;`
+	dropTopicUsersDDL        = `DROP TABLE IF EXISTS topic_users;`
+	dropUsersDDL             = `DROP TABLE IF EXISTS users;`
 )
 
 func teardownTestContext(mctx *Context) {
@@ -46,20 +56,12 @@ func setupTestContext() *Context {
 		Port:     config.Database.Port,
 		Name:     config.Database.Name,
 	})
-	tables := []string{
-		usersDDL,
-		sessionsDDL,
-		emailVerificationDDL,
-		categoriesDDL,
-		topicsDDL,
-		topicUsersDDL,
-		commentsDDL,
-		statisticsDDL,
+	data, err := ioutil.ReadFile("./schema.sql")
+	if err != nil {
+		log.Panicln(err)
 	}
-	for _, q := range tables {
-		if _, err := db.Exec(q); err != nil {
-			log.Panicln(err)
-		}
+	if _, err := db.Exec(string(data)); err != nil {
+		log.Panicln(err)
 	}
 	database := durable.WrapDatabase(db)
 	return WrapContext(context.Background(), database)

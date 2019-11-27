@@ -282,22 +282,3 @@ func categoryCount(ctx context.Context, tx *sql.Tx) (int64, error) {
 	}
 	return count, nil
 }
-
-// topics_count should use pg int64
-const categoriesDDL = `
-CREATE TABLE IF NOT EXISTS categories (
-	category_id           VARCHAR(36) PRIMARY KEY,
-	name                  VARCHAR(36) NOT NULL,
-	alias                 VARCHAR(128) NOT NULL,
-	description           VARCHAR(512) NOT NULL,
-	topics_count          BIGINT NOT NULL DEFAULT 0,
-	last_topic_id         VARCHAR(36),
-	position              INTEGER NOT NULL DEFAULT 0,
-	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS categories_positionx ON categories (position);
-CREATE UNIQUE INDEX IF NOT EXISTS categories_namex ON categories (name);
-`
-const dropCategoriesDDL = `DROP TABLE IF EXISTS categories;`

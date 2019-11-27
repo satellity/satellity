@@ -114,15 +114,3 @@ func readSession(ctx context.Context, tx *sql.Tx, uid, sid string) (*Session, er
 	}
 	return s, err
 }
-
-const sessionsDDL = `
-CREATE TABLE IF NOT EXISTS sessions (
-	session_id            VARCHAR(36) PRIMARY KEY,
-	user_id               VARCHAR(36) NOT NULL,
-	secret                VARCHAR(1024) NOT NULL,
-	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-CREATE INDEX ON sessions (user_id);
-`
-
-const dropSessionsDDL = `DROP TABLE IF EXISTS sessions;`

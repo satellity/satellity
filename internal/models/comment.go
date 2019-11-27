@@ -285,5 +285,3 @@ CREATE INDEX IF NOT EXISTS comments_topic_createdx ON comments (topic_id, create
 CREATE INDEX IF NOT EXISTS comments_user_createdx ON comments (user_id, created_at);
 CREATE INDEX IF NOT EXISTS comments_score_createdx ON comments (score DESC, created_at);
 `
-
-const dropCommentsDDL = `DROP TABLE IF EXISTS comments;`

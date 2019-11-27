@@ -115,15 +115,3 @@ func generateStatisticID(ID, name string) (string, error) {
 	id, err := uuid.FromBytes(sum)
 	return id.String(), err
 }
-
-const statisticsDDL = `
-CREATE TABLE IF NOT EXISTS statistics (
-	statistic_id          VARCHAR(36) PRIMARY KEY,
-	name                  VARCHAR(512) NOT NULL,
-	count                 BIGINT NOT NULL DEFAULT 0,
-	created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-	updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-`
-
-const dropStatisticsDDL = `DROP TABLE IF EXISTS statistics;`
