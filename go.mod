@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/handlers v1.4.2
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/lib/pq v1.2.0
-	github.com/mailgun/mailgun-go/v3 v3.6.1
+	github.com/mailgun/mailgun-go/v3 v3.6.3
 	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/stretchr/testify v1.4.0
 	github.com/unrolled/render v1.0.1
