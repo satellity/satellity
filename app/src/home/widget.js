@@ -22,13 +22,13 @@ class SiteWidget extends Component {
     return (
       <div className={style.widget}>
         <div className={style.section}>
-          <h2 className={style.site}>
-            {Config.Name}
+          <h2 className={style.title}>
+            {i18n.t('general.welcome')}
           </h2>
-          <ul className={style.features} dangerouslySetInnerHTML={{__html: i18n.t('aside.rules')}}>
+          <ul className={style.rules} dangerouslySetInnerHTML={{__html: i18n.t('aside.rules')}}>
           </ul>
         </div>
-        <div className={style.section}>
+        <div className={style.avatar}>
           <Link to='/avatar'>{i18n.t('avatar.title')}</Link>
         </div>
         <div className={style.action}>

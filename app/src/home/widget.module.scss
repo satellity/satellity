@@ -8,7 +8,6 @@
 .section {
   background: white;
   box-sizing: border-box;
-  padding: .8rem;
   margin-bottom: 1.6rem;
   a {
     color: rgba(218, 40, 16, 0.8);
@@ -17,14 +16,32 @@
     }
   }
 }
-.site {
-  margin: 0 0 .2rem;
+.title {
+  border-bottom: 1px solid #F4F5F5;
   font-weight: normal;
+  font-size: 1rem;
+  text-transform: uppercase;
+  line-height: 3;
+  padding: 0 1rem;
+  margin: 0;
+  &:after {
+    background: $color-main-red;
+    content: '';
+    display: block;
+    width: 5rem;
+    height: .2rem;
+  }
 }
-.features {
+.rules {
+  list-style: inside;
+  padding: 1.2rem 1rem;
   li {
     padding: 0 0 .3rem;
   }
+}
+.avatar {
+  background: white;
+  padding: .8rem;
 }
 .action {
   text-align: center;
