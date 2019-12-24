@@ -142,14 +142,14 @@ class Index extends Component {
           </div>
           {state.loading && loadingView}
           {!state.loading && <ul className={style.topics}> {topics} </ul>}
-          {/* TODO i18n */}
-            {
-              state.topics.length >= state.pagination &&
-                state.offset &&
+          {
+            state.topics.length >= state.pagination && state.offset &&
+              (
                 <div className={style.load}>
-                  <Link to={`${this.props.match.url}?offset=${state.offset}`}>More</Link>
+                  <Link to={`${this.props.match.url}?offset=${state.offset}`}>{i18n.t('general.next')}</Link>
                 </div>
-            }
+              )
+          }
         </main>
         <aside className='column aside'>
           <Widget />
