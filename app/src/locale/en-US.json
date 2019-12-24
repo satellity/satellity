@@ -28,7 +28,8 @@
     "delete": "Delete",
     "draft": "Draft",
     "download": "Download",
-    "submit": "Submit"
+    "submit": "Submit",
+    "sign.in": "Sign In"
   },
   "category": {
   },
@@ -65,6 +66,7 @@
   "account": {
     "new": "Register A New Account",
     "identity": "Username or Email *",
+    "email": "Email *",
     "username": "Username *",
     "password": "Password *",
     "verification": "Verification Code *",

@@ -8,7 +8,7 @@ import Home from '../home/view.js';
 import User from '../users/view.js';
 import Topic from '../topics/view.js';
 import Tool from '../tools/view.js';
-import Modal from './modal.js';
+import Login from './login.js';
 
 class MainLayout extends Component {
   constructor(props) {
@@ -51,6 +51,10 @@ class Header extends Component {
   }
 
   handleLoginClick(e) {
+    let n = e.target.className;
+    if (!(n.includes('close') || n.includes('modal') || n.includes('navi'))) {
+      return;
+    }
     this.setState({logging: !this.state.logging});
   }
 
@@ -75,7 +79,7 @@ class Header extends Component {
           <div className={style.site}><span className={style.name}>{Config.Name}</span></div>
           {profile}
         </header>
-          {this.state.logging && <Modal handleLoginClick={this.handleLoginClick} />}
+        {this.state.logging && <Login handleLoginClick={this.handleLoginClick} />}
       </div>
     )
   }

@@ -1,0 +1,87 @@
+@import '../assets/css/constant.scss';
+
+.modal {
+  background: rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+}
+
+.container {
+  background: white;
+  border-radius: .2rem;
+  box-sizing: border-box;
+  color: black;
+  width: 24rem;
+  max-width: 96%;
+  padding: 3.2rem;
+  position: relative;
+}
+
+.loading {
+  text-align: center;
+}
+
+.content {
+  text-align: center;
+  a {
+    background: rgba(218, 40, 16, 0.8);
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    color: white;
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    width: 100%;
+  }
+}
+
+.close {
+  cursor: pointer;
+  font-size: 1.6rem;
+  text-align: right;
+  padding: 0 .8rem;
+  position: absolute;
+  right: .2rem;
+  top: .2rem;
+}
+
+.title {
+  font-size: 1.125rem;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 1.6rem;
+}
+
+.register {
+  cursor: pointer;
+  text-align: center;
+  margin-top: 1.6rem;
+  opacity: .6;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.reset {
+  cursor: pointer;
+  text-align: center;
+  margin-top: .8rem;
+  opacity: .6;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.or {
+  font-size: .875rem;
+  text-align: center;
+  opacity: .6;
+  padding: 1.6rem 0;
+}

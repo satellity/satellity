@@ -60,66 +60,6 @@
   }
 }
 
-.modal {
-  background: rgba(0,0,0,.5);
-  display: flex;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 1000;
-}
-.modalContainer {
-  background: white;
-  border-radius: .2rem;
-  box-sizing: border-box;
-  color: black;
-  width: 24rem;
-  max-width: 96%;
-  padding: 1.6rem 3.2rem;
-  position: relative;
-}
-.loading {
-  text-align: center;
-}
-.action {
-  cursor: pointer;
-  text-align: right;
-  position: absolute;
-  right: .8rem;
-  top: .6rem;
-}
-.app {
-  font-size: 1.25rem;
-  text-align: center;
-  margin-bottom: 1.6rem;
-}
-.content {
-  text-align: center;
-  a {
-    background: rgba(218, 40, 16, 0.8);
-    border-radius: 0.2rem;
-    box-sizing: border-box;
-    color: white;
-    display: inline-block;
-    padding: 0.4rem 0.8rem;
-    width: 100%;
-  }
-}
-.or {
-  text-align: center;
-  padding: 1.6rem 0;
-}
-.register {
-  color: $color-main-red;
-  cursor: pointer;
-  text-align: center;
-  margin-top: 1.6rem;
-}
 
 @media only screen and (max-width: 64rem) {
   .header {

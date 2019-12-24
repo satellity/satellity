@@ -1,4 +1,4 @@
-import style from './main.module.scss';
+import style from './login.module.scss';
 import React, {Component} from 'react';
 import {Redirect} from 'react-router-dom';
 import {loadReCaptcha, ReCaptcha} from 'react-recaptcha-v3';
@@ -6,7 +6,7 @@ import API from '../api/index.js';
 import Button from '../components/button.js';
 import Loading from '../components/loading.js';
 
-class Modal extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
 
@@ -149,13 +149,13 @@ class Modal extends Component {
             <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
           </div>
           <div>
-            <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
+            <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.sign.in')} />
           </div>
         </form>
         <div className={style.register} onClick={(e) => this.handleClick(e, 'USER')}>
           {i18n.t('account.new')}
         </div>
-        <div className={style.register} onClick={(e) => this.handleClick(e, 'PASSWORD')}>
+        <div className={style.reset} onClick={(e) => this.handleClick(e, 'PASSWORD')}>
             {i18n.t('account.reset.password')}
         </div>
       </div>
@@ -174,7 +174,7 @@ class Modal extends Component {
         <div>
           <form onSubmit={this.handleVerification}>
             <div>
-              <input type='text' name='email' required value={state.email} autoComplete='off' placeholder='Your Email *' onChange={this.handleChange} />
+              <input type='text' name='email' required value={state.email} autoComplete='off' placeholder={i18n.t('account.email')} onChange={this.handleChange} />
             </div>
             <div>
               <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
@@ -221,14 +221,14 @@ class Modal extends Component {
 
 
     return (
-      <div className={style.modal}>
-        <div className={style.modalContainer}>
-          <div onClick={this.props.handleLoginClick} className={style.action}>✕</div>
+      <div className={style.modal} onClick={this.props.handleLoginClick}>
+        <div className={style.container}>
+          <div onClick={this.props.handleLoginClick} className={style.close}>✕</div>
           {state.loading && <div className={style.loading}><Loading /></div>}
           {
             !state.loading &&
             <div>
-              <div className={style.app}>
+              <div className={style.title}>
                 {state.purpose==='SESSION' && i18n.t('account.sign.in')}
                 {state.purpose==='USER' && i18n.t('account.sign.up')}
                 {state.purpose==='PASSWORD' && i18n.t('account.reset.password')}
@@ -245,4 +245,4 @@ class Modal extends Component {
   }
 }
 
-export default Modal;
+export default Login;
