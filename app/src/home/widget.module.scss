@@ -43,8 +43,12 @@
   background: white;
   padding: .8rem;
 }
-.action {
-  text-align: center;
+.new {
+  background: white;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.6rem;
+  padding: .8rem;
 }
 .copyright {
   color: $color-font-light-grey;
