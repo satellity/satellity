@@ -1,7 +1,6 @@
 class ColorUtils {
-
   constructor() {
-    this.colors = ['#EF564F', '#4B93D1', '#9354CA', '#414141'];
+    this.colors = ['#EF564F', '#4B93D1', '#9354CA', '#877D6A', '#F9BA48'];
   }
 
   colour(str, alpha) {
@@ -11,8 +10,7 @@ class ColorUtils {
     }
     alpha = Math.round(alpha * 255);
     let hex = (alpha + 0x10000).toString(16).substr(-2).toUpperCase();
-    console.log(this.colors[i % 3] + hex)
-    return this.colors[i % 3] + hex;
+    return this.colors[i % 5] + hex;
   }
 }
 
