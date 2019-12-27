@@ -14,7 +14,7 @@
   margin-right: .8rem;
 }
 .sep {
-  padding: 0 .4rem;
+  padding: 0 .4rem 0 0;
   &.left {
     padding-left: 0;
   }
@@ -32,6 +32,17 @@
   line-height: 1.2;
   margin: -.25rem 0 .4rem;
   word-break: break-all;
+}
+.node {
+  background: #f19794;
+  border-radius: .2rem;
+  color: white;
+  font-size: .75rem;
+  margin-right: .6rem;
+  padding: 1px .2rem;
+}
+.fullname {
+  margin-right: .4rem;
 }
 .external {
   font-size: .75rem;
@@ -52,7 +63,7 @@
   background: rgba($color-main-red, $color-main-red-alpha);
   border-radius: 1.6rem;
   color: white;
-  padding: .1rem .8rem;
+  padding: .1rem .6rem;
 }
 
 @media only screen and (max-width: 64rem) {

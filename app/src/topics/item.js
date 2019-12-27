@@ -22,7 +22,7 @@ class TopicItem extends Component {
     let topic = this.state.topic, comments;
     if (topic.comments_count > 0) {
       comments = (
-        <span className={style.count} style={{backgroundColor: this.color.colour(topic.topic_id)}}> {topic.comments_count} </span>
+        <span className={style.count}> {topic.comments_count} </span>
       )
     }
     return (
@@ -46,14 +46,13 @@ class TopicItem extends Component {
             </a>
           }
           <div>
+            <Link className={style.node} to={{pathname: "/", search: `?c=${topic.category.name}`}} style={{color: this.color.colour(topic.category.name, 1), backgroundColor: this.color.colour(topic.category.name, 0.3)}}>{topic.category.alias}</Link>
             {
               !this.state.profile &&
-              <span>
+                <span className={style.fullname}>
                 <Link to={`/users/${topic.user.user_id}`}>{topic.user.nickname.slice(0,16)}</Link>
               </span>
             }
-            <span className={`${style.sep} ${this.state.profile ? style.left : ''}`}>{i18n.t('topic.in')}</span>
-            <Link to={{pathname: "/", search: `?c=${topic.category.name}`}}>{topic.category.alias}</Link>
             <span className={style.sep}>{i18n.t('topic.at')}</span>
             <TimeAgo date={topic.created_at} />
               {topic.topic_type === 'LINK' && <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} className={style.comments}>{i18n.t('topic.comments')}</Link>}
