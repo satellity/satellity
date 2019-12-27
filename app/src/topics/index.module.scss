@@ -5,18 +5,18 @@
   text-align: center;
 }
 .nodes {
-  background: $color-bg-light-grey;
+  background: white;
+  border-bottom: 1px solid #F4F5F5;
   padding: 0.8rem;
 }
 .node {
   border-radius: .2rem;
   display: inline-block;
-  font-size: 1rem;
+  font-size: 1.125rem;
   padding: .2rem .8rem;
   margin-right: .4rem;
   &:hover, &.current {
-    color: white;
-    background: rgba($color-main-red, 0.8);
+    color: rgba($color-main-red, 0.8);
   }
 }
 .topics {
