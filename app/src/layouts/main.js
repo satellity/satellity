@@ -73,7 +73,7 @@ class Header extends Component {
     return (
       <div>
         <header className={style.header}>
-          <div className={style.site}><span className={style.name}>{Config.Name}</span><FontAwesomeIcon className={style.talk} icon={['far', 'comments']} /></div>
+          <Link className={style.site} to='/'><span className={style.name}>{Config.Name}</span><FontAwesomeIcon className={style.talk} icon={['far', 'comments']} /></Link>
 
           <div className={style.menus}>
             <Link className={`${style.menu} ${window.location.pathname === '/' ? style.current : ''}` } to='/'>

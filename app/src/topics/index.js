@@ -121,19 +121,24 @@ class Index extends Component {
       )
     });
 
-    let seoView;
+    let title, description;
     if (!!state.category.name) {
-      seoView = (
-        <Helmet>
-          <title>{`${state.category.alias} - ${Config.Name}`}</title>
-          <meta name='description' content={state.category.description} />
-        </Helmet>
-      )
+      title = `${state.category.alias} - ${Config.Name}`;
+      description = state.category.description;
+    } else {
+      title = `${i18n.t('site.title')} - ${Config.Name}`;
+      description = i18n.t('site.description');
     }
 
     return (
       <div className='container'>
-        {!state.loading && seoView}
+          {
+            !state.loading &&
+              <Helmet>
+                <title>{title}</title>
+                <meta name='description' content={description} />
+              </Helmet>
+          }
         <main className='column main'>
           <div className={style.nodes}>
             <Link to='/'

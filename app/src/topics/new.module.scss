@@ -5,10 +5,24 @@
   text-align: center;
   padding: .8rem 0 0;
 }
+.title {
+  background: white;
+  border-bottom: 1px solid #F4F5F5;
+  text-transform: uppercase;
+  line-height: 3;
+  padding: 0 1.2rem;
+  &:after {
+    background: $color-main-purple;
+    content: '';
+    display: block;
+    width: 3.6rem;
+    height: .2rem;
+  }
+}
 .rules {
-  border-top: .3rem solid $color-main-purple;
   background-color: white;
-  padding: .8rem;
+  list-style: inside;
+  padding: 1.2rem;
   li {
     padding: 0 0 .4rem;
   }

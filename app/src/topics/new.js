@@ -257,7 +257,8 @@ class New extends Component {
           </div>
         </main>
         <aside className='column aside'>
-          <ol className={style.rules} dangerouslySetInnerHTML={{__html: i18n.t('topic.rules')}}></ol>
+          <div className={style.title}>Rules</div>
+          <ul className={style.rules} dangerouslySetInnerHTML={{__html: i18n.t('topic.rules')}}></ul>
         </aside>
       </div>
     )
