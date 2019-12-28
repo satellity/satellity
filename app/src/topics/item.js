@@ -46,7 +46,7 @@ class TopicItem extends Component {
             </a>
           }
           <div>
-            <Link className={style.node} to={{pathname: "/", search: `?c=${topic.category.name}`}} style={{color: this.color.colour(topic.category.name, 1), backgroundColor: this.color.colour(topic.category.name, 0.3)}}>{topic.category.alias}</Link>
+            <Link className={style.node} to={`/categories/${topic.category.name}`} style={{color: this.color.colour(topic.category.name, 1), backgroundColor: this.color.colour(topic.category.name, 0.3)}}>{topic.category.alias}</Link>
             {
               !this.state.profile &&
                 <span className={style.fullname}>
