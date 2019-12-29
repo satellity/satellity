@@ -103,6 +103,11 @@ ul, ol {
 img {
   max-width: 100%;
 }
+label {
+  color: rgba(0, 0, 0, .6);
+  display: block;
+  margin-bottom: .2rem;
+}
 
 .wrapper {
   margin: 0 auto;

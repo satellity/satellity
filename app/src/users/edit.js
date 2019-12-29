@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom';
 import ReactCrop from 'react-image-crop';
 import API from '../api/index.js';
 import Button from '../components/button.js';
+import Topic from '../topics/view.js';
 
 class Edit extends Component {
   constructor(props) {
@@ -174,6 +175,7 @@ class Edit extends Component {
           </div>
         </main>
         <aside className='column aside'>
+          <Topic.Create />
         </aside>
       </div>
     )

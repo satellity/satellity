@@ -194,9 +194,6 @@ class New extends Component {
         <div className={style.categories}>
           {categories}
         </div>
-        <div className={style.type}>
-          <input name='topic_type' type='checkbox' checked={state.topic_type === 'LINK'} onChange={this.handleChange} /> {i18n.t('topic.link')}
-        </div>
         <div>
           <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' placeholder={i18n.t('topic.placeholder.title')} onChange={this.handleChange} />
         </div>

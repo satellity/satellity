@@ -64,10 +64,10 @@ class Show extends Component {
           {profile}
         </aside>
         <main className='column main'>
-          <div className={style.topics}>
-            <div className={style.header}>
+          <div className={style.title}>
               {i18n.t('user.topics')}
-            </div>
+          </div>
+          <div className={style.topics}>
             <ul>
               {topics}
             </ul>
