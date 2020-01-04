@@ -225,6 +225,11 @@ class New extends Component {
                       placeholder: 'Text (optional)'
                     }}
                     onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
+                    editorDidMount={editor => {
+                      this.instance = editor;
+                      this.instance.refresh();
+                    }}
+
                   />
                 }
                     {
