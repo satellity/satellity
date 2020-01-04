@@ -105,7 +105,9 @@ class Show extends Component {
               {action}
             </h1>
             <div className={style.info}>
-              {state.user.nickname}
+              <Link to={`/users/${state.user.user_id}`}>
+                {state.user.nickname}
+              </Link>
               <span className={style.sep}>{i18n.t('topic.in')}</span>
               <Link to={{pathname: "/", search: `?c=${state.category.name}`}}>{state.category.alias}</Link>
               <span className={style.sep}>{i18n.t('topic.at')}</span>
