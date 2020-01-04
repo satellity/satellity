@@ -57,7 +57,7 @@ class New extends Component {
     }
     this.api.topic.show(id).then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
       let data = resp.data;
       if (!data) {
@@ -73,7 +73,7 @@ class New extends Component {
     });
     this.api.category.index().then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
       const data = resp.data;
       let category_id = this.state.category_id;
@@ -128,7 +128,7 @@ class New extends Component {
   handleSubmit(e) {
     e.preventDefault();
     if (this.state.submitting) {
-      return
+      return;
     }
     this.setState({submitting: true, draft: false}, () => {
       this.submitForm();
@@ -148,11 +148,14 @@ class New extends Component {
       this.api.topic.update(this.state.topic_id, this.state).then((resp) => {
         this.setState({submitting: false});
         if (resp.error) {
-          return
+          return;
+        }
+        if (this.state.draft) {
+          return;
         }
         history.push(`/topics/${resp.data.topic_id}`);
       });
-      return
+      return;
     }
     this.api.topic.create(this.state).then((resp) => {
       if (resp.error) {
