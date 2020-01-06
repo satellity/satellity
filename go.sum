@@ -41,6 +41,8 @@ github.com/mailgun/mailgun-go/v3 v3.6.1 h1:iq7WXvUTp+VmckGIOvA0049mocwxNR1Ga3efK
 github.com/mailgun/mailgun-go/v3 v3.6.1/go.mod h1:E81I5Agcfi/u1szdehi6p6ttdRX/UD3Rq2SrUzwyFIU=
 github.com/mailgun/mailgun-go/v3 v3.6.3 h1:dkPP10w15Igt0uM313CStG9+gd/XqdiqO0862zNAXbs=
 github.com/mailgun/mailgun-go/v3 v3.6.3/go.mod h1:ZjVnH8S0dR2BLjvkZc/rxwerdcirzlA12LQDuGAadR0=
+github.com/mailgun/mailgun-go/v3 v3.6.4 h1:+cvbZRgLSHivbz/w1iWLmxVl6Bqf4geD2D7QMj4+8PE=
+github.com/mailgun/mailgun-go/v3 v3.6.4/go.mod h1:ZjVnH8S0dR2BLjvkZc/rxwerdcirzlA12LQDuGAadR0=
 github.com/mailru/easyjson v0.0.0-20180823135443-60711f1a8329 h1:2gxZ0XQIU/5z3Z3bUBu+FXuk2pFbkN6tcwi/pjyaDic=
 github.com/mailru/easyjson v0.0.0-20180823135443-60711f1a8329/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
