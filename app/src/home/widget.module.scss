@@ -57,7 +57,13 @@
   margin-top: 1.6rem;
 }
 @media only screen and (max-width: 64rem) {
+  .new {
+    display: none;
+  }
   .signIn, .newTopic {
     padding: .8rem;
+  }
+  .copyright {
+    padding: 0 0 .8rem .8rem ;
   }
 }
