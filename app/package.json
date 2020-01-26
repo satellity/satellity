@@ -26,7 +26,7 @@
     "react-codemirror2": "^6.0.0",
     "react-dom": "^16.12.0",
     "react-helmet": "^5.2.1",
-    "react-image-crop": "^8.4.2",
+    "react-image-crop": "^8.5.0",
     "react-recaptcha-v3": "^1.1.0",
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
