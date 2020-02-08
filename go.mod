@@ -16,5 +16,5 @@ require (
 	github.com/unrolled/render v1.0.1
 	go.uber.org/zap v1.13.0
 	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
-	gopkg.in/yaml.v2 v2.2.7
+	gopkg.in/yaml.v2 v2.2.8
 )
