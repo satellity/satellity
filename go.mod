@@ -14,7 +14,7 @@ require (
 	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/stretchr/testify v1.4.0
 	github.com/unrolled/render v1.0.2
-	go.uber.org/zap v1.13.0
+	go.uber.org/zap v1.14.1
 	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
 	gopkg.in/yaml.v2 v2.2.8
 )
