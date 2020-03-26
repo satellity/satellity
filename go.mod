@@ -12,7 +12,7 @@ require (
 	github.com/lib/pq v1.3.0
 	github.com/mailgun/mailgun-go/v3 v3.6.4
 	github.com/speps/go-hashids v2.0.0+incompatible
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	github.com/unrolled/render v1.0.2
 	go.uber.org/zap v1.14.1
 	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
