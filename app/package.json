@@ -24,7 +24,7 @@
     "npm-check-updates": "^4.0.1",
     "react": "^16.13.1",
     "react-codemirror2": "^6.0.0",
-    "react-dom": "^16.12.0",
+    "react-dom": "^16.13.0",
     "react-helmet": "^5.2.1",
     "react-image-crop": "^8.5.0",
     "react-recaptcha-v3": "^1.1.0",
