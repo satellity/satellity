@@ -8799,10 +8799,10 @@ npm-bundled@^1.1.1:
   dependencies:
     npm-normalize-package-bin "^1.0.1"
 
-npm-check-updates@^4.0.6:
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/npm-check-updates/-/npm-check-updates-4.0.6.tgz#4d13f031ca78670a1fb524dc8a527edc9f2a88b0"
-  integrity sha512-1FSPF/IZa2zLV2dyiz3b4NTZm+e1LYciedZSFHsPy50aZ4r1eyzGVYOHxCVQtPa/uKH+7DaVn7yXeipJx06fxg==
+npm-check-updates@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/npm-check-updates/-/npm-check-updates-4.1.0.tgz#e3490c162af4d57b56252d04bfe6bf5507b246f2"
+  integrity sha512-33WkkvIK9dcv3guKx6T/wEW670G/fSiOZ/+arOroAneYh3C8jUX5lDWg6+f8Tc7QZugxkeBtHPD6yK487dtI5w==
   dependencies:
     chalk "^3.0.0"
     cint "^8.2.1"
@@ -8815,6 +8815,7 @@ npm-check-updates@^4.0.6:
     libnpmconfig "^1.2.1"
     lodash "^4.17.15"
     node-alias "^1.0.4"
+    p-map "^4.0.0"
     pacote "^11.1.4"
     progress "^2.0.3"
     prompts "^2.3.2"
@@ -9267,6 +9268,13 @@ p-map@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/p-map/-/p-map-3.0.0.tgz#d704d9af8a2ba684e2600d9a215983d4141a979d"
   integrity sha512-d3qXVTF/s+W+CdJ5A29wywV2n8CQQYahlgz2bFiA+4eVNJbHJodPZ+/gXwPGh0bOqA+j8S+6+ckmvLGPk1QpxQ==
+  dependencies:
+    aggregate-error "^3.0.0"
+
+p-map@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/p-map/-/p-map-4.0.0.tgz#bb2f95a5eda2ec168ec9274e06a747c3e2904d2b"
+  integrity sha512-/bjOqmgETBYB5BoEeGVea8dmvHb2m9GLy1E9W43yeyfP6QQCZGFNa+XRceJEuDB6zqr+gKpIAmlLebMpykw/MQ==
   dependencies:
     aggregate-error "^3.0.0"
 
