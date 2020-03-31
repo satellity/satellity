@@ -23,7 +23,7 @@
     "noty": "^3.2.0-beta",
     "npm-check-updates": "^4.0.6",
     "react": "^16.13.1",
-    "react-codemirror2": "^6.0.0",
+    "react-codemirror2": "^7.1.0",
     "react-dom": "^16.13.1",
     "react-helmet": "^5.2.1",
     "react-image-crop": "^8.5.0",
