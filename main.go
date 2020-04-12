@@ -13,7 +13,6 @@ import (
 	"satellity/internal/controllers"
 	"satellity/internal/durable"
 	"satellity/internal/middlewares"
-	"strings"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/gorilla/handlers"
@@ -53,11 +52,7 @@ func main() {
 		if err != nil {
 			log.Panicln(err)
 		}
-		back := ".."
-		if strings.Contains(dir, "cmd") {
-			back = "../.."
-		}
-		options.Config = path.Join(dir, back, "internal/configs/config.yaml")
+		options.Config = path.Join(dir, "internal/configs/config.yaml")
 	}
 
 	if err := configs.Init(options.Config, options.Environment); err != nil {

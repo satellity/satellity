@@ -19,7 +19,7 @@ Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!
 
 ## Built With
 
-1. Go version go1.13.3 darwin/amd64
+1. Go version go1.4 darwin/amd64
 2. postgres (PostgreSQL) 11.4
 3. react ^16.10.2
 
@@ -39,7 +39,7 @@ Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!
 
 1. `cd ./internal`, copy `config/config.example` to `config/config.yaml`. Replace config with yours.
 2. Prepare and start database, the database schema under `./internal/models/schema.sql`, [how to install postgresql](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04).
-3. `cd ./ && make install && make build && ./bin/satellity` to start Golang server
+3. `cd ./ && go build && ./satellity` to start Golang server
 
 ### Frontend
 
