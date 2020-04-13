@@ -8794,10 +8794,10 @@ npm-bundled@^1.1.1:
   dependencies:
     npm-normalize-package-bin "^1.0.1"
 
-npm-check-updates@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/npm-check-updates/-/npm-check-updates-4.1.0.tgz#e3490c162af4d57b56252d04bfe6bf5507b246f2"
-  integrity sha512-33WkkvIK9dcv3guKx6T/wEW670G/fSiOZ/+arOroAneYh3C8jUX5lDWg6+f8Tc7QZugxkeBtHPD6yK487dtI5w==
+npm-check-updates@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/npm-check-updates/-/npm-check-updates-4.1.2.tgz#700f52b17999aa914a5fbdd9c1a0a51d093d89c0"
+  integrity sha512-CRO20Z12fygKL/ow4j4pnpyxevda/PuFbWpsF5E9sFW0B+M3d32A1dD+fTHLDjgderhKXr64W8qQ6M/Gq8OLiw==
   dependencies:
     chalk "^3.0.0"
     cint "^8.2.1"
@@ -8816,7 +8816,7 @@ npm-check-updates@^4.1.0:
     prompts "^2.3.2"
     rc-config-loader "^3.0.0"
     requireg "^0.2.2"
-    semver "^7.1.3"
+    semver "^7.2.1"
     semver-utils "^1.1.4"
     spawn-please "^0.3.0"
     update-notifier "^4.1.0"
@@ -11521,10 +11521,10 @@ semver@7.0.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.0.0.tgz#5f3ca35761e47e05b206c6daff2cf814f0316b8e"
   integrity sha512-+GB6zVA9LWh6zovYQLALHwv5rb2PHGlJi3lfiqIHxR0uuwCgefcOJc59v9fv1w8GbStwxuuqqAjI9NMAOOgq1A==
 
-semver@^7.0.0, semver@^7.1.1, semver@^7.1.3:
-  version "7.1.3"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.1.3.tgz#e4345ce73071c53f336445cfc19efb1c311df2a6"
-  integrity sha512-ekM0zfiA9SCBlsKa2X1hxyxiI4L3B6EbVJkkdgQXnSEEaHlGdvyodMruTiulSRWMMB4NeIuYNMC9rTKTz97GxA==
+semver@^7.0.0, semver@^7.1.1, semver@^7.1.3, semver@^7.2.1:
+  version "7.2.2"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.2.2.tgz#d01432d74ed3010a20ffaf909d63a691520521cd"
+  integrity sha512-Zo84u6o2PebMSK3zjJ6Zp5wi8VnQZnEaCP13Ul/lt1ANsLACxnJxq4EEm1PY94/por1Hm9+7xpIswdS5AkieMA==
 
 semver@~5.3.0:
   version "5.3.0"
