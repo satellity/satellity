@@ -10656,10 +10656,10 @@ react-helmet@^5.2.1:
     react-fast-compare "^2.0.2"
     react-side-effect "^1.1.0"
 
-react-image-crop@^8.6.1:
-  version "8.6.1"
-  resolved "https://registry.yarnpkg.com/react-image-crop/-/react-image-crop-8.6.1.tgz#449a94875b32ef7e7dad87f00a8db4737ec45d13"
-  integrity sha512-t8QTWLGTHzLR+YshN89E6AeO2sBkE8+yiE2fZh22plr0Bc+bJiqf7MX+qPf3NsTUaTq2Kro/4EOEZLtNNKtkyw==
+react-image-crop@^8.6.2:
+  version "8.6.2"
+  resolved "https://registry.yarnpkg.com/react-image-crop/-/react-image-crop-8.6.2.tgz#bac0963ab517cdfba42b3a091774de4c3f4f3ece"
+  integrity sha512-mi2UwL1ZhMk/L9DhxnRK/V91HYXNNaeBzrX+IfZWPEun6H5jnrts14K2FEBKMEcyz/5anNk8TiU94yo+dSVDog==
   dependencies:
     clsx "^1.0.4"
     core-js "^3.4.2"
