@@ -9,7 +9,7 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/gorilla/handlers v1.4.2
 	github.com/jessevdk/go-flags v1.4.0
-	github.com/lib/pq v1.3.0
+	github.com/lib/pq v1.4.0
 	github.com/mailgun/mailgun-go/v3 v3.6.4
 	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/stretchr/testify v1.5.1
