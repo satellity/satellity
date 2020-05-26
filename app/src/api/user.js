@@ -1,5 +1,5 @@
 import KJUR from 'jsrsasign';
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import Cookies from 'js-cookie';
 import Base64 from '../components/base64.js';
 
@@ -22,7 +22,7 @@ class User {
   }
 
   signIn(email, password, provider, code) {
-    let pwd = uuid().toLowerCase();
+    let pwd = uuidv4().toLowerCase();
     let ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
     let pub = ec.generateKeyPairHex().ecpubhex;
     let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
@@ -52,7 +52,7 @@ class User {
       let data = {purpose: params.purpose, verification_id: params.verification_id, code: params.code, password: params.password};
       return this.api.axios.post(`/email_verifications/${params.verification_id}`, data)
     }
-    let pwd = uuid().toLowerCase();
+    let pwd = uuidv4().toLowerCase();
     let ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
     let pub = ec.generateKeyPairHex().ecpubhex;
     let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);

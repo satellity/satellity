@@ -1,7 +1,7 @@
 import forge from 'node-forge';
 import moment from 'moment';
 import KJUR from 'jsrsasign';
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import Noty from 'noty';
@@ -98,7 +98,7 @@ function sign(uid, sid, privateKey, method, uri, body) {
     uid: uid,
     sid: sid,
     exp: expire,
-    jti: uuid(),
+    jti: uuidv4(),
     sig: md.digest().toHex()
   };
   let sHeader = JSON.stringify(oHeader);
