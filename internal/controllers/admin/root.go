@@ -12,4 +12,5 @@ func RegisterAdminRoutes(database *durable.Database, router *httptreemux.Group) 
 	registerAdminUser(database, api)
 	registerAdminCategory(database, api)
 	registerAdminTopic(database, api)
+	registerAdminComment(database, api)
 }

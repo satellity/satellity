@@ -6,6 +6,7 @@ import Index from './index.js';
 import Categories from './categories/index.js';
 import Users from './users/index.js';
 import Topics from './topics/index.js';
+import Comments from './comments/index.js';
 import CategoriesNew from './categories/new.js';
 import CategoriesEdit from './categories/edit.js';
 import API from '../api/index.js';
@@ -35,6 +36,7 @@ class AdminRoute extends Component {
           <Link to='/admin' className='navi'>Dashboard</Link>
           <Link to='/admin/users' className='navi'>Users</Link>
           <Link to='/admin/topics' className='navi'>Topics</Link>
+          <Link to='/admin/comments' className='navi'>Comments</Link>
           <Link to='/admin/categories' className='navi'>Categories</Link>
         </header>
         <div className='bg-container'>
@@ -42,6 +44,7 @@ class AdminRoute extends Component {
             <Route exact path={`${match.url}`} component={Index} />
             <Route exact path={`${match.url}/users`} component={Users} />
             <Route exact path={`${match.url}/topics`} component={Topics} />
+            <Route exact path={`${match.url}/comments`} component={Comments} />
             <Route exact path={`${match.url}/categories`} component={Categories} />
             <Route exact path={`${match.url}/categories/new`} component={CategoriesNew} />
             <Route path={`${match.url}/categories/:id/edit`} component={CategoriesEdit} />

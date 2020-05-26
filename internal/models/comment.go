@@ -206,7 +206,50 @@ func (user *User) ReadComments(mctx *Context, offset time.Time) ([]*Comment, err
 	return comments, nil
 }
 
-//DeleteComment delete a comment by ID
+// ReadComments read all comments, parameters: offset default time.Now()
+func ReadComments(mctx *Context, offset time.Time) ([]*Comment, error) {
+	ctx := mctx.context
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+
+	var comments []*Comment
+	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM comments WHERE updated_at<$1 ORDER BY updated_at DESC LIMIT $2", strings.Join(commentColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		userIds := []string{}
+		for rows.Next() {
+			comment, err := commentFromRows(rows)
+			if err != nil {
+				return err
+			}
+			userIds = append(userIds, comment.UserID)
+			comments = append(comments, comment)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		userSet, err := readUserSet(ctx, tx, userIds)
+		if err != nil {
+			return err
+		}
+		for i, comment := range comments {
+			comments[i].User = userSet[comment.UserID]
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return comments, nil
+}
+
+// DeleteComment delete a comment by ID
 func (user *User) DeleteComment(mctx *Context, id string) error {
 	ctx := mctx.context
 	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {

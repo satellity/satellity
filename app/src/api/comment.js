@@ -1,6 +1,7 @@
 class Comment {
   constructor(api) {
     this.api = api;
+    this.admin = new Admin(api);
   }
 
   index(id) {
@@ -23,6 +24,20 @@ class Comment {
 
   delete(id) {
     return this.api.axios.delete(`/comments/${id}`);
+  }
+}
+
+class Admin {
+  constructor(api) {
+    this.api = api;
+  }
+
+  index() {
+    return this.api.axios.get('/admin/comments');
+  }
+
+  delete(id) {
+    return this.api.axios.delete(`/admin/comments/${id}`)
   }
 }
 
