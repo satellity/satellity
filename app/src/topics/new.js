@@ -203,10 +203,11 @@ class New extends Component {
         {
           state.topic_type === 'POST' &&
             <div className={style.actions}>
+              { state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye-slash']} onClick={this.handlePreview} /> }
+              { !state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> }
               <a className={style.markdown} href='https://guides.github.com/features/mastering-markdown/' target='_blank' rel='noopener noreferrer'>
                 <FontAwesomeIcon className={style.eye} icon={['fab', 'markdown']} />
               </a>
-              <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} />
             </div>
         }
         {

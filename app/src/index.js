@@ -10,12 +10,12 @@ import NoMatch from './layouts/sink.js';
 import AdminRoute from './admin/admin.js';
 import Oauth from './users/oauth.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBookmark, faComment, faComments, faEdit, faEye, faTrashAlt, faHeart } from '@fortawesome/free-regular-svg-icons';
+import { faBookmark, faComment, faComments, faEdit, faEye, faEyeSlash, faTrashAlt, faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faChalkboard, faEllipsisV, faHome, faPlus, faUsersCog, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { faMarkdown } from '@fortawesome/free-brands-svg-icons';
 library.add(
   faBookmark, faComment, faComments,
-  faEdit, faEye, faTrashAlt,
+  faEdit, faEye, faEyeSlash, faTrashAlt,
   faHeart, faExternalLinkAlt,
   faChalkboard, faEllipsisV, faHome,
   faPlus, faUsersCog, faMarkdown
