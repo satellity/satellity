@@ -23,6 +23,7 @@ class Index extends Component {
     }
     this.state = {
       id: props.match.params.id || 'latest',
+      user: {},
       topics: [],
       categories: categories,
       category: {},
@@ -34,6 +35,7 @@ class Index extends Component {
   }
 
   componentDidMount() {
+    const user = this.api.user.local();
     this.api.category.index().then((resp) => {
       if (resp.error) {
         return
@@ -51,7 +53,7 @@ class Index extends Component {
           }
         }
       }
-      this.setState({category: current, category_id: category_id, categories: resp.data}, () => {
+      this.setState({user: user, category: current, category_id: category_id, categories: resp.data}, () => {
         this.fetchTopics(category_id);
       });
     });
@@ -109,7 +111,7 @@ class Index extends Component {
 
     const topics = state.topics.map((topic) => {
       return (
-        <TopicItem topic={topic} key={topic.topic_id}/>
+        <TopicItem user={state.user} topic={topic} key={topic.topic_id}/>
       )
     });
 

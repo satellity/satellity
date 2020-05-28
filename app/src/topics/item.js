@@ -12,6 +12,7 @@ class TopicItem extends Component {
 
     this.state = {
       profile: !!props.profile,
+      user: props.user,
       topic: props.topic
     };
     this.color = new ColorUtils();
@@ -19,7 +20,8 @@ class TopicItem extends Component {
 
   render() {
     const i18n = window.i18n;
-    let topic = this.state.topic, comments;
+    let state = this.state;
+    let topic = state.topic, comments;
     if (topic.comments_count > 0) {
       comments = (
         <span className={style.count}> {topic.comments_count} </span>
@@ -55,7 +57,10 @@ class TopicItem extends Component {
             }
             <span className={style.sep}>{i18n.t('topic.at')}</span>
             <TimeAgo date={topic.created_at} />
-              {topic.topic_type === 'LINK' && <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} className={style.comments}>{i18n.t('topic.comments')}</Link>}
+            {
+              state.user.user_id === topic.user_id && <Link to={`/topics/${topic.topic_id}/edit`} className={style.edit}> <FontAwesomeIcon icon={['far', 'edit']} /> </Link>
+            }
+            {topic.topic_type === 'LINK' && <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} className={style.comments}>{i18n.t('topic.comments')}</Link>}
           </div>
         </div>
         <div className={style.comment}>
