@@ -34,7 +34,7 @@ class SiteWidget extends Component {
           <Link to='/avatar'>{i18n.t('avatar.title')}</Link>
         </div>
         <div className={style.copyright}>
-          © 2019 MIT license
+          © 2020 MIT license
         </div>
       </div>
     )
