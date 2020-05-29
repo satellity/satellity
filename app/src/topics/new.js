@@ -248,7 +248,7 @@ class New extends Component {
         }
         <div className={style.submit}>
           <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
-          {!state.submitting && <span className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</span>}
+          {!state.submitting && state.topic_id === "" && <span className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</span>}
         </div>
       </form>
     )
