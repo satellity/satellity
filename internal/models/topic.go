@@ -33,6 +33,7 @@ type Topic struct {
 	CommentsCount  int64
 	BookmarksCount int64
 	LikesCount     int64
+	ViewsCount     int64
 	CategoryID     string
 	UserID         string
 	Score          int
@@ -46,15 +47,15 @@ type Topic struct {
 	Category       *Category
 }
 
-var topicColumns = []string{"topic_id", "short_id", "title", "body", "topic_type", "comments_count", "bookmarks_count", "likes_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
+var topicColumns = []string{"topic_id", "short_id", "title", "body", "topic_type", "comments_count", "bookmarks_count", "likes_count", "views_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
 
 func (t *Topic) values() []interface{} {
-	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.TopicType, t.CommentsCount, t.BookmarksCount, t.LikesCount, t.CategoryID, t.UserID, t.Score, t.Draft, t.CreatedAt, t.UpdatedAt}
+	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.TopicType, t.CommentsCount, t.BookmarksCount, t.LikesCount, t.ViewsCount, t.CategoryID, t.UserID, t.Score, t.Draft, t.CreatedAt, t.UpdatedAt}
 }
 
 func topicFromRows(row durable.Row) (*Topic, error) {
 	var t Topic
-	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.TopicType, &t.CommentsCount, &t.BookmarksCount, &t.LikesCount, &t.CategoryID, &t.UserID, &t.Score, &t.Draft, &t.CreatedAt, &t.UpdatedAt)
+	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.TopicType, &t.CommentsCount, &t.BookmarksCount, &t.LikesCount, &t.ViewsCount, &t.CategoryID, &t.UserID, &t.Score, &t.Draft, &t.CreatedAt, &t.UpdatedAt)
 	return &t, err
 }
 
@@ -325,6 +326,7 @@ func ReadTopicWithRelation(mctx *Context, id string, user *User) (*Topic, error)
 	if err != nil {
 		return topic, session.TransactionError(ctx, err)
 	}
+	topic.incrTopicViewsCount(mctx)
 	return topic, nil
 }
 
@@ -525,6 +527,15 @@ func topicsCountByCategory(ctx context.Context, tx *sql.Tx, id string) (int64, e
 	var count int64
 	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topics WHERE category_id=$1 AND draft=false", id).Scan(&count)
 	return count, err
+}
+
+func (topic *Topic) incrTopicViewsCount(mctx *Context) error {
+	topic.ViewsCount += 1
+	_, err := mctx.database.Exec("UPDATE topics SET views_count=$1 WHERE topic_id=$2", topic.ViewsCount, topic.TopicID)
+	if err != nil {
+		return session.TransactionError(mctx.context, err)
+	}
+	return nil
 }
 
 func topicsCount(ctx context.Context, tx *sql.Tx) (int64, error) {

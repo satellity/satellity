@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS topics (
   comments_count        BIGINT NOT NULL DEFAULT 0,
   bookmarks_count       BIGINT NOT NULL DEFAULT 0,
   likes_count           BIGINT NOT NULL DEFAULT 0,
+  views_count           BIGINT NOT NULL DEFAULT 0,
   category_id           VARCHAR(36) NOT NULL,
   user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
   score                 INTEGER NOT NULL DEFAULT 0,

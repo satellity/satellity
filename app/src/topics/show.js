@@ -112,6 +112,7 @@ class Show extends Component {
               <Link to={{pathname: "/", search: `?c=${state.category.name}`}}>{state.category.alias}</Link>
               <span className={style.sep}>{i18n.t('topic.at')}</span>
               <TimeAgo date={state.created_at} />
+              <span className={style.views}>{state.views_count} views</span>
             </div>
           </div>
           <img src={state.user.avatar_url} className={style.avatar} alt={state.user.nickname} />
