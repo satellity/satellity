@@ -121,6 +121,9 @@ class Show extends Component {
           {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.html_body}} />}
         </div>
         <div className={style.actions}>
+          <Link to={`/topics/${state.topic_id}/edit`} className={style.action}>
+            <FontAwesomeIcon icon={['far', 'edit']} />
+          </Link>
           <span className={style.item}>
             {
               state.actioning !== 'like' &&

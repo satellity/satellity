@@ -202,43 +202,43 @@ class New extends Component {
         </div>
         {
           state.topic_type === 'POST' &&
-            <div className={style.actions}>
-              { state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye-slash']} onClick={this.handlePreview} /> }
-              { !state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> }
-              <a className={style.markdown} href='https://guides.github.com/features/mastering-markdown/' target='_blank' rel='noopener noreferrer'>
-                <FontAwesomeIcon className={style.eye} icon={['fab', 'markdown']} />
-              </a>
-            </div>
+          <div className={style.actions}>
+            { state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye-slash']} onClick={this.handlePreview} /> }
+            { !state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> }
+            <a className={style.markdown} href='https://guides.github.com/features/mastering-markdown/' target='_blank' rel='noopener noreferrer'>
+              <FontAwesomeIcon className={style.eye} icon={['fab', 'markdown']} />
+            </a>
+          </div>
         }
         {
           state.topic_type === 'POST' &&
-            <div className={style.body}>
-                {
-                  !state.preview &&
-                  <CodeMirror
-                    className={state.editor}
-                    value={state.body}
-                    options={{
-                      mode: 'markdown',
-                      theme: 'xq-light',
-                      lineNumbers: true,
-                      lineWrapping: true,
-                      placeholder: 'Text (optional)'
-                    }}
-                    onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
-                    editorDidMount={editor => {
-                      this.instance = editor;
-                      this.instance.refresh();
-                    }}
+          <div className={style.body}>
+            {
+              !state.preview &&
+              <CodeMirror
+                className={state.editor}
+                value={state.body}
+                options={{
+                  mode: 'markdown',
+                  theme: 'xq-light',
+                  lineNumbers: true,
+                  lineWrapping: true,
+                  placeholder: 'Text (optional)'
+                }}
+                onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
+                editorDidMount={editor => {
+                  this.instance = editor;
+                  this.instance.refresh();
+                }}
 
                   />
-                }
-                    {
-                      state.preview &&
-                        <article className={`md ${style.preview}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
-                        </article>
-                    }
-                      </div>
+            }
+            {
+              state.preview &&
+              <article className={`md ${style.preview}`} dangerouslySetInnerHTML={{__html: state.body_html}}>
+              </article>
+            }
+          </div>
         }
         {
           state.topic_type === 'LINK' &&

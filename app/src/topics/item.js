@@ -57,9 +57,6 @@ class TopicItem extends Component {
             }
             <span className={style.sep}>{i18n.t('topic.at')}</span>
             <TimeAgo date={topic.created_at} />
-            {
-              state.user.user_id === topic.user_id && <Link to={`/topics/${topic.topic_id}/edit`} className={style.edit}> <FontAwesomeIcon icon={['far', 'edit']} /> </Link>
-            }
             {topic.topic_type === 'LINK' && <Link to={`/topics/${topic.short_id}-${topic.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} className={style.comments}>{i18n.t('topic.comments')}</Link>}
           </div>
         </div>
