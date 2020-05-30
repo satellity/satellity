@@ -1,6 +1,6 @@
 ## Satellity
 
-Satellity is a 100% open source forum, written in Go. Please visit [https://satellity.org](https://satellity.org) for more details. For feedback, you can submit [issues](https://github.com/satellity/satellity/issues) or join our [slack](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLTNhYTUxMDgzMjE2NTcwYjRjMmE5ZDdjNzJjZTgzMjQ3MTQ2YzRiMDE3YTM4YmVjYzBjNTNjOGMxMmRhZTU2ZDM)([https://bit.ly/31b6xeX](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLTNhYTUxMDgzMjE2NTcwYjRjMmE5ZDdjNzJjZTgzMjQ3MTQ2YzRiMDE3YTM4YmVjYzBjNTNjOGMxMmRhZTU2ZDM)), Let's learn Go together!
+Satellity is a 100% open source forum, written in Go. Please visit [https://routinost.com](https://routinost.com) for more details. For feedback, you can submit [issues](https://github.com/satellity/satellity/issues) or join our [slack](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLTNhYTUxMDgzMjE2NTcwYjRjMmE5ZDdjNzJjZTgzMjQ3MTQ2YzRiMDE3YTM4YmVjYzBjNTNjOGMxMmRhZTU2ZDM)([https://bit.ly/31b6xeX](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLTNhYTUxMDgzMjE2NTcwYjRjMmE5ZDdjNzJjZTgzMjQ3MTQ2YzRiMDE3YTM4YmVjYzBjNTNjOGMxMmRhZTU2ZDM)), Let's learn Go together!
 
 ## NOTICE
 

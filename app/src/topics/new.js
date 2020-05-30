@@ -113,7 +113,7 @@ class New extends Component {
   handleBodyChange(editor, data, value) {
     let l = value.split('\n').length;
     let style = 'deditor';
-    if (l > 13) {
+    if (l > 13 || value.length > 1200) {
       value += '\n'.repeat(3);
       style = 'editor'
     }

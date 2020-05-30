@@ -134,13 +134,13 @@ class Index extends Component {
 
     return (
       <div className='container'>
-          {
-            !state.loading &&
-              <Helmet>
-                <title>{title}</title>
-                <meta name='description' content={description} />
-              </Helmet>
-          }
+        {
+          !state.loading &&
+          <Helmet>
+            <title>{title}</title>
+            <meta name='description' content={description} />
+          </Helmet>
+        }
         <main className='column main'>
           <div className={style.nodes}>
             <Link to='/'
