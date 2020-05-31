@@ -20,6 +20,7 @@ class New extends Component {
     this.api = new API();
     this.base64 = new Base64();
     this.converter = new showdown.Converter({ extensions: ['header-anchors', showdownHighlight] });
+    this.instance = null;
     let categories = [];
     let d = window.localStorage.getItem('categories');
     if (!!d) {
@@ -48,6 +49,7 @@ class New extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDraft = this.handleDraft.bind(this);
     this.handlePreview = this.handlePreview.bind(this);
+    this.handleAction = this.handleAction.bind(this);
   }
 
   componentDidMount() {
@@ -123,6 +125,43 @@ class New extends Component {
   handlePreview(e) {
     e.preventDefault();
     this.setState({body_html: this.converter.makeHtml(this.state.body), preview: !this.state.preview});
+  }
+
+  handleAction(action) {
+    if (this.instance !== null) {
+      let editor = this.instance;
+      let cursor = editor.getCursor();
+      switch (action) {
+        case 'heading':
+          editor.replaceRange('## ', {line: cursor.line, ch: 0});
+          break;
+        case 'bold':
+          editor.replaceSelection(`**${editor.getSelection()}**`);
+          break;
+        case 'italic':
+          editor.replaceSelection(`*${editor.getSelection()}*`);
+          break;
+        case 'strikethrough':
+          editor.replaceSelection(`~~${editor.getSelection()}~~`);
+          break;
+        case 'quote':
+          let lines = editor.getSelection().split('\n').length;
+
+          if (cursor.sticky === 'after') {
+            editor.replaceRange('> ', {line: 1, ch: 0}, {line: 1, ch: 0});
+            editor.replaceRange('> ', {line: 0, ch: 0}, {line: 0, ch: 0});
+            for (let i=cursor.line; i<cursor.line+lines; i++) {
+              editor.replaceRange('> ', {line: i, ch: 0});
+            }
+          } else if (cursor.sticky === 'before') {
+            for (let i=cursor.line; i<cursor.line-lines; i--) {
+              editor.replaceRange('> ', {line: i, ch: 0});
+            }
+            }
+          break;
+        default:
+      }
+    }
   }
 
   handleSubmit(e) {
@@ -203,6 +242,12 @@ class New extends Component {
         {
           state.topic_type === 'POST' &&
           <div className={style.actions}>
+            <div className={style.toolbar}>
+              <FontAwesomeIcon className={style.action} icon={['fas', 'heading']} onClick={this.handleAction.bind(this,'heading')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'bold']} onClick={this.handleAction.bind(this,'bold')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'italic']} onClick={this.handleAction.bind(this,'italic')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'strikethrough']} onClick={this.handleAction.bind(this,'strikethrough')} />
+            </div>
             { state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye-slash']} onClick={this.handlePreview} /> }
             { !state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> }
             <a className={style.markdown} href='https://guides.github.com/features/mastering-markdown/' target='_blank' rel='noopener noreferrer'>
@@ -230,8 +275,7 @@ class New extends Component {
                   this.instance = editor;
                   this.instance.refresh();
                 }}
-
-                  />
+              />
             }
             {
               state.preview &&

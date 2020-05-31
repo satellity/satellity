@@ -63,7 +63,20 @@
   height: 3.6rem;
 }
 .actions {
-  text-align: right;
+  align-items: center;
+  display: flex;
+  padding: .4rem 0;
+  .toolbar {
+    flex-grow: 2;
+  }
+  .action {
+    cursor: pointer;
+    color: rgba($color-main-dark, .8);
+    margin-right: 1.2rem;
+    &:hover {
+      color: $color-main-dark;
+    }
+  }
 }
 .markdown {
   margin-left: 1.2rem;
