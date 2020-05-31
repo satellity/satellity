@@ -136,13 +136,13 @@ class New extends Component {
           editor.replaceRange('## ', {line: cursor.line, ch: 0});
           break;
         case 'bold':
-          editor.replaceSelection(`**${editor.getSelection()}**`);
+          editor.replaceSelection(`**${editor.getSelection().trim()}**`);
           break;
         case 'italic':
-          editor.replaceSelection(`*${editor.getSelection()}*`);
+          editor.replaceSelection(`*${editor.getSelection().trim()}*`);
           break;
         case 'strikethrough':
-          editor.replaceSelection(`~~${editor.getSelection()}~~`);
+          editor.replaceSelection(`~~${editor.getSelection().trim()}~~`);
           break;
         case 'quote':
           let lines = editor.getSelection().split('\n').length;
