@@ -131,36 +131,39 @@ class New extends Component {
     if (this.instance !== null) {
       let editor = this.instance;
       let cursor = editor.getCursor();
+      let t;
       switch (action) {
         case 'heading':
           editor.replaceRange('## ', {line: cursor.line, ch: 0});
           break;
         case 'bold':
-          editor.replaceSelection(`**${editor.getSelection().trim()}**`);
+          t = editor.getSelection().trim();
+          editor.replaceSelection(editor.getSelection().replace(t, `**${t}**`));
           break;
         case 'italic':
-          editor.replaceSelection(`*${editor.getSelection().trim()}*`);
+          t = editor.getSelection().trim();
+          editor.replaceSelection(editor.getSelection().replace(t, `*${t}*`));
           break;
         case 'strikethrough':
-          editor.replaceSelection(`~~${editor.getSelection().trim()}~~`);
+          t = editor.getSelection().trim();
+          editor.replaceSelection(editor.getSelection().replace(t, `~~${t}~~`));
           break;
         case 'quote':
-          let lines = editor.getSelection().split('\n').length;
-
-          if (cursor.sticky === 'after') {
-            editor.replaceRange('> ', {line: 1, ch: 0}, {line: 1, ch: 0});
-            editor.replaceRange('> ', {line: 0, ch: 0}, {line: 0, ch: 0});
-            for (let i=cursor.line; i<cursor.line+lines; i++) {
-              editor.replaceRange('> ', {line: i, ch: 0});
+          let selections = editor.listSelections();
+          selections.forEach(function(selection) {
+            let pos = [selection.head.line, selection.anchor.line];
+            if (selection.head.line > selection.anchor.line)  {
+              pos = [selection.anchor.line, selection.head.line];
             }
-          } else if (cursor.sticky === 'before') {
-            for (let i=cursor.line; i<cursor.line-lines; i--) {
-              editor.replaceRange('> ', {line: i, ch: 0});
+            for (let i=pos[0]; i<=pos[1]; i++) {
+              editor.replaceRange('> ', { line: i, ch: 0 });
             }
-            }
+          });
           break;
         default:
       }
+      editor.focus();
+      editor.setCursor({ line: cursor.line, ch: cursor.ch });
     }
   }
 
@@ -246,7 +249,8 @@ class New extends Component {
               <FontAwesomeIcon className={style.action} icon={['fas', 'heading']} onClick={this.handleAction.bind(this,'heading')} />
               <FontAwesomeIcon className={style.action} icon={['fas', 'bold']} onClick={this.handleAction.bind(this,'bold')} />
               <FontAwesomeIcon className={style.action} icon={['fas', 'italic']} onClick={this.handleAction.bind(this,'italic')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'strikethrough']} onClick={this.handleAction.bind(this,'strikethrough')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'strikethrough']} onClick={this.handleAction.bind(this, 'strikethrough')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'quote-left']} onClick={this.handleAction.bind(this, 'quote')} />
             </div>
             { state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye-slash']} onClick={this.handlePreview} /> }
             { !state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> }
