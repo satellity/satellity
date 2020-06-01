@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   avatar_url             VARCHAR(512) NOT NULL DEFAULT '',
   encrypted_password     VARCHAR(1024),
   github_id              VARCHAR(1024) UNIQUE,
+  role                   VARCHAR(128) NOT NULL DEFAULT '',
   created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );

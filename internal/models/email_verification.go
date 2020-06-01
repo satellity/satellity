@@ -197,6 +197,7 @@ func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, pass
 			UserID:    uuid.Must(uuid.NewV4()).String(),
 			Username:  username,
 			Nickname:  nickname,
+			Role:      UserRoleMember,
 			CreatedAt: t,
 			UpdatedAt: t,
 		}

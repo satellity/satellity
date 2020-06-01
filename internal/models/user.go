@@ -36,6 +36,7 @@ type User struct {
 	Biography         string
 	EncryptedPassword sql.NullString
 	GithubID          sql.NullString
+	Role              string
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 
@@ -43,15 +44,15 @@ type User struct {
 	isNew     bool
 }
 
-var userColumns = []string{"user_id", "email", "username", "nickname", "avatar_url", "biography", "encrypted_password", "github_id", "created_at", "updated_at"}
+var userColumns = []string{"user_id", "email", "username", "nickname", "avatar_url", "biography", "encrypted_password", "github_id", "role", "created_at", "updated_at"}
 
 func (u *User) values() []interface{} {
-	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.AvatarURL, u.Biography, u.EncryptedPassword, u.GithubID, u.CreatedAt, u.UpdatedAt}
+	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.AvatarURL, u.Biography, u.EncryptedPassword, u.GithubID, u.Role, u.CreatedAt, u.UpdatedAt}
 }
 
 func userFromRows(row durable.Row) (*User, error) {
 	var u User
-	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.AvatarURL, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.CreatedAt, &u.UpdatedAt)
+	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.AvatarURL, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.Role, &u.CreatedAt, &u.UpdatedAt)
 	return &u, err
 }
 
@@ -307,9 +308,12 @@ func (u *User) GetAvatar() string {
 }
 
 // Role of an user, contains admin and member for now.
-func (u *User) Role() string {
+func (u *User) GetRole() string {
 	if configs.AppConfig.OperatorSet[u.Email.String] {
 		return UserRoleAdmin
+	}
+	if u.Role != "" {
+		return u.Role
 	}
 	return UserRoleMember
 }
@@ -323,7 +327,7 @@ func (u *User) Name() string {
 }
 
 func (u *User) isAdmin() bool {
-	return u.Role() == UserRoleAdmin
+	return u.GetRole() == UserRoleAdmin
 }
 
 func findUserByID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {

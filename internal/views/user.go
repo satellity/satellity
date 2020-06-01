@@ -59,7 +59,7 @@ func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) {
 		Username:  user.Username,
 		Email:     user.Email.String,
 		SessionID: user.SessionID,
-		Role:      user.Role(),
+		Role:      user.GetRole(),
 	}
 	RenderResponse(w, r, accountView)
 }

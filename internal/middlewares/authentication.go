@@ -60,7 +60,7 @@ func Authenticate(database *durable.Database, handler http.Handler) http.Handler
 			return
 		}
 		ctx := context.WithValue(r.Context(), keyCurrentUser, user)
-		if user.Role() != models.UserRoleAdmin {
+		if user.GetRole() != models.UserRoleAdmin {
 			handleUserRouters(handler, w, r.WithContext(ctx))
 			return
 		}
