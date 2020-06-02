@@ -1,7 +1,7 @@
 import style from './new.module.scss';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import {Controlled as CodeMirror} from 'react-codemirror2'
+import {UnControlled as CodeMirror} from 'react-codemirror2'
 import showdown from 'showdown';
 import showdownHighlight from 'showdown-highlight';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -113,13 +113,32 @@ class New extends Component {
   }
 
   handleBodyChange(editor, data, value) {
+    if (!data.origin) {
+      return;
+    }
+    let cursor = editor.getCursor();
     let l = value.split('\n').length;
     let style = 'deditor';
     if (l > 13 || value.length > 1200) {
-      value += '\n'.repeat(3);
+      if (value.charAt(value.length - 1) !== "\n") {
+        value += '\n';
+      }
       style = 'editor'
     }
-    this.setState({body: value, editor: style});
+    this.setState({body: value, editor: style}, () => {
+      let indent = 0;
+      if (data.text.length===1) {
+        switch (data.text[0]) {
+          case '**':
+          case '****':
+          case '~~~~':
+            indent = data.text[0].length/2;
+            break;
+          default:
+        }
+      }
+      this.instance.setCursor({line: cursor.line, ch: cursor.ch-indent});
+    });
   }
 
   handlePreview(e) {
@@ -127,14 +146,14 @@ class New extends Component {
     this.setState({body_html: this.converter.makeHtml(this.state.body), preview: !this.state.preview});
   }
 
-  handleAction(action) {
+  handleAction(action, identity) {
     if (this.instance !== null) {
       let editor = this.instance;
       let cursor = editor.getCursor();
       let t;
       switch (action) {
         case 'heading':
-          editor.replaceRange('## ', {line: cursor.line, ch: 0});
+          editor.replaceRange('## ', {line: cursor.line, ch: 0}, {line: cursor.line, ch: 0}, 'range');
           break;
         case 'bold':
           t = editor.getSelection().trim();
@@ -148,6 +167,8 @@ class New extends Component {
           t = editor.getSelection().trim();
           editor.replaceSelection(editor.getSelection().replace(t, `~~${t}~~`));
           break;
+        case 'ol':
+        case 'ul':
         case 'quote':
           let selections = editor.listSelections();
           selections.forEach(function(selection) {
@@ -156,14 +177,13 @@ class New extends Component {
               pos = [selection.anchor.line, selection.head.line];
             }
             for (let i=pos[0]; i<=pos[1]; i++) {
-              editor.replaceRange('> ', { line: i, ch: 0 });
+              editor.replaceRange(identity, { line: i, ch: 0 }, { line: i, ch: 0 }, 'range');
             }
           });
           break;
         default:
       }
-      editor.focus();
-      editor.setCursor({ line: cursor.line, ch: cursor.ch });
+      this.instance.focus();
     }
   }
 
@@ -250,7 +270,9 @@ class New extends Component {
               <FontAwesomeIcon className={style.action} icon={['fas', 'bold']} onClick={this.handleAction.bind(this,'bold')} />
               <FontAwesomeIcon className={style.action} icon={['fas', 'italic']} onClick={this.handleAction.bind(this,'italic')} />
               <FontAwesomeIcon className={style.action} icon={['fas', 'strikethrough']} onClick={this.handleAction.bind(this, 'strikethrough')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'quote-left']} onClick={this.handleAction.bind(this, 'quote')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'quote-left']} onClick={this.handleAction.bind(this, 'quote', '> ')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'list-ol']} onClick={this.handleAction.bind(this, 'ol', '1. ')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'list-ul']} onClick={this.handleAction.bind(this, 'ul', '* ')} />
             </div>
             { state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye-slash']} onClick={this.handlePreview} /> }
             { !state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> }
@@ -274,7 +296,7 @@ class New extends Component {
                   lineWrapping: true,
                   placeholder: 'Text (optional)'
                 }}
-                onBeforeChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
+                onChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
                 editorDidMount={editor => {
                   this.instance = editor;
                   this.instance.refresh();

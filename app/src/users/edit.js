@@ -72,7 +72,7 @@ class Edit extends Component {
   onCropChange(crop, percentCrop) {
   };
 
- makeClientCrop(crop) {
+  makeClientCrop(crop) {
     if (this.imageRef) {
       crop.width = this.imageRef.naturalWidth;
       crop.height = this.imageRef.naturalHeight;
