@@ -14,7 +14,7 @@ require (
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/speps/go-hashids v2.0.0+incompatible
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.0
 	github.com/unrolled/render v1.0.3
 	go.uber.org/zap v1.15.0
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
