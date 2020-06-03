@@ -326,7 +326,9 @@ func ReadTopicWithRelation(mctx *Context, id string, user *User) (*Topic, error)
 	if err != nil {
 		return topic, session.TransactionError(ctx, err)
 	}
-	topic.incrTopicViewsCount(mctx)
+	if err := topic.incrTopicViewsCount(mctx); err != nil {
+		session.ServerError(ctx, err)
+	}
 	return topic, nil
 }
 

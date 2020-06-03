@@ -149,23 +149,16 @@ class New extends Component {
   handleAction(action, identity) {
     if (this.instance !== null) {
       let editor = this.instance;
-      let cursor = editor.getCursor();
-      let t;
       switch (action) {
         case 'heading':
-          editor.replaceRange('## ', {line: cursor.line, ch: 0}, {line: cursor.line, ch: 0}, 'range');
+          let cursor = editor.getCursor();
+          editor.replaceRange('## ', {line: cursor.line, ch: 0}, {line: cursor.line, ch: 0}, '+input');
           break;
         case 'bold':
-          t = editor.getSelection().trim();
-          editor.replaceSelection(editor.getSelection().replace(t, `**${t}**`));
-          break;
         case 'italic':
-          t = editor.getSelection().trim();
-          editor.replaceSelection(editor.getSelection().replace(t, `*${t}*`));
-          break;
         case 'strikethrough':
-          t = editor.getSelection().trim();
-          editor.replaceSelection(editor.getSelection().replace(t, `~~${t}~~`));
+          let t = editor.getSelection().trim();
+          editor.replaceSelection(editor.getSelection().replace(t, `${identity}${t}${identity}`));
           break;
         case 'ol':
         case 'ul':
@@ -177,7 +170,7 @@ class New extends Component {
               pos = [selection.anchor.line, selection.head.line];
             }
             for (let i=pos[0]; i<=pos[1]; i++) {
-              editor.replaceRange(identity, { line: i, ch: 0 }, { line: i, ch: 0 }, 'range');
+              editor.replaceRange(identity, { line: i, ch: 0 }, { line: i, ch: 0 }, '+input');
             }
           });
           break;
@@ -266,10 +259,10 @@ class New extends Component {
           state.topic_type === 'POST' &&
           <div className={style.actions}>
             <div className={style.toolbar}>
-              <FontAwesomeIcon className={style.action} icon={['fas', 'heading']} onClick={this.handleAction.bind(this,'heading')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'bold']} onClick={this.handleAction.bind(this,'bold')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'italic']} onClick={this.handleAction.bind(this,'italic')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'strikethrough']} onClick={this.handleAction.bind(this, 'strikethrough')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'heading']} onClick={this.handleAction.bind(this, 'heading')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'bold']} onClick={this.handleAction.bind(this, 'bold', '**')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'italic']} onClick={this.handleAction.bind(this, 'italic', '*')} />
+              <FontAwesomeIcon className={style.action} icon={['fas', 'strikethrough']} onClick={this.handleAction.bind(this, 'strikethrough', '~~')} />
               <FontAwesomeIcon className={style.action} icon={['fas', 'quote-left']} onClick={this.handleAction.bind(this, 'quote', '> ')} />
               <FontAwesomeIcon className={style.action} icon={['fas', 'list-ol']} onClick={this.handleAction.bind(this, 'ol', '1. ')} />
               <FontAwesomeIcon className={style.action} icon={['fas', 'list-ul']} onClick={this.handleAction.bind(this, 'ul', '* ')} />
