@@ -247,6 +247,13 @@ class New extends Component {
       </div>
     )
 
+    const toolbar = [];
+    TOOLBAR.forEach((data) => {
+      toolbar.push(
+        <FontAwesomeIcon className={style.action} icon={['fas', data.icon]} onClick={this.handleAction.bind(this, data.action, data.identity)} />
+      );
+    });
+
     let form = (
       <form onSubmit={this.handleSubmit}>
         <div className={style.categories}>
@@ -259,13 +266,7 @@ class New extends Component {
           state.topic_type === 'POST' &&
           <div className={style.actions}>
             <div className={style.toolbar}>
-              <FontAwesomeIcon className={style.action} icon={['fas', 'heading']} onClick={this.handleAction.bind(this, 'heading')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'bold']} onClick={this.handleAction.bind(this, 'bold', '**')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'italic']} onClick={this.handleAction.bind(this, 'italic', '*')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'strikethrough']} onClick={this.handleAction.bind(this, 'strikethrough', '~~')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'quote-left']} onClick={this.handleAction.bind(this, 'quote', '> ')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'list-ol']} onClick={this.handleAction.bind(this, 'ol', '1. ')} />
-              <FontAwesomeIcon className={style.action} icon={['fas', 'list-ul']} onClick={this.handleAction.bind(this, 'ul', '* ')} />
+              { toolbar }
             </div>
             { state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye-slash']} onClick={this.handlePreview} /> }
             { !state.preview && <FontAwesomeIcon className={style.eye} icon={['far', 'eye']} onClick={this.handlePreview} /> }
@@ -333,5 +334,16 @@ class New extends Component {
     )
   }
 }
+
+const TOOLBAR = [
+  {icon: 'heading', action: 'heading', identity: ''},
+  {icon: 'bold', action: 'bold', identity: '**'},
+  {icon: 'italic', action: 'italic', identity: '*'},
+  {icon: 'strikethrough', action: 'strikethrough', identity: '~~'},
+  {icon: 'quote-left', action: 'quote', identity: '> '},
+  {icon: 'list-ol', action: 'ol', identity: '1. '},
+  {icon: 'list-ul', action: 'ul', identity: '* '},
+]
+
 
 export default New;
