@@ -304,6 +304,9 @@ class New extends Component {
             }
           </div>
         }
+        <div className={style.upload}>
+          <a href='https://imgur.com/upload' target='_blank' rel='noopener noreferrer'>Upload an Image</a>
+        </div>
         {
           state.topic_type === 'LINK' &&
           <div>

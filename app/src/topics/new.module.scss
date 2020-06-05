@@ -100,6 +100,12 @@
     word-wrap: break-word;
   }
 }
+.upload {
+  margin-bottom: 1.6rem;
+  a {
+    color: rgba($color-main-dark, .8);
+  }
+}
 .draft {
   cursor: pointer;
   margin-left: .8rem;
