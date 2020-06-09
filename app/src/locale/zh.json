@@ -1,0 +1,28 @@
+{
+  "online": {
+    "cartoon.avatar": {
+      "head.title": "在线免费卡通头像制作",
+      "head.description": "通过这个制作器，可以非常方便的制作免费的卡通头像",
+      "page": {
+        "download": "下载头像",
+        "title": "免费卡通头像制作",
+        "subtitle": "赶快制作斧免费卡通头像吧!",
+        "description": {
+          "title": "如何制作你的头像?",
+          "body": "制作自己的免费软件非常简单, 脸的轮廓是无法改变的， 您只需要选择适合自己的合适的修饰配件, 肤色等。同时可以免费下载。",
+          "thanks": "特别致谢: 设计者 <a href='https://twitter.com/pablostanley' target='_blank'>Pablo Stanley</a>, 开源软件作者 <a href='https://twitter.com/fangpenlin' target='_blank'>Fang-Pen Lin</a>."
+        }
+      },
+      "actions": {
+        "hair": "头发",
+        "accessory": "眼镜",
+        "beard": "胡子",
+        "clothes": "衣服",
+        "eyes": "眼睛",
+        "eyebrows": "眉毛",
+        "mouth": "嘴",
+        "skin": "皮肤"
+      }
+    }
+  }
+}

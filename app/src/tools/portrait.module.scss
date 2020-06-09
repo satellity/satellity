@@ -1,15 +1,15 @@
 .container {
   background: white;
   padding: 1.6rem;
-  margin-top: 1.6rem;
+  padding-top: 1.6rem;
 }
 .title {
   font-weight: bold;
-  text-align: left;
+  text-align: center;
   margin-bottom: .8rem;
 }
 .subtitle {
-  text-align: left;
+  text-align: center;
   margin-bottom: 3.2rem;
 }
 .actions {
@@ -63,13 +63,16 @@
   margin-top: 1.6rem;
 }
 
+.languages {
+  margin-top: 1.6rem;
+  text-align: right;
+}
+.country {
+  width: 1.8rem;
+  margin-left: .6rem;
+}
+
 @media only screen and (max-width: 64rem) {
-  .title {
-    text-align: center;
-  }
-  .subtitle {
-    text-align: center;
-  }
   .canvas {
     display: block;
   }

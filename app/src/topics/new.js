@@ -247,11 +247,8 @@ class New extends Component {
       </div>
     )
 
-    const toolbar = [];
-    TOOLBAR.forEach((data) => {
-      toolbar.push(
-        <FontAwesomeIcon className={style.action} icon={['fas', data.icon]} onClick={this.handleAction.bind(this, data.action, data.identity)} />
-      );
+    const toolbar = TOOLBAR.map((data) => {
+      return <FontAwesomeIcon className={style.action} icon={['fas', data.icon]} onClick={this.handleAction.bind(this, data.action, data.identity)} />
     });
 
     let form = (
@@ -304,6 +301,9 @@ class New extends Component {
             }
           </div>
         }
+        <div className={style.upload}>
+          <a href='https://imgur.com/upload' target='_blank' rel='noopener noreferrer'>Does not support upload image, please use imgur first.</a>
+        </div>
         {
           state.topic_type === 'LINK' &&
           <div>

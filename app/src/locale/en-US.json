@@ -4,27 +4,6 @@
     "description": "Satellity is a 100% open source, discourse-like forum written in Go. For demo, please visit https://satellity.org. For feedback, you can submit issues or join our slack(https://bit.ly/2IV6LCW), Let's learn Go together!",
     "features": "Satellity is PRE-ALPHA now! Please be careful when you decide to use it!"
   },
-  "avatar": {
-    "title": "Make your own free avatar",
-    "description": "Make your own free avatar online, a free online avatar generator for anyone to make their beautiful personal avatar easily!",
-    "head": "Free Avatar Maker",
-    "subtitle": "Create Your Own Avatar For Free!",
-    "page": {
-      "title": "How to make your own avatar?",
-      "description": "Making an avatar is very simple, just click the different parts, like hair, accessory, beard, etc to switch the selection, and then click the favorite style. You can see the result on the right (or above) immediately. Also You can click the download button to get your avatar. Enjoy it! Any questions, feedbacks are appreciated, feel free to submit in the forum.",
-      "thanks": "Special Thanks: avatar is designed by <a href='https://twitter.com/pablostanley' target='_blank'>Pablo Stanley</a>, and npm is developed by <a href='https://twitter.com/fangpenlin' target='_blank'>Fang-Pen Lin</a>."
-    },
-    "actions": {
-      "hair": "hair",
-      "accessory": "accessory",
-      "beard": "beard",
-      "clothes": "clothes",
-      "eyes": "eyes",
-      "eyebrows": "eyebrows",
-      "mouth": "mouth",
-      "skin": "skin"
-    }
-  },
   "general": {
     "all": "View all",
     "delete": "Delete",
@@ -112,5 +91,32 @@
     "10020": "Invalid verification code.",
     "10101": "Invalid image data.",
     "10102": "Recaptcha is invalid."
+  },
+
+  "online": {
+    "cartoon.avatar": {
+      "head.title": "Free Online Cartoon Avatar Maker",
+      "head.description": "Make your own free cartoon avatar online, a free online avatar generator for anyone to make their beautiful personal avatar easily!",
+      "page": {
+        "download": "Download",
+        "title": "Free Cartoon Avatar Maker",
+        "subtitle": "Create Your Own Avatar For Free!",
+        "description": {
+          "title": "How to make your own avatar?",
+          "body": "Making an avatar is very simple, just click the different parts, like hair, accessory, beard, etc to switch the selection, and then click the favorite style. You can see the result on the right (or above) immediately. Also You can click the download button to get your avatar. Enjoy it! Any questions, feedbacks are appreciated, feel free to submit in the forum.",
+          "thanks": "Special Thanks: avatar is designed by <a href='https://twitter.com/pablostanley' target='_blank'>Pablo Stanley</a>, and npm is developed by <a href='https://twitter.com/fangpenlin' target='_blank'>Fang-Pen Lin</a>."
+        }
+      },
+      "actions": {
+        "hair": "hair",
+        "accessory": "accessory",
+        "beard": "beard",
+        "clothes": "clothes",
+        "eyes": "eyes",
+        "eyebrows": "eyebrows",
+        "mouth": "mouth",
+        "skin": "skin"
+      }
+    }
   }
 }

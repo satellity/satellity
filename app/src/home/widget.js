@@ -30,9 +30,6 @@ class SiteWidget extends Component {
           <ul className={style.rules} dangerouslySetInnerHTML={{__html: i18n.t('aside.rules')}}>
           </ul>
         </div>
-        <div className={style.avatar}>
-          <Link to='/avatar'>{i18n.t('avatar.title')}</Link>
-        </div>
         <div className={style.copyright}>
           © 2020 MIT license
         </div>
