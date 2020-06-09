@@ -3,12 +3,21 @@ $font-main-title: 'Roboto', sans-serif;
 $font-main-mono: 'Roboto Mono', monospace;
 
 $color-font-dark: rgb(33, 33, 33);
-$color-font-grey: rgb(74, 74, 74);
-$color-font-light-grey: rgb(115, 115, 115);
+$color-font-grey: rgb(92, 97, 102);
+$color-font-light-grey: rgb(142, 144, 145);
 
-$color-bg-light-grey: rgb(247, 247, 247);
+$color-bg-main: rgb(248, 249, 250);
+$color-bg-grey: rgb(233, 236, 238);
+$color-bg-light-grey: rgb(242, 244, 246);
+$color-bg-error: rgb(255, 248, 248);
 
-$color-border-light-grey: rgb(247, 247, 247);
+$color-link-main: rgb(79, 128, 176);
+
+$color-border-grey: rgb(233, 236, 238);
+$color-border-light-grey: rgb(243, 244, 245);
+$color-border-error: rgb(248, 248, 248);
+
+$color-notification: rgb(240, 76, 107);
 
 $color-main-dark: rgb(50, 50, 50);
 $color-main-grey: rgb(200, 200, 200);

@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import showdown from 'showdown';
+import Tool from './tools/view.js';
 import Locale from './locale/index.js';
 import MainLayout from './layouts/main.js';
 import NoMatch from './layouts/sink.js';
@@ -48,6 +49,7 @@ ReactDOM.render((
   <Router>
     <div>
       <Switch>
+        <Route exact path='/avatar' component={Tool.Portrait} />
         <Route path='/oauth/:provider/callback' component={Oauth} />
         <Route path='/admin' component={AdminRoute} />
         <Route path='/404' component={NoMatch} />

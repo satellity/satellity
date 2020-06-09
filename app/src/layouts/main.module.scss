@@ -2,7 +2,6 @@
 
 .container {
   min-height: 100vh;
-  background: rgb(236, 240, 245);
 }
 .header {
   background: white;
@@ -10,7 +9,7 @@
   align-items: center;
   font-size: 1.2rem;
   text-align: center;
-  line-height: 2rem;
+  line-height: 3rem;
   box-sizing: border-box;
   padding: 0 1.6rem;
   &:after {
@@ -21,20 +20,18 @@
 }
 .site {
   color: $color-main-red;
+  display: flex;
+  align-items: center;
   font-size: 1.125rem;
-  font-style: italic;
   font-weight: bold;
   text-align: center;
   text-transform: uppercase;
-  position: relative;
   padding-right: 1.3rem;
   margin-right: 1.6rem;
-}
-.talk {
-  font-size: 1rem;
-  position: absolute;
-  top: 0;
-  right: 0;
+  .logo {
+    width: 1.2rem;
+    margin-right: .4rem;
+  }
 }
 .menus {
   box-sizing: border-box;

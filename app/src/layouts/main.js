@@ -1,4 +1,5 @@
 import style from './main.module.scss';
+import logo from '../assets/images/logo.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { Route, Link, Switch, Redirect } from 'react-router-dom';
@@ -7,16 +8,12 @@ import API from '../api/index.js'
 import Home from '../home/view.js';
 import User from '../users/view.js';
 import Topic from '../topics/view.js';
-import Tool from '../tools/view.js';
 import Login from './login.js';
 
 class MainLayout extends Component {
   constructor(props) {
     super(props);
     this.state = {p: encodeURIComponent(props.location.pathname)};
-    const classes = document.body.classList.values();
-    document.body.classList.remove(...classes);
-    document.body.classList.add('main', 'layout');
   }
 
   render() {
@@ -26,7 +23,6 @@ class MainLayout extends Component {
         <div className='wrapper'>
           <Switch>
             <Route exact path='/' component={Topic.Index} />
-            <Route exact path='/avatar' component={Tool.Portrait} />
             <Route exact path='/dashboard' component={Home.Dashboard} />
             <Route exact path='/categories/:id' component={Topic.Index} />
             <Route exact path='/user/edit' component={User.Edit} />
@@ -73,7 +69,7 @@ class Header extends Component {
     return (
       <div>
         <header className={style.header}>
-          <Link className={style.site} to='/'><span className={style.name}>{Config.Name}</span><FontAwesomeIcon className={style.talk} icon={['far', 'comments']} /></Link>
+          <Link className={style.site} to='/'><img className={style.logo} src={logo} alt={Config.Name} /><span className={style.name}>{Config.Name}</span></Link>
 
           <div className={style.menus}>
             <Link className={`${style.menu} ${window.location.pathname === '/' ? style.current : ''}` } to='/'>

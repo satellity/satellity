@@ -247,11 +247,8 @@ class New extends Component {
       </div>
     )
 
-    const toolbar = [];
-    TOOLBAR.forEach((data) => {
-      toolbar.push(
-        <FontAwesomeIcon className={style.action} icon={['fas', data.icon]} onClick={this.handleAction.bind(this, data.action, data.identity)} />
-      );
+    const toolbar = TOOLBAR.map((data) => {
+      return <FontAwesomeIcon className={style.action} icon={['fas', data.icon]} onClick={this.handleAction.bind(this, data.action, data.identity)} />
     });
 
     let form = (
