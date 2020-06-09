@@ -43,7 +43,12 @@ showdown.extension('header-anchors', function() {
   }];
 });
 
-window.i18n = new Locale(navigator.language);
+let language = navigator.language
+let locale = new URLSearchParams(window.location.search).get('locale');
+if (!!locale) {
+  language = locale.split('-')[0];
+}
+window.i18n = new Locale(language);
 
 ReactDOM.render((
   <Router>

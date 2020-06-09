@@ -6,6 +6,9 @@ import {Helmet} from 'react-helmet';
 import {saveAs} from 'file-saver';
 import Button from '../components/button.js';
 import Config from '../components/config.js';
+import usa from '../assets/countries/usa.svg';
+import russia from '../assets/countries/russia.svg';
+import china from '../assets/countries/china.svg';
 
 class Portrait extends Component {
   constructor(props) {
@@ -98,7 +101,7 @@ class Portrait extends Component {
         return null;
       }
       return (
-        <span key={o} className={`${style.action} ${state.action === o ? style.current : ''}`} onClick={(e) => this.handleActionClick(e, o)}>{i18n.t(`avatar.actions.${o}`)}</span>
+        <span key={o} className={`${style.action} ${state.action === o ? style.current : ''}`} onClick={(e) => this.handleActionClick(e, o)}>{i18n.t(`online.cartoon.avatar.actions.${o}`)}</span>
       );
     });
 
@@ -208,35 +211,35 @@ class Portrait extends Component {
 
     const seoView = (
       <Helmet>
-        <title> {`${i18n.t('avatar.title')} - ${Config.Name}`}</title>
-        <meta name='description' content={i18n.t('avatar.description')} />
+        <title> {`${i18n.t('online.cartoon.avatar.head.title')} - ${Config.Name}`}</title>
+        <meta name='description' content={i18n.t('online.cartoon.avatar.head.description')} />
       </Helmet>
     )
 
     return (
       <div className={style.container}>
-        <h1 className={style.title}>{i18n.t('avatar.head')}</h1>
-        <div className={style.subtitle}>{i18n.t('avatar.subtitle')}</div>
+        <h1 className={style.title}>{i18n.t('online.cartoon.avatar.page.title')}</h1>
+        <div className={style.subtitle}>{i18n.t('online.cartoon.avatar.page.subtitle')}</div>
         {seoView}
         <div className={style.canvas}>
           <div className={style.profile}>
             <div className={style.avatar}>
-            <Avatar style={{'width': '100%'}}
-              ref={this.avatar}
-              avatarStyle={state.avatar}
-              topType={state.top}
-              accessoriesType={state.accessory}
-              hairColor={state.hairColor}
-              hatColor={state.hatColor}
-              facialHairType={state.facialHair}
-              facialHairColor={state.facialHairColor}
-              clotheType={state.clothe}
-              clotheColor={state.clotheColor}
-              graphicType={state.graphic}
-              eyeType={state.eye}
-              eyebrowType={state.eyebrow}
-              mouthType={state.mouth}
-              skinColor={state.skin} />
+              <Avatar style={{'width': '100%'}}
+                ref={this.avatar}
+                avatarStyle={state.avatar}
+                topType={state.top}
+                accessoriesType={state.accessory}
+                hairColor={state.hairColor}
+                hatColor={state.hatColor}
+                facialHairType={state.facialHair}
+                facialHairColor={state.facialHairColor}
+                clotheType={state.clothe}
+                clotheColor={state.clotheColor}
+                graphicType={state.graphic}
+                eyeType={state.eye}
+                eyebrowType={state.eyebrow}
+                mouthType={state.mouth}
+                skinColor={state.skin} />
               <canvas
                 style={{ display: 'none' }}
                 width='528'
@@ -246,10 +249,10 @@ class Portrait extends Component {
             </div>
 
             <div className={style.download}>
-              <Button type='button' classes='button auto' text={i18n.t('general.download')} click={this.handleDownload} disabled={state.downloading} />
+              <Button type='button' classes='button auto' text={i18n.t('online.cartoon.avatar.page.download')} click={this.handleDownload} disabled={state.downloading} />
             </div>
             {state.action === 'hair' && state.top !== 'NoHair' && state.top !== 'LongHairFrida' && state.top.includes('Hair') && <div className={style.colors}> {hairColors} </div>}
-              {state.action === 'hair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && !state.top.includes('Hair') && <div className={style.colors}> {hatColors} </div>}
+            {state.action === 'hair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && !state.top.includes('Hair') && <div className={style.colors}> {hatColors} </div>}
           </div>
           <div>
             <div className={style.actions}>
@@ -268,9 +271,14 @@ class Portrait extends Component {
             {state.action === 'clothes' && !state.clothe.includes('Blazer') && <div className={style.colors}> {clotheColors} </div>}
           </div>
         </div>
-        <h2 className={style.head2}>{i18n.t('avatar.page.title')}</h2>
-        <div>{i18n.t('avatar.page.description')}</div>
-        <div className={style.thanks} dangerouslySetInnerHTML={{__html: i18n.t('avatar.page.thanks')}}>
+        <h2 className={style.head2}>{i18n.t('online.cartoon.avatar.page.description.title')}</h2>
+        <div>{i18n.t('online.cartoon.avatar.page.description.body')}</div>
+        <div className={style.thanks} dangerouslySetInnerHTML={{__html: i18n.t('online.cartoon.avatar.page.description.thanks')}}>
+        </div>
+        <div className={style.languages}>
+          <a href='/avatar'><img className={style.country} src={usa} alt={Config.Name} /></a>
+          <a href='/avatar?locale=ru'><img className={style.country} src={russia} alt={Config.Name} /></a>
+          <a href='/avatar?locale=zh'><img className={style.country} src={china} alt={Config.Name} /></a>
         </div>
       </div>
     )
