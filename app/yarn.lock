@@ -10604,10 +10604,10 @@ react-icons@^3.8.0:
   dependencies:
     camelcase "^5.0.0"
 
-react-image-crop@^8.6.2:
-  version "8.6.2"
-  resolved "https://registry.yarnpkg.com/react-image-crop/-/react-image-crop-8.6.2.tgz#bac0963ab517cdfba42b3a091774de4c3f4f3ece"
-  integrity sha512-mi2UwL1ZhMk/L9DhxnRK/V91HYXNNaeBzrX+IfZWPEun6H5jnrts14K2FEBKMEcyz/5anNk8TiU94yo+dSVDog==
+react-image-crop@^8.6.4:
+  version "8.6.4"
+  resolved "https://registry.yarnpkg.com/react-image-crop/-/react-image-crop-8.6.4.tgz#51289c22baf7d116575102e885f879af71376388"
+  integrity sha512-5buyhUg9slzW+QGvN2dbpGSI1VqPxxmfEwe19TZXUB7LjW5+ljZOnrTSsteIzeBqmz6ngVucc8l+OrwgcDOSNg==
   dependencies:
     clsx "^1.0.4"
     core-js "^3.4.2"
