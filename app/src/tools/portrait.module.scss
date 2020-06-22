@@ -1,53 +1,74 @@
-.container {
-  background: white;
-  padding: 1.6rem;
-  padding-top: 1.6rem;
+.page {
+  background: #070b28;
+  min-height: 100vh;
+  padding-top: 3.2rem;
 }
 .title {
-  font-weight: bold;
+  color: white;
+  font-size: 2rem;
   text-align: center;
   margin-bottom: .8rem;
 }
 .subtitle {
+  color: white;
   text-align: center;
   margin-bottom: 3.2rem;
 }
-.actions {
-  margin-bottom: .8rem;
-  padding: .1rem;
-}
-.action {
-  background: rgba(218,40,16,.8);
-  box-sizing: border-box;
-  border-radius: .2rem;
-  color: white;
-  cursor: pointer;
-  display: inline-block;
-  margin: 0 .4rem .4rem 0;
-  padding: .4rem .8rem;
-  opacity: .8;
-  &:hover, &.current {
-    opacity: 1;
+.container {
+  background: white;
+  border-radius: 2rem 2rem 0 0;
+  padding: 3.2rem;
+  .wrapper {
+    width: 64rem;
+    max-width: 100%;
+    margin: 0 auto;
   }
 }
-.canvas {
-  display: flex;
+.actions {
+  text-align: center;
+  margin-bottom: .8rem;
+  padding: .1rem;
+  .action {
+    color: rgba(218,40,16,.8);
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 .4rem .4rem 0;
+    padding: .4rem .8rem;
+    &:hover {
+    color: rgba(218,40,16,1);
+    }
+    &.current {
+      font-size: 1.6rem;
+    }
+  }
 }
 .profile {
   box-sizing: border-box;
+  text-align: center;
   padding: 0 1.6rem 1.6rem 0;
 }
 .avatar {
-  width: 24rem;
-  max-width: 100%;
   margin-bottom: 1.6rem;
+  text-align: center;
+  width: 100%;
 }
 .download {
   display: flex;
   justify-content: center;
   margin-bottom: .8rem;
 }
-.item {
+.parts {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: .8rem;
+  overflow-x: scroll;
+}
+.colors {
+  display: flex;
+  justify-content: flex-start;
+  overflow-x: scroll;
+}
+.widget {
   background: rgba(236,240,245,.5);
   border: .1rem solid white;
   box-sizing: border-box;
@@ -62,41 +83,11 @@
 .thanks {
   margin-top: 1.6rem;
 }
-
 .languages {
   margin-top: 1.6rem;
   text-align: right;
-}
-.country {
-  width: 1.8rem;
-  margin-left: .6rem;
-}
-
-@media only screen and (max-width: 64rem) {
-  .canvas {
-    display: block;
-  }
-  .profile {
-    display: flex;
-    flex-direction: column;
-    padding-right: 0;
-  }
-  .avatar {
-    width: 100%;
-    text-align: center;
-  }
-  .colors {
-    display: flex;
-    justify-content: space-between;
-    overflow-x: scroll;
-  }
-  .parts {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: .8rem;
-    overflow-x: scroll;
-  }
-  .actions {
-    text-align: center;
+  .country {
+    width: 1.8rem;
+    margin-left: .6rem;
   }
 }

@@ -84,7 +84,7 @@ class Portrait extends Component {
         ctx.drawImage(img, 0, 0);
         ctx.restore();
         this.canvas.current.toBlob(imageBlob => {
-          saveAs(imageBlob, 'satellity.png');
+          saveAs(imageBlob, 'routinost.png');
         });
       };
       this.setState({downloading: false});
@@ -107,7 +107,7 @@ class Portrait extends Component {
 
     const hairShapes = state.hair_shapes.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'top', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'top', o)}>
           <Piece pieceType='top' pieceSize='100' topType={o} hairColor='Blank'/>
         </div>
       )
@@ -115,7 +115,7 @@ class Portrait extends Component {
 
     const accessories = state.accessories.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'accessory', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'accessory', o)}>
           <Piece pieceType='accessories' pieceSize='100' accessoriesType={o}/>
         </div>
       )
@@ -123,7 +123,7 @@ class Portrait extends Component {
 
     const facialHairs = state.facial_hairs.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'facialHair', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'facialHair', o)}>
           <Piece pieceType='facialHair' pieceSize='100' facialHairType={o}/>
         </div>
       )
@@ -131,7 +131,7 @@ class Portrait extends Component {
 
     const clothes = state.clothes.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'clothe', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'clothe', o)}>
           <Piece pieceType='clothe' pieceSize='100' clotheType={o} clotheColor="Blank"/>
         </div>
       )
@@ -139,7 +139,7 @@ class Portrait extends Component {
 
     const graphics = state.graphics.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'graphic', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'graphic', o)}>
           <Piece pieceType="graphics" pieceSize="100" graphicType={o} />
         </div>
       )
@@ -147,7 +147,7 @@ class Portrait extends Component {
 
     const eyes = state.eyes.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'eye', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'eye', o)}>
           <Piece pieceType='eyes' pieceSize='100' eyeType={o}/>
         </div>
       )
@@ -155,7 +155,7 @@ class Portrait extends Component {
 
     const eyebrows = state.eyebrows.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'eyebrow', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'eyebrow', o)}>
           <Piece pieceType='eyebrows' pieceSize='100' eyebrowType={o}/>
         </div>
       )
@@ -163,7 +163,7 @@ class Portrait extends Component {
 
     const mouths = state.mouths.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'mouth', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'mouth', o)}>
           <Piece pieceType='mouth' pieceSize='100' mouthType={o}/>
         </div>
       )
@@ -171,7 +171,7 @@ class Portrait extends Component {
 
     const skins = state.skins.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'skin', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'skin', o)}>
           <Piece pieceType='skin' pieceSize='100' skinColor={o}/>
         </div>
       )
@@ -179,7 +179,7 @@ class Portrait extends Component {
 
     const hairColors = state.hair_colors.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'hairColor', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'hairColor', o)}>
           <Piece pieceType='hairColor' pieceSize='48' hairColor={o}/>
         </div>
       )
@@ -187,7 +187,7 @@ class Portrait extends Component {
 
     const hatColors = state.hat_colors.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'hatColor', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'hatColor', o)}>
           <Piece pieceType='hatColor' pieceSize='48' hatColor={o}/>
         </div>
       )
@@ -195,7 +195,7 @@ class Portrait extends Component {
 
     const facialHairColors = state.facial_hair_colors.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'facialHairColor', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'facialHairColor', o)}>
           <Piece pieceType='facialHairColor' pieceSize='48' facialHairColor={o}/>
         </div>
       )
@@ -203,7 +203,7 @@ class Portrait extends Component {
 
     const clotheColors = state.clothe_colors.map((o) => {
       return (
-        <div key={o} className={style.item} onClick={(e) => this.handleClick(e, 'clotheColor', o)}>
+        <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'clotheColor', o)}>
           <Piece pieceType='clotheColor' pieceSize='48' clotheColor={o}/>
         </div>
       )
@@ -217,68 +217,71 @@ class Portrait extends Component {
     )
 
     return (
-      <div className={style.container}>
+      <div className={style.page}>
         <h1 className={style.title}>{i18n.t('online.cartoon.avatar.page.title')}</h1>
         <div className={style.subtitle}>{i18n.t('online.cartoon.avatar.page.subtitle')}</div>
         {seoView}
-        <div className={style.canvas}>
-          <div className={style.profile}>
-            <div className={style.avatar}>
-              <Avatar style={{'width': '100%'}}
-                ref={this.avatar}
-                avatarStyle={state.avatar}
-                topType={state.top}
-                accessoriesType={state.accessory}
-                hairColor={state.hairColor}
-                hatColor={state.hatColor}
-                facialHairType={state.facialHair}
-                facialHairColor={state.facialHairColor}
-                clotheType={state.clothe}
-                clotheColor={state.clotheColor}
-                graphicType={state.graphic}
-                eyeType={state.eye}
-                eyebrowType={state.eyebrow}
-                mouthType={state.mouth}
-                skinColor={state.skin} />
-              <canvas
-                style={{ display: 'none' }}
-                width='528'
-                height='570'
-                ref={this.canvas}
-              />
-            </div>
+        <div className={style.container}>
+          <div className={style.wrapper}>
+            <div className={style.canvas}>
+              <div className={style.profile}>
+                <div className={style.avatar}>
+                  <Avatar style={{'width': '100%'}}
+                    ref={this.avatar}
+                    avatarStyle={state.avatar}
+                    topType={state.top}
+                    accessoriesType={state.accessory}
+                    hairColor={state.hairColor}
+                    hatColor={state.hatColor}
+                    facialHairType={state.facialHair}
+                    facialHairColor={state.facialHairColor}
+                    clotheType={state.clothe}
+                    clotheColor={state.clotheColor}
+                    graphicType={state.graphic}
+                    eyeType={state.eye}
+                    eyebrowType={state.eyebrow}
+                    mouthType={state.mouth}
+                    skinColor={state.skin} />
+                  <canvas
+                    style={{ display: 'none' }}
+                    width='528'
+                    height='570'
+                    ref={this.canvas}
+                  />
+                </div>
 
-            <div className={style.download}>
-              <Button type='button' classes='button auto' text={i18n.t('online.cartoon.avatar.page.download')} click={this.handleDownload} disabled={state.downloading} />
+                <div className={style.download}>
+                  <Button type='button' classes='button auto' text={i18n.t('online.cartoon.avatar.page.download')} click={this.handleDownload} disabled={state.downloading} />
+                </div>
+              </div>
+              <div>
+                <div className={style.actions}>
+                  {actions}
+                </div>
+                {state.action === 'hair' && <div className={style.parts}> {hairShapes} </div>}
+                {state.action === 'accessory' && <div className={style.parts}> {accessories} </div>}
+                {state.action === 'beard' && <div className={style.parts}> {facialHairs} </div>}
+                {state.action === 'clothes' && <div className={style.parts}> {clothes} </div>}
+                {state.action === 'clothes' && state.clothe.includes('Graphic') && <div className={style.parts}> {graphics} </div>}
+                {state.action === 'eyes' && <div className={style.parts}> {eyes} </div>}
+                {state.action === 'eyebrows' && <div className={style.parts}> {eyebrows} </div>}
+                {state.action === 'mouth' && <div className={style.parts}> {mouths} </div>}
+                {state.action === 'skin' && <div className={style.parts}> {skins} </div>}
+                {state.action === 'hair' && state.top !== 'NoHair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && state.top !== 'LongHairFrida' && state.top.includes('Hair') && <div className={style.colors}> {hairColors} </div>}
+                {state.action === 'beard' && state.facialHair !== 'Blank' && <div className={style.colors}> {facialHairColors} </div>}
+                {state.action === 'clothes' && !state.clothe.includes('Blazer') && <div className={style.colors}> {clotheColors} </div>}
+              </div>
             </div>
-            {state.action === 'hair' && state.top !== 'NoHair' && state.top !== 'LongHairFrida' && state.top.includes('Hair') && <div className={style.colors}> {hairColors} </div>}
-            {state.action === 'hair' && state.top !== 'Eyepatch' && state.top !== 'Hat' && !state.top.includes('Hair') && <div className={style.colors}> {hatColors} </div>}
-          </div>
-          <div>
-            <div className={style.actions}>
-              {actions}
+            <h2 className={style.head2}>{i18n.t('online.cartoon.avatar.page.description.title')}</h2>
+            <div>{i18n.t('online.cartoon.avatar.page.description.body')}</div>
+            <div className={style.thanks} dangerouslySetInnerHTML={{__html: i18n.t('online.cartoon.avatar.page.description.thanks')}}>
             </div>
-            {state.action === 'hair' && <div className={style.parts}> {hairShapes} </div>}
-            {state.action === 'accessory' && <div className={style.parts}> {accessories} </div>}
-            {state.action === 'beard' && <div className={style.parts}> {facialHairs} </div>}
-            {state.action === 'clothes' && <div className={style.parts}> {clothes} </div>}
-            {state.action === 'clothes' && state.clothe.includes('Graphic') && <div className={style.parts}> {graphics} </div>}
-            {state.action === 'eyes' && <div className={style.parts}> {eyes} </div>}
-            {state.action === 'eyebrows' && <div className={style.parts}> {eyebrows} </div>}
-            {state.action === 'mouth' && <div className={style.parts}> {mouths} </div>}
-            {state.action === 'skin' && <div className={style.parts}> {skins} </div>}
-            {state.action === 'beard' && state.facialHair !== 'Blank' && <div className={style.colors}> {facialHairColors} </div>}
-            {state.action === 'clothes' && !state.clothe.includes('Blazer') && <div className={style.colors}> {clotheColors} </div>}
+            <div className={style.languages}>
+              <a href='/avatar'><img className={style.country} src={usa} alt={Config.Name} /></a>
+              <a href='/avatar?locale=ru'><img className={style.country} src={russia} alt={Config.Name} /></a>
+              <a href='/avatar?locale=zh'><img className={style.country} src={china} alt={Config.Name} /></a>
+            </div>
           </div>
-        </div>
-        <h2 className={style.head2}>{i18n.t('online.cartoon.avatar.page.description.title')}</h2>
-        <div>{i18n.t('online.cartoon.avatar.page.description.body')}</div>
-        <div className={style.thanks} dangerouslySetInnerHTML={{__html: i18n.t('online.cartoon.avatar.page.description.thanks')}}>
-        </div>
-        <div className={style.languages}>
-          <a href='/avatar'><img className={style.country} src={usa} alt={Config.Name} /></a>
-          <a href='/avatar?locale=ru'><img className={style.country} src={russia} alt={Config.Name} /></a>
-          <a href='/avatar?locale=zh'><img className={style.country} src={china} alt={Config.Name} /></a>
         </div>
       </div>
     )

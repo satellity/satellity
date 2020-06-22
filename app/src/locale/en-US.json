@@ -100,7 +100,7 @@
       "page": {
         "download": "Download",
         "title": "Free Cartoon Avatar Maker",
-        "subtitle": "Create Your Own Avatar For Free!",
+        "subtitle": "A playful Avatar Generator, Create Avatar For Free!",
         "description": {
           "title": "How to make your own avatar?",
           "body": "Making an avatar is very simple, just click the different parts, like hair, accessory, beard, etc to switch the selection, and then click the favorite style. You can see the result on the right (or above) immediately. Also You can click the download button to get your avatar. Enjoy it! Any questions, feedbacks are appreciated, feel free to submit in the forum.",
@@ -108,14 +108,14 @@
         }
       },
       "actions": {
-        "hair": "hair",
-        "accessory": "accessory",
-        "beard": "beard",
-        "clothes": "clothes",
-        "eyes": "eyes",
-        "eyebrows": "eyebrows",
-        "mouth": "mouth",
-        "skin": "skin"
+        "hair": "Hair",
+        "accessory": "Accessory",
+        "beard": "Beard",
+        "clothes": "Clothes",
+        "eyes": "Eyes",
+        "eyebrows": "Eyebrows",
+        "mouth": "Mouth",
+        "skin": "Skin"
       }
     }
   }
