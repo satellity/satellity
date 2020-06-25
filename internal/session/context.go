@@ -12,6 +12,7 @@ type contextValueKey int
 const (
 	keyLogger      contextValueKey = 1
 	keyRender      contextValueKey = 2
+	keyDatabase    contextValueKey = 3
 	keyRequestBody contextValueKey = 13
 )
 
@@ -35,6 +36,17 @@ func Render(ctx context.Context) *render.Render {
 // WithRender put render to context
 func WithRender(ctx context.Context, r *render.Render) context.Context {
 	return context.WithValue(ctx, keyRender, r)
+}
+
+// Database read the database from context
+func Database(ctx context.Context) *durable.Database {
+	v, _ := ctx.Value(keyDatabase).(*durable.Database)
+	return v
+}
+
+// WithDatabase put database in context
+func WithDatabase(ctx context.Context, database *durable.Database) context.Context {
+	return context.WithValue(ctx, keyDatabase, database)
 }
 
 // RequestBody read request body from context

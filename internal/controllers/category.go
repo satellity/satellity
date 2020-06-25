@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"satellity/internal/durable"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
@@ -11,20 +10,17 @@ import (
 	"github.com/dimfeld/httptreemux"
 )
 
-type categoryImpl struct {
-	database *durable.Database
-}
+type categoryImpl struct{}
 
-func registerCategory(database *durable.Database, router *httptreemux.Group) {
-	impl := &categoryImpl{database: database}
+func registerCategory(router *httptreemux.Group) {
+	impl := &categoryImpl{}
 
 	router.GET("/categories", impl.index)
 	router.GET("/categories/:id/topics", impl.topics)
 }
 
 func (impl *categoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	mctx := models.WrapContext(r.Context(), impl.database)
-	categories, err := models.ReadAllCategories(mctx)
+	categories, err := models.ReadAllCategories(r.Context())
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
@@ -34,13 +30,12 @@ func (impl *categoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[st
 
 func (impl *categoryImpl) topics(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	mctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.ReadCategoryByIDOrName(mctx, params["id"])
+	category, err := models.ReadCategoryByIDOrName(r.Context(), params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if category == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if topics, err := category.ReadTopics(mctx, offset); err != nil {
+	} else if topics, err := category.ReadTopics(r.Context(), offset); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

@@ -12,7 +12,6 @@ import (
 func TestTopicCRUD(t *testing.T) {
 	assert := assert.New(t)
 	ctx := setupTestContext()
-	defer ctx.database.Close()
 	defer teardownTestContext(ctx)
 
 	user := createTestUser(ctx, "im.yuqlee@gmail.com", "username", "password")

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -8,6 +9,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"satellity/internal/session"
 	"strings"
 	"testing"
 	"time"
@@ -21,7 +23,6 @@ import (
 func TestUserCRUD(t *testing.T) {
 	assert := assert.New(t)
 	ctx := setupTestContext()
-	defer ctx.database.Close()
 	defer teardownTestContext(ctx)
 
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
@@ -83,7 +84,7 @@ func TestUserCRUD(t *testing.T) {
 			assert.Nil(err)
 			assert.NotNil(new)
 			assert.Equal(tc.username, user.Username)
-			assert.Equal(tc.role, user.Role())
+			assert.Equal(tc.role, user.GetRole())
 
 			sess, err := readTestSession(ctx, new.UserID, new.SessionID)
 			assert.Nil(err)
@@ -116,17 +117,16 @@ func TestUserCRUD(t *testing.T) {
 	}
 }
 
-func createTestUser(mctx *Context, email, username, password string) *User {
+func createTestUser(ctx context.Context, email, username, password string) *User {
 	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	public, _ := x509.MarshalPKIXPublicKey(priv.Public())
-	user, _ := CreateUser(mctx, email, username, "nickname", "", password, hex.EncodeToString(public))
+	user, _ := CreateUser(ctx, email, username, "nickname", "", password, hex.EncodeToString(public))
 	return user
 }
 
-func readTestSession(mctx *Context, uid, sid string) (*Session, error) {
-	ctx := mctx.context
+func readTestSession(ctx context.Context, uid, sid string) (*Session, error) {
 	var s *Session
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		s, err = readSession(ctx, tx, uid, sid)
 		return err

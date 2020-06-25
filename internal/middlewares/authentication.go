@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"regexp"
-	"satellity/internal/durable"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
@@ -42,15 +41,14 @@ func CurrentUser(r *http.Request) *models.User {
 }
 
 // Authenticate handle routes by user's role
-func Authenticate(database *durable.Database, handler http.Handler) http.Handler {
+func Authenticate(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("Authorization")
 		if !strings.HasPrefix(header, "Bearer ") {
 			handleUnauthorized(handler, w, r)
 			return
 		}
-		mctx := models.WrapContext(r.Context(), database)
-		user, err := models.AuthenticateUser(mctx, header[7:])
+		user, err := models.AuthenticateUser(r.Context(), header[7:])
 		if err != nil {
 			views.RenderErrorResponse(w, r, err)
 			return

@@ -38,9 +38,9 @@ func categoryFromRows(row durable.Row) (*Category, error) {
 	return &c, err
 }
 
-// CreateCategory create a new category.
-func CreateCategory(mctx *Context, name, alias, description string, position int64) (*Category, error) {
-	ctx := mctx.context
+// CreateCategory create a new category with none blank name and alias, and optional description.
+// alias use for human-readable, position for ordering categories
+func CreateCategory(ctx context.Context, name, alias, description string, position int64) (*Category, error) {
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if len(name) < 1 {
@@ -63,7 +63,7 @@ func CreateCategory(mctx *Context, name, alias, description string, position int
 		UpdatedAt:   t,
 	}
 
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		if position == 0 {
 			count, err := categoryCount(ctx, tx)
 			if err != nil {
@@ -85,17 +85,13 @@ func CreateCategory(mctx *Context, name, alias, description string, position int
 	return category, nil
 }
 
-// UpdateCategory update a category's attributes
-func UpdateCategory(mctx *Context, id, name, alias, description string, position int64) (*Category, error) {
-	ctx := mctx.context
+// UpdateCategory update fields of a category
+func UpdateCategory(ctx context.Context, id, name, alias, description string, position int64) (*Category, error) {
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
-	if len(alias) < 1 && len(name) < 1 {
-		return nil, session.BadDataError(ctx)
-	}
 
 	var category *Category
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil || category == nil {
@@ -107,9 +103,7 @@ func UpdateCategory(mctx *Context, id, name, alias, description string, position
 		if len(alias) > 0 {
 			category.Alias = alias
 		}
-		if len(description) > 0 {
-			category.Description = description
-		}
+		category.Description = description
 		category.Position = position
 		category.UpdatedAt = time.Now()
 		cols, posits := durable.PrepareColumnsWithParams([]string{"name", "alias", "description", "position", "updated_at"})
@@ -125,17 +119,13 @@ func UpdateCategory(mctx *Context, id, name, alias, description string, position
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	if category == nil {
-		return nil, session.NotFoundError(ctx)
-	}
 	return category, nil
 }
 
-// ReadCategory read a category by ID (uuid).
-func ReadCategory(mctx *Context, id string) (*Category, error) {
-	ctx := mctx.context
+// ReadCategory read a category by ID
+func ReadCategory(ctx context.Context, id string) (*Category, error) {
 	var category *Category
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		return err
@@ -147,10 +137,9 @@ func ReadCategory(mctx *Context, id string) (*Category, error) {
 }
 
 // ReadCategoryByIDOrName read a category by id or name
-func ReadCategoryByIDOrName(mctx *Context, identity string) (*Category, error) {
-	ctx := mctx.context
+func ReadCategoryByIDOrName(ctx context.Context, identity string) (*Category, error) {
 	query := fmt.Sprintf("SELECT %s FROM categories WHERE category_id=$1 OR name=$1", strings.Join(categoryColumns, ","))
-	row, err := mctx.database.QueryRowContext(ctx, query, identity)
+	row, err := session.Database(ctx).QueryRowContext(ctx, query, identity)
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
@@ -162,10 +151,9 @@ func ReadCategoryByIDOrName(mctx *Context, identity string) (*Category, error) {
 }
 
 // ReadAllCategories read categories order by position
-func ReadAllCategories(mctx *Context) ([]*Category, error) {
-	ctx := mctx.context
+func ReadAllCategories(ctx context.Context) ([]*Category, error) {
 	var categories []*Category
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		categories, err = readCategories(ctx, tx)
 		return err
@@ -207,13 +195,14 @@ func readCategories(ctx context.Context, tx *sql.Tx) ([]*Category, error) {
 }
 
 // emitToCategory update category's info, e.g.: LastTopicID, TopicsCount
-func emitToCategory(mctx *Context, id string) (*Category, error) {
+func emitToCategory(db *durable.Database, logger *durable.Logger, id string) (*Category, error) {
+	ctx := session.WithDatabase(context.Background(), db)
+	ctx = session.WithLogger(ctx, logger)
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	ctx := context.Background()
 	var category *Category
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil {

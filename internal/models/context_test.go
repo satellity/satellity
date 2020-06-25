@@ -6,6 +6,7 @@ import (
 	"log"
 	"satellity/internal/configs"
 	"satellity/internal/durable"
+	"satellity/internal/session"
 )
 
 const (
@@ -22,7 +23,7 @@ const (
 	dropUsersDDL             = `DROP TABLE IF EXISTS users;`
 )
 
-func teardownTestContext(mctx *Context) {
+func teardownTestContext(ctx context.Context) {
 	tables := []string{
 		dropStatisticsDDL,
 		dropCommentsDDL,
@@ -33,7 +34,7 @@ func teardownTestContext(mctx *Context) {
 		dropSessionsDDL,
 		dropUsersDDL,
 	}
-	db := mctx.database
+	db := session.Database(ctx)
 	for _, q := range tables {
 		if _, err := db.Exec(q); err != nil {
 			log.Panicln(err)
@@ -41,7 +42,7 @@ func teardownTestContext(mctx *Context) {
 	}
 }
 
-func setupTestContext() *Context {
+func setupTestContext() context.Context {
 	if err := configs.Init("../configs/config.yaml", testEnvironment); err != nil {
 		log.Panicln(err)
 	}
@@ -64,5 +65,5 @@ func setupTestContext() *Context {
 		log.Panicln(err)
 	}
 	database := durable.WrapDatabase(db)
-	return WrapContext(context.Background(), database)
+	return session.WithDatabase(context.Background(), database)
 }

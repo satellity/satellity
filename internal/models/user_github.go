@@ -22,8 +22,7 @@ type GithubUser struct {
 }
 
 // CreateGithubUser create a github user. TODO should use createUser
-func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) {
-	ctx := mctx.context
+func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, error) {
 	token, err := fetchAccessToken(ctx, code)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
@@ -33,19 +32,22 @@ func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) 
 		return nil, session.ServerError(ctx, err)
 	}
 	var user *User
-	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		user, err = findUserByGithubID(ctx, tx, data.NodeID)
 		if err != nil {
 			return nil
 		}
 		user, err = createUser(ctx, tx, data.Email, fmt.Sprintf("%s_GH", data.Login), data.Name, "", sessionSecret, data.NodeID, user)
+		if err != nil {
+			return nil
+		}
+		_, err = upsertStatistic(ctx, tx, "users")
 		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	go upsertStatistic(mctx, "users")
 	return user, nil
 }
 

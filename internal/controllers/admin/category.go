@@ -3,7 +3,6 @@ package admin
 import (
 	"encoding/json"
 	"net/http"
-	"satellity/internal/durable"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
@@ -11,9 +10,7 @@ import (
 	"github.com/dimfeld/httptreemux"
 )
 
-type adminCategoryImpl struct {
-	database *durable.Database
-}
+type adminCategoryImpl struct{}
 
 type categoryRequest struct {
 	Name        string `json:"name"`
@@ -22,8 +19,8 @@ type categoryRequest struct {
 	Position    int64  `json:"position"`
 }
 
-func registerAdminCategory(database *durable.Database, router *httptreemux.Group) {
-	impl := &adminCategoryImpl{database: database}
+func registerAdminCategory(router *httptreemux.Group) {
+	impl := &adminCategoryImpl{}
 
 	router.POST("/categories", impl.create)
 	router.POST("/categories/:id", impl.update)
@@ -37,8 +34,7 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	mctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.CreateCategory(mctx, body.Name, body.Alias, body.Description, body.Position)
+	category, err := models.CreateCategory(r.Context(), body.Name, body.Alias, body.Description, body.Position)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
@@ -47,8 +43,7 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 }
 
 func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	mctx := models.WrapContext(r.Context(), impl.database)
-	categories, err := models.ReadAllCategories(mctx)
+	categories, err := models.ReadAllCategories(r.Context())
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
@@ -62,20 +57,22 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	mctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.UpdateCategory(mctx, params["id"], body.Name, body.Alias, body.Description, body.Position)
+	category, err := models.UpdateCategory(r.Context(), params["id"], body.Name, body.Alias, body.Description, body.Position)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
+	} else if category == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 	} else {
 		views.RenderCategory(w, r, category)
 	}
 }
 
 func (impl *adminCategoryImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	mctx := models.WrapContext(r.Context(), impl.database)
-	category, err := models.ReadCategory(mctx, params["id"])
+	category, err := models.ReadCategory(r.Context(), params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
+	} else if category == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
 	} else {
 		views.RenderCategory(w, r, category)
 	}

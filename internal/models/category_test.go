@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"satellity/internal/session"
 	"strings"
 	"testing"
 
@@ -12,7 +13,6 @@ import (
 func TestCategoryCRUD(t *testing.T) {
 	assert := assert.New(t)
 	ctx := setupTestContext()
-	defer ctx.database.Close()
 	defer teardownTestContext(ctx)
 
 	categoryCases := []struct {
@@ -53,7 +53,7 @@ func TestCategoryCRUD(t *testing.T) {
 			assert.Nil(err)
 			assert.NotNil(new)
 			assert.Equal(category.CategoryID, new.CategoryID)
-			new, err = emitToCategory(ctx, category.CategoryID)
+			new, err = emitToCategory(session.Database(ctx), session.Logger(ctx), category.CategoryID)
 			assert.Nil(err)
 			assert.NotNil(new)
 			categories, err := ReadAllCategories(ctx)
@@ -63,23 +63,23 @@ func TestCategoryCRUD(t *testing.T) {
 			assert.Nil(err)
 			assert.Nil(new)
 			new, err = UpdateCategory(ctx, uuid.Must(uuid.NewV4()).String(), "new"+category.Name, "new"+category.Alias, "new"+category.Description, 10)
-			assert.NotNil(err)
+			assert.Nil(err)
 			assert.Nil(new)
 			new, err = UpdateCategory(ctx, category.CategoryID, "", "", "", 10)
-			assert.NotNil(err)
-			assert.Nil(new)
+			assert.Nil(err)
+			assert.NotNil(new)
 			new, err = UpdateCategory(ctx, category.CategoryID, "new"+category.Name, "", "", 10)
 			assert.Nil(err)
 			assert.NotNil(new)
 			assert.Equal("new"+tc.name, new.Name)
 			assert.Equal(tc.alias, new.Alias)
-			assert.Equal(tc.description, new.Description)
+			assert.Equal("", new.Description)
 			new, err = UpdateCategory(ctx, category.CategoryID, "new"+category.Name, "new"+category.Alias, "", 10)
 			assert.Nil(err)
 			assert.NotNil(new)
 			assert.Equal("new"+tc.name, new.Name)
 			assert.Equal("new"+tc.alias, new.Alias)
-			assert.Equal(tc.description, new.Description)
+			assert.Equal("", new.Description)
 			new, err = UpdateCategory(ctx, category.CategoryID, "new"+category.Name, "new"+category.Alias, "new"+category.Description, 10)
 			assert.Nil(err)
 			assert.NotNil(new)

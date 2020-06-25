@@ -2,7 +2,6 @@ package admin
 
 import (
 	"net/http"
-	"satellity/internal/durable"
 	"satellity/internal/models"
 	"satellity/internal/views"
 	"time"
@@ -10,20 +9,17 @@ import (
 	"github.com/dimfeld/httptreemux"
 )
 
-type userImpl struct {
-	database *durable.Database
-}
+type userImpl struct{}
 
-func registerAdminUser(database *durable.Database, router *httptreemux.Group) {
-	impl := &userImpl{database: database}
+func registerAdminUser(router *httptreemux.Group) {
+	impl := &userImpl{}
 
 	router.GET("/users", impl.index)
 }
 
 func (impl *userImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	ctx := models.WrapContext(r.Context(), impl.database)
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	users, err := models.ReadUsers(ctx, offset)
+	users, err := models.ReadUsers(r.Context(), offset)
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
