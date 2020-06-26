@@ -7481,10 +7481,10 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jsrsasign@^8.0.18:
-  version "8.0.18"
-  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-8.0.18.tgz#dd9d5ec8f54f6ef929a998ae4bd0f66c16d8608d"
-  integrity sha512-ecSllQMHUmhyGGRujah3VEsV9YNJDHEwiiG6SlijBNDQUaOrXOJcAWTalPqBeT8IQLDmReA5NeFLXK7fDND+YA==
+jsrsasign@^8.0.19:
+  version "8.0.19"
+  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-8.0.19.tgz#c36260f103cc639a9202e5243d7544cde48d53a7"
+  integrity sha512-qf+F41huTh9ThXj5n3yfAJJRp8vx05JYbGlGvCjusYX50rsfqY6ASK08LCOutl0yA1BHIpGG8bd1w5x9aGy7Zg==
 
 jss-plugin-camel-case@^10.0.0:
   version "10.2.0"
