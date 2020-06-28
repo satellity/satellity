@@ -3,6 +3,7 @@ module satellity
 go 1.14
 
 require (
+	github.com/decred/base58 v1.0.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/go-errors/errors v1.1.1

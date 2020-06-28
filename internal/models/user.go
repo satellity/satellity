@@ -50,9 +50,12 @@ func (u *User) values() []interface{} {
 	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.AvatarURL, u.Biography, u.EncryptedPassword, u.GithubID, u.Role, u.CreatedAt, u.UpdatedAt}
 }
 
-func userFromRows(row durable.Row) (*User, error) {
+func userFromRow(row durable.Row) (*User, error) {
 	var u User
 	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.AvatarURL, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.Role, &u.CreatedAt, &u.UpdatedAt)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
 	return &u, err
 }
 
@@ -207,7 +210,7 @@ func ReadUsers(ctx context.Context, offset time.Time) ([]*User, error) {
 
 	var users []*User
 	for rows.Next() {
-		user, err := userFromRows(rows)
+		user, err := userFromRow(rows)
 		if err != nil {
 			return nil, session.TransactionError(ctx, err)
 		}
@@ -228,7 +231,7 @@ func readUsersByIds(ctx context.Context, tx *sql.Tx, ids []string) ([]*User, err
 
 	var users []*User
 	for rows.Next() {
-		user, err := userFromRows(rows)
+		user, err := userFromRow(rows)
 		if err != nil {
 			return nil, err
 		}
@@ -287,7 +290,7 @@ func ReadUserByUsernameOrEmail(ctx context.Context, identity string) (*User, err
 
 func findUserByIdentity(ctx context.Context, tx *sql.Tx, identity string) (*User, error) {
 	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1 LIMIT 1", strings.Join(userColumns, ",")), identity)
-	user, err := userFromRows(row)
+	user, err := userFromRow(row)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
@@ -333,7 +336,7 @@ func findUserByID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
 	}
 
 	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE user_id=$1", strings.Join(userColumns, ",")), id)
-	u, err := userFromRows(row)
+	u, err := userFromRow(row)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}

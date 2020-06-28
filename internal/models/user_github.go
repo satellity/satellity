@@ -33,12 +33,11 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 	}
 	var user *User
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		user, err = findUserByGithubID(ctx, tx, data.NodeID)
+		existing, err := findUserByGithubID(ctx, tx, data.NodeID)
 		if err != nil {
-			return nil
+			return err
 		}
-		user, err = createUser(ctx, tx, data.Email, fmt.Sprintf("%s_GH", data.Login), data.Name, "", sessionSecret, data.NodeID, user)
+		user, err = createUser(ctx, tx, data.Email, fmt.Sprintf("%s_GH", data.Login), data.Name, "", sessionSecret, data.NodeID, existing)
 		if err != nil {
 			return nil
 		}
@@ -138,17 +137,6 @@ func fetchUserEmail(ctx context.Context, accessToken string) (string, error) {
 }
 
 func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
-		return nil, nil
-	}
-	return userFromRows(rows)
+	row := tx.QueryRow(fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
+	return userFromRow(row)
 }

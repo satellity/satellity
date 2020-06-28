@@ -9,6 +9,7 @@ import Topics from './topics/index.js';
 import Comments from './comments/index.js';
 import CategoriesNew from './categories/new.js';
 import CategoriesEdit from './categories/edit.js';
+import ProductView from './products/view.js';
 import API from '../api/index.js';
 
 class AdminRoute extends Component {
@@ -35,6 +36,7 @@ class AdminRoute extends Component {
           <Link to='/' className='brand'> &larr; <span className='only-pc'>Back to {this.state.site}</span></Link>
           <Link to='/admin' className='navi'>Dashboard</Link>
           <Link to='/admin/users' className='navi'>Users</Link>
+          <Link to='/admin/products' className='navi'>Products</Link>
           <Link to='/admin/topics' className='navi'>Topics</Link>
           <Link to='/admin/comments' className='navi'>Comments</Link>
           <Link to='/admin/categories' className='navi'>Categories</Link>
@@ -48,6 +50,9 @@ class AdminRoute extends Component {
             <Route exact path={`${match.url}/categories`} component={Categories} />
             <Route exact path={`${match.url}/categories/new`} component={CategoriesNew} />
             <Route path={`${match.url}/categories/:id/edit`} component={CategoriesEdit} />
+            <Route exact path={`${match.url}/products`} component={ProductView.Index} />
+            <Route exact path={`${match.url}/products/new`} component={ProductView.New} />
+            <Route exact path={`${match.url}/products/:id/edit`} component={ProductView.New} />
           </div>
         </div>
       </div>

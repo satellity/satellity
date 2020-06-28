@@ -130,9 +130,6 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 		}
 		defer stmt.Close()
 		_, err = stmt.ExecContext(ctx, topic.values()...)
-		if err != nil {
-			return err
-		}
 		return err
 	})
 	if err != nil {
@@ -171,12 +168,18 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
-		if err != nil {
+		if err != nil || topic == nil {
 			return err
-		} else if topic == nil {
-			return nil
 		} else if topic.UserID != user.UserID && !user.isAdmin() {
 			return session.AuthorizationError(ctx)
+		}
+		topic.User = user
+		if topic.UserID != user.UserID {
+			u, err := findUserByID(ctx, tx, topic.UserID)
+			if err != nil {
+				return err
+			}
+			topic.User = u
 		}
 		prevDraft = topic.Draft
 		if !topic.Draft && draft {
@@ -237,7 +240,6 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 		go emitToCategory(session.Database(ctx), session.Logger(ctx), prevCategoryID)
 		go emitToCategory(session.Database(ctx), session.Logger(ctx), topic.CategoryID)
 	}
-	topic.User = user
 	return topic, nil
 }
 
