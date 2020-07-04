@@ -8,6 +8,7 @@ import Noty from 'noty';
 import Category from './category.js';
 import Topic from './topic.js';
 import Comment from './comment.js';
+import Product from './product.js';
 import Client from './client.js';
 import User from './user.js';
 import Me from './me.js';
@@ -118,6 +119,7 @@ class API {
     this.category = new Category(this);
     this.topic = new Topic(this);
     this.comment = new Comment(this);
+    this.product = new Product(axios);
     this.user = new User(this);
     this.me = new Me(this);
     this.verification = new Verification(this);

@@ -1,16 +1,15 @@
 package admin
 
 import (
-	"satellity/internal/durable"
-
 	"github.com/dimfeld/httptreemux"
 )
 
 // RegisterAdminRoutes register admin routes
-func RegisterAdminRoutes(database *durable.Database, router *httptreemux.Group) {
+func RegisterAdminRoutes(router *httptreemux.Group) {
 	api := router.NewGroup("/admin")
-	registerAdminUser(database, api)
-	registerAdminCategory(database, api)
-	registerAdminTopic(database, api)
-	registerAdminComment(database, api)
+	registerAdminUser(api)
+	registerAdminCategory(api)
+	registerAdminTopic(api)
+	registerAdminComment(api)
+	registerAdminProduct(api)
 }

@@ -5,7 +5,6 @@ import (
 	"runtime"
 	"satellity/internal/configs"
 	"satellity/internal/controllers/admin"
-	"satellity/internal/durable"
 	"satellity/internal/session"
 	"satellity/internal/views"
 
@@ -13,17 +12,18 @@ import (
 )
 
 // RegisterRoutes register all routes
-func RegisterRoutes(database *durable.Database, router *httptreemux.TreeMux) {
+func RegisterRoutes(router *httptreemux.TreeMux) {
 	api := router.NewGroup("/api")
 
 	api.GET("/_hc", health)
 	api.GET("/client", client)
-	registerUser(database, api)
-	registerCategory(database, api)
-	registerTopic(database, api)
-	registerComment(database, api)
-	registerVerification(database, api)
-	admin.RegisterAdminRoutes(database, api)
+	registerUser(api)
+	registerCategory(api)
+	registerTopic(api)
+	registerComment(api)
+	registerProduct(api)
+	registerVerification(api)
+	admin.RegisterAdminRoutes(api)
 }
 
 func health(w http.ResponseWriter, r *http.Request, _ map[string]string) {

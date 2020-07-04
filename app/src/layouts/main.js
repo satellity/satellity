@@ -8,6 +8,7 @@ import API from '../api/index.js'
 import Home from '../home/view.js';
 import User from '../users/view.js';
 import Topic from '../topics/view.js';
+import Product from '../products/view.js';
 import Login from './login.js';
 
 class MainLayout extends Component {
@@ -30,6 +31,8 @@ class MainLayout extends Component {
             <Route exact path='/topics/new' component={Topic.New} />
             <Route path='/topics/:id/edit' component={Topic.New} />
             <Route path='/topics/:id' component={Topic.Show} />
+            <Route exact path='/products' component={Product.Index} />
+            <Route path='/products/:id' component={Product.Show} />
             <Redirect to={`/404?p=${this.state.p}`} />
           </Switch>
         </div>

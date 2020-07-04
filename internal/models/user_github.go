@@ -22,8 +22,7 @@ type GithubUser struct {
 }
 
 // CreateGithubUser create a github user. TODO should use createUser
-func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) {
-	ctx := mctx.context
+func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, error) {
 	token, err := fetchAccessToken(ctx, code)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
@@ -33,19 +32,21 @@ func CreateGithubUser(mctx *Context, code, sessionSecret string) (*User, error) 
 		return nil, session.ServerError(ctx, err)
 	}
 	var user *User
-	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		user, err = findUserByGithubID(ctx, tx, data.NodeID)
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+		existing, err := findUserByGithubID(ctx, tx, data.NodeID)
+		if err != nil {
+			return err
+		}
+		user, err = createUser(ctx, tx, data.Email, fmt.Sprintf("%s_GH", data.Login), data.Name, "", sessionSecret, data.NodeID, existing)
 		if err != nil {
 			return nil
 		}
-		user, err = createUser(ctx, tx, data.Email, fmt.Sprintf("%s_GH", data.Login), data.Name, "", sessionSecret, data.NodeID, user)
+		_, err = upsertStatistic(ctx, tx, "users")
 		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	go upsertStatistic(mctx, "users")
 	return user, nil
 }
 
@@ -136,17 +137,6 @@ func fetchUserEmail(ctx context.Context, accessToken string) (string, error) {
 }
 
 func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		if err := rows.Err(); err != nil {
-			return nil, err
-		}
-		return nil, nil
-	}
-	return userFromRows(rows)
+	row := tx.QueryRow(fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
+	return userFromRow(row)
 }

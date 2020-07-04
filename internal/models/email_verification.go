@@ -36,9 +36,7 @@ func emailVerificationFromRows(row durable.Row) (*EmailVerification, error) {
 }
 
 // CreateEmailVerification create an email verification
-func CreateEmailVerification(mctx *Context, purpose, email, recaptcha string) (*EmailVerification, error) {
-	ctx := mctx.context
-
+func CreateEmailVerification(ctx context.Context, purpose, email, recaptcha string) (*EmailVerification, error) {
 	code, err := generateVerificationCode(ctx)
 	if err != nil {
 		return nil, err
@@ -58,7 +56,7 @@ func CreateEmailVerification(mctx *Context, purpose, email, recaptcha string) (*
 	}
 
 	var should bool
-	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		_, err = tx.ExecContext(ctx, "DELETE FROM email_verifications WHERE created_at<$1", time.Now().Add(-24*time.Hour))
 		if err != nil {
 			return err
@@ -93,11 +91,9 @@ func CreateEmailVerification(mctx *Context, purpose, email, recaptcha string) (*
 }
 
 // VerifyEmailVerification verify an email verification
-func VerifyEmailVerification(mctx *Context, verificationID, code, username, password, sessionSecret string) (*User, error) {
-	ctx := mctx.context
-
+func VerifyEmailVerification(ctx context.Context, verificationID, code, username, password, sessionSecret string) (*User, error) {
 	var user *User
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		ev, err := findEmailVerification(ctx, tx, verificationID)
 		if err != nil || ev == nil {
 			return err
@@ -147,10 +143,9 @@ func VerifyEmailVerification(mctx *Context, verificationID, code, username, pass
 	return user, nil
 }
 
-func Reset(mctx *Context, verificationID, code, password string) error {
-	ctx := mctx.context
+func Reset(ctx context.Context, verificationID, code, password string) error {
 	var user *User
-	err := mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		ev, err := findEmailVerification(ctx, tx, verificationID)
 		if err != nil || ev == nil {
 			return err
@@ -275,15 +270,3 @@ func generateVerificationCode(ctx context.Context) (string, error) {
 	}
 	return fmt.Sprint(c), nil
 }
-
-const emailVerificationDDL = `
-CREATE TABLE IF NOT EXISTS email_verifications (
-	verification_id        VARCHAR(36) PRIMARY KEY,
-	email                  VARCHAR(512),
-	code                   VARCHAR(512),
-	created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS email_verifications_email_code_createdx ON email_verifications (email, code, created_at DESC);
-CREATE INDEX IF NOT EXISTS email_verifications_createdx ON email_verifications (created_at DESC);
-`

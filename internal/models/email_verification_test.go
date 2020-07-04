@@ -13,11 +13,10 @@ import (
 
 func TestEmailVerification(t *testing.T) {
 	assert := assert.New(t)
-	mctx := setupTestContext()
-	defer mctx.database.Close()
-	defer teardownTestContext(mctx)
+	ctx := setupTestContext()
+	defer teardownTestContext(ctx)
 
-	ev, err := CreateEmailVerification(mctx, "USER", "im.yuqlee@gmail.com", "testrecaptcha")
+	ev, err := CreateEmailVerification(ctx, "USER", "im.yuqlee@gmail.com", "testrecaptcha")
 	assert.Nil(err)
 	assert.NotNil(ev)
 
@@ -25,10 +24,10 @@ func TestEmailVerification(t *testing.T) {
 	assert.Nil(err)
 	public, err := x509.MarshalPKIXPublicKey(priv.Public())
 	assert.Nil(err)
-	user, err := VerifyEmailVerification(mctx, ev.VerificationID, ev.Code, "jason", "nopassword", hex.EncodeToString(public))
+	user, err := VerifyEmailVerification(ctx, ev.VerificationID, ev.Code, "jason", "nopassword", hex.EncodeToString(public))
 	assert.Nil(err)
 	assert.NotNil(user)
-	user, err = ReadUser(mctx, user.UserID)
+	user, err = ReadUser(ctx, user.UserID)
 	assert.Nil(err)
 	assert.NotNil(user)
 }

@@ -13,9 +13,10 @@ import (
 
 // Error is a custom error
 type Error struct {
-	Status      int    `json:"status"`
-	Code        int    `json:"code"`
-	Description string `json:"description"`
+	Status      int         `json:"status"`
+	Code        int         `json:"code"`
+	Description string      `json:"description"`
+	Extra       interface{} `json:"extra,omitempty"`
 	trace       string
 }
 
@@ -67,6 +68,17 @@ func TransactionError(ctx context.Context, err error) Error {
 func BadDataError(ctx context.Context) Error {
 	description := "The request data has invalid field."
 	return createError(ctx, http.StatusAccepted, 10002, description, nil)
+}
+
+func BadDataErrorWithFieldAndData(ctx context.Context, field, reason, data string) Error {
+	description := "The request data has invalid field."
+	er := fmt.Errorf("[BAD DATA %s]", data)
+	err := createError(ctx, http.StatusAccepted, 10002, description, er)
+	err.Extra = map[string]string{
+		"field":  field,
+		"reason": reason,
+	}
+	return err
 }
 
 // InvalidEmailFormatError means the email is invalid.

@@ -32,58 +32,44 @@ func (s *Statistic) values() []interface{} {
 	return []interface{}{s.StatisticID, s.Name, s.Count, s.CreatedAt, s.UpdatedAt}
 }
 
-// TODO: ctx without logger
-func upsertStatistic(mctx *Context, name string) (*Statistic, error) {
-	ctx := context.Background()
+func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, error) {
 	id, err := generateStatisticID(SolidStatisticID, name)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
 	}
-	if name != "users" &&
-		name != "topics" &&
-		name != "comments" {
+	if name != "users" && name != "topics" && name != "comments" {
 		return nil, session.BadDataError(ctx)
 	}
 
-	var s *Statistic
-	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
-		var err error
-		s, err = findStatistic(ctx, tx, id)
-		if err != nil {
-			return err
-		}
-		var count int64
-		switch name {
-		case "users":
-			count, err = usersCount(ctx, tx)
-		case "topics":
-			count, err = topicsCount(ctx, tx)
-		case "comments":
-			count, err = commentsCount(ctx, tx)
-		}
-		if err != nil {
-			return err
-		}
-		if s != nil {
-			s.Count = count
-			_, err := tx.ExecContext(ctx, fmt.Sprintf("UPDATE statistics SET count=$1 WHERE statistic_id=$2"), count, id)
-			return err
-		}
+	s, err := findStatistic(ctx, tx, id)
+	if err != nil {
+		return nil, err
+	}
+	var count int64
+	switch name {
+	case "users":
+		count, err = usersCount(ctx, tx)
+	case "topics":
+		count, err = topicsCount(ctx, tx)
+	case "comments":
+		count, err = commentsCount(ctx, tx)
+	}
+	if err != nil {
+		return nil, err
+	}
+	t := time.Now()
+	if s == nil {
 		s = &Statistic{
 			StatisticID: id,
 			Name:        name,
-			Count:       int64(count),
+			CreatedAt:   t,
 		}
-		cols, params := durable.PrepareColumnsWithParams(statisticColumns)
-		if _, err := tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s)", cols, params), s.values()...); err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
 	}
-	return s, nil
+	s.Count = count
+	s.UpdatedAt = t
+	cols, params := durable.PrepareColumnsWithParams(statisticColumns)
+	_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s) ON CONFLICT (statistic_id) DO UPDATE SET (count,updated_at)=(EXCLUDED.count,EXCLUDED.updated_at)", cols, params), s.values()...)
+	return s, err
 }
 
 func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, error) {

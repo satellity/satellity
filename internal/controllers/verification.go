@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"satellity/internal/durable"
 	"satellity/internal/models"
 	"satellity/internal/session"
 	"satellity/internal/views"
@@ -16,9 +15,7 @@ const (
 	purposePassword = "PASSWORD"
 )
 
-type verificationImpl struct {
-	database *durable.Database
-}
+type verificationImpl struct{}
 
 type verificationRequest struct {
 	Recaptcha     string `json:"recaptcha"`
@@ -30,8 +27,8 @@ type verificationRequest struct {
 	SessionSecret string `json:"session_secret"`
 }
 
-func registerVerification(database *durable.Database, router *httptreemux.Group) {
-	impl := &verificationImpl{database: database}
+func registerVerification(router *httptreemux.Group) {
+	impl := &verificationImpl{}
 
 	router.POST("/email_verifications", impl.create)
 	router.POST("/email_verifications/:id", impl.verify)
@@ -43,8 +40,7 @@ func (impl *verificationImpl) create(w http.ResponseWriter, r *http.Request, _ m
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	mctx := models.WrapContext(r.Context(), impl.database)
-	if verification, err := models.CreateEmailVerification(mctx, body.Purpose, body.Email, body.Recaptcha); err != nil {
+	if verification, err := models.CreateEmailVerification(r.Context(), body.Purpose, body.Email, body.Recaptcha); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderVerification(w, r, verification)
@@ -58,17 +54,16 @@ func (impl *verificationImpl) verify(w http.ResponseWriter, r *http.Request, par
 		return
 	}
 
-	mctx := models.WrapContext(r.Context(), impl.database)
 	switch body.Purpose {
 	case purposeUser:
-		user, err := models.VerifyEmailVerification(mctx, params["id"], body.Code, body.Username, body.Password, body.SessionSecret)
+		user, err := models.VerifyEmailVerification(r.Context(), params["id"], body.Code, body.Username, body.Password, body.SessionSecret)
 		if err != nil {
 			views.RenderErrorResponse(w, r, err)
 		} else {
 			views.RenderAccount(w, r, user)
 		}
 	case purposePassword:
-		err := models.Reset(mctx, params["id"], body.Code, body.Password)
+		err := models.Reset(r.Context(), params["id"], body.Code, body.Password)
 		if err != nil {
 			views.RenderErrorResponse(w, r, err)
 		} else {

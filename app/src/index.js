@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import showdown from 'showdown';
+import API from './api/index.js';
 import Tool from './tools/view.js';
 import Locale from './locale/index.js';
 import MainLayout from './layouts/main.js';
@@ -49,6 +50,7 @@ if (!!locale) {
   language = locale.split('-')[0];
 }
 window.i18n = new Locale(language);
+window.api = new API();
 
 ReactDOM.render((
   <Router>

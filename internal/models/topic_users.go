@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"satellity/internal/durable"
@@ -34,13 +35,12 @@ func (tu *TopicUser) values() []interface{} {
 }
 
 // ActiondBy execute user action, like or bookmark a topic
-func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bool) (*Topic, error) {
-	ctx := mctx.context
+func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, state bool) (*Topic, error) {
 	if action != TopicUserActionLiked &&
 		action != TopicUserActionBookmarked {
 		return topic, session.BadDataError(ctx)
 	}
-	tu, err := readTopicUser(mctx, topic.TopicID, user.UserID)
+	tu, err := readTopicUser(ctx, topic.TopicID, user.UserID)
 	if err != nil {
 		return topic, session.TransactionError(ctx, err)
 	}
@@ -55,7 +55,7 @@ func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bo
 			isNew: true,
 		}
 	}
-	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var lcount, bcount int64
 		if action == TopicUserActionLiked {
 			tu.Liked = state
@@ -95,7 +95,7 @@ func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bo
 			return nil
 		}
 		query := fmt.Sprintf("UPDATE topic_users SET %s=$1 WHERE topic_id=$2 AND user_id=$3", action)
-		if _, err := mctx.database.ExecContext(ctx, query, state, tu.TopicID, tu.UserID); err != nil {
+		if _, err := session.Database(ctx).ExecContext(ctx, query, state, tu.TopicID, tu.UserID); err != nil {
 			return err
 		}
 		return nil
@@ -106,10 +106,9 @@ func (topic *Topic) ActiondBy(mctx *Context, user *User, action string, state bo
 	return topic, nil
 }
 
-func readTopicUser(mctx *Context, topicID, userID string) (*TopicUser, error) {
-	ctx := mctx.context
+func readTopicUser(ctx context.Context, topicID, userID string) (*TopicUser, error) {
 	query := fmt.Sprintf("SELECT %s FROM topic_users WHERE topic_id=$1 AND user_id=$2", strings.Join(topicUserColumns, ","))
-	row, err := mctx.database.QueryRowContext(ctx, query, topicID, userID)
+	row, err := session.Database(ctx).QueryRowContext(ctx, query, topicID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -120,11 +119,11 @@ func readTopicUser(mctx *Context, topicID, userID string) (*TopicUser, error) {
 	return tu, err
 }
 
-func fillTopicWithAction(mctx *Context, topic *Topic, user *User) error {
+func fillTopicWithAction(ctx context.Context, topic *Topic, user *User) error {
 	if user == nil {
 		return nil
 	}
-	tu, err := readTopicUser(mctx, topic.TopicID, user.UserID)
+	tu, err := readTopicUser(ctx, topic.TopicID, user.UserID)
 	if err != nil || tu == nil {
 		return err
 	}

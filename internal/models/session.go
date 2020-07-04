@@ -37,8 +37,7 @@ func sessionFromRows(row durable.Row) (*Session, error) {
 }
 
 // CreateSession create a new user session
-func CreateSession(mctx *Context, identity, password, sessionSecret string) (*User, error) {
-	ctx := mctx.context
+func CreateSession(ctx context.Context, identity, password, sessionSecret string) (*User, error) {
 	data, err := hex.DecodeString(sessionSecret)
 	if err != nil {
 		return nil, session.BadDataError(ctx)
@@ -53,7 +52,7 @@ func CreateSession(mctx *Context, identity, password, sessionSecret string) (*Us
 		return nil, session.BadDataError(ctx)
 	}
 
-	user, err := ReadUserByUsernameOrEmail(mctx, identity)
+	user, err := ReadUserByUsernameOrEmail(ctx, identity)
 	if err != nil {
 		return nil, err
 	} else if user == nil {
@@ -63,7 +62,7 @@ func CreateSession(mctx *Context, identity, password, sessionSecret string) (*Us
 		return nil, session.InvalidPasswordError(ctx)
 	}
 
-	err = mctx.database.RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		_, err := tx.ExecContext(ctx, "DELETE FROM sessions WHERE session_id IN (SELECT session_id FROM sessions WHERE user_id=$1 ORDER BY created_at DESC OFFSET 5)", user.UserID)
 		if err != nil {
 			return err
