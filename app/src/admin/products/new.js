@@ -1,15 +1,14 @@
 import style from './new.module.scss';
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import Loading from '../../components/loading.js';
-import API from '../../api/index.js';
 const validate = require('uuid-validate');
 
 class New extends Component {
   constructor(props) {
     super(props);
 
-    this.api = new API();
+    this.api = window.api;
     let id = this.props.match.params.id;
     this.state = {
       product_id: !id ? '' : id,

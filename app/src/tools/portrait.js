@@ -185,6 +185,7 @@ class Portrait extends Component {
       )
     });
 
+    /*
     const hatColors = state.hat_colors.map((o) => {
       return (
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'hatColor', o)}>
@@ -192,6 +193,7 @@ class Portrait extends Component {
         </div>
       )
     });
+    */
 
     const facialHairColors = state.facial_hair_colors.map((o) => {
       return (

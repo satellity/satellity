@@ -1,0 +1,41 @@
+@import '../assets/css/constant.scss';
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 2.4rem .8rem;
+}
+.product {
+  box-sizing: border-box;
+  padding: 0 .8rem 1.6rem;
+  width: 33.3%;
+}
+.wrapper {
+  background: white;
+  display: block;
+  word-break: break-word;
+}
+.cover {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  height: 12rem;
+}
+.desc {
+  padding: .8rem;
+}
+
+@media only screen and (max-width: 48rem) {
+  .product {
+    width: 50%;
+  }
+  .cover {
+    height: 10rem;
+  }
+}
+
+@media only screen and (max-width: 30rem) {
+  .product {
+    width: 100%;
+  }
+}
