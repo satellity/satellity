@@ -26,10 +26,10 @@ class Index extends Component {
       return (
         <li key={product.product_id}>
           {product.user.nickname} |
-          <Link to={`/products/${product.product_id}`}>{product.name}</Link>
+          <Link to={`/products/${product.short_id}`}>{product.name}</Link>
           <div className={style.time}>
             {product.product_id} | {product.created_at} |
-            <Link to={`/admin/products/${product.product_id}/edit`} >EIDT</Link> |
+            <Link to={`/admin/products/${product.short_id}/edit`} >EIDT</Link> |
           </div>
         </li>
       )
