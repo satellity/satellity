@@ -1,6 +1,7 @@
 import style from './index.module.scss';
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
+import LazyLoad from 'react-lazyload';
 
 export default class Index extends Component {
   constructor(props) {
@@ -28,7 +29,9 @@ export default class Index extends Component {
       return (
         <div className={style.product}>
           <Link className={style.wrapper} to={`/products/${p.short_id}-${p.name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`}>
-            <div className={style.cover} style={{backgroundImage: `url(${p.cover_url})`}} />
+            <LazyLoad className={style.cover} offset={100}>
+              <div className={style.cover} style={{backgroundImage: `url(${p.cover_url})`}} />
+            </LazyLoad>
             <div className={style.desc}>
               <div className={style.name}>{p.name}</div>
             </div>

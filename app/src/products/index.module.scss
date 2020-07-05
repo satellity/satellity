@@ -16,6 +16,10 @@
   display: block;
   word-break: break-word;
 }
+.lazy {
+  height: 12rem;
+  overflow: hidden;
+}
 .cover {
   background-repeat: no-repeat;
   background-size: cover;
@@ -29,6 +33,10 @@
 @media only screen and (max-width: 48rem) {
   .product {
     width: 50%;
+  }
+  .lazy {
+    height: 10rem;
+    overflow: hidden;
   }
   .cover {
     height: 10rem;
