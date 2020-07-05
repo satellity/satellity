@@ -49,6 +49,12 @@ export default class Show extends Component {
           <div>
             {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.html_body}} />}
           </div>
+          {
+            state.source !== '' &&
+              <div>
+                <a href={state.source} className='btn info' rel='nofollow noopener noreferrer' target='_blank'>Visit</a>
+              </div>
+          }
         </div>
       </div>
     );
