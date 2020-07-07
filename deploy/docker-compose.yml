@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+    frontend:
+        build:
+            context: ..
+            dockerfile: build/frontend/Dockerfile
+        restart: always
+        network_mode: "host"
+        depends_on:
+            - backend
+        ports:
+            - "80:80"
+    backend:
+        build:
+            context: ..
+            dockerfile: build/backend/Dockerfile
+        restart: always
+        network_mode: "host"
+        depends_on:
+            - db
+    db:
+        build:
+            context: ..
+            dockerfile: build/db/Dockerfile
+        environment:
+            - POSTGRES_USER=satellity
+            - POSTGRES_DB=satellity_dev
+            - POSTGRES_PASSWORD=password
+        network_mode: "host"

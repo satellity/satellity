@@ -11,6 +11,11 @@ RUN mv env.example .env \
 
 RUN yarn build
 
+COPY deploy/nginx_example.conf /usr/src/conf/nginx.conf
+
+RUN sed -i 's#/path/to/satellity/html#/usr/share/nginx/html#g' /usr/src/conf/nginx.conf
+
 FROM nginx:alpine
 
 COPY --from=builder /usr/src/app/build /usr/share/nginx/html
+COPY --from=builder /usr/src/conf/nginx.conf /etc/nginx/nginx.conf
