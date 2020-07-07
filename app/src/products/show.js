@@ -2,6 +2,7 @@ import style from './show.module.scss';
 import React, {Component} from 'react';
 import showdown from 'showdown';
 import showdownHighlight from 'showdown-highlight';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SiteWidget from '../home/widget.js';
 import Loading from '../components/loading.js';
 
@@ -15,6 +16,7 @@ export default class Show extends Component {
     this.state = {
       product_id: props.match.params.id,
       loading: true,
+      tags: [],
     };
   }
 
@@ -49,11 +51,15 @@ export default class Show extends Component {
           <div>
             {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.html_body}} />}
           </div>
+          <div className={style.tags}>
+            <FontAwesomeIcon className={style.icon} icon={['fas', 'tags']} />
+            {state.tags.join(', ')}
+          </div>
           {
             state.source !== '' &&
-              <div>
-                <a href={state.source} className='btn info' rel='nofollow noopener noreferrer' target='_blank'>Visit</a>
-              </div>
+            <div>
+              <a href={state.source} className='btn info' rel='nofollow noopener noreferrer' target='_blank'>Visit</a>
+            </div>
           }
         </div>
       </div>

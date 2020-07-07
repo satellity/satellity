@@ -13,7 +13,7 @@ import AdminRoute from './admin/admin.js';
 import Oauth from './users/oauth.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBookmark, faComment, faComments, faEdit, faEye, faEyeSlash, faTrashAlt, faHeart } from '@fortawesome/free-regular-svg-icons';
-import { faChalkboard, faEllipsisV, faHome, faPlus, faUsersCog, faExternalLinkAlt, faHeading, faBold, faItalic, faStrikethrough, faQuoteLeft, faListOl, faListUl } from '@fortawesome/free-solid-svg-icons';
+import { faChalkboard, faEllipsisV, faHome, faPlus, faUsersCog, faExternalLinkAlt, faHeading, faBold, faItalic, faStrikethrough, faQuoteLeft, faListOl, faListUl, faTags } from '@fortawesome/free-solid-svg-icons';
 import { faMarkdown } from '@fortawesome/free-brands-svg-icons';
 library.add(
   faBookmark, faComment, faComments,
@@ -21,7 +21,8 @@ library.add(
   faHeart, faExternalLinkAlt,
   faChalkboard, faEllipsisV, faHome,
   faPlus, faUsersCog, faMarkdown,
-  faHeading, faBold, faItalic, faStrikethrough, faQuoteLeft, faListOl, faListUl
+  faHeading, faBold, faItalic, faStrikethrough, faQuoteLeft, faListOl, faListUl,
+  faTags
 );
 
 showdown.setOption('customizedHeaderId', true);

@@ -2,6 +2,7 @@ import style from './index.module.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import LazyLoad from 'react-lazyload';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default class Index extends Component {
   constructor(props) {
@@ -34,6 +35,10 @@ export default class Index extends Component {
             </LazyLoad>
             <div className={style.desc}>
               <div className={style.name}>{p.name}</div>
+            </div>
+            <div className={style.tags}>
+              <FontAwesomeIcon className={style.icon} icon={['fas', 'tags']} />
+              {p.tags.join(', ')}
             </div>
           </Link>
         </div>

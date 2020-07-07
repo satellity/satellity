@@ -15,6 +15,12 @@
 .content {
   padding: .8rem;
 }
+.tags {
+  margin-bottom: .8rem;
+  .icon {
+    margin-right: .4rem;
+  }
+}
 
 @media only screen and (max-width: 48rem) {
   .cover {
