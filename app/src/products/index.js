@@ -1,5 +1,5 @@
 import style from './index.module.scss';
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import LazyLoad from 'react-lazyload';
 
