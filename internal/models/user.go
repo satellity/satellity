@@ -185,6 +185,9 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 			}
 			return nil, session.TransactionError(ctx, err)
 		}
+		if s == nil {
+			return nil, nil
+		}
 		pkix, err := hex.DecodeString(s.Secret)
 		if err != nil {
 			return nil, err
