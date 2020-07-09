@@ -14,6 +14,9 @@ import Login from './login.js';
 class MainLayout extends Component {
   constructor(props) {
     super(props);
+
+    const classes = document.body.classList.values();
+    document.body.classList.remove(...classes);
     this.state = {p: encodeURIComponent(props.location.pathname)};
   }
 
