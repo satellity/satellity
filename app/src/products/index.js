@@ -35,10 +35,10 @@ export default class Index extends Component {
             </LazyLoad>
             <div className={style.desc}>
               <div className={style.name}>{p.name}</div>
-            </div>
-            <div className={style.tags}>
-              <FontAwesomeIcon className={style.icon} icon={['fas', 'tags']} />
-              {p.tags.join(', ')}
+              <div className={style.tags}>
+                <FontAwesomeIcon className={style.icon} icon={['fas', 'tags']} />
+                {p.tags.join(', ')}
+              </div>
             </div>
           </Link>
         </div>
