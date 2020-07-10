@@ -10,7 +10,7 @@ import (
 	"github.com/dimfeld/httptreemux"
 )
 
-type adminCategoryImpl struct{}
+type categoryImpl struct{}
 
 type categoryRequest struct {
 	Name        string `json:"name"`
@@ -20,7 +20,7 @@ type categoryRequest struct {
 }
 
 func registerAdminCategory(router *httptreemux.Group) {
-	impl := &adminCategoryImpl{}
+	impl := &categoryImpl{}
 
 	router.POST("/categories", impl.create)
 	router.POST("/categories/:id", impl.update)
@@ -28,7 +28,7 @@ func registerAdminCategory(router *httptreemux.Group) {
 	router.GET("/categories/:id", impl.show)
 }
 
-func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+func (impl *categoryImpl) create(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	var body categoryRequest
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
@@ -42,7 +42,7 @@ func (impl *adminCategoryImpl) create(w http.ResponseWriter, r *http.Request, _ 
 	}
 }
 
-func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+func (impl *categoryImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	categories, err := models.ReadAllCategories(r.Context())
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
@@ -51,7 +51,7 @@ func (impl *adminCategoryImpl) index(w http.ResponseWriter, r *http.Request, _ m
 	}
 }
 
-func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, params map[string]string) {
+func (impl *categoryImpl) update(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	var body categoryRequest
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
@@ -67,7 +67,7 @@ func (impl *adminCategoryImpl) update(w http.ResponseWriter, r *http.Request, pa
 	}
 }
 
-func (impl *adminCategoryImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
+func (impl *categoryImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	category, err := models.ReadCategory(r.Context(), params["id"])
 	if err != nil {
 		views.RenderErrorResponse(w, r, err)
