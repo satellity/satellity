@@ -51,16 +51,16 @@ export default class Show extends Component {
           <div>
             {state.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: state.html_body}} />}
           </div>
+          {
+            state.source !== '' &&
+            <div>
+              Address: <a href={state.source} rel='nofollow noopener noreferrer' target='_blank'>{state.source}</a>
+            </div>
+          }
           <div className={style.tags}>
             <FontAwesomeIcon className={style.icon} icon={['fas', 'tags']} />
             {state.tags.join(', ')}
           </div>
-          {
-            state.source !== '' &&
-            <div>
-              <a href={state.source} className='btn info' rel='nofollow noopener noreferrer' target='_blank'>Visit</a>
-            </div>
-          }
         </div>
       </div>
     );

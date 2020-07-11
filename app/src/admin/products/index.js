@@ -25,8 +25,10 @@ class Index extends Component {
     const listProducts = state.products.map((product) => {
       return (
         <li key={product.product_id}>
-          {product.user.nickname} |
           <Link to={`/products/${product.short_id}`}>{product.name}</Link>
+          <div>
+            {product.user.nickname} | {product.tags.join(', ')}
+          </div>
           <div className={style.time}>
             {product.product_id} | {product.created_at} |
             <Link to={`/admin/products/${product.short_id}/edit`} >EIDT</Link> |
