@@ -3,6 +3,8 @@ import React, {Component} from 'react';
 import showdown from 'showdown';
 import showdownHighlight from 'showdown-highlight';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Helmet } from 'react-helmet';
+import Config from '../components/config.js';
 import SiteWidget from '../home/widget.js';
 import Loading from '../components/loading.js';
 
@@ -15,6 +17,8 @@ export default class Show extends Component {
 
     this.state = {
       product_id: props.match.params.id,
+      name: '',
+      body: '',
       loading: true,
       tags: [],
     };
@@ -39,6 +43,19 @@ export default class Show extends Component {
       <div className={style.loading}>
         <Loading class='medium' />
       </div>
+    );
+
+    let start = state.body.indexOf('>');
+    let end = state.body.indexOf(';');
+    start = start > 0 ? start : 0;
+    end = end > 256 ? 256 : end;
+    if (end < 0) end = 256;
+    const seoView = (
+      <Helmet>
+        <meta charSet="utf-9" />
+        <title>{`${state.name} 👦 👧 👨 👩 - ${Config.Name}`}</title>
+        <meta name='description' content={`🥇 ${state.body.substring(start, end)}`} />
+      </Helmet>
     );
 
     const productView = (
@@ -67,6 +84,7 @@ export default class Show extends Component {
 
     return (
       <div className='container'>
+        {!state.loading && seoView}
         <main className='column main'>
           {state.loading && loadingView}
           {!state.loading && productView}
