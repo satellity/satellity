@@ -19,12 +19,22 @@ class Admin {
   }
 
   create(params) {
-    const data = {name: params.name, body: params.body, cover: params.cover, source: params.source, tags: params.tags};
+    const tags = params.tags.map((e) => {
+      if (typeof e !== 'string') return e;
+      e = e.trim();
+      return e.charAt(0).toUpperCase() + e.slice(1);
+    });
+    const data = {name: params.name, body: params.body, cover: params.cover, source: params.source, tags: tags};
     return this.api.post('/admin/products', data);
   }
 
   update(params) {
-    const data = {name: params.name, body: params.body, cover: params.cover, source: params.source, tags: params.tags};
+    const tags = params.tags.map((e) => {
+      if (typeof e !== 'string') return e;
+      e = e.trim();
+      return e.charAt(0).toUpperCase() + e.slice(1);
+    });
+    const data = {name: params.name, body: params.body, cover: params.cover, source: params.source, tags: tags};
     return this.api.post(`/admin/products/${params.product_id}`, data);
   }
 }
