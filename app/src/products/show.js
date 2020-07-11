@@ -45,7 +45,7 @@ export default class Show extends Component {
       </div>
     );
 
-    let start = state.body.indexOf('>');
+    let start = state.body.indexOf('>') + 1;
     let end = state.body.indexOf(';');
     start = start > 0 ? start : 0;
     end = end > 256 ? 256 : end;
