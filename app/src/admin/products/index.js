@@ -27,7 +27,7 @@ class Index extends Component {
         <li key={product.product_id}>
           <Link to={`/products/${product.short_id}`}>{product.name}</Link>
           <div>
-            {product.user.nickname} | {product.tags.join(', ')}
+            {product.user.nickname} | {product.tags.join(', ')} | <a href={product.source} target='_blank' rel='noopener noreferrer'> External </a>
           </div>
           <div className={style.time}>
             {product.product_id} | {product.created_at} | <Link to={`/admin/products/${product.short_id}/edit`} >EIDT</Link>
