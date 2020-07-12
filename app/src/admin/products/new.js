@@ -90,6 +90,9 @@ class New extends Component {
           New Product
         </h1>
         <div className='panel'>
+          <div>
+            { state.cover !== '' && <img className={style.cover} src={state.cover} alt={state.name} /> }
+          </div>
           <form onSubmit={this.handleSubmit}>
             <div>
               <label name='name'>Name *</label>
