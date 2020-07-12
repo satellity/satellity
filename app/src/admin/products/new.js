@@ -103,7 +103,7 @@ class New extends Component {
               <input type='text' name='cover' required value={state.cover} autoComplete='off' onChange={this.handleChange} />
             </div>
             <div>
-              <label name='source'>Source *</label>
+              <label name='source'>Source * { state.source !== '' && <a href={state.source} rel='noopener noreferrer' target='_blank'>Go</a>}</label>
               <input type='text' name='source' required value={state.source} autoComplete='off' onChange={this.handleChange} />
             </div>
             <div>
