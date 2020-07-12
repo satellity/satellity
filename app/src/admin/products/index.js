@@ -30,8 +30,7 @@ class Index extends Component {
             {product.user.nickname} | {product.tags.join(', ')}
           </div>
           <div className={style.time}>
-            {product.product_id} | {product.created_at} |
-            <Link to={`/admin/products/${product.short_id}/edit`} >EIDT</Link> |
+            {product.product_id} | {product.created_at} | <Link to={`/admin/products/${product.short_id}/edit`} >EIDT</Link>
           </div>
         </li>
       )

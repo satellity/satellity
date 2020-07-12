@@ -7,6 +7,7 @@ import (
 )
 
 // CategoryView is the response body of a category
+// A category uses to categorize topics
 type CategoryView struct {
 	Type        string    `json:"type"`
 	CategoryID  string    `json:"category_id"`
@@ -35,12 +36,12 @@ func buildCategory(category *models.Category) CategoryView {
 	}
 }
 
-// RenderCategory response a category
+// RenderCategory responses a single category
 func RenderCategory(w http.ResponseWriter, r *http.Request, category *models.Category) {
 	RenderResponse(w, r, buildCategory(category))
 }
 
-// RenderCategories response sevaral categories
+// RenderCategories response an array of categories
 func RenderCategories(w http.ResponseWriter, r *http.Request, categories []*models.Category) {
 	views := make([]CategoryView, len(categories))
 	for i, c := range categories {

@@ -1,6 +1,6 @@
 ## API
 
-API is the back-end of [Satellity](https://satellity.org), there isn't a convention for Go (maybe just I don't find), so I learned from RoR:
+API is the back-end of [Routinost](https://routinost.com), there isn't a convention for Go (maybe just I don't find), so I learned from RoR:
 
 1. `clouds` includes third part services, like mailgun and recaptcha.
 2. `configs` contains server side configs.
