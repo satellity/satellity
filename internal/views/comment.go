@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// CommentView is the response body of comment
+// CommentView is the response body of comment, which belongs to a topic
 type CommentView struct {
 	Type      string    `json:"type"`
 	CommentID string    `json:"comment_id"`
@@ -36,12 +36,12 @@ func buildComment(comment *models.Comment) CommentView {
 	return view
 }
 
-// RenderComment response a comment
+// RenderComment response single comment
 func RenderComment(w http.ResponseWriter, r *http.Request, comment *models.Comment) {
 	RenderResponse(w, r, buildComment(comment))
 }
 
-// RenderComments response a bundle of comments
+// RenderComments response an array of comments
 func RenderComments(w http.ResponseWriter, r *http.Request, comments []*models.Comment) {
 	views := make([]CommentView, len(comments))
 	for i, comment := range comments {
