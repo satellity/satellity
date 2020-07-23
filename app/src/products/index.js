@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import LazyLoad from 'react-lazyload';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Loading from '../components/loading.js';
 
 export default class Index extends Component {
   constructor(props) {
@@ -11,6 +12,7 @@ export default class Index extends Component {
     this.api = window.api;
     this.state = {
       products: [],
+      loading: true,
     };
   }
 
@@ -19,12 +21,18 @@ export default class Index extends Component {
       if (resp.error) {
         return;
       }
-      this.setState({products: resp.data});
+      this.setState({products: resp.data, loading: false});
     });
   }
 
   render() {
     const state = this.state;
+
+    const loadingView = (
+      <div className={style.loading}>
+        <Loading />
+      </div>
+    )
 
     const products = state.products.map((p) => {
       return (
@@ -47,7 +55,8 @@ export default class Index extends Component {
 
     return (
       <div className={style.container}>
-        {products}
+        {state.loading && loadingView}
+        {!state.loading && products}
       </div>
     )
   }
