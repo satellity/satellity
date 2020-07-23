@@ -1,5 +1,6 @@
 import style from './widget.module.scss';
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import Button from '../components/button.js';
 import API from '../api/index.js';
 
@@ -28,6 +29,9 @@ class SiteWidget extends Component {
           </h2>
           <ul className={style.rules} dangerouslySetInnerHTML={{__html: i18n.t('aside.rules')}}>
           </ul>
+        </div>
+        <div className={style.avatar}>
+          <Link to='/products'>Avatar Maker Collection</Link>
         </div>
         <div className={style.copyright}>
           © 2020 MIT license
