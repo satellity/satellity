@@ -17,12 +17,14 @@ class Edit extends Component {
       avatar_url: user.avatar_url,
       nickname: user.nickname,
       biography: user.biography,
-      submitting: false
+      submitting: false,
+      me: this.api.user.loggedIn(),
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.handleSignOut = this.handleSignOut.bind(this);
     this.handleFileChange = this.handleFileChange.bind(this);
     this.onImageLoaded = this.onImageLoaded.bind(this);
     this.onCropComplete = this.onCropComplete.bind(this);
@@ -49,6 +51,14 @@ class Edit extends Component {
 
   handleClick(e) {
     this.refs.file.click();
+  }
+
+  handleSignOut(e) {
+    console.log("signout")
+    e.preventDefault();
+
+    this.api.me.signOut();
+    this.setState({me: false});
   }
 
   handleFileChange(e) {
@@ -128,13 +138,13 @@ class Edit extends Component {
 
   render() {
     const i18n = window.i18n;
-    if (!this.api.user.loggedIn()) {
+    const state = this.state;
+
+    if (!state.me) {
       return (
         <Redirect to={{ pathname: '/' }} />
       )
     }
-
-    let state = this.state;
 
     return (
       <div className='container'>
@@ -168,10 +178,13 @@ class Edit extends Component {
                 <label name='biography'>{i18n.t('user.biography')}</label>
                 <textarea type='text' name='biography' value={state.biography} onChange={this.handleChange} />
               </div>
-              <div className='action'>
+              <div className={style.action}>
                 <Button type='submit' classes='submit' text={i18n.t('general.submit')} disabled={state.submitting} />
               </div>
             </form>
+            <div className={style.action}>
+              <Button type='button' click={this.handleSignOut} classes='submit' text={i18n.t('general.sign.out')} disabled={state.submitting} />
+            </div>
           </div>
         </main>
         <aside className='column aside'>
