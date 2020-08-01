@@ -2,12 +2,11 @@ package models
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
+	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/x509"
 	"database/sql"
-	"encoding/hex"
+	"encoding/base64"
 	"fmt"
 	"satellity/internal/session"
 	"strings"
@@ -25,9 +24,9 @@ func TestUserCRUD(t *testing.T) {
 	ctx := setupTestContext()
 	defer teardownTestContext(ctx)
 
-	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
 	assert.Nil(err)
-	public, err := x509.MarshalPKIXPublicKey(priv.Public())
+	public, err := x509.MarshalPKIXPublicKey(pub)
 	assert.Nil(err)
 
 	userCases := []struct {
@@ -41,8 +40,8 @@ func TestUserCRUD(t *testing.T) {
 		count         int
 		valid         bool
 	}{
-		{"im.yuqlee@gmail.com", "username", "nickname", "", "pass", hex.EncodeToString(public), "member", 0, false},
-		{"im.yuqlee@gmail.com", "username", "nickname", "", "     pass     ", hex.EncodeToString(public), "member", 1, true},
+		{"im.yuqlee1@gmail.com", "username1", "nickname", "", "pass", base64.RawURLEncoding.EncodeToString(public), "member", 0, false},
+		{"im.yuqlee@gmail.com", "username", "nickname", "", "     pass     ", base64.RawURLEncoding.EncodeToString(public), "member", 1, true},
 	}
 
 	for _, tc := range userCases {
@@ -80,24 +79,24 @@ func TestUserCRUD(t *testing.T) {
 			existing, err = ReadUserByUsernameOrEmail(ctx, strings.ToUpper(tc.email))
 			assert.Nil(err)
 			assert.NotNil(existing)
-			existing, err = CreateSession(ctx, tc.email, tc.password, hex.EncodeToString(public))
+			existing, err = CreateSession(ctx, tc.email, tc.password, base64.RawURLEncoding.EncodeToString(public))
 			assert.Nil(err)
 			assert.NotNil(existing)
 			assert.Equal(tc.username, user.Username)
 			assert.Equal(tc.role, user.GetRole())
 
-			sess, err := readTestSession(ctx, existing.UserID, existing.SessionID)
+			sess, err := readTestSession(ctx, existing.UserID, existing.Session.SessionID)
 			assert.Nil(err)
 			assert.NotNil(sess)
-			sess, err = readTestSession(ctx, uuid.Must(uuid.NewV4()).String(), existing.SessionID)
+			sess, err = readTestSession(ctx, uuid.Must(uuid.NewV4()).String(), existing.Session.SessionID)
 			assert.Nil(err)
 			assert.Nil(sess)
 
 			claims := &jwt.MapClaims{
 				"uid": existing.UserID,
-				"sid": existing.SessionID,
+				"sid": existing.Session.SessionID,
 			}
-			token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+			token := jwt.NewWithClaims(&EdDSASigningMethod{}, claims)
 			ss, err := token.SignedString(priv)
 			assert.Nil(err)
 			existing, err = AuthenticateUser(ctx, ss)
@@ -118,9 +117,9 @@ func TestUserCRUD(t *testing.T) {
 }
 
 func createTestUser(ctx context.Context, email, username, password string) *User {
-	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	public, _ := x509.MarshalPKIXPublicKey(priv.Public())
-	user, _ := CreateUser(ctx, email, username, "nickname", "", password, hex.EncodeToString(public))
+	pub, _, _ := ed25519.GenerateKey(rand.Reader)
+	public, _ := x509.MarshalPKIXPublicKey(pub)
+	user, _ := CreateUser(ctx, email, username, "nickname", "", password, base64.RawURLEncoding.EncodeToString(public))
 	return user
 }
 

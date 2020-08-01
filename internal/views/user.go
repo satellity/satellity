@@ -20,10 +20,11 @@ type UserView struct {
 // AccountView is the response body of a sign in user
 type AccountView struct {
 	UserView
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	SessionID string `json:"session_id"`
-	Role      string `json:"role"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	SessionID    string `json:"session_id"`
+	RemotePublic string `json:"remote_public"`
+	Role         string `json:"role"`
 }
 
 func buildUser(user *models.User) UserView {
@@ -55,11 +56,14 @@ func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
 // RenderAccount response
 func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) {
 	accountView := AccountView{
-		UserView:  buildUser(user),
-		Username:  user.Username,
-		Email:     user.Email.String,
-		SessionID: user.SessionID,
-		Role:      user.GetRole(),
+		UserView: buildUser(user),
+		Username: user.Username,
+		Email:    user.Email.String,
+		Role:     user.GetRole(),
+	}
+	if user.Session != nil {
+		accountView.SessionID = user.Session.SessionID
+		accountView.RemotePublic = user.Session.PublicKey
 	}
 	RenderResponse(w, r, accountView)
 }

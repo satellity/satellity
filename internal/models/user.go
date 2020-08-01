@@ -2,11 +2,11 @@ package models
 
 import (
 	"context"
-	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/md5"
 	"crypto/x509"
 	"database/sql"
-	"encoding/hex"
+	"encoding/base64"
 	"fmt"
 	"satellity/internal/clouds"
 	"satellity/internal/configs"
@@ -40,8 +40,8 @@ type User struct {
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 
-	SessionID string
-	isNew     bool
+	Session *Session
+	isNew   bool
 }
 
 var userColumns = []string{"user_id", "email", "username", "nickname", "avatar_url", "biography", "encrypted_password", "github_id", "role", "created_at", "updated_at"}
@@ -60,17 +60,17 @@ func userFromRow(row durable.Row) (*User, error) {
 }
 
 // CreateUser create a new user
-func CreateUser(ctx context.Context, email, username, nickname, biography, password string, sessionSecret string) (*User, error) {
-	data, err := hex.DecodeString(sessionSecret)
+func CreateUser(ctx context.Context, email, username, nickname, biography, password string, public string) (*User, error) {
+	data, err := base64.RawURLEncoding.DecodeString(public)
 	if err != nil {
 		return nil, session.BadDataError(ctx)
 	}
-	public, err := x509.ParsePKIXPublicKey(data)
+	pub, err := x509.ParsePKIXPublicKey(data)
 	if err != nil {
-		return nil, session.BadDataError(ctx)
+		return nil, session.ServerError(ctx, err)
 	}
-	switch public.(type) {
-	case *ecdsa.PublicKey:
+	switch pub.(type) {
+	case ed25519.PublicKey:
 	default:
 		return nil, session.BadDataError(ctx)
 	}
@@ -95,7 +95,7 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 	var user *User
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		var err error
-		user, err = createUser(ctx, tx, email, username, username, password, sessionSecret, "", nil)
+		user, err = createUser(ctx, tx, email, username, username, password, public, "", nil)
 		if err != nil {
 			return err
 		}
@@ -157,7 +157,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		if !ok {
 			return nil, nil
 		}
-		if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
+		if _, ok := token.Method.(*EdDSASigningMethod); !ok {
 			return nil, nil
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
@@ -176,7 +176,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 			} else if s == nil {
 				return nil
 			}
-			user.SessionID = s.SessionID
+			user.Session = s
 			return nil
 		})
 		if err != nil {
@@ -188,7 +188,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		if s == nil {
 			return nil, nil
 		}
-		pkix, err := hex.DecodeString(s.Secret)
+		pkix, err := base64.RawURLEncoding.DecodeString(s.ClientPublic)
 		if err != nil {
 			return nil, err
 		}

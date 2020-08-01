@@ -1,11 +1,9 @@
 package models
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
+	"crypto/ed25519"
 	"crypto/rand"
-	"crypto/x509"
-	"encoding/hex"
+	"encoding/base64"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,11 +18,9 @@ func TestEmailVerification(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(ev)
 
-	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	pub, _, err := ed25519.GenerateKey(rand.Reader)
 	assert.Nil(err)
-	public, err := x509.MarshalPKIXPublicKey(priv.Public())
-	assert.Nil(err)
-	user, err := VerifyEmailVerification(ctx, ev.VerificationID, ev.Code, "jason", "nopassword", hex.EncodeToString(public))
+	user, err := VerifyEmailVerification(ctx, ev.VerificationID, ev.Code, "jason", "nopassword", base64.RawURLEncoding.EncodeToString(pub))
 	assert.Nil(err)
 	assert.NotNil(user)
 	user, err = ReadUser(ctx, user.UserID)

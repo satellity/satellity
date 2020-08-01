@@ -91,7 +91,7 @@ func CreateEmailVerification(ctx context.Context, purpose, email, recaptcha stri
 }
 
 // VerifyEmailVerification verify an email verification
-func VerifyEmailVerification(ctx context.Context, verificationID, code, username, password, sessionSecret string) (*User, error) {
+func VerifyEmailVerification(ctx context.Context, verificationID, code, username, password, public string) (*User, error) {
 	var user *User
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
 		ev, err := findEmailVerification(ctx, tx, verificationID)
@@ -121,15 +121,15 @@ func VerifyEmailVerification(ctx context.Context, verificationID, code, username
 			return err
 		}
 		if user != nil {
-			s, err := user.addSession(ctx, tx, sessionSecret)
+			s, err := user.addSession(ctx, tx, public)
 			if err != nil {
 				return err
 			}
-			user.SessionID = s.SessionID
+			user.Session = s
 			return nil
 		}
 
-		user, err = createUser(ctx, tx, ev.Email, username, username, password, sessionSecret, "", nil)
+		user, err = createUser(ctx, tx, ev.Email, username, username, password, public, "", nil)
 		return err
 	})
 	if err != nil {
@@ -185,7 +185,7 @@ func Reset(ctx context.Context, verificationID, code, password string) error {
 	return nil
 }
 
-func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, password, sessionSecret, githubID string, user *User) (*User, error) {
+func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, password, public, githubID string, user *User) (*User, error) {
 	if user == nil {
 		t := time.Now()
 		user = &User{
@@ -217,11 +217,11 @@ func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, pass
 			return nil, err
 		}
 	}
-	s, err := user.addSession(ctx, tx, sessionSecret)
+	s, err := user.addSession(ctx, tx, public)
 	if err != nil {
 		return nil, err
 	}
-	user.SessionID = s.SessionID
+	user.Session = s
 	return user, nil
 }
 
