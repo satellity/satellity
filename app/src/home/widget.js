@@ -31,7 +31,7 @@ class SiteWidget extends Component {
           </ul>
         </div>
         <div className={style.avatar}>
-          <Link to='/products'>Avatar Maker Collection</Link>
+          <Link to='/products'>Person Creator Collection</Link>
         </div>
         <div className={style.copyright}>
           © 2020 MIT license
