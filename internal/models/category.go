@@ -43,7 +43,7 @@ func categoryFromRows(row durable.Row) (*Category, error) {
 func CreateCategory(ctx context.Context, name, alias, description string, position int64) (*Category, error) {
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
-	if len(name) < 1 {
+	if name == "" {
 		return nil, session.BadDataError(ctx)
 	}
 	if alias == "" {
@@ -97,10 +97,10 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 		if err != nil || category == nil {
 			return err
 		}
-		if len(name) > 0 {
+		if name != "" {
 			category.Name = name
 		}
-		if len(alias) > 0 {
+		if alias != "" {
 			category.Alias = alias
 		}
 		category.Description = description
