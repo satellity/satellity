@@ -54,9 +54,12 @@ export default class Index extends Component {
     });
 
     return (
-      <div className={style.container}>
-        {state.loading && loadingView}
-        {!state.loading && products}
+      <div>
+        <h1 className={style.title}> Collections of <span className={style.keyword}>Person Creator</span> For <span role="img" aria-label="Phone Android iOS">📱</span> or <span role="img" aria-label="Web PC Online">💻</span> </h1>
+        <div className={style.container}>
+          {state.loading && loadingView}
+          {!state.loading && products}
+        </div>
       </div>
     )
   }
