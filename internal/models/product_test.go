@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 )
@@ -50,6 +51,9 @@ func TestProductCRUD(t *testing.T) {
 			assert.Equal("new"+pc.body, product.Body)
 
 			products, err := FindProducts(ctx)
+			assert.Nil(err)
+			assert.Len(products, 1)
+			products, err = RelatedProducts(ctx, uuid.Nil.String())
 			assert.Nil(err)
 			assert.Len(products, 1)
 		})

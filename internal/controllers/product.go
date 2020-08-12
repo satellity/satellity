@@ -18,11 +18,20 @@ func registerProduct(router *httptreemux.Group) {
 	impl := &productImpl{}
 
 	router.GET("/products", impl.index)
+	router.GET("/products/:id/relationships", impl.relationships)
 	router.GET("/products/:id", impl.show)
 }
 
 func (impl *productImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	if products, err := models.FindProducts(r.Context()); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else {
+		views.RenderProducts(w, r, products)
+	}
+}
+
+func (impl *productImpl) relationships(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	if products, err := models.RelatedProducts(r.Context(), params["id"]); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderProducts(w, r, products)

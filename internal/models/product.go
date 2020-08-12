@@ -111,16 +111,16 @@ func (user *User) UpdateProduct(ctx context.Context, productID, name, body, cove
 			}
 			p.User = u
 		}
-		if len(name) > 1 {
+		if name != "" {
 			p.Name = name
 		}
-		if len(body) > 1 {
+		if body != "" {
 			p.Body = body
 		}
-		if len(cover) > 1 {
+		if cover != "" {
 			p.CoverURL = cover
 		}
-		if len(source) > 1 {
+		if source != "" {
 			p.Source = source
 		}
 		if len(tags) > 1 {
@@ -216,4 +216,42 @@ func findProduct(ctx context.Context, tx *sql.Tx, productID string) (*Product, e
 	}
 	row := tx.QueryRow(fmt.Sprintf("SELECT %s FROM products WHERE product_id=$1", strings.Join(productColumns, ",")), productID)
 	return productFromRow(row)
+}
+
+func RelatedProducts(ctx context.Context, id string) ([]*Product, error) {
+	var products []*Product
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM products WHERE product_id>$1 LIMIT 3", strings.Join(productColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, id)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		var userIds []string
+		for rows.Next() {
+			product, err := productFromRow(rows)
+			if err != nil {
+				return err
+			}
+			userIds = append(userIds, product.UserID)
+			products = append(products, product)
+		}
+
+		userSet, err := readUserSet(ctx, tx, userIds)
+		if err != nil {
+			return err
+		}
+		for i, product := range products {
+			products[i].User = userSet[product.UserID]
+		}
+		return nil
+	})
+	if err != nil {
+		if _, ok := err.(session.Error); ok {
+			return nil, err
+		}
+		return nil, session.TransactionError(ctx, err)
+	}
+	return products, nil
 }
