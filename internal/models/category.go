@@ -241,9 +241,6 @@ func emitToCategory(db *durable.Database, logger *durable.Logger, id string) (*C
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return category, nil

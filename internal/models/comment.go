@@ -91,9 +91,6 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	c.User = user
@@ -129,9 +126,6 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return comment, nil
@@ -278,9 +272,6 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return err
-		}
 		return session.TransactionError(ctx, err)
 	}
 	return nil

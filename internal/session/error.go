@@ -124,6 +124,10 @@ func RecaptchaVerifyError(ctx context.Context) Error {
 }
 
 func createError(ctx context.Context, status, code int, description string, err error) Error {
+	if sessionErr, ok := err.(Error); ok {
+		return sessionErr
+	}
+
 	pc, file, line, _ := runtime.Caller(2)
 	funcName := runtime.FuncForPC(pc).Name()
 	trace := fmt.Sprintf("[ERROR %d] %s\n%s:%d %s", code, description, file, line, funcName)

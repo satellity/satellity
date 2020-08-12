@@ -133,9 +133,6 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	if !topic.Draft {
@@ -221,9 +218,6 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	if topic == nil {

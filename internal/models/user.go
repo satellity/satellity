@@ -180,9 +180,6 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 			return nil
 		})
 		if err != nil {
-			if _, ok := err.(session.Error); ok {
-				return nil, err
-			}
 			return nil, session.TransactionError(ctx, err)
 		}
 		if s == nil {
@@ -264,9 +261,6 @@ func ReadUser(ctx context.Context, id string) (*User, error) {
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return user, nil

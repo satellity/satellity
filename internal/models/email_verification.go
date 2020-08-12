@@ -133,9 +133,6 @@ func VerifyEmailVerification(ctx context.Context, verificationID, code, username
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	} else if user == nil {
 		return nil, session.VerificationCodeInvalidError(ctx)
@@ -175,9 +172,6 @@ func Reset(ctx context.Context, verificationID, code, password string) error {
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return err
-		}
 		return session.TransactionError(ctx, err)
 	} else if user == nil {
 		return session.VerificationCodeInvalidError(ctx)

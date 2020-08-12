@@ -82,9 +82,6 @@ func (user *User) CreateProduct(ctx context.Context, name, body, cover, source s
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	p.User = user
@@ -138,9 +135,6 @@ func (user *User) UpdateProduct(ctx context.Context, productID, name, body, cove
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return p, nil
@@ -178,9 +172,6 @@ func FindProducts(ctx context.Context) ([]*Product, error) {
 		return nil
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return products, nil
@@ -202,9 +193,6 @@ func FindProduct(ctx context.Context, productID string) (*Product, error) {
 		return err
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return p, nil
@@ -248,9 +236,6 @@ func RelatedProducts(ctx context.Context, id string) ([]*Product, error) {
 		return nil
 	})
 	if err != nil {
-		if _, ok := err.(session.Error); ok {
-			return nil, err
-		}
 		return nil, session.TransactionError(ctx, err)
 	}
 	return products, nil
