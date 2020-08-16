@@ -70,12 +70,16 @@ class Show extends Component {
       </div>
     )
 
-    const seoView = (
-      <Helmet>
-        <title>{`${state.title} - ${state.user.nickname} - ${Config.Name}`}</title>
-        <meta name='description' content={state.short_body} />
-      </Helmet>
-    )
+    let seoView;
+    if (!state.loading) {
+      seoView = (
+        <Helmet>
+          <title>{`${state.title} - ${state.user.nickname} - ${Config.Name}`}</title>
+          <meta name='description' content={state.short_body} />
+          <link rel="canonical" href={`${Config.Host}/topics/${state.short_id}-${state.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} />
+        </Helmet>
+      )
+    }
 
     let action;
     if (state.is_owner) {
@@ -153,7 +157,7 @@ class Show extends Component {
 
     return (
       <div className='container'>
-        {!state.loading && seoView}
+        {seoView}
         <main className='column main'>
           {state.loading && loadingView}
           {!state.loading && topicView}

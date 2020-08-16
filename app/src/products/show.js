@@ -55,6 +55,7 @@ export default class Show extends Component {
         <meta charSet="utf-9" />
         <title>{`${state.name} 👦 👧 👨 👩 - ${Config.Name}`}</title>
         <meta name='description' content={`🥇 ${state.body.substring(start, end)}`} />
+        <link rel="canonical" href={`${Config.Host}/products/${state.short_id}-${state.name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} />
       </Helmet>
     );
 
