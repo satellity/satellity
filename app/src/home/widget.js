@@ -34,7 +34,7 @@ class SiteWidget extends Component {
           <Link to='/products'>Person Creator Collection</Link>
         </div>
         <div className={style.copyright}>
-          © 2020 MIT license
+          © 2019 - Now MIT license
         </div>
       </div>
     )
