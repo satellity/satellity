@@ -87,7 +87,7 @@ export default class Index extends Component {
 
     if (!!state.q) {
       header = (
-        <h1 className={style.title}> Collections of <span className={style.keyword}>Person Creator</span> For <span className={style.keyword}>{state.q}</span>, or <Link to='/products'>Visit ALL Avatar Maker</Link></h1>
+        <h1 className={style.title}> Collections of <span className={style.keyword}>Person Creator</span> For <span className={style.keyword}>{state.q}</span>, or <Link to='/products'>Visit <span className={style.keyword}>ALL</span> Avatar Maker</Link></h1>
       )
     }
 
