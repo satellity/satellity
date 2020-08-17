@@ -10,8 +10,10 @@ export default class Index extends Component {
     super(props);
 
     this.api = window.api;
+    let q = props.match.params.id || '';
+    q = q.replace('best-', '').replace('-avatar-maker', '');
     this.state = {
-      q: props.match.params.id || '',
+      q: q,
       products: [],
       loading: true,
     };
@@ -28,7 +30,9 @@ export default class Index extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.props.match.params.id !== prevProps.match.params.id) {
-      this.setState({q: this.props.match.params.id}, () => {
+      let q = this.props.match.params.id || '';
+      q = q.replace('best-', '').replace('-avatar-maker', '');
+      this.setState({q: q}, () => {
         this.api.product.index(this.state.q).then((resp) => {
           if (resp.error) {
             return;
@@ -77,12 +81,22 @@ export default class Index extends Component {
       )
     });
 
+    let header = (
+      <h1 className={style.title}> Collections of <span className={style.keyword}>Person Creator</span> For <span role="img" aria-label="Phone Android iOS">📱</span> or <span role="img" aria-label="Web PC Online">💻</span> </h1>
+    )
+
+    if (!!state.q) {
+      header = (
+        <h1 className={style.title}> Collections of <span className={style.keyword}>Person Creator</span> For <span className={style.keyword}>{state.q}</span>, or <Link to='/products'>Visit ALL Avatar Maker</Link></h1>
+      )
+    }
+
     return (
       <div>
-        <h1 className={style.title}> Collections of <span className={style.keyword}>Person Creator</span> For <span role="img" aria-label="Phone Android iOS">📱</span> or <span role="img" aria-label="Web PC Online">💻</span> </h1>
+        { header }
         <div className={style.container}>
-          {state.loading && loadingView}
-          {!state.loading && products}
+          { state.loading && loadingView }
+          { !state.loading && products }
         </div>
       </div>
     )
