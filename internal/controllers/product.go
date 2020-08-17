@@ -23,7 +23,15 @@ func registerProduct(router *httptreemux.Group) {
 }
 
 func (impl *productImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	if products, err := models.FindProducts(r.Context()); err != nil {
+	query := r.URL.Query().Get("q")
+	var products []*models.Product
+	var err error
+	if query != "" {
+		products, err = models.SearchProducts(r.Context(), query)
+	} else {
+		products, err = models.FindProducts(r.Context())
+	}
+	if err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderProducts(w, r, products)
@@ -40,11 +48,7 @@ func (impl *productImpl) relationships(w http.ResponseWriter, r *http.Request, p
 
 func (impl *productImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	subs := strings.Split(params["id"], "-")
-	if len(subs) < 1 || len(subs[0]) < 5 {
-		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-		return
-	}
-	id, err := uuid.FromBytes(base58.Decode(subs[0]))
+	id, err := uuid.FromBytes(base58.Decode(subs[len(subs)-1]))
 	if err != nil {
 		views.RenderErrorResponse(w, r, session.ServerError(r.Context(), err))
 		return

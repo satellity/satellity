@@ -240,3 +240,39 @@ func RelatedProducts(ctx context.Context, id string) ([]*Product, error) {
 	}
 	return products, nil
 }
+
+func SearchProducts(ctx context.Context, query string) ([]*Product, error) {
+	keys := strings.Split(strings.TrimSpace(query), ",")
+	var products []*Product
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+		query := fmt.Sprintf("SELECT %s FROM products WHERE $1 <@ tags LIMIT 50", strings.Join(productColumns, ","))
+		rows, err := tx.QueryContext(ctx, query, pq.Array(keys))
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		var userIds []string
+		for rows.Next() {
+			product, err := productFromRow(rows)
+			if err != nil {
+				return err
+			}
+			userIds = append(userIds, product.UserID)
+			products = append(products, product)
+		}
+
+		userSet, err := readUserSet(ctx, tx, userIds)
+		if err != nil {
+			return err
+		}
+		for i, product := range products {
+			products[i].User = userSet[product.UserID]
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return products, nil
+}

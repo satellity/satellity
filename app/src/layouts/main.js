@@ -35,6 +35,7 @@ class MainLayout extends Component {
             <Route path='/topics/:id/edit' component={Topic.New} />
             <Route path='/topics/:id' component={Topic.Show} />
             <Route exact path='/products' component={Product.Index} />
+            <Route path='/products/q/:id' component={Product.Index} />
             <Route path='/products/:id' component={Product.Show} />
             <Redirect to={`/404?p=${this.state.p}`} />
           </Switch>

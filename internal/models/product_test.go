@@ -26,7 +26,7 @@ func TestProductCRUD(t *testing.T) {
 		valid  bool
 	}{
 		{"", "body", "", "", []string{}, false},
-		{"name", "body", "cover", "source", []string{"Avatar"}, true},
+		{"name", "body", "cover", "source", []string{"Big", "Small"}, true},
 	}
 
 	for _, pc := range productCases {
@@ -56,6 +56,16 @@ func TestProductCRUD(t *testing.T) {
 			products, err = RelatedProducts(ctx, uuid.Nil.String())
 			assert.Nil(err)
 			assert.Len(products, 1)
+
+			products, err = SearchProducts(ctx, "Big")
+			assert.Nil(err)
+			assert.Len(products, 1)
+			products, err = SearchProducts(ctx, "Big,Small")
+			assert.Nil(err)
+			assert.Len(products, 1)
+			products, err = SearchProducts(ctx, "small")
+			assert.Nil(err)
+			assert.Len(products, 0)
 		})
 	}
 }

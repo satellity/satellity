@@ -11,7 +11,7 @@ class Index extends Component {
   }
 
   componentDidMount() {
-    this.api.product.index().then((resp) => {
+    this.api.product.index('').then((resp) => {
       if (resp.error) {
         return
       }

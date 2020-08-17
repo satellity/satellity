@@ -4,8 +4,9 @@ class Product {
     this.admin = new Admin(api);
   }
 
-  index() {
-    return this.api.get('/products');
+  index(q) {
+    q = q.replace('best-', '').replace('-avatar-maker', '');
+    return this.api.get(`/products?q=${q}`);
   }
 
   show(id) {

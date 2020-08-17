@@ -1,5 +1,6 @@
 import style from './show.module.scss';
 import React, {Component} from 'react';
+import { Link } from 'react-router-dom';
 import showdown from 'showdown';
 import showdownHighlight from 'showdown-highlight';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -59,6 +60,12 @@ export default class Show extends Component {
       </Helmet>
     );
 
+    let tags = state.tags.map((t) => {
+      return (
+        <Link to={`/products/q/best-${t}-avatar-maker`}>{t}, &nbsp;</Link>
+      )
+    });
+
     const productView = (
       <div className={style.product}>
         <div className={style.cover} style={{backgroundImage: `url(${state.cover_url})`}} />
@@ -77,7 +84,7 @@ export default class Show extends Component {
           }
           <div className={style.tags}>
             <FontAwesomeIcon className={style.icon} icon={['fas', 'tags']} />
-            {state.tags.join(', ')}
+            {tags}
           </div>
         </div>
       </div>

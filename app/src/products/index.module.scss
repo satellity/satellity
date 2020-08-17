@@ -38,6 +38,9 @@
   background-size: cover;
   background-position: center;
   height: 12rem;
+  &:hover {
+    opacity: 0.8;
+  }
 }
 .desc {
   padding: .8rem;

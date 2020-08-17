@@ -11,18 +11,32 @@ export default class Index extends Component {
 
     this.api = window.api;
     this.state = {
+      q: props.match.params.id || '',
       products: [],
       loading: true,
     };
   }
 
   componentDidMount() {
-    this.api.product.index().then((resp) => {
+    this.api.product.index(this.state.q).then((resp) => {
       if (resp.error) {
         return;
       }
       this.setState({products: resp.data, loading: false});
     });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.match.params.id !== prevProps.match.params.id) {
+      this.setState({q: this.props.match.params.id}, () => {
+        this.api.product.index(this.state.q).then((resp) => {
+          if (resp.error) {
+            return;
+          }
+          this.setState({products: resp.data, loading: false});
+        });
+      })
+    }
   }
 
   render() {
@@ -35,20 +49,30 @@ export default class Index extends Component {
     )
 
     const products = state.products.map((p) => {
+      let tags = p.tags.map((t) => {
+        return (
+          <Link to={`/products/q/best-${t}-avatar-maker`}>{t}, &nbsp;</Link>
+        )
+      });
+      let path = `/products/${p.name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}-${p.short_id}`
       return (
-        <div className={style.product}>
-          <Link className={style.wrapper} to={`/products/${p.short_id}-${p.name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`}>
-            <LazyLoad className={style.cover} offset={100}>
-              <div className={style.cover} style={{backgroundImage: `url(${p.cover_url})`}} />
-            </LazyLoad>
+        <div key={p.product_id} className={style.product}>
+          <div className={style.wrapper}>
+            <Link to={path}>
+              <LazyLoad className={style.cover} offset={100}>
+                <div className={style.cover} style={{backgroundImage: `url(${p.cover_url})`}} />
+              </LazyLoad>
+            </Link>
             <div className={style.desc}>
-              <div className={style.name}>{p.name}</div>
+              <Link to={path}>
+                <div className={style.name}>{p.name}</div>
+              </Link>
               <div className={style.tags}>
                 <FontAwesomeIcon className={style.icon} icon={['fas', 'tags']} />
-                {p.tags.join(', ')}
+                {tags}
               </div>
             </div>
-          </Link>
+          </div>
         </div>
       )
     });
