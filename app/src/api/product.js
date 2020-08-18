@@ -24,6 +24,9 @@ class Admin {
       if (typeof e !== 'string') return e;
       return e.trim().replace(/\s+/g, ' ').split(' ').map((c) => {
         c = c.trim()
+        if (c === 'iOS' || c === 'IOS') {
+          return 'iOS'
+        }
         return c.charAt(0).toUpperCase() + c.slice(1);
       }).join(' ');
     })));
@@ -36,6 +39,9 @@ class Admin {
       if (typeof e !== 'string') return e;
       return e.trim().replace(/\s+/g, ' ').split(' ').map((c) => {
         c = c.trim()
+        if (c === 'iOS' || c === 'IOS') {
+          return 'iOS'
+        }
         return c.charAt(0).toUpperCase() + c.slice(1);
       }).join(' ');
     })));
