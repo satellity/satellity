@@ -53,7 +53,7 @@ export default class Index extends Component {
     )
 
     const products = state.products.map((p) => {
-      let tags = p.tags.map((t) => {
+      let tags = p.tags.slice(0, 4).map((t) => {
         return (
           <Link to={`/products/q/best-${t}-avatar-maker`}>{t}, &nbsp;</Link>
         )
