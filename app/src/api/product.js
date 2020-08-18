@@ -22,8 +22,10 @@ class Admin {
   create(params) {
     const tags = params.tags.map((e) => {
       if (typeof e !== 'string') return e;
-      e = e.trim();
-      return e.charAt(0).toUpperCase() + e.slice(1);
+      return e.trim().replace(/\s+/g, ' ').split(' ').map((c) => {
+        c = c.trim()
+        return c.charAt(0).toUpperCase() + c.slice(1);
+      }).join(' ');
     });
     const data = {name: params.name, body: params.body, cover: params.cover, source: params.source, tags: tags};
     return this.api.post('/admin/products', data);
@@ -32,8 +34,10 @@ class Admin {
   update(params) {
     const tags = params.tags.map((e) => {
       if (typeof e !== 'string') return e;
-      e = e.trim();
-      return e.charAt(0).toUpperCase() + e.slice(1);
+      return e.trim().replace(/\s+/g, ' ').split(' ').map((c) => {
+        c = c.trim()
+        return c.charAt(0).toUpperCase() + c.slice(1);
+      }).join(' ');
     });
     const data = {name: params.name, body: params.body, cover: params.cover, source: params.source, tags: tags};
     return this.api.post(`/admin/products/${params.product_id}`, data);
