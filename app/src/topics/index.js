@@ -132,6 +132,11 @@ class Index extends Component {
       description = i18n.t('site.description');
     }
 
+    let canonical = <link rel="canonical" href={`${Config.Host}`} />;
+    if (state.category_id !== 'latest') {
+      canonical = <link rel="canonical" href={`${Config.Host}/categories/${state.category.name}`} />
+    }
+
     return (
       <div className='container'>
         {
@@ -139,6 +144,7 @@ class Index extends Component {
           <Helmet>
             <title>{title}</title>
             <meta name='description' content={description} />
+            {canonical}
           </Helmet>
         }
         <main className='column main'>
