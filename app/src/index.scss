@@ -140,6 +140,13 @@ div.container {
     width: 24rem;
   }
 }
+.clearfix {
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
 
 @media only screen and (max-width: 64rem) {
   html {

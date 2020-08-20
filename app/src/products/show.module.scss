@@ -24,6 +24,14 @@
     margin-right: .4rem;
   }
 }
+.title {
+  padding: 0 0.8rem;
+}
+.relationships {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 0 2.4rem;
+}
 
 @media only screen and (max-width: 48rem) {
   .cover {

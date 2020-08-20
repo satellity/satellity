@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet';
 import Config from '../components/config.js';
 import SiteWidget from '../home/widget.js';
 import Loading from '../components/loading.js';
+import Item from './item.js';
 
 export default class Show extends Component {
   constructor(props) {
@@ -22,20 +23,52 @@ export default class Show extends Component {
       body: '',
       loading: true,
       tags: [],
+      relationships: [],
     };
   }
 
   componentDidMount() {
     this.api.product.show(this.state.product_id).then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
 
       let data = resp.data;
       data.loading = false;
       data.html_body = this.converter.makeHtml(data.body);
       this.setState(data);
+    }).then(() => {
+      this.api.product.relationships(this.state.product_id).then((resp) => {
+        if (resp.error) {
+          return;
+        }
+        this.setState({relationships: resp.data});
+      });
     });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.match.params.id !== prevProps.match.params.id) {
+      this.setState({product_id: this.props.match.params.id, loading: true}, () => {
+        this.api.product.show(this.state.product_id).then((resp) => {
+          if (resp.error) {
+            return;
+          }
+
+          let data = resp.data;
+          data.loading = false;
+          data.html_body = this.converter.makeHtml(data.body);
+          this.setState(data);
+        }).then(() => {
+          this.api.product.relationships(this.state.product_id).then((resp) => {
+            if (resp.error) {
+              return;
+            }
+            this.setState({relationships: resp.data});
+          });
+        });
+      });
+    }
   }
 
   render() {
@@ -60,9 +93,9 @@ export default class Show extends Component {
       </Helmet>
     );
 
-    let tags = state.tags.map((t) => {
+    let tags = state.tags.map((t, i) => {
       return (
-        <Link to={`/products/q/best-${t}-avatar-maker`}>{t}, &nbsp;</Link>
+        <Link to={`/products/q/best-${t}-avatar-maker`}>{t}{ i+1<state.tags.length && ','} &nbsp;</Link>
       )
     });
 
@@ -90,16 +123,34 @@ export default class Show extends Component {
       </div>
     );
 
+    const products = state.relationships.map((p) => {
+      return (
+        <Item product={p} />
+      )
+    });
+
     return (
-      <div className='container'>
-        {!state.loading && seoView}
-        <main className='column main'>
-          {state.loading && loadingView}
-          {!state.loading && productView}
-        </main>
-        <aside className='column aside'>
-          <SiteWidget />
-        </aside>
+      <div>
+        <div className='container'>
+          {!state.loading && seoView}
+          <main className='column main'>
+            {state.loading && loadingView}
+            {!state.loading && productView}
+          </main>
+          <aside className='column aside'>
+            <SiteWidget />
+          </aside>
+        </div>
+        {
+          products.length > 0 && (
+            <div>
+              <h2 className={style.title}>Related Person Creator</h2>
+              <div className={style.relationships}>
+                {products}
+              </div>
+            </div>
+          )
+        }
       </div>
     )
   }

@@ -9,6 +9,10 @@ class Product {
     return this.api.get(`/products?q=${q}`);
   }
 
+  relationships(id) {
+    return this.api.get(`/products/${id}/relationships`);
+  }
+
   show(id) {
     return this.api.get(`/products/${id}`);
   }
