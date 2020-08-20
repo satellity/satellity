@@ -6,6 +6,7 @@ internal/configs/*
 !internal/configs/config.example
 publish
 public
+app/public/sitemap.xml
 !app/public
 
 # web
