@@ -111,9 +111,9 @@ export default class Show extends Component {
           </div>
           {
             state.source !== '' &&
-            <div>
-              Address: <a href={state.source} rel='nofollow noopener noreferrer' target='_blank'>{state.source}</a>
-            </div>
+              <div>
+                Address: <a href={state.source} rel='nofollow noopener noreferrer' target='_blank'>{state.source}</a>
+              </div>
           }
           <div className={style.tags}>
             <FontAwesomeIcon className={style.icon} icon={['fas', 'tags']} />
