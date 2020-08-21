@@ -19,7 +19,7 @@ Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!
 
 ## Built With
 
-1. Go version go1.4 darwin/amd64
+1. go version go1.15 darwin/amd64
 2. postgres (PostgreSQL) 12.3
 3. react ^16.13.1
 
