@@ -33,11 +33,11 @@ async function generateSitemap() {
   let productsQMap = [];
 
   for (let i=0; i<topics.length; i++) {
-    topicsMap.push({id: `topics/${topics[i].short_id}-${topics[i].title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`});
+    topicsMap.push({id: `${topics[i].short_id}-${topics[i].title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`});
   }
 
   for (let i=0; i<products.length; i++) {
-    productsMap.push({id: `products/${products[i].name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}-${products[i].short_id}`});
+    productsMap.push({id: `${products[i].name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}-${products[i].short_id}`});
     for (let j=0;j<products[i].tags.length;j++) {
       productsQMap.push({id: `best-${products[i].tags[j]}-avatar-maker`});
     }
