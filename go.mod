@@ -8,7 +8,7 @@ require (
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/go-errors/errors v1.1.1
 	github.com/gofrs/uuid v3.3.0+incompatible
-	github.com/gorilla/handlers v1.4.2
+	github.com/gorilla/handlers v1.5.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/lib/pq v1.8.0
 	github.com/mailgun/mailgun-go/v3 v3.6.4
