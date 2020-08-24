@@ -36,12 +36,16 @@ async function generateSitemap() {
     topicsMap.push({id: `${topics[i].short_id}-${topics[i].title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`});
   }
 
+  let keywords  = new Map();
   for (let i=0; i<products.length; i++) {
     productsMap.push({id: `${products[i].name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}-${products[i].short_id}`});
     for (let j=0;j<products[i].tags.length;j++) {
-      productsQMap.push({id: `best-${products[i].tags[j]}-avatar-maker`});
+      keywords.set(products[i].tags[j], `best-${products[i].tags[j]}-avatar-maker`);
     }
   }
+  keywords.forEach((v, k, m) => {
+    productsQMap.push({id: v});
+  });
 
   const paramsConfig = {
     "/topics/:id": topicsMap,
