@@ -1,6 +1,8 @@
 import style from './sink.module.scss';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+import Config from '../components/config.js';
 
 const NoMatch = ({ location }) => {
   const classes = document.body.classList.values();
@@ -11,6 +13,11 @@ const NoMatch = ({ location }) => {
 
   return (
     <div className={style.container}>
+      <Helmet>
+        <title>{`Page Not Found - ${Config.Name}`}</title>
+        <meta name='description' content='Page Not Found' />
+        <link rel="canonical" href={`${Config.Host}/404`} />
+      </Helmet>
       <h3 className={style.body}>
          LOL! NO MATCH FOR <span className={style.path}>{p}</span>
         <div className={style.action}>
