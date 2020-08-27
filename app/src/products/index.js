@@ -1,6 +1,7 @@
 import style from './index.module.scss';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import Loading from '../components/loading.js';
 import Item from './item.js';
 
@@ -67,8 +68,23 @@ export default class Index extends Component {
       );
     }
 
+    let seoTitle = `Collections of Person Creator For Android, iOS, Or Online`;
+    let seoDesc = `Best Avatar Creator for you to make yourself portrait and use it for your profile picture.`;
+    if (!!state.q) {
+      seoTitle = `Best of ${state.q} Avatar Creator for Android, iOS, Or Online`;
+      seoDesc = `Best ${state.q} Avatar Creator for you to make yourself portrait and use it for your profile picture.`;
+    }
+
+    const seoView = (
+      <Helmet>
+        <title>{seoTitle}</title>
+        <meta name='description' content={seoDesc} />
+      </Helmet>
+    );
+
     return (
       <div>
+        { !state.loading && seoView }
         { header }
         <div className={style.container}>
           { state.loading && loadingView }
