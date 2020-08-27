@@ -79,6 +79,14 @@ export default class Show extends Component {
       </div>
     );
 
+    let os = "ONLINE";
+    if (state.tags.includes("Android")) {
+      os = "ANDROID";
+    }
+    if (state.tags.includes("iOS")) {
+      os = "IOS";
+    }
+
     let start = state.body.indexOf('>') + 1;
     let end = state.body.indexOf(';');
     start = start > 0 ? start : 0;
@@ -90,6 +98,20 @@ export default class Show extends Component {
         <title>{`${state.name} 👦 👧 👨 👩 - ${Config.Name}`}</title>
         <meta name='description' content={`🥇 ${state.body.substring(start, end)}`} />
         <link rel="canonical" href={`${Config.Host}/products/${state.short_id}-${state.name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} />
+        <script type="application/ld+json">
+          {`{
+            "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "${state.name}",
+              "operatingSystem": "${os}",
+              "applicationCategory": "Photo",
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.3",
+                "ratingCount": "10"
+              }
+          }`}
+        </script>
       </Helmet>
     );
 
