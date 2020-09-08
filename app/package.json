@@ -33,7 +33,7 @@
     "react-router-dom": "^5.2.0",
     "react-router-sitemap": "^1.2.0",
     "react-scripts": "3.4.1",
-    "react-styleguidist": "^11.0.8",
+    "react-styleguidist": "^11.0.10",
     "react-timeago": "^4.4.0",
     "showdown": "^1.9.1",
     "showdown-highlight": "^2.1.4",
