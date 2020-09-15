@@ -15,7 +15,7 @@
     "file-saver": "^2.0.2",
     "js-cookie": "^2.2.1",
     "jsrsasign": "^8.0.21",
-    "moment": "^2.27.0",
+    "moment": "^2.28.0",
     "node-forge": "^0.9.1",
     "node-polyglot": "^2.4.0",
     "node-sass": "^4.14.1",
