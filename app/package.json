@@ -21,7 +21,7 @@
     "node-sass": "^4.14.1",
     "normalize.css": "^8.0.1",
     "noty": "^3.2.0-beta",
-    "npm-check-updates": "^7.0.2",
+    "npm-check-updates": "^9.0.1",
     "react": "^16.13.1",
     "react-codemirror2": "^7.2.1",
     "react-dom": "^16.13.1",
