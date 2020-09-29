@@ -8219,10 +8219,10 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jsrsasign@^8.0.21:
-  version "8.0.21"
-  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-8.0.21.tgz#ed76337f5cdeddc9a6eede292e8e132307388df2"
-  integrity sha512-1xR/GYQkXbPCEZZI59K/eYXjr5f9g3mUNHVX7NS/GU9/z5QYTLJ6g7q1yD4Egy7nA05q/bQ2M4Ta1jtBb7FA6Q==
+jsrsasign@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-10.0.0.tgz#a544b4e63124c4da56a6e7a8007e0ee8a616a81e"
+  integrity sha512-U1lSbeqaRN8aUOvbsfX7xzFXcjtV1g5zaWI+TrjBwZ46kSH0gZscEquyO9cmaTPTv1U1KAJxoSLUx79dM03Exw==
 
 jss-plugin-camel-case@^10.0.0:
   version "10.2.0"
