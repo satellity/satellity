@@ -1,0 +1,17 @@
+@import "~bootstrap/scss/bootstrap";
+
+.user-details-dropdown-menu-component {
+  button#user-details-dropdown-menu {
+    &:focus {
+      box-shadow: none;
+    }
+  }
+  .dropdown-menu {
+    width: 180px;
+
+    .dropdown-item {
+      line-height: 1.5;
+      white-space: break-spaces;
+    }
+  }
+}

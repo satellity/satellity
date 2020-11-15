@@ -16,3 +16,7 @@ dist
 .env
 .env.development
 .env.production
+
+# editor
+launch.json
+settings.json
