@@ -12574,10 +12574,10 @@ shellwords@^0.1.1:
   resolved "https://registry.yarnpkg.com/shellwords/-/shellwords-0.1.1.tgz#d6b9181c1a48d397324c84871efbcfc73fc0654b"
   integrity sha512-vFwSUfQvqybiICwZY5+DAWIPLKsWO31Q91JSKl3UYv+K5c2QRPzn0qzec6QPu1Qc9eHYItiP3NdJqNVqetYAww==
 
-showdown-highlight@^2.1.4:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/showdown-highlight/-/showdown-highlight-2.1.4.tgz#9a9b4cd699f8de6ed1d45ae2e23f58cfd3e22350"
-  integrity sha512-6HLf/ScJXvI4n42zdPq79htmY6duk9b++WHieb3M7D1bsfy9oI8TjQp0SgMGyKP5eT3jA2XcnSoKzDOQRAWHAw==
+showdown-highlight@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/showdown-highlight/-/showdown-highlight-2.1.5.tgz#3e6b77e9e3a3e66179177aef215813abbdc68693"
+  integrity sha512-hpPl6TFmbQoGv9TWP2une2zLASFAdNX7+MiDvEe3bWvoazksIwsThwDyXmGZi9GVrC2Vjm97OnLOIDBhWk1rYw==
   dependencies:
     highlight.js "^9.18.1"
     html-encoder-decoder "^1.3.8"

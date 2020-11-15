@@ -36,7 +36,7 @@
     "react-styleguidist": "^11.0.8",
     "react-timeago": "^4.4.0",
     "showdown": "^1.9.1",
-    "showdown-highlight": "^2.1.4",
+    "showdown-highlight": "^2.1.5",
     "text-encoder-lite": "^2.0.0",
     "uuid": "^8.3.0",
     "uuid-validate": "^0.0.3"
