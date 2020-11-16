@@ -18,7 +18,7 @@
     "moment": "^2.27.0",
     "node-forge": "^0.10.0",
     "node-polyglot": "^2.4.0",
-    "node-sass": "^4.14.1",
+    "node-sass": "^5.0.0",
     "normalize.css": "^8.0.1",
     "noty": "^3.2.0-beta",
     "npm-check-updates": "^10.0.0",
