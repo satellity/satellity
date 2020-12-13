@@ -210,7 +210,7 @@ func emitToCategory(db *durable.Database, logger *durable.Logger, id string) (*C
 		} else if category == nil {
 			return session.NotFoundError(ctx)
 		}
-		topic, err := category.lastTopic(ctx, tx)
+		topic, err := category.latestTopic(ctx, tx)
 		if err != nil {
 			return err
 		}

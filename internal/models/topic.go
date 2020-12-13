@@ -403,20 +403,20 @@ func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 		}
 		defer rows.Close()
 
-		userIds := []string{}
+		userIDs := []string{}
 		for rows.Next() {
 			topic, err := topicFromRows(rows)
 			if err != nil {
 				return err
 			}
-			userIds = append(userIds, topic.UserID)
+			userIDs = append(userIDs, topic.UserID)
 			topic.Category = set[topic.CategoryID]
 			topics = append(topics, topic)
 		}
 		if err := rows.Err(); err != nil {
 			return err
 		}
-		userSet, err := readUserSet(ctx, tx, userIds)
+		userSet, err := readUserSet(ctx, tx, userIDs)
 		if err != nil {
 			return err
 		}
@@ -482,20 +482,20 @@ func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*
 		}
 		defer rows.Close()
 
-		userIds := []string{}
+		userIDs := []string{}
 		for rows.Next() {
 			topic, err := topicFromRows(rows)
 			if err != nil {
 				return err
 			}
-			userIds = append(userIds, topic.UserID)
+			userIDs = append(userIDs, topic.UserID)
 			topic.Category = category
 			topics = append(topics, topic)
 		}
 		if err := rows.Err(); err != nil {
 			return err
 		}
-		userSet, err := readUserSet(ctx, tx, userIds)
+		userSet, err := readUserSet(ctx, tx, userIDs)
 		if err != nil {
 			return err
 		}
@@ -510,8 +510,8 @@ func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*
 	return topics, nil
 }
 
-func (category *Category) lastTopic(ctx context.Context, tx *sql.Tx) (*Topic, error) {
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
+func (category *Category) latestTopic(ctx context.Context, tx *sql.Tx) (*Topic, error) {
+	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false ORDER BY category_id,draft,updated_at DESC LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
 	t, err := topicFromRows(row)
 	if err == sql.ErrNoRows {
 		return nil, nil
