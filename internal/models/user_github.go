@@ -32,7 +32,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		return nil, session.ServerError(ctx, err)
 	}
 	var user *User
-	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		existing, err := findUserByGithubID(ctx, tx, data.NodeID)
 		if err != nil {
 			return err

@@ -72,7 +72,7 @@ func (user *User) CreateProduct(ctx context.Context, name, body, cover, source s
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		stmt, err := tx.PrepareContext(ctx, pq.CopyIn("products", productColumns...))
 		if err != nil {
 			return err
@@ -91,7 +91,7 @@ func (user *User) CreateProduct(ctx context.Context, name, body, cover, source s
 func (user *User) UpdateProduct(ctx context.Context, productID, name, body, cover, source string, tags []string) (*Product, error) {
 	name, body, cover, source = strings.TrimSpace(name), strings.TrimSpace(body), strings.TrimSpace(cover), strings.TrimSpace(source)
 	var p *Product
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		existing, err := findProduct(ctx, tx, productID)
 		if err != nil || existing == nil {
 			return err
@@ -142,7 +142,7 @@ func (user *User) UpdateProduct(ctx context.Context, productID, name, body, cove
 
 func FindProducts(ctx context.Context) ([]*Product, error) {
 	var products []*Product
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM products ORDER BY score,created_at DESC LIMIT 99", strings.Join(productColumns, ","))
 		rows, err := tx.Query(query)
 		if err != nil {
@@ -179,7 +179,7 @@ func FindProducts(ctx context.Context) ([]*Product, error) {
 
 func FindProduct(ctx context.Context, productID string) (*Product, error) {
 	var p *Product
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		var err error
 		p, err = findProduct(ctx, tx, productID)
 		if err != nil || p == nil {
@@ -208,7 +208,7 @@ func findProduct(ctx context.Context, tx *sql.Tx, productID string) (*Product, e
 
 func RelatedProducts(ctx context.Context, id string) ([]*Product, error) {
 	var products []*Product
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM products WHERE product_id>$1 LIMIT 3", strings.Join(productColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, id)
 		if err != nil {
@@ -244,7 +244,7 @@ func RelatedProducts(ctx context.Context, id string) ([]*Product, error) {
 func SearchProducts(ctx context.Context, query string) ([]*Product, error) {
 	keys := strings.Split(strings.TrimSpace(query), ",")
 	var products []*Product
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM products WHERE $1 <@ tags LIMIT 50", strings.Join(productColumns, ","))
 		rows, err := tx.QueryContext(ctx, query, pq.Array(keys))
 		if err != nil {

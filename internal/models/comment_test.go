@@ -95,7 +95,7 @@ func TestCommentCRUD(t *testing.T) {
 
 func readTestComment(ctx context.Context, id string) (*Comment, error) {
 	var comment *Comment
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		var err error
 		comment, err = findComment(ctx, tx, id)
 		return err

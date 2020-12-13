@@ -62,7 +62,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 		return nil, session.InvalidPasswordError(ctx)
 	}
 
-	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		_, err := tx.ExecContext(ctx, "DELETE FROM sessions WHERE session_id IN (SELECT session_id FROM sessions WHERE user_id=$1 ORDER BY created_at DESC OFFSET 5)", user.UserID)
 		if err != nil {
 			return err

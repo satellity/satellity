@@ -63,7 +63,7 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 		UpdatedAt:   t,
 	}
 
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		if position == 0 {
 			count, err := categoryCount(ctx, tx)
 			if err != nil {
@@ -91,7 +91,7 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 	description = strings.TrimSpace(description)
 
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil || category == nil {
@@ -125,7 +125,7 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 // ReadCategory read a category by ID
 func ReadCategory(ctx context.Context, id string) (*Category, error) {
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		return err
@@ -153,7 +153,7 @@ func ReadCategoryByIDOrName(ctx context.Context, identity string) (*Category, er
 // ReadAllCategories read categories order by position
 func ReadAllCategories(ctx context.Context) ([]*Category, error) {
 	var categories []*Category
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		var err error
 		categories, err = readCategories(ctx, tx)
 		return err
@@ -202,7 +202,7 @@ func emitToCategory(db *durable.Database, logger *durable.Logger, id string) (*C
 		return nil, nil
 	}
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil {

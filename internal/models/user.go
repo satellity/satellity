@@ -93,7 +93,7 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 	}
 
 	var user *User
-	err = session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		var err error
 		user, err = createUser(ctx, tx, email, username, username, password, sessionSecret, "", nil)
 		if err != nil {
@@ -121,7 +121,7 @@ func (u *User) UpdateProfile(ctx context.Context, nickname, biography string, av
 		u.Biography = biography
 	}
 	u.UpdatedAt = time.Now()
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		cols, posits := durable.PrepareColumnsWithParams([]string{"nickname", "biography", "updated_at"})
 		stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, posits, u.UserID))
 		if err != nil {
@@ -162,7 +162,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
 		var s *Session
-		err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+		err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 			u, err := findUserByID(ctx, tx, uid)
 			if err != nil {
 				return err
@@ -255,7 +255,7 @@ func readUserSet(ctx context.Context, tx *sql.Tx, ids []string) (map[string]*Use
 // ReadUser read user by id.
 func ReadUser(ctx context.Context, id string) (*User, error) {
 	var user *User
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		var err error
 		user, err = findUserByID(ctx, tx, id)
 		return err
@@ -274,7 +274,7 @@ func ReadUserByUsernameOrEmail(ctx context.Context, identity string) (*User, err
 	}
 
 	var user *User
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
 		var err error
 		user, err = findUserByIdentity(ctx, tx, identity)
 		return err
