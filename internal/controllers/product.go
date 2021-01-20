@@ -7,7 +7,7 @@ import (
 	"satellity/internal/views"
 	"strings"
 
-	"github.com/decred/base58"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/dimfeld/httptreemux"
 	"github.com/gofrs/uuid"
 )

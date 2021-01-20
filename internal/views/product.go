@@ -5,7 +5,7 @@ import (
 	"satellity/internal/models"
 	"time"
 
-	"github.com/decred/base58"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/gofrs/uuid"
 )
 
