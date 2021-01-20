@@ -38,7 +38,7 @@
     "showdown": "^1.9.1",
     "showdown-highlight": "^2.1.5",
     "text-encoder-lite": "^2.0.0",
-    "uuid": "^8.3.0",
+    "uuid": "^8.3.2",
     "uuid-validate": "^0.0.3"
   },
   "scripts": {
