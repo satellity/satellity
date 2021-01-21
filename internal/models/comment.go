@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
@@ -10,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/lib/pq"
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -56,7 +55,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		topic, err := findTopic(ctx, tx, topicID)
 		if err != nil {
 			return err
@@ -73,7 +72,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		}
 		cols, posits := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
 		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, posits, topic.TopicID)
-		_, err = tx.ExecContext(ctx, query, topic.CommentsCount, topic.UpdatedAt)
+		_, err = tx.Exec(ctx, query, topic.CommentsCount, topic.UpdatedAt)
 		if err != nil {
 			return err
 		}
@@ -82,12 +81,8 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		if err != nil {
 			return err
 		}
-		stmt, err := tx.PrepareContext(ctx, pq.CopyIn("comments", commentColumns...))
-		if err != nil {
-			return err
-		}
-		defer stmt.Close()
-		_, err = stmt.ExecContext(ctx, c.values()...)
+		rows := [][]interface{}{c.values()}
+		_, err = tx.CopyFrom(ctx, pgx.Identifier{"comments"}, commentColumns, pgx.CopyFromRows(rows))
 		return err
 	})
 	if err != nil {
@@ -104,7 +99,7 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 		return nil, session.BadDataError(ctx)
 	}
 	var comment *Comment
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		var err error
 		comment, err = findComment(ctx, tx, id)
 		if err != nil {
@@ -117,12 +112,7 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 		comment.Body = body
 		comment.UpdatedAt = time.Now()
 		cols, posits := durable.PrepareColumnsWithParams([]string{"body", "updated_at"})
-		stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, posits, comment.CommentID))
-		if err != nil {
-			return err
-		}
-		defer stmt.Close()
-		_, err = stmt.ExecContext(ctx, comment.Body, comment.UpdatedAt)
+		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, posits, comment.CommentID), comment.Body, comment.UpdatedAt)
 		return err
 	})
 	if err != nil {
@@ -138,9 +128,9 @@ func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comm
 	}
 
 	var comments []*Comment
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at LIMIT $3", strings.Join(commentColumns, ","))
-		rows, err := tx.QueryContext(ctx, query, topic.TopicID, offset, LIMIT)
+		rows, err := tx.Query(ctx, query, topic.TopicID, offset, LIMIT)
 		if err != nil {
 			return err
 		}
@@ -178,7 +168,7 @@ func (user *User) ReadComments(ctx context.Context, offset time.Time) ([]*Commen
 	if offset.IsZero() {
 		offset = time.Now()
 	}
-	rows, err := session.Database(ctx).QueryContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentColumns, ",")), user.UserID, offset, LIMIT)
+	rows, err := session.Database(ctx).Query(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentColumns, ",")), user.UserID, offset, LIMIT)
 	if err != nil {
 		return nil, err
 	}
@@ -206,9 +196,9 @@ func ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
 	}
 
 	var comments []*Comment
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM comments WHERE updated_at<$1 ORDER BY updated_at DESC LIMIT $2", strings.Join(commentColumns, ","))
-		rows, err := tx.QueryContext(ctx, query, offset, LIMIT)
+		rows, err := tx.Query(ctx, query, offset, LIMIT)
 		if err != nil {
 			return err
 		}
@@ -243,7 +233,7 @@ func ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
 
 // DeleteComment delete a comment by ID
 func (user *User) DeleteComment(ctx context.Context, id string) error {
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		comment, err := findComment(ctx, tx, id)
 		if err != nil || comment == nil {
 			return err
@@ -264,11 +254,11 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 		topic.CommentsCount = count - 1
 		cols, posits := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
 		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, posits, topic.TopicID)
-		_, err = tx.ExecContext(ctx, query, topic.CommentsCount, topic.UpdatedAt)
+		_, err = tx.Exec(ctx, query, topic.CommentsCount, topic.UpdatedAt)
 		if err != nil {
 			return err
 		}
-		_, err = tx.ExecContext(ctx, "DELETE FROM comments WHERE comment_id=$1", comment.CommentID)
+		_, err = tx.Exec(ctx, "DELETE FROM comments WHERE comment_id=$1", comment.CommentID)
 		return err
 	})
 	if err != nil {
@@ -277,26 +267,26 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 	return nil
 }
 
-func findComment(ctx context.Context, tx *sql.Tx, id string) (*Comment, error) {
+func findComment(ctx context.Context, tx pgx.Tx, id string) (*Comment, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE comment_id=$1", strings.Join(commentColumns, ",")), id)
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE comment_id=$1", strings.Join(commentColumns, ",")), id)
 	c, err := commentFromRows(row)
-	if err == sql.ErrNoRows {
+	if err == pgx.ErrNoRows {
 		return nil, nil
 	}
 	return c, err
 }
 
-func commentsCountByTopic(ctx context.Context, tx *sql.Tx, id string) (int64, error) {
+func commentsCountByTopic(ctx context.Context, tx pgx.Tx, id string) (int64, error) {
 	var count int64
-	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM comments WHERE topic_id=$1", id).Scan(&count)
+	err := tx.QueryRow(ctx, "SELECT count(*) FROM comments WHERE topic_id=$1", id).Scan(&count)
 	return count, err
 }
 
-func commentsCount(ctx context.Context, tx *sql.Tx) (int64, error) {
+func commentsCount(ctx context.Context, tx pgx.Tx) (int64, error) {
 	var count int64
-	err := tx.QueryRowContext(ctx, "SELECT count(*) FROM comments").Scan(&count)
+	err := tx.QueryRow(ctx, "SELECT count(*) FROM comments").Scan(&count)
 	return count, err
 }

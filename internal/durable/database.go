@@ -3,10 +3,11 @@ package durable
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4"
 	_ "github.com/lib/pq" //
 )
 
@@ -19,20 +20,20 @@ type ConnectionInfo struct {
 	Name     string
 }
 
-// Database is wrapped struct of *sql.DB
+// Database is wrapped struct of *pgx.Conn
 type Database struct {
-	db *sql.DB
+	db *pgx.Conn
 }
 
 // OpenDatabaseClient generate a database client
-func OpenDatabaseClient(ctx context.Context, c *ConnectionInfo) *sql.DB {
+func OpenDatabaseClient(ctx context.Context, c *ConnectionInfo) *pgx.Conn {
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", c.User, c.Password, c.Host, c.Port, c.Name)
-	db, err := sql.Open("postgres", connStr)
+	db, err := pgx.Connect(ctx, connStr)
 	if err != nil {
 		log.Fatal(err)
 		return nil
 	}
-	if err := db.Ping(); err != nil {
+	if err := db.Ping(ctx); err != nil {
 		log.Fatal(fmt.Errorf("\nFail to connect the database.\nPlease make sure the connection info is valid %#v", c))
 		return nil
 	}
@@ -40,89 +41,42 @@ func OpenDatabaseClient(ctx context.Context, c *ConnectionInfo) *sql.DB {
 }
 
 // WrapDatabase create a *Database
-func WrapDatabase(db *sql.DB) *Database {
+func WrapDatabase(db *pgx.Conn) *Database {
 	return &Database{db: db}
 }
 
-// Close the *sql.DB
+// Close the *pgx.Conn
 func (d *Database) Close() error {
-	return d.db.Close()
+	return d.db.Close(context.Background())
 }
 
 // Exec executes a prepared statement
-func (d *Database) Exec(query string, args ...interface{}) (sql.Result, error) {
-	stmt, err := d.db.Prepare(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	return stmt.Exec(args...)
-}
-
-// ExecContext executes a prepared statement with a context
-func (d *Database) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
-	stmt, err := d.db.Prepare(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	return stmt.ExecContext(ctx, args...)
+func (d *Database) Exec(ctx context.Context, query string, args ...interface{}) (pgconn.CommandTag, error) {
+	return d.db.Exec(ctx, query, args...)
 }
 
 // Query executes a prepared query statement with the given arguments
-func (d *Database) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	stmt, err := d.db.Prepare(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	return stmt.Query(args...)
-}
-
-// QueryContext executes a prepared query statement with the given arguments
-func (d *Database) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
-	stmt, err := d.db.Prepare(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	return stmt.QueryContext(ctx, args...)
+func (d *Database) Query(ctx context.Context, query string, args ...interface{}) (pgx.Rows, error) {
+	return d.db.Query(ctx, query, args...)
 }
 
 // QueryRowContext executes a prepared query statement with the given arguments.
-func (d *Database) QueryRowContext(ctx context.Context, query string, args ...interface{}) (*sql.Row, error) {
-	stmt, err := d.db.Prepare(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	return stmt.QueryRowContext(ctx, args...), nil
+func (d *Database) QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row {
+	return d.db.QueryRow(ctx, query, args...)
 }
 
 // RunInTransaction run a query in the transaction
-func (d *Database) RunInTransaction(ctx context.Context, opts *sql.TxOptions, fn func(*sql.Tx) error) error {
+func (d *Database) RunInTransaction(ctx context.Context, opts pgx.TxOptions, fn func(pgx.Tx) error) error {
 	tx, err := d.db.BeginTx(ctx, opts)
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if err := recover(); err != nil {
-			_ = tx.Rollback()
-			panic(err)
-		}
-	}()
+	defer tx.Rollback(ctx)
+
 	if err := fn(tx); err != nil {
-		if err := tx.Rollback(); err != nil {
-			return err
-		}
 		return err
 	}
-	return tx.Commit()
+	return tx.Commit(ctx)
 }
 
 // PrepareColumnsWithParams prepare columns and placeholders

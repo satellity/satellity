@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/jackc/pgx/v4"
 )
 
 // EmailVerification verify email
@@ -56,8 +57,8 @@ func CreateEmailVerification(ctx context.Context, purpose, email, recaptcha stri
 	}
 
 	var should bool
-	err = session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
-		_, err = tx.ExecContext(ctx, "DELETE FROM email_verifications WHERE created_at<$1", time.Now().Add(-24*time.Hour))
+	err = session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+		_, err = tx.Exec(ctx, "DELETE FROM email_verifications WHERE created_at<$1", time.Now().Add(-24*time.Hour))
 		if err != nil {
 			return err
 		}
@@ -71,12 +72,7 @@ func CreateEmailVerification(ctx context.Context, purpose, email, recaptcha stri
 		should = true
 		cols, posits := durable.PrepareColumnsWithParams(emailVerificationColumns)
 		query := fmt.Sprintf("INSERT INTO email_verifications(%s) VALUES (%s)", cols, posits)
-		stmt, err := tx.PrepareContext(ctx, query)
-		if err != nil {
-			return err
-		}
-		defer stmt.Close()
-		_, err = stmt.ExecContext(ctx, ev.values()...)
+		_, err = tx.Exec(ctx, query, ev.values()...)
 		return err
 	})
 	if err != nil {
@@ -93,7 +89,7 @@ func CreateEmailVerification(ctx context.Context, purpose, email, recaptcha stri
 // VerifyEmailVerification verify an email verification
 func VerifyEmailVerification(ctx context.Context, verificationID, code, username, password, sessionSecret string) (*User, error) {
 	var user *User
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		ev, err := findEmailVerification(ctx, tx, verificationID)
 		if err != nil || ev == nil {
 			return err
@@ -107,7 +103,7 @@ func VerifyEmailVerification(ctx context.Context, verificationID, code, username
 		if ev.CreatedAt.Add(time.Hour * 24).Before(time.Now()) {
 			return session.VerificationCodeInvalidError(ctx)
 		}
-		_, err = tx.ExecContext(ctx, "DELETE FROM email_verifications WHERE verification_id=$1", ev.VerificationID)
+		_, err = tx.Exec(ctx, "DELETE FROM email_verifications WHERE verification_id=$1", ev.VerificationID)
 		if err != nil {
 			return err
 		}
@@ -142,7 +138,7 @@ func VerifyEmailVerification(ctx context.Context, verificationID, code, username
 
 func Reset(ctx context.Context, verificationID, code, password string) error {
 	var user *User
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		ev, err := findEmailVerification(ctx, tx, verificationID)
 		if err != nil || ev == nil {
 			return err
@@ -156,7 +152,7 @@ func Reset(ctx context.Context, verificationID, code, password string) error {
 		if ev.CreatedAt.Add(time.Hour * 24).Before(time.Now()) {
 			return session.VerificationCodeInvalidError(ctx)
 		}
-		_, err = tx.ExecContext(ctx, "DELETE FROM email_verifications WHERE verification_id=$1", ev.VerificationID)
+		_, err = tx.Exec(ctx, "DELETE FROM email_verifications WHERE verification_id=$1", ev.VerificationID)
 		if err != nil {
 			return err
 		}
@@ -168,7 +164,7 @@ func Reset(ctx context.Context, verificationID, code, password string) error {
 		if err != nil || user == nil {
 			return err
 		}
-		_, err = tx.ExecContext(ctx, "UPDATE users SET (encrypted_password, updated_at)=($2, $3) WHERE user_id=$1", user.UserID, sql.NullString{String: encryptedPassword, Valid: true}, time.Now())
+		_, err = tx.Exec(ctx, "UPDATE users SET (encrypted_password, updated_at)=($2, $3) WHERE user_id=$1", user.UserID, sql.NullString{String: encryptedPassword, Valid: true}, time.Now())
 		return err
 	})
 	if err != nil {
@@ -179,7 +175,7 @@ func Reset(ctx context.Context, verificationID, code, password string) error {
 	return nil
 }
 
-func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, password, sessionSecret, githubID string, user *User) (*User, error) {
+func createUser(ctx context.Context, tx pgx.Tx, email, username, nickname, password, sessionSecret, githubID string, user *User) (*User, error) {
 	if user == nil {
 		t := time.Now()
 		user = &User{
@@ -201,12 +197,7 @@ func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, pass
 		}
 
 		cols, posits := durable.PrepareColumnsWithParams(userColumns)
-		stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, posits))
-		if err != nil {
-			return nil, err
-		}
-		defer stmt.Close()
-		_, err = stmt.ExecContext(ctx, user.values()...)
+		_, err := tx.Exec(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, posits), user.values()...)
 		if err != nil {
 			return nil, err
 		}
@@ -219,10 +210,10 @@ func createUser(ctx context.Context, tx *sql.Tx, email, username, nickname, pass
 	return user, nil
 }
 
-func findEmailVerification(ctx context.Context, tx *sql.Tx, id string) (*EmailVerification, error) {
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM email_verifications WHERE verification_id=$1", strings.Join(emailVerificationColumns, ",")), id)
+func findEmailVerification(ctx context.Context, tx pgx.Tx, id string) (*EmailVerification, error) {
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM email_verifications WHERE verification_id=$1", strings.Join(emailVerificationColumns, ",")), id)
 	ev, err := emailVerificationFromRows(row)
-	if err == sql.ErrNoRows {
+	if err == pgx.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
@@ -230,10 +221,10 @@ func findEmailVerification(ctx context.Context, tx *sql.Tx, id string) (*EmailVe
 	return ev, nil
 }
 
-func lastEmailVerification(ctx context.Context, tx *sql.Tx) (*EmailVerification, error) {
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM email_verifications ORDER BY created_at DESC LIMIT 1", strings.Join(emailVerificationColumns, ",")))
+func lastEmailVerification(ctx context.Context, tx pgx.Tx) (*EmailVerification, error) {
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM email_verifications ORDER BY created_at DESC LIMIT 1", strings.Join(emailVerificationColumns, ",")))
 	ev, err := emailVerificationFromRows(row)
-	if err == sql.ErrNoRows {
+	if err == pgx.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
@@ -241,10 +232,10 @@ func lastEmailVerification(ctx context.Context, tx *sql.Tx) (*EmailVerification,
 	return ev, nil
 }
 
-func findEmailVerificationByEmailAndCode(ctx context.Context, tx *sql.Tx, email, code string) (*EmailVerification, error) {
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM email_verifications WHERE email=$1 AND code=$2 ORDER BY email,code,created_at DESC LIMIT 1", strings.Join(emailVerificationColumns, ",")), email, code)
+func findEmailVerificationByEmailAndCode(ctx context.Context, tx pgx.Tx, email, code string) (*EmailVerification, error) {
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM email_verifications WHERE email=$1 AND code=$2 ORDER BY email,code,created_at DESC LIMIT 1", strings.Join(emailVerificationColumns, ",")), email, code)
 	ev, err := emailVerificationFromRows(row)
-	if err == sql.ErrNoRows {
+	if err == pgx.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, err

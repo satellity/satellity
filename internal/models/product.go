@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/jackc/pgx/v4"
 	"github.com/lib/pq"
 )
 
@@ -39,7 +39,7 @@ func (p *Product) values() []interface{} {
 func productFromRow(row durable.Row) (*Product, error) {
 	var p Product
 	err := row.Scan(&p.ProductID, &p.Name, &p.Body, &p.CoverURL, &p.Source, &p.Tags, &p.ViewsCount, &p.Score, &p.UserID, &p.CreatedAt, &p.UpdatedAt)
-	if err == sql.ErrNoRows {
+	if err == pgx.ErrNoRows {
 		return nil, nil
 	}
 	return &p, err
@@ -72,13 +72,11 @@ func (user *User) CreateProduct(ctx context.Context, name, body, cover, source s
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
-		stmt, err := tx.PrepareContext(ctx, pq.CopyIn("products", productColumns...))
-		if err != nil {
-			return err
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+		rows := [][]interface{}{
+			p.values(),
 		}
-		defer stmt.Close()
-		_, err = stmt.ExecContext(ctx, p.values()...)
+		_, err := tx.CopyFrom(ctx, pgx.Identifier{"products"}, productColumns, pgx.CopyFromRows(rows))
 		return err
 	})
 	if err != nil {
@@ -91,7 +89,7 @@ func (user *User) CreateProduct(ctx context.Context, name, body, cover, source s
 func (user *User) UpdateProduct(ctx context.Context, productID, name, body, cover, source string, tags []string) (*Product, error) {
 	name, body, cover, source = strings.TrimSpace(name), strings.TrimSpace(body), strings.TrimSpace(cover), strings.TrimSpace(source)
 	var p *Product
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		existing, err := findProduct(ctx, tx, productID)
 		if err != nil || existing == nil {
 			return err
@@ -126,12 +124,7 @@ func (user *User) UpdateProduct(ctx context.Context, productID, name, body, cove
 		p.UpdatedAt = time.Now()
 		columns, placeholders := durable.PrepareColumnsWithParams([]string{"name", "body", "cover_url", "source", "tags", "updated_at"})
 		values := []interface{}{p.Name, p.Body, p.CoverURL, p.Source, p.Tags, p.UpdatedAt}
-		stmt, err := tx.Prepare(fmt.Sprintf("UPDATE products SET (%s)=(%s) WHERE product_id='%s'", columns, placeholders, p.ProductID))
-		if err != nil {
-			return err
-		}
-		defer stmt.Close()
-		_, err = stmt.ExecContext(ctx, values...)
+		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE products SET (%s)=(%s) WHERE product_id='%s'", columns, placeholders, p.ProductID), values...)
 		return err
 	})
 	if err != nil {
@@ -142,9 +135,9 @@ func (user *User) UpdateProduct(ctx context.Context, productID, name, body, cove
 
 func FindProducts(ctx context.Context) ([]*Product, error) {
 	var products []*Product
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM products ORDER BY score,created_at DESC LIMIT 99", strings.Join(productColumns, ","))
-		rows, err := tx.Query(query)
+		rows, err := tx.Query(ctx, query)
 		if err != nil {
 			return err
 		}
@@ -179,7 +172,7 @@ func FindProducts(ctx context.Context) ([]*Product, error) {
 
 func FindProduct(ctx context.Context, productID string) (*Product, error) {
 	var p *Product
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		var err error
 		p, err = findProduct(ctx, tx, productID)
 		if err != nil || p == nil {
@@ -198,19 +191,19 @@ func FindProduct(ctx context.Context, productID string) (*Product, error) {
 	return p, nil
 }
 
-func findProduct(ctx context.Context, tx *sql.Tx, productID string) (*Product, error) {
+func findProduct(ctx context.Context, tx pgx.Tx, productID string) (*Product, error) {
 	if id, _ := uuid.FromString(productID); id.String() == uuid.Nil.String() {
 		return nil, nil
 	}
-	row := tx.QueryRow(fmt.Sprintf("SELECT %s FROM products WHERE product_id=$1", strings.Join(productColumns, ",")), productID)
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM products WHERE product_id=$1", strings.Join(productColumns, ",")), productID)
 	return productFromRow(row)
 }
 
 func RelatedProducts(ctx context.Context, id string) ([]*Product, error) {
 	var products []*Product
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM products WHERE product_id>$1 LIMIT 3", strings.Join(productColumns, ","))
-		rows, err := tx.QueryContext(ctx, query, id)
+		rows, err := tx.Query(ctx, query, id)
 		if err != nil {
 			return err
 		}
@@ -244,9 +237,9 @@ func RelatedProducts(ctx context.Context, id string) ([]*Product, error) {
 func SearchProducts(ctx context.Context, query string) ([]*Product, error) {
 	keys := strings.Split(strings.TrimSpace(query), ",")
 	var products []*Product
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM products WHERE $1 <@ tags LIMIT 50", strings.Join(productColumns, ","))
-		rows, err := tx.QueryContext(ctx, query, pq.Array(keys))
+		rows, err := tx.Query(ctx, query, pq.Array(keys))
 		if err != nil {
 			return err
 		}

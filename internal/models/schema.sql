@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS categories (
   alias                 VARCHAR(128) NOT NULL,
   description           VARCHAR(512) NOT NULL,
   topics_count          BIGINT NOT NULL DEFAULT 0,
-  last_topic_id         VARCHAR(36),
+  last_topic_id         VARCHAR(36) NOT NULL DEFAULT '',
   position              INTEGER NOT NULL DEFAULT 0,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()

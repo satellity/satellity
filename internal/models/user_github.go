@@ -3,7 +3,6 @@ package models
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,6 +10,8 @@ import (
 	"satellity/internal/external"
 	"satellity/internal/session"
 	"strings"
+
+	"github.com/jackc/pgx/v4"
 )
 
 // GithubUser is the response body of github oauth.
@@ -32,7 +33,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		return nil, session.ServerError(ctx, err)
 	}
 	var user *User
-	err = session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		existing, err := findUserByGithubID(ctx, tx, data.NodeID)
 		if err != nil {
 			return err
@@ -136,7 +137,7 @@ func fetchUserEmail(ctx context.Context, accessToken string) (string, error) {
 	return emails[0].Email, nil
 }
 
-func findUserByGithubID(ctx context.Context, tx *sql.Tx, id string) (*User, error) {
-	row := tx.QueryRow(fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
+func findUserByGithubID(ctx context.Context, tx pgx.Tx, id string) (*User, error) {
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
 	return userFromRow(row)
 }

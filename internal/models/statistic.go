@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"crypto/md5"
-	"database/sql"
 	"fmt"
 	"io"
 	"satellity/internal/durable"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/jackc/pgx/v4"
 )
 
 // SolidStatisticID is used to generate a solid id from name
@@ -32,12 +32,14 @@ func (s *Statistic) values() []interface{} {
 	return []interface{}{s.StatisticID, s.Name, s.Count, s.CreatedAt, s.UpdatedAt}
 }
 
-func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, error) {
+func upsertStatistic(ctx context.Context, tx pgx.Tx, name string) (*Statistic, error) {
 	id, err := generateStatisticID(SolidStatisticID, name)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
 	}
-	if name != "users" && name != "topics" && name != "comments" {
+	switch name {
+	case "users", "topics", "comments":
+	default:
 		return nil, session.BadDataError(ctx)
 	}
 
@@ -68,18 +70,18 @@ func upsertStatistic(ctx context.Context, tx *sql.Tx, name string) (*Statistic, 
 	s.Count = count
 	s.UpdatedAt = t
 	cols, params := durable.PrepareColumnsWithParams(statisticColumns)
-	_, err = tx.ExecContext(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s) ON CONFLICT (statistic_id) DO UPDATE SET (count,updated_at)=(EXCLUDED.count,EXCLUDED.updated_at)", cols, params), s.values()...)
+	_, err = tx.Exec(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s) ON CONFLICT (statistic_id) DO UPDATE SET (count,updated_at)=(EXCLUDED.count,EXCLUDED.updated_at)", cols, params), s.values()...)
 	return s, err
 }
 
-func findStatistic(ctx context.Context, tx *sql.Tx, id string) (*Statistic, error) {
+func findStatistic(ctx context.Context, tx pgx.Tx, id string) (*Statistic, error) {
 	if _, err := uuid.FromString(id); err != nil {
 		return nil, nil
 	}
 
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(statisticColumns, ",")), id)
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM Statistics WHERE statistic_id=$1", strings.Join(statisticColumns, ",")), id)
 	s, err := statisticFromRows(row)
-	if err == sql.ErrNoRows {
+	if err == pgx.ErrNoRows {
 		return nil, nil
 	}
 	return s, err
