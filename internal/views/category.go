@@ -29,7 +29,7 @@ func buildCategory(category *models.Category) CategoryView {
 		Alias:       category.Alias,
 		Description: category.Description,
 		TopicsCount: category.TopicsCount,
-		LastTopicID: *category.LastTopicID,
+		LastTopicID: category.LastTopicID.String,
 		Position:    category.Position,
 		CreatedAt:   category.CreatedAt,
 		UpdatedAt:   category.UpdatedAt,
