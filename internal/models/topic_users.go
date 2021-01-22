@@ -2,12 +2,13 @@ package models
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v4"
 )
 
 //
@@ -55,11 +56,11 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 			isNew: true,
 		}
 	}
-	err = session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		var lcount, bcount int64
 		if action == TopicUserActionLiked {
 			tu.Liked = state
-			if err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND liked=true", topic.TopicID).Scan(&lcount); err != nil {
+			if err := tx.QueryRow(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND liked=true", topic.TopicID).Scan(&lcount); err != nil {
 				return err
 			}
 			if lcount > 0 {
@@ -71,7 +72,7 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 		}
 		if action == TopicUserActionBookmarked {
 			tu.Bookmarked = state
-			if err := tx.QueryRowContext(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND bookmarked=true", topic.TopicID).Scan(&bcount); err != nil {
+			if err := tx.QueryRow(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND bookmarked=true", topic.TopicID).Scan(&bcount); err != nil {
 				return err
 			}
 			if bcount > 0 {
@@ -83,19 +84,19 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 		}
 		topic.IsLikedBy = tu.Liked
 		topic.IsBookmarkedBy = tu.Bookmarked
-		if _, err := tx.ExecContext(ctx, "UPDATE topics SET (likes_count,bookmarks_count)=($1,$2) WHERE topic_id=$3", topic.LikesCount, topic.BookmarksCount, topic.TopicID); err != nil {
+		if _, err := tx.Exec(ctx, "UPDATE topics SET (likes_count,bookmarks_count)=($1,$2) WHERE topic_id=$3", topic.LikesCount, topic.BookmarksCount, topic.TopicID); err != nil {
 			return err
 		}
 		if tu.isNew {
 			params, positions := durable.PrepareColumnsWithParams(topicUserColumns)
 			query := fmt.Sprintf("INSERT INTO topic_users (%s) VALUES (%s)", params, positions)
-			if _, err := tx.ExecContext(ctx, query, tu.values()...); err != nil {
+			if _, err := tx.Exec(ctx, query, tu.values()...); err != nil {
 				return err
 			}
 			return nil
 		}
 		query := fmt.Sprintf("UPDATE topic_users SET %s=$1 WHERE topic_id=$2 AND user_id=$3", action)
-		if _, err := session.Database(ctx).ExecContext(ctx, query, state, tu.TopicID, tu.UserID); err != nil {
+		if _, err := session.Database(ctx).Exec(ctx, query, state, tu.TopicID, tu.UserID); err != nil {
 			return err
 		}
 		return nil
@@ -108,12 +109,9 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 
 func readTopicUser(ctx context.Context, topicID, userID string) (*TopicUser, error) {
 	query := fmt.Sprintf("SELECT %s FROM topic_users WHERE topic_id=$1 AND user_id=$2", strings.Join(topicUserColumns, ","))
-	row, err := session.Database(ctx).QueryRowContext(ctx, query, topicID, userID)
-	if err != nil {
-		return nil, err
-	}
+	row := session.Database(ctx).QueryRow(ctx, query, topicID, userID)
 	tu, err := topicUserFromRow(row)
-	if err == sql.ErrNoRows {
+	if err == pgx.ErrNoRows {
 		return nil, nil
 	}
 	return tu, err

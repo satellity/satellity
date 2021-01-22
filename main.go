@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,12 +15,13 @@ import (
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/gorilla/handlers"
+	"github.com/jackc/pgx/v4"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
 
-func startHTTP(db *sql.DB, logger *zap.Logger, port string) error {
+func startHTTP(db *pgx.Conn, logger *zap.Logger, port string) error {
 	database := durable.WrapDatabase(db)
 	router := httptreemux.New()
 	controllers.RegisterHanders(router)
@@ -67,7 +67,7 @@ func main() {
 		Port:     config.Database.Port,
 		Name:     config.Database.Name,
 	})
-	defer db.Close()
+	defer db.Close(context.Background())
 
 	logger, err := zap.NewDevelopment()
 	if config.Environment == "production" {

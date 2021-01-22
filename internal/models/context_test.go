@@ -38,7 +38,7 @@ func teardownTestContext(ctx context.Context) {
 	}
 	db := session.Database(ctx)
 	for _, q := range tables {
-		if _, err := db.Exec(q); err != nil {
+		if _, err := db.Exec(ctx, q); err != nil {
 			log.Panicln(err)
 		}
 	}
@@ -63,7 +63,7 @@ func setupTestContext() context.Context {
 	if err != nil {
 		log.Panicln(err)
 	}
-	if _, err := db.Exec(string(data)); err != nil {
+	if _, err := db.Exec(context.Background(), string(data)); err != nil {
 		log.Panicln(err)
 	}
 	database := durable.WrapDatabase(db)

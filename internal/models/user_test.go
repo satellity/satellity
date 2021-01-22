@@ -6,7 +6,6 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/x509"
-	"database/sql"
 	"encoding/hex"
 	"fmt"
 	"satellity/internal/session"
@@ -16,6 +15,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
+	"github.com/jackc/pgx/v4"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -126,7 +126,7 @@ func createTestUser(ctx context.Context, email, username, password string) *User
 
 func readTestSession(ctx context.Context, uid, sid string) (*Session, error) {
 	var s *Session
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		var err error
 		s, err = readSession(ctx, tx, uid, sid)
 		return err

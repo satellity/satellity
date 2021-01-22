@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"crypto/x509"
-	"database/sql"
 	"encoding/hex"
 	"fmt"
 	"satellity/internal/durable"
@@ -13,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/jackc/pgx/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -62,8 +62,8 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 		return nil, session.InvalidPasswordError(ctx)
 	}
 
-	err = session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
-		_, err := tx.ExecContext(ctx, "DELETE FROM sessions WHERE session_id IN (SELECT session_id FROM sessions WHERE user_id=$1 ORDER BY created_at DESC OFFSET 5)", user.UserID)
+	err = session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+		_, err := tx.Exec(ctx, "DELETE FROM sessions WHERE session_id IN (SELECT session_id FROM sessions WHERE user_id=$1 ORDER BY created_at DESC OFFSET 5)", user.UserID)
 		if err != nil {
 			return err
 		}
@@ -80,7 +80,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 	return user, nil
 }
 
-func (user *User) addSession(ctx context.Context, tx *sql.Tx, secret string) (*Session, error) {
+func (user *User) addSession(ctx context.Context, tx pgx.Tx, secret string) (*Session, error) {
 	s := &Session{
 		SessionID: uuid.Must(uuid.NewV4()).String(),
 		UserID:    user.UserID,
@@ -89,16 +89,11 @@ func (user *User) addSession(ctx context.Context, tx *sql.Tx, secret string) (*S
 	}
 
 	cols, posits := durable.PrepareColumnsWithParams(sessionColumns)
-	stmt, err := tx.PrepareContext(ctx, fmt.Sprintf("INSERT INTO sessions(%s) VALUES(%s)", cols, posits))
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-	_, err = stmt.ExecContext(ctx, s.values()...)
-	return s, nil
+	_, err := tx.Exec(ctx, fmt.Sprintf("INSERT INTO sessions(%s) VALUES(%s)", cols, posits), s.values()...)
+	return s, err
 }
 
-func readSession(ctx context.Context, tx *sql.Tx, uid, sid string) (*Session, error) {
+func readSession(ctx context.Context, tx pgx.Tx, uid, sid string) (*Session, error) {
 	if id, _ := uuid.FromString(uid); id.String() == uuid.Nil.String() {
 		return nil, nil
 	}
@@ -106,9 +101,9 @@ func readSession(ctx context.Context, tx *sql.Tx, uid, sid string) (*Session, er
 		return nil, nil
 	}
 
-	row := tx.QueryRowContext(ctx, fmt.Sprintf("SELECT %s FROM sessions WHERE user_id=$1 AND session_id=$2", strings.Join(sessionColumns, ",")), uid, sid)
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM sessions WHERE user_id=$1 AND session_id=$2", strings.Join(sessionColumns, ",")), uid, sid)
 	s, err := sessionFromRows(row)
-	if err == sql.ErrNoRows {
+	if err == pgx.ErrNoRows {
 		return nil, nil
 	}
 	return s, err

@@ -2,13 +2,13 @@ package models
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"satellity/internal/session"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/jackc/pgx/v4"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -95,7 +95,7 @@ func TestCommentCRUD(t *testing.T) {
 
 func readTestComment(ctx context.Context, id string) (*Comment, error) {
 	var comment *Comment
-	err := session.Database(ctx).RunInTransaction(ctx, nil, func(tx *sql.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		var err error
 		comment, err = findComment(ctx, tx, id)
 		return err
