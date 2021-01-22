@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
@@ -19,7 +20,7 @@ type Category struct {
 	Alias       string
 	Description string
 	TopicsCount int64
-	LastTopicID string
+	LastTopicID sql.NullString
 	Position    int64
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
@@ -204,15 +205,15 @@ func emitToCategory(ctx context.Context, id string) (*Category, error) {
 		if err != nil {
 			return err
 		}
-		var lastTopicID string
+		lastTopicID := sql.NullString{String: "", Valid: false}
 		if topic != nil {
-			lastTopicID = topic.TopicID
+			lastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
 		}
-		if category.LastTopicID != lastTopicID {
+		if category.LastTopicID.String != lastTopicID.String {
 			category.LastTopicID = lastTopicID
 		}
 		category.TopicsCount = 0
-		if category.LastTopicID != "" {
+		if category.LastTopicID.Valid {
 			count, err := topicsCountByCategory(ctx, tx, category.CategoryID)
 			if err != nil {
 				return err

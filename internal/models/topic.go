@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
@@ -111,7 +112,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 			return session.BadDataError(ctx)
 		}
 		topic.CategoryID = category.CategoryID
-		category.LastTopicID = topic.TopicID
+		category.LastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
 		count, err := topicsCountByCategory(ctx, tx, category.CategoryID)
 		if err != nil {
 			return err
