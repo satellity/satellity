@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    image: satellity-backend
+    ports:
+      - '4000:4000'
+    container_name: satellity-backend
+    restart: unless-stopped
+    depends_on:
+      - database
+  database:
+    image: postgres:alpine
+    container_name: satellity-database
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: satellity
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: satellity_dev
+    volumes:
+      - ${PWD}/internal/models/schema.sql:/docker-entrypoint-initdb.d/schema.sql

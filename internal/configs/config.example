@@ -5,8 +5,8 @@ default: &default
     port: 4000
   database:
     user: satellity
-    password: ""
-    host: localhost
+    password: mysecretpassword
+    host: database
     port: 5432
   github:
     client_id: b9b78f
