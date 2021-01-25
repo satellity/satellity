@@ -12,7 +12,7 @@
     "axios": "^0.21.1",
     "base64-js": "^1.5.1",
     "codemirror": "^5.58.2",
-    "file-saver": "^2.0.2",
+    "file-saver": "^2.0.5",
     "js-cookie": "^2.2.1",
     "jsrsasign": "^10.0.5",
     "moment": "^2.29.1",
