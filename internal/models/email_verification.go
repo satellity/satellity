@@ -57,7 +57,7 @@ func CreateEmailVerification(ctx context.Context, purpose, email, recaptcha stri
 	}
 
 	var should bool
-	err = session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		_, err = tx.Exec(ctx, "DELETE FROM email_verifications WHERE created_at<$1", time.Now().Add(-24*time.Hour))
 		if err != nil {
 			return err
@@ -89,7 +89,7 @@ func CreateEmailVerification(ctx context.Context, purpose, email, recaptcha stri
 // VerifyEmailVerification verify an email verification
 func VerifyEmailVerification(ctx context.Context, verificationID, code, username, password, sessionSecret string) (*User, error) {
 	var user *User
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		ev, err := findEmailVerification(ctx, tx, verificationID)
 		if err != nil || ev == nil {
 			return err
@@ -138,7 +138,7 @@ func VerifyEmailVerification(ctx context.Context, verificationID, code, username
 
 func Reset(ctx context.Context, verificationID, code, password string) error {
 	var user *User
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		ev, err := findEmailVerification(ctx, tx, verificationID)
 		if err != nil || ev == nil {
 			return err

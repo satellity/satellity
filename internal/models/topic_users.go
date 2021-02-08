@@ -56,7 +56,7 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 			isNew: true,
 		}
 	}
-	err = session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var lcount, bcount int64
 		if action == TopicUserActionLiked {
 			tu.Liked = state

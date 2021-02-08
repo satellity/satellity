@@ -103,7 +103,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 		return nil, session.ServerError(ctx, err)
 	}
 
-	err = session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		category, err := findCategory(ctx, tx, categoryID)
 		if err != nil {
 			return err
@@ -160,7 +160,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 	var topic *Topic
 	var prevCategoryID string
 	var prevDraft bool
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
 		if err != nil || topic == nil {
@@ -233,7 +233,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 //ReadTopic read a topic by ID
 func ReadTopic(ctx context.Context, id string) (*Topic, error) {
 	var topic *Topic
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
 		if err != nil {
@@ -272,7 +272,7 @@ func (user *User) DeleteTopic(ctx context.Context, id string) error {
 	if !user.isAdmin() {
 		return session.ForbiddenError(ctx)
 	}
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		topic, err := findTopic(ctx, tx, id)
 		if err != nil || topic == nil {
 			return err
@@ -290,7 +290,7 @@ func (user *User) DeleteTopic(ctx context.Context, id string) error {
 //DraftTopic read the draft topic
 func (user *User) DraftTopic(ctx context.Context) (*Topic, error) {
 	var topic *Topic
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND draft=true LIMIT 1", strings.Join(topicColumns, ","))
 		row := tx.QueryRow(ctx, query, user.UserID)
@@ -343,7 +343,7 @@ func ReadTopicByShortID(ctx context.Context, id string) (*Topic, error) {
 	}
 	id = subs[0]
 	var topic *Topic
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		topic, err = findTopicByShortID(ctx, tx, id)
 		if topic == nil || err != nil {
@@ -383,7 +383,7 @@ func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 	}
 
 	var topics []*Topic
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		set, err := readCategorySet(ctx, tx)
 		if err != nil {
 			return err
@@ -431,7 +431,7 @@ func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, e
 	}
 
 	var topics []*Topic
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		set, err := readCategorySet(ctx, tx)
 		if err != nil {
 			return err
@@ -467,7 +467,7 @@ func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*
 	}
 
 	var topics []*Topic
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND updated_at<$2 ORDER BY category_id,draft,updated_at DESC LIMIT $3", strings.Join(topicColumns, ","))
 		rows, err := tx.Query(ctx, query, category.CategoryID, offset, LIMIT)
 		if err != nil {

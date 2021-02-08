@@ -55,7 +55,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		topic, err := findTopic(ctx, tx, topicID)
 		if err != nil {
 			return err
@@ -99,7 +99,7 @@ func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment,
 		return nil, session.BadDataError(ctx)
 	}
 	var comment *Comment
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		comment, err = findComment(ctx, tx, id)
 		if err != nil {
@@ -128,7 +128,7 @@ func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comm
 	}
 
 	var comments []*Comment
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at LIMIT $3", strings.Join(commentColumns, ","))
 		rows, err := tx.Query(ctx, query, topic.TopicID, offset, LIMIT)
 		if err != nil {
@@ -196,7 +196,7 @@ func ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
 	}
 
 	var comments []*Comment
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("SELECT %s FROM comments WHERE updated_at<$1 ORDER BY updated_at DESC LIMIT $2", strings.Join(commentColumns, ","))
 		rows, err := tx.Query(ctx, query, offset, LIMIT)
 		if err != nil {
@@ -233,7 +233,7 @@ func ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
 
 // DeleteComment delete a comment by ID
 func (user *User) DeleteComment(ctx context.Context, id string) error {
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		comment, err := findComment(ctx, tx, id)
 		if err != nil || comment == nil {
 			return err

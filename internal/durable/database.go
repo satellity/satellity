@@ -66,8 +66,8 @@ func (d *Database) QueryRow(ctx context.Context, query string, args ...interface
 }
 
 // RunInTransaction run a query in the transaction
-func (d *Database) RunInTransaction(ctx context.Context, opts pgx.TxOptions, fn func(pgx.Tx) error) error {
-	tx, err := d.db.BeginTx(ctx, opts)
+func (d *Database) RunInTransaction(ctx context.Context, fn func(pgx.Tx) error) error {
+	tx, err := d.db.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.Serializable})
 	if err != nil {
 		return err
 	}

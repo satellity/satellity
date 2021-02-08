@@ -41,7 +41,8 @@ func categoryFromRows(row durable.Row) (*Category, error) {
 // CreateCategory create a new category with none blank name and alias, and optional description.
 // alias use for human-readable, position for ordering categories
 func CreateCategory(ctx context.Context, name, alias, description string, position int64) (*Category, error) {
-	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
+	alias = strings.TrimSpace(alias)
+	name = strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 	if name == "" {
 		return nil, session.BadDataError(ctx)
@@ -62,8 +63,7 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 		UpdatedAt:   t,
 	}
 
-	var option pgx.TxOptions
-	err := session.Database(ctx).RunInTransaction(ctx, option, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		if position == 0 {
 			count, err := categoryCount(ctx, tx)
 			if err != nil {
@@ -90,8 +90,7 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 	description = strings.TrimSpace(description)
 
 	var category *Category
-	var option pgx.TxOptions
-	err := session.Database(ctx).RunInTransaction(ctx, option, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil || category == nil {
@@ -120,8 +119,7 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 // ReadCategory read a category by ID
 func ReadCategory(ctx context.Context, id string) (*Category, error) {
 	var category *Category
-	var option pgx.TxOptions
-	err := session.Database(ctx).RunInTransaction(ctx, option, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		return err
@@ -146,7 +144,7 @@ func ReadCategoryByIDOrName(ctx context.Context, identity string) (*Category, er
 // ReadAllCategories read categories order by position
 func ReadAllCategories(ctx context.Context) ([]*Category, error) {
 	var categories []*Category
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		categories, err = readCategories(ctx, tx)
 		return err
@@ -193,7 +191,7 @@ func emitToCategory(ctx context.Context, id string) (*Category, error) {
 		return nil, nil
 	}
 	var category *Category
-	err := session.Database(ctx).RunInTransaction(ctx, pgx.TxOptions{}, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
 		if err != nil {
