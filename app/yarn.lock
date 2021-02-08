@@ -11857,10 +11857,10 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
 
-react-lazyload@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/react-lazyload/-/react-lazyload-3.1.0.tgz#2d2b172ede29f0a72dc4b329af6f1626ffd637d2"
-  integrity sha512-WNkWS2jlLnAud2uEqi/Ud4TEjzOQzsN97NzbeRodB9k0TepnoadXDU2bee3PvfP3vpbepsZ716FjSb+xS1W4UQ==
+react-lazyload@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/react-lazyload/-/react-lazyload-3.1.1.tgz#e355f3f3ae88e8fe8262800bc685a100f9580b3b"
+  integrity sha512-NWd+8TCrvNv7O+xY/lLd3vB1ThOAY8kuh3hY9fEpIlOgZ6RO/3q1SaYQeIYOQMSFltZhg++58hSfxzZRxlGpsw==
 
 react-recaptcha-v3@^2.0.1:
   version "2.0.1"
