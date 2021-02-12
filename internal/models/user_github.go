@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"net/http"
 	"satellity/internal/configs"
-	"satellity/internal/external"
 	"satellity/internal/session"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -53,7 +53,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 
 func fetchAccessToken(ctx context.Context, code string) (string, error) {
 	config := configs.AppConfig
-	client := external.HTTPClient()
+	client := HTTPClient()
 	data, err := json.Marshal(map[string]interface{}{
 		"client_id":     config.Github.ClientID,
 		"client_secret": config.Github.ClientSecret,
@@ -86,7 +86,7 @@ func fetchAccessToken(ctx context.Context, code string) (string, error) {
 }
 
 func fetchOauthUser(ctx context.Context, accessToken string) (*GithubUser, error) {
-	client := external.HTTPClient()
+	client := HTTPClient()
 	req, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func fetchOauthUser(ctx context.Context, accessToken string) (*GithubUser, error
 }
 
 func fetchUserEmail(ctx context.Context, accessToken string) (string, error) {
-	client := external.HTTPClient()
+	client := HTTPClient()
 	req, err := http.NewRequest("GET", "https://api.github.com/user/public_emails", nil)
 	if err != nil {
 		return "", err
@@ -140,4 +140,9 @@ func fetchUserEmail(ctx context.Context, accessToken string) (string, error) {
 func findUserByGithubID(ctx context.Context, tx pgx.Tx, id string) (*User, error) {
 	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM users WHERE github_id=$1", strings.Join(userColumns, ",")), id)
 	return userFromRow(row)
+}
+
+// HTTPClient is a client with Timeout (5 seconds).
+func HTTPClient() *http.Client {
+	return &http.Client{Timeout: 5 * time.Second}
 }

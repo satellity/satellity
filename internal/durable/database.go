@@ -8,7 +8,6 @@ import (
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
-	_ "github.com/lib/pq" //
 )
 
 // ConnectionInfo is the info of the postgres
