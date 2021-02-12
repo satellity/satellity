@@ -1,15 +1,15 @@
 CREATE TABLE IF NOT EXISTS users (
-  user_id                VARCHAR(36) PRIMARY KEY,
-  email                  VARCHAR(512),
-  username               VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
-  nickname               VARCHAR(64) NOT NULL DEFAULT '',
-  biography              VARCHAR(2048) NOT NULL DEFAULT '',
-  avatar_url             VARCHAR(512) NOT NULL DEFAULT '',
-  encrypted_password     VARCHAR(1024),
-  github_id              VARCHAR(1024) UNIQUE,
-  role                   VARCHAR(128) NOT NULL DEFAULT '',
-  created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+  user_id               VARCHAR(36) PRIMARY KEY,
+  email                 VARCHAR(512),
+  username              VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
+  nickname              VARCHAR(64) NOT NULL DEFAULT '',
+  biography             VARCHAR(2048) NOT NULL DEFAULT '',
+  avatar_url            VARCHAR(512) NOT NULL DEFAULT '',
+  encrypted_password    VARCHAR(1024),
+  github_id             VARCHAR(1024) UNIQUE,
+  role                  VARCHAR(128) NOT NULL DEFAULT '',
+  created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_emailx ON users ((LOWER(email)));
@@ -19,7 +19,7 @@ CREATE INDEX IF NOT EXISTS users_createdx ON users (created_at);
 
 CREATE TABLE IF NOT EXISTS sessions (
   session_id            VARCHAR(36) PRIMARY KEY,
-  user_id               VARCHAR(36) NOT NULL,
+  user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
   secret                VARCHAR(1024) NOT NULL,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
@@ -28,10 +28,10 @@ CREATE INDEX IF NOT EXISTS sessions_userx ON sessions (user_id);
 
 
 CREATE TABLE IF NOT EXISTS email_verifications (
-  verification_id        VARCHAR(36) PRIMARY KEY,
-  email                  VARCHAR(512),
-  code                   VARCHAR(512),
-  created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+  verification_id       VARCHAR(36) PRIMARY KEY,
+  email                 VARCHAR(512),
+  code                  VARCHAR(512),
+  created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS email_verifications_email_code_createdx ON email_verifications (email, code, created_at DESC);
@@ -56,7 +56,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS categories_namex ON categories (name);
 
 CREATE TABLE IF NOT EXISTS topics (
   topic_id              VARCHAR(36) PRIMARY KEY,
-  short_id              VARCHAR(256) NOT NULL,
+  short_id              VARCHAR(256) NOT NULL UNIQUE,
   title                 VARCHAR(512) NOT NULL,
   body                  TEXT NOT NULL,
   topic_type            VARCHAR(256) NOT NULL,
@@ -72,7 +72,6 @@ CREATE TABLE IF NOT EXISTS topics (
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS topics_shortx ON topics(short_id);
 CREATE INDEX IF NOT EXISTS topics_draft_createdx ON topics(draft, created_at DESC);
 CREATE INDEX IF NOT EXISTS topics_user_draft_createdx ON topics(user_id, draft, created_at DESC);
 CREATE INDEX IF NOT EXISTS topics_category_draft_createdx ON topics(category_id, draft, created_at DESC);
