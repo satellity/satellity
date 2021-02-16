@@ -2,9 +2,19 @@
 
 Satellity is a 100% open source forum, written in Go. Please visit [https://routinost.com](https://routinost.com) for more details. For feedback, you can submit [issues](https://github.com/satellity/satellity/issues) or join our [slack](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLTNhYTUxMDgzMjE2NTcwYjRjMmE5ZDdjNzJjZTgzMjQ3MTQ2YzRiMDE3YTM4YmVjYzBjNTNjOGMxMmRhZTU2ZDM)([https://bit.ly/31b6xeX](https://join.slack.com/t/satellity/shared_invite/enQtNTcwMTIyODAwMDgxLTNhYTUxMDgzMjE2NTcwYjRjMmE5ZDdjNzJjZTgzMjQ3MTQ2YzRiMDE3YTM4YmVjYzBjNTNjOGMxMmRhZTU2ZDM)), Let's learn Go together!
 
-## NOTICE
 
-Satellity is a still a **PRE-ALPHA** version. Please don't use it in production!!
+## How to deployment
+
+1. A VPS, I'm using [Digital Ocean](https://m.do.co/c/f911b101f6ac) right now, and you can use any other VPS like GCP, AWS. You'll get some credit from the link, and it depends on you.
+2. Install Nginx `sudo apt install nginx -y`, here is an example config of nginx https://github.com/satellity/satellity/blob/master/deploy/nginx_example.conf , I'm using Ubuntu 20.04 LTS
+3. Install Postgresql `sudo apt install postgresql -y`, [how to install PostgreSQL On Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-20-04-quickstart), after create the database, you need import the database schema https://github.com/satellity/satellity/blob/master/internal/models/schema.sql
+4. Deploy the api server and web, you can find the shell script here: https://github.com/satellity/satellity/tree/master/deploy
+5. Use systemd to manage http server, here is the service template https://github.com/satellity/satellity/blob/master/deploy/systemd/satellity-http.service, and you can find the basic commands [here](https://wiki.archlinux.org/index.php/systemd)
+6. Lets Encrypt, here is a step by step tutorial, https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04
+7. Then you can visit you website after restart nginx
+
+Some people want to know why not use docker? The most direct reason is that I don't know docker and didn't take time on it. And a shell script is enough for me right now.
+
 
 ## Features
 
