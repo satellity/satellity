@@ -70,9 +70,9 @@ func CreateEmailVerification(ctx context.Context, purpose, email, recaptcha stri
 			return nil
 		}
 		should = true
-		cols, posits := durable.PrepareColumnsWithParams(emailVerificationColumns)
-		query := fmt.Sprintf("INSERT INTO email_verifications(%s) VALUES (%s)", cols, posits)
-		_, err = tx.Exec(ctx, query, ev.values()...)
+
+		rows := [][]interface{}{ev.values()}
+		_, err = tx.CopyFrom(ctx, pgx.Identifier{"email_verifications"}, emailVerificationColumns, pgx.CopyFromRows(rows))
 		return err
 	})
 	if err != nil {
@@ -196,8 +196,8 @@ func createUser(ctx context.Context, tx pgx.Tx, email, username, nickname, passw
 			user.GithubID = sql.NullString{String: githubID, Valid: true}
 		}
 
-		cols, posits := durable.PrepareColumnsWithParams(userColumns)
-		_, err := tx.Exec(ctx, fmt.Sprintf("INSERT INTO users(%s) VALUES (%s)", cols, posits), user.values()...)
+		rows := [][]interface{}{user.values()}
+		_, err := tx.CopyFrom(ctx, pgx.Identifier{"users"}, userColumns, pgx.CopyFromRows(rows))
 		if err != nil {
 			return nil, err
 		}

@@ -88,8 +88,8 @@ func (user *User) addSession(ctx context.Context, tx pgx.Tx, secret string) (*Se
 		CreatedAt: time.Now(),
 	}
 
-	cols, posits := durable.PrepareColumnsWithParams(sessionColumns)
-	_, err := tx.Exec(ctx, fmt.Sprintf("INSERT INTO sessions(%s) VALUES(%s)", cols, posits), s.values()...)
+	rows := [][]interface{}{s.values()}
+	_, err := tx.CopyFrom(ctx, pgx.Identifier{"sessions"}, sessionColumns, pgx.CopyFromRows(rows))
 	return s, err
 }
 

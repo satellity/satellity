@@ -88,12 +88,9 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 			return err
 		}
 		if tu.isNew {
-			params, positions := durable.PrepareColumnsWithParams(topicUserColumns)
-			query := fmt.Sprintf("INSERT INTO topic_users (%s) VALUES (%s)", params, positions)
-			if _, err := tx.Exec(ctx, query, tu.values()...); err != nil {
-				return err
-			}
-			return nil
+			rows := [][]interface{}{tu.values()}
+			_, err := tx.CopyFrom(ctx, pgx.Identifier{"topic_users"}, topicUserColumns, pgx.CopyFromRows(rows))
+			return err
 		}
 		query := fmt.Sprintf("UPDATE topic_users SET %s=$1 WHERE topic_id=$2 AND user_id=$3", action)
 		if _, err := session.Database(ctx).Exec(ctx, query, state, tu.TopicID, tu.UserID); err != nil {
