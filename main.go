@@ -15,13 +15,13 @@ import (
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/gorilla/handlers"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
 
-func startHTTP(db *pgx.Conn, logger *zap.Logger, port string) error {
+func startHTTP(db *pgxpool.Pool, logger *zap.Logger, port string) error {
 	database := durable.WrapDatabase(db)
 	router := httptreemux.New()
 	controllers.RegisterHanders(router)
@@ -34,7 +34,7 @@ func startHTTP(db *pgx.Conn, logger *zap.Logger, port string) error {
 	handler = middlewares.Logger(handler, durable.NewLogger(logger))
 	handler = handlers.ProxyHeaders(handler)
 
-	log.Println("App running at port: ", port)
+	log.Println("HTTP server running at:", port)
 	return http.ListenAndServe(fmt.Sprintf(":%s", port), handler)
 }
 
@@ -68,7 +68,7 @@ func main() {
 		Port:     config.Database.Port,
 		Name:     config.Database.Name,
 	})
-	defer db.Close(context.Background())
+	defer db.Close()
 
 	logger, err := zap.NewDevelopment()
 	if config.Environment == "production" {

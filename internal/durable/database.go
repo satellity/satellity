@@ -8,6 +8,7 @@ import (
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // ConnectionInfo is the info of the postgres
@@ -21,32 +22,37 @@ type ConnectionInfo struct {
 
 // Database is wrapped struct of *pgx.Conn
 type Database struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
 // OpenDatabaseClient generate a database client
-func OpenDatabaseClient(ctx context.Context, c *ConnectionInfo) *pgx.Conn {
+func OpenDatabaseClient(ctx context.Context, c *ConnectionInfo) *pgxpool.Pool {
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", c.User, c.Password, c.Host, c.Port, c.Name)
-	db, err := pgx.Connect(ctx, connStr)
+	config, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
-		log.Fatal(err)
-		return nil
+		log.Panicln(err)
 	}
-	if err := db.Ping(ctx); err != nil {
+	config.MinConns = 1
+	config.MaxConns = 128
+	dbpool, err := pgxpool.ConnectConfig(context.Background(), config)
+	if err != nil {
+		log.Panicln(err)
+	}
+	if err := dbpool.Ping(ctx); err != nil {
 		log.Fatal(fmt.Errorf("\nFail to connect the database.\nPlease make sure the connection info is valid %#v", c))
 		return nil
 	}
-	return db
+	return dbpool
 }
 
 // WrapDatabase create a *Database
-func WrapDatabase(db *pgx.Conn) *Database {
+func WrapDatabase(db *pgxpool.Pool) *Database {
 	return &Database{db: db}
 }
 
 // Close the *pgx.Conn
-func (d *Database) Close() error {
-	return d.db.Close(context.Background())
+func (d *Database) Close() {
+	d.db.Close()
 }
 
 // Exec executes a prepared statement
