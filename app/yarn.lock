@@ -9373,10 +9373,10 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jsrsasign@^10.1.10:
-  version "10.1.10"
-  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-10.1.10.tgz#5d39cbbe3038de83d67daf3d5362fabd9cd54086"
-  integrity sha512-//Kkza0S/kFbK5fq6eVbwlM36tKes+ak6FfTn8+mFxKlYzN/3bVJDa0ZERGYu78QKWrXPpos+TIC1tTJDNFDRQ==
+jsrsasign@^10.1.11:
+  version "10.1.11"
+  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-10.1.11.tgz#eb9d19da4a8721ac1df398a4949745ffde7a4d1d"
+  integrity sha512-7AzGLg+HsOrkulMu8jrOgDuDsp1K8TMLeMpzkkxqTtnkq1Cb5Sivbt7jHUUvCSoVCdZak5IsHNInEnOhmSgT6g==
 
 jss-plugin-camel-case@^10.0.0:
   version "10.2.0"
