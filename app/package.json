@@ -20,7 +20,7 @@
     "node-polyglot": "^2.4.0",
     "normalize.css": "^8.0.1",
     "noty": "^3.2.0-beta",
-    "npm-check-updates": "^11.1.4",
+    "npm-check-updates": "^11.2.0",
     "react": "^17.0.1",
     "react-codemirror2": "^7.2.1",
     "react-dom": "^17.0.1",
