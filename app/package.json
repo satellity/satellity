@@ -14,7 +14,7 @@
     "codemirror": "^5.59.2",
     "file-saver": "^2.0.5",
     "js-cookie": "^2.2.1",
-    "jsrsasign": "^10.1.10",
+    "jsrsasign": "^10.1.13",
     "moment": "^2.29.1",
     "node-forge": "^0.10.0",
     "node-polyglot": "^2.4.0",
