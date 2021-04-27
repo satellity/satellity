@@ -34,7 +34,7 @@
     "react-scripts": "4.0.2",
     "react-styleguidist": "^11.1.5",
     "react-timeago": "^5.2.0",
-    "sass": "^1.32.7",
+    "sass": "^1.32.11",
     "showdown": "^1.9.1",
     "showdown-highlight": "^2.1.6",
     "text-encoder-lite": "^2.0.0",
