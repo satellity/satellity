@@ -16,7 +16,7 @@
     "js-cookie": "^2.2.1",
     "jsrsasign": "^10.1.10",
     "moment": "^2.29.1",
-    "node-forge": "^0.10.0",
+    "node-forge": "^1.0.0",
     "node-polyglot": "^2.4.0",
     "normalize.css": "^8.0.1",
     "noty": "^3.2.0-beta",
