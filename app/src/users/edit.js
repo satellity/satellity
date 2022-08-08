@@ -1,5 +1,5 @@
 import style from './index.module.scss';
-import 'react-image-crop/lib/ReactCrop.scss';
+import 'react-image-crop/src/ReactCrop.scss';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import ReactCrop from 'react-image-crop';
