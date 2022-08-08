@@ -11,7 +11,7 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/jackc/pgconn v1.13.0
 	github.com/jackc/pgx/v4 v4.10.2-0.20210213165900-927a15124e6a
-	github.com/jessevdk/go-flags v1.4.0
+	github.com/jessevdk/go-flags v1.5.0
 	github.com/lib/pq v1.10.6
 	github.com/mailgun/mailgun-go/v3 v3.6.4
 	github.com/mailru/easyjson v0.7.1 // indirect
