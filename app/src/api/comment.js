@@ -37,7 +37,7 @@ class Admin {
   }
 
   delete(id) {
-    return this.api.axios.delete(`/admin/comments/${id}`)
+    return this.api.axios.delete(`/admin/comments/${id}`);
   }
 }
 

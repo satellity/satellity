@@ -1,19 +1,19 @@
 import style from './index.module.scss';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import LazyLoad from 'react-lazyload';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 export default function Item(props) {
   const p = props.product;
 
-  let tags = p.tags.slice(0, 4).map((t, i) => {
+  const tags = p.tags.slice(0, 4).map((t, i) => {
     return (
       <Link to={`/products/q/best-${t}-avatar-maker`}>{t}{ i<3 && ','} &nbsp;</Link>
-    )
+    );
   });
 
-  let path = `/products/${p.name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}-${p.short_id}`
+  const path = `/products/${p.name.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}-${p.short_id}`;
 
   return (
     <div key={p.product_id} className={style.product}>
@@ -34,5 +34,5 @@ export default function Item(props) {
         </div>
       </div>
     </div>
-  )
+  );
 }

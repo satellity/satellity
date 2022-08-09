@@ -1,6 +1,6 @@
 import style from './widget.module.scss';
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 import Button from '../components/button.js';
 import API from '../api/index.js';
 
@@ -37,7 +37,7 @@ class SiteWidget extends Component {
           © 2019 - Now MIT license
         </div>
       </div>
-    )
+    );
   }
 }
 

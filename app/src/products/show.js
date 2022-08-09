@@ -1,10 +1,10 @@
 import style from './show.module.scss';
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import showdown from 'showdown';
 import showdownHighlight from 'showdown-highlight';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Helmet } from 'react-helmet';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {Helmet} from 'react-helmet';
 import Config from '../components/config.js';
 import SiteWidget from '../home/widget.js';
 import Loading from '../components/loading.js';
@@ -15,7 +15,7 @@ export default class Show extends Component {
     super(props);
 
     this.api = window.api;
-    this.converter = new showdown.Converter({ extensions: ['header-anchors', showdownHighlight] });
+    this.converter = new showdown.Converter({extensions: ['header-anchors', showdownHighlight]});
 
     this.state = {
       product_id: props.match.params.id,
@@ -33,7 +33,7 @@ export default class Show extends Component {
         return;
       }
 
-      let data = resp.data;
+      const data = resp.data;
       data.loading = false;
       data.html_body = this.converter.makeHtml(data.body);
       this.setState(data);
@@ -55,7 +55,7 @@ export default class Show extends Component {
             return;
           }
 
-          let data = resp.data;
+          const data = resp.data;
           data.loading = false;
           data.html_body = this.converter.makeHtml(data.body);
           this.setState(data);
@@ -79,12 +79,12 @@ export default class Show extends Component {
       </div>
     );
 
-    let os = "ONLINE";
-    if (state.tags.includes("Android")) {
-      os = "ANDROID";
+    let os = 'ONLINE';
+    if (state.tags.includes('Android')) {
+      os = 'ANDROID';
     }
-    if (state.tags.includes("iOS")) {
-      os = "IOS";
+    if (state.tags.includes('iOS')) {
+      os = 'IOS';
     }
 
     let start = state.body.indexOf('>') + 1;
@@ -114,10 +114,10 @@ export default class Show extends Component {
       </Helmet>
     );
 
-    let tags = state.tags.map((t, i) => {
+    const tags = state.tags.map((t, i) => {
       return (
         <Link to={`/products/q/best-${t}-avatar-maker`}>{t}{ i+1<state.tags.length && ','} &nbsp;</Link>
-      )
+      );
     });
 
     const productView = (
@@ -147,7 +147,7 @@ export default class Show extends Component {
     const products = state.relationships.map((p) => {
       return (
         <Item product={p} />
-      )
+      );
     });
 
     return (
@@ -173,6 +173,6 @@ export default class Show extends Component {
           )
         }
       </div>
-    )
+    );
   }
 }

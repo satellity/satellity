@@ -1,6 +1,6 @@
 import style from './index.module.scss';
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 import API from '../../api/index.js';
 
 class AdminTopic extends Component {
@@ -14,7 +14,7 @@ class AdminTopic extends Component {
   componentDidMount() {
     this.api.topic.admin.index().then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
       this.setState({topics: resp.data});
     });
@@ -22,14 +22,14 @@ class AdminTopic extends Component {
 
   handleDelete(e, id, title) {
     e.preventDefault();
-    let c = window.confirm(`Delete: ${title}`);
+    const c = window.confirm(`Delete: ${title}`);
     if (c) {
       this.api.topic.admin.delete(id).then((resp) => {
         if (resp.error) {
-          return
+          return;
         }
 
-        let topics = this.state.topics.filter((topic) => {
+        const topics = this.state.topics.filter((topic) => {
           return topic.topic_id !== id;
         });
         this.setState({topics: topics});
@@ -43,15 +43,15 @@ class AdminTopic extends Component {
     const listTopics = state.topics.map((topic) => {
       return (
         <li key={topic.topic_id}>
-            {topic.user.nickname} |
+          {topic.user.nickname} |
           <Link to={`/topics/${topic.topic_id}`}>{topic.title}</Link>
           <div className={style.time}>
-              {topic.topic_id} | {topic.created_at} |
+            {topic.topic_id} | {topic.created_at} |
             <Link to={`/topics/${topic.topic_id}/edit`} >EIDT</Link> |
             <Link to='' onClick={(e) => this.handleDelete(e, topic.topic_id, topic.title)} >DELETE</Link>
           </div>
         </li>
-      )
+      );
     });
 
     return (
@@ -61,7 +61,7 @@ class AdminTopic extends Component {
         </h1>
         <div className='panel'>
           <ul>
-              {listTopics}
+            {listTopics}
           </ul>
         </div>
       </div>

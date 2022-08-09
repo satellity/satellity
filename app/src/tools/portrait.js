@@ -30,20 +30,20 @@ class Portrait extends Component {
       eyebrow: 'Default',
       mouth: 'Smile',
       skin: 'Light',
-      hair_shapes: ['NoHair','Eyepatch','Hat','Hijab','Turban','WinterHat1','WinterHat2','WinterHat3','WinterHat4','LongHairBigHair','LongHairBob','LongHairBun','LongHairCurly','LongHairCurvy','LongHairDreads','LongHairFrida','LongHairFro','LongHairFroBand','LongHairNotTooLong','LongHairShavedSides','LongHairMiaWallace','LongHairStraight','LongHairStraight2','LongHairStraightStrand','ShortHairDreads01','ShortHairDreads02','ShortHairFrizzle','ShortHairShaggyMullet','ShortHairShortCurly','ShortHairShortFlat','ShortHairShortRound','ShortHairShortWaved','ShortHairSides','ShortHairTheCaesar','ShortHairTheCaesarSidePart'],
-      accessories: ['Blank','Kurt','Prescription01','Prescription02','Round','Sunglasses','Wayfarers'],
-      hat_colors: ['Black','Blue01','Blue02','Blue03','Gray01','Gray02','Heather','PastelBlue','PastelGreen','PastelOrange','PastelRed','PastelYellow','Pink','Red','White'],
-      hair_colors: ['Auburn','Black','Blonde','BlondeGolden','Brown','BrownDark','PastelPink','Platinum','Red','SilverGray'],
-      facial_hairs: ['Blank','MoustacheFancy','MoustacheMagnum','BeardLight','BeardMedium', 'BeardMajestic'],
-      facial_hair_colors: ['Auburn','Black','Blonde','BlondeGolden','Brown','BrownDark','Platinum','Red'],
-      clothes: ['BlazerShirt','BlazerSweater','CollarSweater','GraphicShirt','Hoodie','Overall','ShirtCrewNeck','ShirtScoopNeck','ShirtVNeck'],
-      clothe_colors: ['Black','Blue01','Blue02','Blue03','Gray01','Gray02','Heather','PastelBlue','PastelGreen','PastelOrange','PastelRed','PastelYellow','Pink','Red','White'],
-      eyes: ['Close','Cry','Default','Dizzy','EyeRoll','Happy','Hearts','Side','Squint','Surprised','Wink','WinkWacky'],
-      eyebrows: ['Angry','AngryNatural','Default','DefaultNatural','FlatNatural','RaisedExcited','RaisedExcitedNatural','SadConcerned','SadConcernedNatural','UnibrowNatural','UpDown','UpDownNatural'],
-      mouths: ['Concerned','Default','Disbelief','Eating','Grimace','Sad','ScreamOpen','Serious','Smile','Tongue','Twinkle','Vomit'],
-      skins: ['Tanned','Yellow','Pale','Light','Brown','DarkBrown','Black'],
-      graphics: ['Blank','Skull','SkullOutline','Bat','Cumbia','Deer','Diamond','Hola','Selena','Pizza','Resist','Bear'],
-      downloading: false
+      hair_shapes: ['NoHair', 'Eyepatch', 'Hat', 'Hijab', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'LongHairBigHair', 'LongHairBob', 'LongHairBun', 'LongHairCurly', 'LongHairCurvy', 'LongHairDreads', 'LongHairFrida', 'LongHairFro', 'LongHairFroBand', 'LongHairNotTooLong', 'LongHairShavedSides', 'LongHairMiaWallace', 'LongHairStraight', 'LongHairStraight2', 'LongHairStraightStrand', 'ShortHairDreads01', 'ShortHairDreads02', 'ShortHairFrizzle', 'ShortHairShaggyMullet', 'ShortHairShortCurly', 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved', 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'],
+      accessories: ['Blank', 'Kurt', 'Prescription01', 'Prescription02', 'Round', 'Sunglasses', 'Wayfarers'],
+      hat_colors: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+      hair_colors: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
+      facial_hairs: ['Blank', 'MoustacheFancy', 'MoustacheMagnum', 'BeardLight', 'BeardMedium', 'BeardMajestic'],
+      facial_hair_colors: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'Platinum', 'Red'],
+      clothes: ['BlazerShirt', 'BlazerSweater', 'CollarSweater', 'GraphicShirt', 'Hoodie', 'Overall', 'ShirtCrewNeck', 'ShirtScoopNeck', 'ShirtVNeck'],
+      clothe_colors: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+      eyes: ['Close', 'Cry', 'Default', 'Dizzy', 'EyeRoll', 'Happy', 'Hearts', 'Side', 'Squint', 'Surprised', 'Wink', 'WinkWacky'],
+      eyebrows: ['Angry', 'AngryNatural', 'Default', 'DefaultNatural', 'FlatNatural', 'RaisedExcited', 'RaisedExcitedNatural', 'SadConcerned', 'SadConcernedNatural', 'UnibrowNatural', 'UpDown', 'UpDownNatural'],
+      mouths: ['Concerned', 'Default', 'Disbelief', 'Eating', 'Grimace', 'Sad', 'ScreamOpen', 'Serious', 'Smile', 'Tongue', 'Twinkle', 'Vomit'],
+      skins: ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Black'],
+      graphics: ['Blank', 'Skull', 'SkullOutline', 'Bat', 'Cumbia', 'Deer', 'Diamond', 'Hola', 'Selena', 'Pizza', 'Resist', 'Bear'],
+      downloading: false,
     };
 
     this.avatar = React.createRef();
@@ -56,18 +56,18 @@ class Portrait extends Component {
   handleClick(e, k, v) {
     e.preventDefault();
     this.setState({
-      [k]: v
+      [k]: v,
     });
   }
 
   handleActionClick(e, v) {
     e.preventDefault();
     this.setState({
-      action: v
+      action: v,
     });
   }
 
-  handleDownload(e)  {
+  handleDownload(e) {
     e.preventDefault();
     const svg = ReactDOM.findDOMNode(this.avatar.current);
     const canvas = this.canvas.current;
@@ -76,27 +76,27 @@ class Portrait extends Component {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const img = new Image();
       const data = svg.outerHTML;
-      const blob = new Blob([data], { type: 'image/svg+xml' })
+      const blob = new Blob([data], {type: 'image/svg+xml'});
       const url = URL.createObjectURL(blob);
       img.onload = () => {
         ctx.save();
         ctx.scale(2, 2);
         ctx.drawImage(img, 0, 0);
         ctx.restore();
-        this.canvas.current.toBlob(imageBlob => {
+        this.canvas.current.toBlob((imageBlob) => {
           saveAs(imageBlob, 'routinost.png');
         });
       };
       this.setState({downloading: false});
-      img.src = url
+      img.src = url;
     });
   }
 
-  render () {
+  render() {
     const i18n = window.i18n;
     const state = this.state;
 
-    const actions = ['hair','accessory','beard','clothes','eyes','eyebrows','mouth', 'skin'].map((o) => {
+    const actions = ['hair', 'accessory', 'beard', 'clothes', 'eyes', 'eyebrows', 'mouth', 'skin'].map((o) => {
       if (state.top === 'Hijab' && o === 'beard') {
         return null;
       }
@@ -110,7 +110,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'top', o)}>
           <Piece pieceType='top' pieceSize='100' topType={o} hairColor='Blank'/>
         </div>
-      )
+      );
     });
 
     const accessories = state.accessories.map((o) => {
@@ -118,7 +118,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'accessory', o)}>
           <Piece pieceType='accessories' pieceSize='100' accessoriesType={o}/>
         </div>
-      )
+      );
     });
 
     const facialHairs = state.facial_hairs.map((o) => {
@@ -126,7 +126,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'facialHair', o)}>
           <Piece pieceType='facialHair' pieceSize='100' facialHairType={o}/>
         </div>
-      )
+      );
     });
 
     const clothes = state.clothes.map((o) => {
@@ -134,7 +134,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'clothe', o)}>
           <Piece pieceType='clothe' pieceSize='100' clotheType={o} clotheColor="Blank"/>
         </div>
-      )
+      );
     });
 
     const graphics = state.graphics.map((o) => {
@@ -142,7 +142,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'graphic', o)}>
           <Piece pieceType="graphics" pieceSize="100" graphicType={o} />
         </div>
-      )
+      );
     });
 
     const eyes = state.eyes.map((o) => {
@@ -150,7 +150,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'eye', o)}>
           <Piece pieceType='eyes' pieceSize='100' eyeType={o}/>
         </div>
-      )
+      );
     });
 
     const eyebrows = state.eyebrows.map((o) => {
@@ -158,7 +158,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'eyebrow', o)}>
           <Piece pieceType='eyebrows' pieceSize='100' eyebrowType={o}/>
         </div>
-      )
+      );
     });
 
     const mouths = state.mouths.map((o) => {
@@ -166,7 +166,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'mouth', o)}>
           <Piece pieceType='mouth' pieceSize='100' mouthType={o}/>
         </div>
-      )
+      );
     });
 
     const skins = state.skins.map((o) => {
@@ -174,7 +174,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'skin', o)}>
           <Piece pieceType='skin' pieceSize='100' skinColor={o}/>
         </div>
-      )
+      );
     });
 
     const hairColors = state.hair_colors.map((o) => {
@@ -182,7 +182,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'hairColor', o)}>
           <Piece pieceType='hairColor' pieceSize='48' hairColor={o}/>
         </div>
-      )
+      );
     });
 
     /*
@@ -200,7 +200,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'facialHairColor', o)}>
           <Piece pieceType='facialHairColor' pieceSize='48' facialHairColor={o}/>
         </div>
-      )
+      );
     });
 
     const clotheColors = state.clothe_colors.map((o) => {
@@ -208,7 +208,7 @@ class Portrait extends Component {
         <div key={o} className={style.widget} onClick={(e) => this.handleClick(e, 'clotheColor', o)}>
           <Piece pieceType='clotheColor' pieceSize='48' clotheColor={o}/>
         </div>
-      )
+      );
     });
 
     const seoView = (
@@ -216,7 +216,7 @@ class Portrait extends Component {
         <title> {`${i18n.t('online.cartoon.avatar.head.title')} - ${Config.Name}`}</title>
         <meta name='description' content={i18n.t('online.cartoon.avatar.head.description')} />
       </Helmet>
-    )
+    );
 
     return (
       <div className={style.page}>
@@ -245,7 +245,7 @@ class Portrait extends Component {
                     mouthType={state.mouth}
                     skinColor={state.skin} />
                   <canvas
-                    style={{ display: 'none' }}
+                    style={{display: 'none'}}
                     width='528'
                     height='570'
                     ref={this.canvas}
@@ -286,7 +286,7 @@ class Portrait extends Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 

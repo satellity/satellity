@@ -1,7 +1,7 @@
 import style from './index.module.scss';
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
+import {Helmet} from 'react-helmet';
 import Loading from '../components/loading.js';
 import Item from './item.js';
 
@@ -39,7 +39,7 @@ export default class Index extends Component {
           }
           this.setState({products: resp.data, loading: false});
         });
-      })
+      });
     }
   }
 
@@ -55,7 +55,7 @@ export default class Index extends Component {
     const products = state.products.map((p) => {
       return (
         <Item product={p} />
-      )
+      );
     });
 
     let header = (
@@ -91,6 +91,6 @@ export default class Index extends Component {
           { !state.loading && products }
         </div>
       </div>
-    )
+    );
   }
 }

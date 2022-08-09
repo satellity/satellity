@@ -1,11 +1,11 @@
 import style from './show.module.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
 import showdownHighlight from 'showdown-highlight';
-import { Helmet } from 'react-helmet';
+import {Helmet} from 'react-helmet';
 import API from '../api/index.js';
 import Config from '../components/config.js';
 import SiteWidget from '../home/widget.js';
@@ -18,23 +18,23 @@ class Show extends Component {
     this.state = {
       actioning: '',
       loading: true,
-      topic_id: props.match.params.id,
+      topic_id: 'TODO',
       user: {},
       category: {},
     };
 
     this.api = new API();
-    this.converter = new showdown.Converter({ extensions: ['header-anchors', showdownHighlight] });
+    this.converter = new showdown.Converter({extensions: ['header-anchors', showdownHighlight]});
     this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
     const user = this.api.user.local();
-    this.api.topic.show(this.props.match.params.id).then((resp) => {
+    this.api.topic.show('TODO').then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
-      let data = resp.data;
+      const data = resp.data;
       data.loading = false;
       data.is_owner = data.user.user_id === user.user_id;
       data.short_body = data.body.substring(0, 128);
@@ -54,7 +54,7 @@ class Show extends Component {
     this.api.topic.action(action, this.state.topic_id).then((resp) => {
       if (resp.error) {
         this.setState({actioning: ''});
-        return
+        return;
       }
       resp.data.actioning = '';
       this.setState(resp.data);
@@ -63,12 +63,12 @@ class Show extends Component {
 
   render() {
     const i18n = window.i18n;
-    let state = this.state;
+    const state = this.state;
     const loadingView = (
       <div className={style.loading}>
         <Loading class='medium' />
       </div>
-    )
+    );
 
     let seoView;
     if (!state.loading) {
@@ -76,9 +76,10 @@ class Show extends Component {
         <Helmet>
           <title>{`${state.title} - ${state.user.nickname} - ${Config.Name}`}</title>
           <meta name='description' content={state.short_body} />
-          <link rel="canonical" href={`${Config.Host}/topics/${state.short_id}-${state.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} />
+          <link rel="canonical"
+            href={`${Config.Host}/topics/${state.short_id}-${state.title.replace(/\W+/mgsi, ' ').replace(/\s+/mgsi, '-').replace(/[^\w-]/mgsi, '')}`} />
         </Helmet>
-      )
+      );
     }
 
     let action;
@@ -87,12 +88,12 @@ class Show extends Component {
         <Link to={`/topics/${state.topic_id}/edit`} className={style.edit}>
           <FontAwesomeIcon icon={['far', 'edit']} />
         </Link>
-      )
+      );
     }
 
     let like = {};
     if (state.is_liked_by) {
-    like = {color: 'rgb(218, 40, 16)'};
+      like = {color: 'rgb(218, 40, 16)'};
     }
 
     let bookmark = {};
@@ -113,7 +114,7 @@ class Show extends Component {
                 {state.user.nickname}
               </Link>
               <span className={style.sep}>{i18n.t('topic.in')}</span>
-              <Link to={{pathname: "/", search: `?c=${state.category.name}`}}>{state.category.alias}</Link>
+              <Link to={{pathname: '/', search: `?c=${state.category.name}`}}>{state.category.alias}</Link>
               <span className={style.sep}>{i18n.t('topic.at')}</span>
               <TimeAgo date={state.created_at} />
               <span className={style.views}>{state.views_count} views</span>
@@ -153,7 +154,7 @@ class Show extends Component {
           </span>
         </div>
       </div>
-    )
+    );
 
     return (
       <div className='container'>
@@ -167,7 +168,7 @@ class Show extends Component {
           <SiteWidget />
         </aside>
       </div>
-    )
+    );
   }
 }
 

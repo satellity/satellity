@@ -1,5 +1,5 @@
 import style from './index.module.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import React, {Component} from 'react';
 import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
@@ -14,7 +14,7 @@ class CommentIndex extends Component {
     this.state = {
       user: this.api.user.local(),
       comments: [],
-      comments_count: props.commentsCount
+      comments_count: 'todo',
     };
 
     this.converter = new showdown.Converter();
@@ -24,14 +24,14 @@ class CommentIndex extends Component {
   }
 
   componentDidMount() {
-    this.api.comment.index(this.props.topicId).then((resp) => {
+    this.api.comment.index('TODO').then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
       const comments = resp.data.map((comment) => {
         comment.body = this.converter.makeHtml(comment.body);
         comment.handling = false;
-        return comment
+        return comment;
       });
       this.setState({comments: comments});
     });
@@ -45,7 +45,7 @@ class CommentIndex extends Component {
       } else {
         comment.handling = false;
       }
-      return comment
+      return comment;
     });
     this.setState({comments: comments});
   }
@@ -54,15 +54,15 @@ class CommentIndex extends Component {
     e.preventDefault();
     this.api.comment.delete(id).then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
-      const comments = this.state.comments.filter(comment => comment.comment_id !== id);
+      const comments = this.state.comments.filter((comment) => comment.comment_id !== id);
       this.setState({comments: comments});
-    })
+    });
   }
 
   handleSubmit(comment) {
-    let newComments = this.state.comments.slice();
+    const newComments = this.state.comments.slice();
     comment.body = this.converter.makeHtml(comment.body);
     newComments.push(comment);
     this.setState({comments: newComments, comments_count: newComments.length});
@@ -71,7 +71,7 @@ class CommentIndex extends Component {
   render() {
     const i18n = window.i18n;
     const state = this.state;
-    let comments = state.comments.map((comment) => {
+    const comments = state.comments.map((comment) => {
       let action;
       if (state.user.user_id === comment.user_id) {
         action = (
@@ -87,7 +87,7 @@ class CommentIndex extends Component {
               </div>
             }
           </span>
-        )
+        );
       }
 
       return (
@@ -105,26 +105,26 @@ class CommentIndex extends Component {
           <article className='md' dangerouslySetInnerHTML={{__html: comment.body}}>
           </article>
         </li>
-      )
+      );
     });
 
-    let commentsContainer = (
+    const commentsContainer = (
       <div className={style.container}>
         <h3>{i18n.t('comment.count', {count: state.comments_count})}</h3>
         <ul className={style.comments}>
           {comments}
         </ul>
       </div>
-    )
+    );
 
     return (
       <div>
         {this.state.comments_count > 0 && commentsContainer}
         <CommentNew
-          topicId={this.props.topicId}
+          topicId={'TODO'}
           handleSubmit={this.handleSubmit} />
       </div>
-    )
+    );
   }
 }
 

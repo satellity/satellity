@@ -1,10 +1,10 @@
 import style from './new.module.scss';
-import React, { Component } from 'react';
-import { Navigate } from 'react-router-dom';
-import {UnControlled as CodeMirror} from 'react-codemirror2'
+import React, {Component} from 'react';
+import {Navigate} from 'react-router-dom';
+import {UnControlled as CodeMirror} from 'react-codemirror2';
 import showdown from 'showdown';
 import showdownHighlight from 'showdown-highlight';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import Base64 from '../components/base64.js';
 import API from '../api/index.js';
 import Loading from '../components/loading.js';
@@ -16,17 +16,17 @@ class New extends Component {
     super(props);
     this.api = new API();
     this.base64 = new Base64();
-    this.converter = new showdown.Converter({ extensions: ['header-anchors', showdownHighlight] });
+    this.converter = new showdown.Converter({extensions: ['header-anchors', showdownHighlight]});
     this.instance = null;
     let categories = [];
-    let d = window.localStorage.getItem('categories');
+    const d = window.localStorage.getItem('categories');
     if (!!d) {
       categories = JSON.parse(this.base64.decode(d));
     }
-    let id = this.props.match.params.id;
+    let id = 'TODO';
     // false , 0 , '' , null , undefined , and NaN
     if (!id) {
-      id = ''
+      id = '';
     }
     this.state = {
       editor: 'deditor',
@@ -38,7 +38,7 @@ class New extends Component {
       categories: categories,
       preview: false,
       loading: true,
-      submitting: false
+      submitting: false,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleCategoryClick = this.handleCategoryClick.bind(this);
@@ -50,7 +50,7 @@ class New extends Component {
   }
 
   componentDidMount() {
-    let id = 'draft'
+    let id = 'draft';
     if (validate(this.state.topic_id)) {
       id = this.state.topic_id;
     }
@@ -62,7 +62,7 @@ class New extends Component {
       if (!data) {
         data = {body: ''};
       }
-      let l = data.body.split('\n').length;
+      const l = data.body.split('\n').length;
       if (l > 13) {
         data.body += '\n'.repeat(3);
         data.editor = 'editor';
@@ -75,15 +75,16 @@ class New extends Component {
         return;
       }
       const data = resp.data;
-      let category_id = this.state.category_id;
-      if (!category_id && data.length > 0) {
-        category_id = data[0].category_id;
+      const categoryId = this.state.category_id;
+      if (!categoryId && data.length > 0) {
+        categoryId = data[0].category_id;
       }
-      this.setState({categories: data, category_id: category_id});
+      this.setState({categories: data, category_id: categoryId});
     });
   }
 
   componentDidUpdate(prevProps, prevState) {
+    /*
     if (this.props.location.pathname !== prevProps.location.pathname) {
       if (this.props.location.pathname === '/topics/new') {
         this.setState({
@@ -94,13 +95,14 @@ class New extends Component {
         });
       }
     }
+    */
   }
 
   handleChange(e) {
     const name = e.target.name;
     const value = e.target.type === 'checkbox' ? (e.target.checked ? 'LINK' : 'POST') : e.target.value;
     this.setState({
-      [name]: value
+      [name]: value,
     });
   }
 
@@ -113,14 +115,14 @@ class New extends Component {
     if (!data.origin) {
       return;
     }
-    let cursor = editor.getCursor();
-    let l = value.split('\n').length;
+    const cursor = editor.getCursor();
+    const l = value.split('\n').length;
     let style = 'deditor';
     if (l > 13 || value.length > 1200) {
-      if (value.charAt(value.length - 1) !== "\n") {
+      if (value.charAt(value.length - 1) !== '\n') {
         value += '\n';
       }
-      style = 'editor'
+      style = 'editor';
     }
     this.setState({body: value, editor: style}, () => {
       let indent = 0;
@@ -145,29 +147,29 @@ class New extends Component {
 
   handleAction(action, identity) {
     if (this.instance !== null) {
-      let editor = this.instance;
+      const editor = this.instance;
       switch (action) {
         case 'heading':
-          let cursor = editor.getCursor();
+          const cursor = editor.getCursor();
           editor.replaceRange('## ', {line: cursor.line, ch: 0}, {line: cursor.line, ch: 0}, '+input');
           break;
         case 'bold':
         case 'italic':
         case 'strikethrough':
-          let t = editor.getSelection().trim();
+          const t = editor.getSelection().trim();
           editor.replaceSelection(editor.getSelection().replace(t, `${identity}${t}${identity}`));
           break;
         case 'ol':
         case 'ul':
         case 'quote':
-          let selections = editor.listSelections();
+          const selections = editor.listSelections();
           selections.forEach(function(selection) {
             let pos = [selection.head.line, selection.anchor.line];
-            if (selection.head.line > selection.anchor.line)  {
+            if (selection.head.line > selection.anchor.line) {
               pos = [selection.anchor.line, selection.head.line];
             }
             for (let i=pos[0]; i<=pos[1]; i++) {
-              editor.replaceRange(identity, { line: i, ch: 0 }, { line: i, ch: 0 }, '+input');
+              editor.replaceRange(identity, {line: i, ch: 0}, {line: i, ch: 0}, '+input');
             }
           });
           break;
@@ -195,7 +197,6 @@ class New extends Component {
   }
 
   submitForm() {
-    const history = this.props.history;
     if (validate(this.state.topic_id)) {
       this.api.topic.update(this.state.topic_id, this.state).then((resp) => {
         this.setState({submitting: false});
@@ -205,16 +206,14 @@ class New extends Component {
         if (this.state.draft) {
           return;
         }
-        history.push(`/topics/${resp.data.topic_id}`);
       });
       return;
     }
     this.api.topic.create(this.state).then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
       this.setState({submitting: false});
-      history.push(`/topics/${resp.data.topic_id}`);
     });
   }
 
@@ -223,38 +222,43 @@ class New extends Component {
     if (!this.api.user.loggedIn()) {
       return (
         <Navigate to="/" replace />
-      )
+      );
     }
 
-    let state = this.state;
+    const state = this.state;
     const categories = state.categories.map((c) => {
       return (
-        <span key={c.category_id} className={`${style.category} ${c.category_id === state.category_id ? style.active : ''}`} onClick={(e) => this.handleCategoryClick(e, c.category_id)}>{c.alias}</span>
-      )
+        <span key={c.category_id} className={`${style.category} ${c.category_id === state.category_id ? style.active : ''}`}
+          onClick={(e) => this.handleCategoryClick(e, c.category_id)}>
+          {c.alias}
+        </span>
+      );
     });
 
     let title = <h1>{i18n.t('topic.title.new')}</h1>;
     if (validate(state.topic_id)) {
-      title = <h1>{i18n.t('topic.title.edit', {name: state.title})}</h1>
+      title = <h1>{i18n.t('topic.title.edit', {name: state.title})}</h1>;
     }
 
     const loadingView = (
       <div className={style.loading}>
         <Loading class='medium'/>
       </div>
-    )
+    );
 
     const toolbar = TOOLBAR.map((data) => {
-      return <FontAwesomeIcon className={style.action} icon={['fas', data.icon]} onClick={this.handleAction.bind(this, data.action, data.identity)} />
+      return <FontAwesomeIcon className={style.action} icon={['fas', data.icon]} onClick={this.handleAction.bind(this, data.action, data.identity)}
+        key={data.icon} />;
     });
 
-    let form = (
+    const form = (
       <form onSubmit={this.handleSubmit}>
         <div className={style.categories}>
           {categories}
         </div>
         <div>
-          <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' placeholder={i18n.t('topic.placeholder.title')} onChange={this.handleChange} />
+          <input type='text' name='title' pattern='.{3,}' required value={state.title} autoComplete='off' placeholder={i18n.t('topic.placeholder.title')}
+            onChange={this.handleChange} />
         </div>
         {
           state.topic_type === 'POST' &&
@@ -282,10 +286,10 @@ class New extends Component {
                   theme: 'xq-light',
                   lineNumbers: true,
                   lineWrapping: true,
-                  placeholder: 'Text (optional)'
+                  placeholder: 'Text (optional)',
                 }}
                 onChange={(editor, data, value) => this.handleBodyChange(editor, data, value)}
-                editorDidMount={editor => {
+                editorDidMount={(editor) => {
                   this.instance = editor;
                   this.instance.refresh();
                 }}
@@ -304,15 +308,20 @@ class New extends Component {
         {
           state.topic_type === 'LINK' &&
           <div>
-            <textarea name='body' rows='2' value={state.body} onChange={this.handleChange} className={style.link} placeholder={i18n.t('topic.placeholder.url')}></textarea>
+            <textarea name='body' rows='2' value={state.body} onChange={this.handleChange} className={style.link}
+              placeholder={i18n.t('topic.placeholder.url')} />
           </div>
         }
         <div className={style.submit}>
           <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
-          {!state.submitting && (state.topic_id === "" || state.draft) && <span className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</span>}
+          {
+            !state.submitting &&
+              (state.topic_id === '' || state.draft) &&
+              <span className={style.draft} onClick={this.handleDraft}>{i18n.t('general.draft')}</span>
+          }
         </div>
       </form>
-    )
+    );
 
     return (
       <div className='container'>
@@ -328,7 +337,7 @@ class New extends Component {
           <ul className={style.rules} dangerouslySetInnerHTML={{__html: i18n.t('topic.rules')}}></ul>
         </aside>
       </div>
-    )
+    );
   }
 }
 
@@ -340,7 +349,7 @@ const TOOLBAR = [
   {icon: 'quote-left', action: 'quote', identity: '> '},
   {icon: 'list-ol', action: 'ol', identity: '1. '},
   {icon: 'list-ul', action: 'ul', identity: '* '},
-]
+];
 
 
 export default New;

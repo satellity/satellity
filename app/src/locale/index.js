@@ -1,7 +1,7 @@
 import Polyglot from 'node-polyglot';
 
 function Locale(lang) {
-  var locale = 'en-US';
+  const locale = 'en-US';
   this.polyglot = new Polyglot({locale: locale});
   this.polyglot.extend(require(`./en-US.json`));
   if (languages[lang]) {
@@ -12,12 +12,12 @@ function Locale(lang) {
 Locale.prototype = {
   t: function(key, options) {
     return this.polyglot.t(key, options);
-  }
+  },
 };
 
 const languages = {
   'zh': true,
-  'ru': true
+  'ru': true,
 };
 
 export default Locale;
