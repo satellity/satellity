@@ -2,13 +2,12 @@ import style from './main.module.scss';
 import logo from '../assets/images/logo.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Route, Link, Switch, Redirect } from 'react-router-dom';
+import { Route, Link, Routes, Navigate } from 'react-router-dom';
 import Config from '../components/config.js';
 import API from '../api/index.js'
 import Home from '../home/view.js';
 import User from '../users/view.js';
 import Topic from '../topics/view.js';
-import Product from '../products/view.js';
 import Login from './login.js';
 
 class MainLayout extends Component {
@@ -17,7 +16,7 @@ class MainLayout extends Component {
 
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
-    this.state = {p: encodeURIComponent(props.location.pathname)};
+    this.state = {p: ''};
   }
 
   render() {
@@ -25,20 +24,16 @@ class MainLayout extends Component {
       <div className={style.container}>
         <Header />
         <div className='wrapper'>
-          <Switch>
-            <Route exact path='/' component={Topic.Index} />
-            <Route exact path='/dashboard' component={Home.Dashboard} />
-            <Route exact path='/categories/:id' component={Topic.Index} />
-            <Route exact path='/user/edit' component={User.Edit} />
-            <Route path='/users/:id' component={User.Show} />
-            <Route exact path='/topics/new' component={Topic.New} />
-            <Route path='/topics/:id/edit' component={Topic.New} />
-            <Route path='/topics/:id' component={Topic.Show} />
-            <Route exact path='/products' component={Product.Index} />
-            <Route path='/products/q/:id' component={Product.Index} />
-            <Route path='/products/:id' component={Product.Show} />
-            <Redirect to={`/404?p=${this.state.p}`} />
-          </Switch>
+          <Routes>
+            <Route index path='/' element={<Topic.Index />} />
+            <Route exact path='/dashboard' element={<Home.Dashboard />} />
+            <Route exact path='/categories/:id' element={<Topic.Index />} />
+            <Route exact path='/user/edit' element={<User.Edit />} />
+            <Route path='/users/:id' element={<User.Show />} />
+            <Route exact path='/topics/new' element={<Topic.New />} />
+            <Route path='/topics/:id/edit' element={<Topic.New />} />
+            <Route path='/topics/:id' element={<Topic.Show />} />
+          </Routes>
         </div>
       </div>
     )

@@ -1,6 +1,6 @@
 import style from './oauth.module.scss';
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import API from '../api/index.js';
 import Loading from '../components/loading.js';
 
@@ -29,7 +29,7 @@ class Oauth extends Component {
   render() {
     if (this.state.redirect) {
       return (
-        <Redirect to={{ pathname: "/" }} />
+        <Navigate to="/" replace />
       )
     }
     return (

@@ -1,6 +1,6 @@
 import style from './dashboard.module.scss';
 import React, {Component} from 'react';
-import {Redirect} from 'react-router-dom';
+import {Navigate} from 'react-router-dom';
 import API from '../api/index.js';
 import TopicItem from '../topics/item.js';
 import Profile from '../users/profile.js';
@@ -32,7 +32,7 @@ class Dashboard extends Component {
     let state = this.state;
     if (!state.user.user_id) {
       return (
-        <Redirect to={{ pathname: "/" }} />
+        <Navigate to="/" replace />
       )
     }
 

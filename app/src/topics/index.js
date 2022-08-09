@@ -22,7 +22,7 @@ class Index extends Component {
       categories = JSON.parse(this.base64.decode(d));
     }
     this.state = {
-      id: props.match.params.id || 'latest',
+      id: 'latest',
       user: {},
       topics: [],
       categories: categories,
@@ -30,7 +30,7 @@ class Index extends Component {
       category_id: 'latest',
       loading: true,
       pagination: 30,
-      offset: new URLSearchParams(props.location.search).get('offset'),
+      offset: 'TODO',
     };
   }
 
@@ -60,12 +60,10 @@ class Index extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    let offset = new URLSearchParams(this.props.location.search).get('offset');
-    let prev = new URLSearchParams(prevProps.location.search).get('offset');
-    if (this.props.match.params.id !== prevProps.match.params.id || offset !== prev) {
+    if (false) {
       let category_id = 'latest';
       let current = {};
-      let category = this.props.match.params.id || 'latest';
+      let category = 'latest';
       if (category !== 'latest') {
         for (let i = 0; i < this.state.categories.length; i++) {
           let c = this.state.categories[i];
@@ -76,7 +74,7 @@ class Index extends Component {
           }
         }
       }
-      this.setState({category: current, category_id: category_id, offset: offset}, () => {
+      this.setState({category: current, category_id: category_id, offset: 'TODO'}, () => {
         this.fetchTopics(category_id);
       });
     }

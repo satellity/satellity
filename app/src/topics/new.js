@@ -1,6 +1,6 @@
 import style from './new.module.scss';
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import {UnControlled as CodeMirror} from 'react-codemirror2'
 import showdown from 'showdown';
 import showdownHighlight from 'showdown-highlight';
@@ -9,9 +9,6 @@ import Base64 from '../components/base64.js';
 import API from '../api/index.js';
 import Loading from '../components/loading.js';
 import Button from '../components/button.js';
-require('codemirror/lib/codemirror.css');
-require('codemirror/theme/xq-light.css');
-require('codemirror/mode/markdown/markdown.js');
 const validate = require('uuid-validate');
 
 class New extends Component {
@@ -225,7 +222,7 @@ class New extends Component {
     const i18n = window.i18n;
     if (!this.api.user.loggedIn()) {
       return (
-        <Redirect to={{ pathname: '/' }} />
+        <Navigate to="/" replace />
       )
     }
 

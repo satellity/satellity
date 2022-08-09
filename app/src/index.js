@@ -1,11 +1,10 @@
 import './index.scss';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import * as serviceWorker from './serviceWorker';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import showdown from 'showdown';
 import API from './api/index.js';
-import Tool from './tools/view.js';
 import Locale from './locale/index.js';
 import MainLayout from './layouts/main.js';
 import NoMatch from './layouts/sink.js';
@@ -53,19 +52,19 @@ if (!!locale) {
 window.i18n = new Locale(language);
 window.api = new API();
 
-ReactDOM.render((
-  <Router>
-    <div>
-      <Switch>
-        <Route exact path='/avatar' component={Tool.Portrait} />
-        <Route path='/oauth/:provider/callback' component={Oauth} />
-        <Route path='/admin' component={AdminRoute} />
-        <Route path='/404' component={NoMatch} />
-        <MainLayout />
-      </Switch>
-    </div>
-  </Router>
-), document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container); // createRoot(container!) if you use TypeScript
+
+root.render(
+  <BrowserRouter>
+    <Routes>
+      <Route path='/oauth/:provider/callback' element={<Oauth />} />
+      <Route path='/admin' element={<AdminRoute />} />
+      <Route path='/404' element={<NoMatch />} />
+      <Route path='/' element={<MainLayout />} />
+    </Routes>
+  </BrowserRouter>
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
