@@ -1,7 +1,7 @@
 import style from './index.module.scss';
 import 'react-image-crop/src/ReactCrop.scss';
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import ReactCrop from 'react-image-crop';
 import API from '../api/index.js';
 import Button from '../components/button.js';
@@ -142,7 +142,7 @@ class Edit extends Component {
 
     if (!state.me) {
       return (
-        <Redirect to={{ pathname: '/' }} />
+        <Navigate to="/" replace />
       )
     }
 

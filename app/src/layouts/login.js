@@ -1,6 +1,6 @@
 import style from './login.module.scss';
 import React, {Component} from 'react';
-import {Redirect} from 'react-router-dom';
+import {Navigate} from 'react-router-dom';
 import {loadReCaptcha, ReCaptcha} from 'react-recaptcha-v3';
 import API from '../api/index.js';
 import Button from '../components/button.js';
@@ -129,7 +129,7 @@ class Login extends Component {
     let state = this.state;
     if (state.success) {
       return (
-        <Redirect to={{pathname: "/"}} />
+        <Navigate to="/" replace />
       )
     }
 
