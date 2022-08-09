@@ -2,7 +2,7 @@ import style from './main.module.scss';
 import logo from '../assets/images/logo.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Route, Link, Routes, Navigate } from 'react-router-dom';
+import { Route, Link, Routes } from 'react-router-dom';
 import Config from '../components/config.js';
 import API from '../api/index.js'
 import Home from '../home/view.js';
