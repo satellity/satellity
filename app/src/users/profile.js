@@ -1,6 +1,6 @@
 import style from './profile.module.scss';
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import API from '../api/index.js';
 
 class Profile extends Component {
@@ -13,7 +13,7 @@ class Profile extends Component {
   componentDidMount() {
     this.api.user.remote().then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
       this.setState(resp.data);
     });
@@ -21,20 +21,20 @@ class Profile extends Component {
 
   render() {
     const i18n = window.i18n;
-    let state = this.state;
+    const state = this.state;
     return (
       <div className={style.profile}>
         <div className={style.user}>
           <img src={state.avatar_url} className={style.avatar} alt={state.nickname} />
           <div className={style.nickname}>
-              {state.nickname}
+            {state.nickname}
           </div>
         </div>
         <div className={style.new}>
           <Link to='/topics/new'>{i18n.t('topic.new')}</Link>
         </div>
       </div>
-    )
+    );
   }
 }
 

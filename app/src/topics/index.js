@@ -1,7 +1,7 @@
 import style from './index.module.scss';
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
+import {Helmet} from 'react-helmet';
 import Config from '../components/config.js';
 import Base64 from '../components/base64.js';
 import Loading from '../components/loading.js';
@@ -17,7 +17,7 @@ class Index extends Component {
     this.base64 = new Base64();
     // TODO decode should categories in api;
     let categories = [];
-    let d = window.localStorage.getItem('categories');
+    const d = window.localStorage.getItem('categories');
     if (d !== null && d !== undefined && d !== '') {
       categories = JSON.parse(this.base64.decode(d));
     }
@@ -38,22 +38,22 @@ class Index extends Component {
     const user = this.api.user.local();
     this.api.category.index().then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
-      let category_id = 'latest';
+      let categoryId = 'latest';
       let current = {};
-      let category = this.state.id;
+      const category = this.state.id;
       if (category !== 'latest') {
         for (let i = 0; i < resp.data.length; i++) {
-          let c = resp.data[i];
+          const c = resp.data[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-            category_id = c.category_id;
+            categoryId = c.category_id;
             current = c;
             break;
           }
         }
       }
-      this.setState({user: user, category: current, category_id: category_id, categories: resp.data}, () => {
+      this.setState({user: user, category: current, category_id: categoryId, categories: resp.data}, () => {
         this.fetchTopics(category_id);
       });
     });
@@ -61,67 +61,68 @@ class Index extends Component {
 
   componentDidUpdate(prevProps) {
     if (false) {
-      let category_id = 'latest';
+      let categoryId = 'latest';
       let current = {};
-      let category = 'latest';
+      const category = 'latest';
       if (category !== 'latest') {
         for (let i = 0; i < this.state.categories.length; i++) {
-          let c = this.state.categories[i];
+          const c = this.state.categories[i];
           if (c.name.toLocaleLowerCase() === category.toLocaleLowerCase()) {
-            category_id = c.category_id;
+            categoryId = c.category_id;
             current = c;
             break;
           }
         }
       }
-      this.setState({category: current, category_id: category_id, offset: 'TODO'}, () => {
+      this.setState({category: current, category_id: categoryId, offset: 'TODO'}, () => {
         this.fetchTopics(category_id);
       });
     }
   }
 
-  fetchTopics(category_id) {
+  fetchTopics(categoryId) {
     this.setState({loading: true}, () => {
-      let request = category_id === 'latest' ?
+      const request = categoryId === 'latest' ?
         this.api.topic.index(this.state.offset) :
         this.api.category.topics(category_id, this.state.offset);
 
       request.then((resp) => {
         if (resp.error) {
-          return
+          return;
         }
-        let data = resp.data;
-        let offset = data.length >= this.state.pagination ? data[data.length-1].updated_at : '' ;
-        this.setState({category_id: category_id, loading: false, offset: offset, topics: data});
+        const data = resp.data;
+        const offset = data.length >= this.state.pagination ? data[data.length-1].updated_at : '';
+        this.setState({category_id: categoryId, loading: false, offset: offset, topics: data});
       });
     });
   }
 
   render() {
     const i18n = window.i18n;
-    let state = this.state;
+    const state = this.state;
 
     const loadingView = (
       <div className={style.loading}>
         <Loading />
       </div>
-    )
+    );
 
     const topics = state.topics.map((topic) => {
       return (
         <TopicItem user={state.user} topic={topic} key={topic.topic_id}/>
-      )
+      );
     });
 
     const categories = state.categories.map((category) => {
       return (
-        <Link to={`/categories/${category.name}`} className={`${style.node} ${state.category_id === category.category_id ? style.current : ''}`} key={category.category_id} >
-            {category.alias}
+        <Link to={`/categories/${category.name}`} className={`${style.node} ${state.category_id === category.category_id ? style.current : ''}`}
+          key={category.category_id}>
+          {category.alias}
         </Link>
-      )
+      );
     });
 
-    let title, description;
+    let title; let description;
     if (!!state.category.name) {
       title = `${state.category.alias} - ${Config.Name}`;
       description = state.category.description;
@@ -132,7 +133,7 @@ class Index extends Component {
 
     let canonical = <link rel="canonical" href={`${Config.Host}`} />;
     if (state.category_id !== 'latest') {
-      canonical = <link rel="canonical" href={`${Config.Host}/categories/${state.category.name}`} />
+      canonical = <link rel="canonical" href={`${Config.Host}/categories/${state.category.name}`} />;
     }
 
     return (
@@ -157,7 +158,7 @@ class Index extends Component {
             state.topics.length >= state.pagination && state.offset &&
               (
                 <div className={style.load}>
-                  <Link to={`${this.props.match.url}?offset=${state.offset}`}>{i18n.t('general.next')}</Link>
+                  <Link to={`${props.match.url}?offset=${state.offset}`}>{i18n.t('general.next')}</Link>
                 </div>
               )
           }

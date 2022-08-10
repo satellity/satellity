@@ -1,6 +1,6 @@
 import style from './oauth.module.scss';
-import React, { Component } from 'react';
-import { Navigate } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Navigate} from 'react-router-dom';
 import API from '../api/index.js';
 import Loading from '../components/loading.js';
 
@@ -11,7 +11,7 @@ class Oauth extends Component {
     const classes = document.body.classList.values();
     document.body.classList.remove(...classes);
     document.body.classList.add('loading', 'layout');
-    let params = new URLSearchParams(props.location.search);
+    const params = new URLSearchParams('');
     this.state = {
       code: params.get('code'),
       redirect: false,
@@ -20,8 +20,7 @@ class Oauth extends Component {
 
   componentDidMount() {
     // TODO should use redirect
-    const props = this.props;
-    new API().user.signIn('','',props.match.params.provider,this.state.code).then((resp) => {
+    new API().user.signIn('', '', '', this.state.code).then((resp) => {
       this.setState({redirect: true});
     });
   }
@@ -30,7 +29,7 @@ class Oauth extends Component {
     if (this.state.redirect) {
       return (
         <Navigate to="/" replace />
-      )
+      );
     }
     return (
       <div className={style.loading}>

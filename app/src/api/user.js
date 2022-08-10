@@ -1,5 +1,5 @@
 import KJUR from 'jsrsasign';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import Cookies from 'js-cookie';
 import Base64 from '../components/base64.js';
 
@@ -12,21 +12,21 @@ class User {
   }
 
   get ecdsa() {
-    let priv = window.localStorage.getItem('token');
-    let pwd = Cookies.get('sid');
+    const priv = window.localStorage.getItem('token');
+    const pwd = Cookies.get('sid');
     if (!priv || !pwd) {
-      return "";
+      return '';
     }
-    let ec = KJUR.KEYUTIL.getKey(priv, pwd);
+    const ec = KJUR.KEYUTIL.getKey(priv, pwd);
     return KJUR.KEYUTIL.getPEM(ec, 'PKCS1PRV');
   }
 
   signIn(email, password, provider, code) {
-    let pwd = uuidv4().toLowerCase();
-    let ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
-    let pub = ec.generateKeyPairHex().ecpubhex;
-    let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
-    let data = {session_secret: this.fixed_schema_header + pub, code: code, email: email, password: password};
+    const pwd = uuidv4().toLowerCase();
+    const ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
+    const pub = ec.generateKeyPairHex().ecpubhex;
+    const priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
+    const data = {session_secret: this.fixed_schema_header + pub, code: code, email: email, password: password};
     let request;
     if (code) {
       request = this.api.axios.post(`/oauth/${provider}`, data);
@@ -37,8 +37,8 @@ class User {
       if (resp.error) {
         return resp;
       }
-      let data = resp.data;
-      Cookies.set('sid', pwd, { expires: 365 });
+      const data = resp.data;
+      Cookies.set('sid', pwd, {expires: 365});
       window.localStorage.setItem('token', priv);
       window.localStorage.setItem('uid', data.user_id);
       window.localStorage.setItem('sid', data.session_id);
@@ -49,20 +49,27 @@ class User {
 
   verify(params) {
     if (params.purpose === 'PASSWORD') {
-      let data = {purpose: params.purpose, verification_id: params.verification_id, code: params.code, password: params.password};
-      return this.api.axios.post(`/email_verifications/${params.verification_id}`, data)
+      const data = {purpose: params.purpose, verification_id: params.verification_id, code: params.code, password: params.password};
+      return this.api.axios.post(`/email_verifications/${params.verification_id}`, data);
     }
-    let pwd = uuidv4().toLowerCase();
-    let ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
-    let pub = ec.generateKeyPairHex().ecpubhex;
-    let priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
-    let data = {purpose: params.purpose, verification_id: params.verification_id, code: params.code, username: params.username, password: params.password, session_secret: this.fixed_schema_header + pub};
+    const pwd = uuidv4().toLowerCase();
+    const ec = new KJUR.crypto.ECDSA({'curve': 'secp256r1'});
+    const pub = ec.generateKeyPairHex().ecpubhex;
+    const priv = KJUR.KEYUTIL.getPEM(ec, 'PKCS8PRV', pwd);
+    const data = {
+      purpose: params.purpose,
+      verification_id: params.verification_id,
+      code: params.code,
+      username: params.username,
+      password: params.password,
+      session_secret: this.fixed_schema_header + pub,
+    };
     return this.api.axios.post(`/email_verifications/${params.verification_id}`, data).then((resp) => {
       if (resp.error) {
         return resp;
       }
-      let data = resp.data;
-      Cookies.set('sid', pwd, { expires: 365 });
+      const data = resp.data;
+      Cookies.set('sid', pwd, {expires: 365});
       window.localStorage.setItem('token', priv);
       window.localStorage.setItem('uid', data.user_id);
       window.localStorage.setItem('sid', data.session_id);
@@ -72,8 +79,8 @@ class User {
   }
 
   update(params) {
-    let i = params.avatar_url.indexOf(",");
-    const data = {nickname: params.nickname, biography: params.biography, avatar: params.avatar_url.slice(i+1)}
+    const i = params.avatar_url.indexOf(',');
+    const data = {nickname: params.nickname, biography: params.biography, avatar: params.avatar_url.slice(i+1)};
     return this.api.axios.post('/me', data).then((resp) => {
       if (resp.error) {
         return resp;
@@ -94,7 +101,7 @@ class User {
       }
       window.localStorage.setItem('user', this.base64.encode(JSON.stringify(resp.data)));
       return resp;
-    })
+    });
   }
 
   local() {

@@ -47,7 +47,7 @@ class Admin {
   }
 
   delete(id) {
-    return this.api.axios.delete(`/admin/topics/${id}`)
+    return this.api.axios.delete(`/admin/topics/${id}`);
   }
 }
 

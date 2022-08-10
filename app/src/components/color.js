@@ -9,7 +9,7 @@ class ColorUtils {
       i = str.charCodeAt(0);
     }
     alpha = Math.round(alpha * 255);
-    let hex = (alpha + 0x10000).toString(16).substr(-2).toUpperCase();
+    const hex = (alpha + 0x10000).toString(16).substr(-2).toUpperCase();
     return this.colors[i % 5] + hex;
   }
 }

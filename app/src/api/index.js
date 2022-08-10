@@ -1,7 +1,7 @@
 import forge from 'node-forge';
 import moment from 'moment';
 import KJUR from 'jsrsasign';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import Noty from 'noty';
@@ -15,16 +15,16 @@ import Me from './me.js';
 import Verification from './verification.js';
 
 Noty.overrideDefaults({
-    type: 'error',
-    layout: 'topCenter',
-    killer: true,
-    theme: 'nest',
-    timeout: 1000,
-    progressBar: false,
-    animation: {
-      open : 'noty_effects_open',
-      close: 'noty_effects_close'
-    }
+  type: 'error',
+  layout: 'topCenter',
+  killer: true,
+  theme: 'nest',
+  timeout: 1000,
+  progressBar: false,
+  animation: {
+    open: 'noty_effects_open',
+    close: 'noty_effects_close',
+  },
 });
 
 axios.defaults.headers.common['Content-Type'] = 'application/json';
@@ -32,7 +32,7 @@ axios.interceptors.request.use(function(config) {
   config.url = '/api' + config.url;
   const {method, url, data} = config;
   config.headers.common['Authorization'] = `Bearer ${token(method, url, data)}`;
-  return config
+  return config;
 }, function(error) {
   return Promise.reject(error);
 });
@@ -43,20 +43,20 @@ axios.interceptors.response.use(function(response) {
     if (!!data.error) {
       const error = data.error;
       new Noty({
-        text: window.i18n.t(`errors.${error.code}`)
+        text: window.i18n.t(`errors.${error.code}`),
       }).show();
       if (error.code === 401) {
-        window.localStorage.removeItem('user')
-        window.location.href = '/'
+        window.localStorage.removeItem('user');
+        window.location.href = '/';
       } else if (error.code === 404) {
-        window.location.href = '/404'
+        window.location.href = '/404';
       }
     }
     return data;
   }
-  return response
+  return response;
 }, function(error) {
-  let status, data;
+  let status; let data;
   // TODO: should clear error.request and error
   if (error.response) {
     status = error.response.status;
@@ -69,42 +69,44 @@ axios.interceptors.response.use(function(response) {
     data = error.message;
   }
   new Noty({
-    text: window.i18n.t(`errors.${status}`)
+    text: window.i18n.t(`errors.${status}`),
   }).show();
   return {error: {code: status, description: data}};
 });
 
 function token(method, uri, body) {
-  let priv = window.localStorage.getItem('token');
-  let pwd = Cookies.get('sid');
+  const priv = window.localStorage.getItem('token');
+  const pwd = Cookies.get('sid');
   if (!priv || !pwd) {
-    return "";
+    return '';
   }
-  Cookies.set('sid', pwd, { expires: 365 });
+  Cookies.set('sid', pwd, {expires: 365});
 
-  let uid = window.localStorage.getItem('uid');
-  let sid = window.localStorage.getItem('sid');
+  const uid = window.localStorage.getItem('uid');
+  const sid = window.localStorage.getItem('sid');
   return sign(uid, sid, priv, method, uri, body);
 }
 
 function sign(uid, sid, privateKey, method, uri, body) {
-  if (typeof body !== 'string') { body = ""; }
+  if (typeof body !== 'string') {
+    body = '';
+  }
 
-  let expire = moment.utc().add(30, 'minutes').unix();
-  let md = forge.md.sha256.create();
+  const expire = moment.utc().add(30, 'minutes').unix();
+  const md = forge.md.sha256.create();
   md.update(method + uri + body);
 
-  let oHeader = {alg: 'ES256', typ: 'JWT'};
-  let oPayload = {
+  const oHeader = {alg: 'ES256', typ: 'JWT'};
+  const oPayload = {
     uid: uid,
     sid: sid,
     exp: expire,
     jti: uuidv4(),
-    sig: md.digest().toHex()
+    sig: md.digest().toHex(),
   };
-  let sHeader = JSON.stringify(oHeader);
-  let sPayload = JSON.stringify(oPayload);
-  let pwd = Cookies.get('sid');
+  const sHeader = JSON.stringify(oHeader);
+  const sPayload = JSON.stringify(oPayload);
+  const pwd = Cookies.get('sid');
   try {
     KJUR.KEYUTIL.getKey(privateKey, pwd);
   } catch (e) {

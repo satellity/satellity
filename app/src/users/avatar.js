@@ -1,17 +1,16 @@
 import style from './avatar.module.scss';
-import React, {Component} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-class Avatar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = props.user;
-  }
+const Avatar = ({user, classes}) => {
+  return (
+    <img src={user.avatar_url} alt={user.nickname} className={`${style.avatar} ${style[[classes]]}`} />
+  );
+};
 
-  render() {
-    return (
-      <img src={this.state.avatar_url} alt={this.state.nickname} className={`${style.avatar} ${style[[this.props.class]]}`} />
-    )
-  }
-}
+Avatar.propTypes = {
+  user: PropTypes.objecta,
+  classes: PropTypes.string,
+};
 
 export default Avatar;

@@ -3,5 +3,5 @@ import Show from './show.js';
 
 export default {
   Show: Show,
-  Edit: Edit
+  Edit: Edit,
 };

@@ -13,7 +13,7 @@ class Category {
         return resp;
       }
       const categories = resp.data.map((o) => {
-        return {category_id: o.category_id, name: o.name, alias: o.alias}
+        return {category_id: o.category_id, name: o.name, alias: o.alias};
       });
       window.localStorage.setItem('categories', this.base64.encode(JSON.stringify(categories)));
       return resp;

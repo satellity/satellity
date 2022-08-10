@@ -1,7 +1,7 @@
 import style from './index.module.scss';
 import 'react-image-crop/src/ReactCrop.scss';
-import React, { Component } from 'react';
-import { Navigate } from 'react-router-dom';
+import React, {Component} from 'react';
+import {Navigate} from 'react-router-dom';
 import ReactCrop from 'react-image-crop';
 import API from '../api/index.js';
 import Button from '../components/button.js';
@@ -35,7 +35,7 @@ class Edit extends Component {
   componentDidMount() {
     this.api.user.remote().then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
       this.setState(resp.data);
     });
@@ -45,16 +45,16 @@ class Edit extends Component {
     e.preventDefault();
     const {name, value} = e.target;
     this.setState({
-      [name]: value
+      [name]: value,
     });
   }
 
   handleClick(e) {
-    this.refs.file.click();
+    // this.refs.file.click();
   }
 
   handleSignOut(e) {
-    console.log("signout")
+    console.log('signout');
     e.preventDefault();
 
     this.api.me.signOut();
@@ -65,7 +65,7 @@ class Edit extends Component {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader();
       reader.addEventListener('load', () => {
-        this.setState({ avatar_url: reader.result });
+        this.setState({avatar_url: reader.result});
       });
       reader.readAsDataURL(e.target.files[0]);
     }
@@ -95,44 +95,42 @@ class Edit extends Component {
         crop.height = crop.width;
       }
       const canvas = document.createElement('canvas');
-      let w = crop.width > 512 ? 512 : crop.width;
+      const w = crop.width > 512 ? 512 : crop.width;
       canvas.width = w;
       canvas.height = w;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(
-        this.imageRef,
-        0,
-        0,
-        crop.width,
-        crop.height,
-        0,
-        0,
-        w,
-        w
+          this.imageRef,
+          0,
+          0,
+          crop.width,
+          crop.height,
+          0,
+          0,
+          w,
+          w,
       );
-      var img = new Image();
+      const img = new Image();
       img.crossOrigin='anonymous';
       img.src = '';
       img.onload = () => {
         this.setState({avatar_url: canvas.toDataURL()});
-      }
+      };
     }
   }
 
   handleSubmit(e) {
     e.preventDefault();
     if (this.state.submitting) {
-      return
+      return;
     }
     this.setState({submitting: true});
     // TODO should use redirect
-    const history = this.props.history;
     this.api.user.update(this.state).then((resp) => {
       this.setState({submitting: false});
       if (resp.error) {
-        return
+        return;
       }
-      history.push('/');
     });
   }
 
@@ -143,7 +141,7 @@ class Edit extends Component {
     if (!state.me) {
       return (
         <Navigate to="/" replace />
-      )
+      );
     }
 
     return (
@@ -153,7 +151,7 @@ class Edit extends Component {
             <h2>{i18n.t('user.edit')}</h2>
             <form onSubmit={this.handleSubmit}>
               <div className={style.group}>
-                <input type='file' ref='file' className={style.file} onChange={this.handleFileChange} />
+                <input type='file' className={style.file} onChange={this.handleFileChange} />
                 <ReactCrop
                   src={state.avatar_url}
                   crop={{aspect: 1}}
@@ -191,7 +189,7 @@ class Edit extends Component {
           <Topic.Create />
         </aside>
       </div>
-    )
+    );
   }
 }
 

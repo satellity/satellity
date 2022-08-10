@@ -5,6 +5,7 @@ import {loadReCaptcha, ReCaptcha} from 'react-recaptcha-v3';
 import API from '../api/index.js';
 import Button from '../components/button.js';
 import Loading from '../components/loading.js';
+import PropTypes from 'prop-types';
 
 class Login extends Component {
   constructor(props) {
@@ -24,7 +25,7 @@ class Login extends Component {
       success: false,
       loading: true,
       submitting: false,
-    }
+    };
 
     this.api = new API();
     this.handleChange = this.handleChange.bind(this);
@@ -58,21 +59,21 @@ class Login extends Component {
   handleChange(e) {
     const {target: {name, value}} = e;
     this.setState({
-      [name]: value
+      [name]: value,
     });
   }
 
   handleVerification(e) {
     e.preventDefault();
     if (this.state.submitting) {
-      return
+      return;
     }
     this.api.verification.create(this.state).then((resp) => {
       if (resp.error) {
         this.setState({submitting: false});
-        return
+        return;
       }
-      let data = resp.data;
+      const data = resp.data;
       data.submitting = false;
       this.setState(data);
     });
@@ -82,13 +83,13 @@ class Login extends Component {
   handleRegister(e) {
     e.preventDefault();
     if (this.state.submitting) {
-      return
+      return;
     }
     this.setState({submitting: true});
     this.api.user.verify(this.state).then((resp) => {
       if (resp.error) {
         this.setState({submitting: false});
-        return
+        return;
       }
       this.setState({success: true, submitting: false});
     });
@@ -97,12 +98,12 @@ class Login extends Component {
   handleResetPassword(e) {
     e.preventDefault();
     if (this.state.submitting) {
-      return
+      return;
     }
     this.api.user.verify(this.state).then((resp) => {
       if (resp.error) {
         this.setState({submitting: false});
-        return
+        return;
       }
       this.setState({purpose: 'SESSION', verification_id: '', email: '', password: '', submitting: false});
     });
@@ -113,12 +114,12 @@ class Login extends Component {
     e.preventDefault();
     this.setState({submitting: true});
     if (this.state.submitting) {
-      return
+      return;
     }
     this.api.user.signIn(this.state.email, this.state.password).then((resp) => {
       if (resp.error) {
         this.setState({submitting: false});
-        return
+        return;
       }
       this.setState({success: true, submitting: false});
     });
@@ -126,27 +127,30 @@ class Login extends Component {
 
   render() {
     const i18n = window.i18n;
-    let state = this.state;
+    const state = this.state;
     if (state.success) {
       return (
         <Navigate to="/" replace />
-      )
+      );
     }
 
-    let signIn = (
+    const signIn = (
       <div>
         <div className={style.content}>
-          <Button type='link' action={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${state.github_client_id}`} classes='button' text={i18n.t('login.github')} original />
+          <Button type='link' action={`https://github.com/login/oauth/authorize?scope=user:email&client_id=${state.github_client_id}`}
+            classes='button' text={i18n.t('login.github')} original />
         </div>
         <div className={style.or}>
           OR
         </div>
         <form onSubmit={this.handleSignIn}>
           <div>
-            <input type='text' name='email' required value={state.email} autoComplete='off' placeholder={i18n.t('account.identity')} onChange={this.handleChange} />
+            <input type='text' name='email' required value={state.email} autoComplete='off' placeholder={i18n.t('account.identity')}
+              onChange={this.handleChange} />
           </div>
           <div>
-            <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
+            <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')}
+              onChange={this.handleChange} />
           </div>
           <div>
             <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.sign.in')} />
@@ -156,12 +160,12 @@ class Login extends Component {
           {i18n.t('account.new')}
         </div>
         <div className={style.reset} onClick={(e) => this.handleClick(e, 'PASSWORD')}>
-            {i18n.t('account.reset.password')}
+          {i18n.t('account.reset.password')}
         </div>
       </div>
     );
 
-    let verification = (
+    const verification = (
       <div>
         {
           state.recaptcha_site_key !== '' &&
@@ -174,7 +178,8 @@ class Login extends Component {
         <div>
           <form onSubmit={this.handleVerification}>
             <div>
-              <input type='text' name='email' required value={state.email} autoComplete='off' placeholder={i18n.t('account.email')} onChange={this.handleChange} />
+              <input type='text' name='email' required value={state.email} autoComplete='off'
+                placeholder={i18n.t('account.email')} onChange={this.handleChange} />
             </div>
             <div>
               <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
@@ -184,17 +189,20 @@ class Login extends Component {
       </div>
     );
 
-    let register = (
+    const register = (
       <div>
         <form onSubmit={this.handleRegister}>
           <div>
-            <input type='text' name='code' required value={state.code} autoComplete='off' placeholder={i18n.t('account.verification')} onChange={this.handleChange} />
+            <input type='text' name='code' required value={state.code} autoComplete='off'
+              placeholder={i18n.t('account.verification')} onChange={this.handleChange} />
           </div>
           <div>
-            <input type='text' name='username' required value={state.username} autoComplete='off' placeholder={i18n.t('account.username')} onChange={this.handleChange} />
+            <input type='text' name='username' required value={state.username} autoComplete='off'
+              placeholder={i18n.t('account.username')} onChange={this.handleChange} />
           </div>
           <div>
-            <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
+            <input type='password' name='password' required value={state.password} autoComplete='off'
+              placeholder={i18n.t('account.password')} onChange={this.handleChange} />
           </div>
           <div>
             <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
@@ -203,14 +211,16 @@ class Login extends Component {
       </div>
     );
 
-    let password = (
+    const password = (
       <div>
         <form onSubmit={this.handleResetPassword}>
           <div>
-            <input type='text' name='code' required value={state.code} autoComplete='off' placeholder={i18n.t('account.verification')} onChange={this.handleChange} />
+            <input type='text' name='code' required value={state.code} autoComplete='off'
+              placeholder={i18n.t('account.verification')} onChange={this.handleChange} />
           </div>
           <div>
-            <input type='password' name='password' required value={state.password} autoComplete='off' placeholder={i18n.t('account.password')} onChange={this.handleChange} />
+            <input type='password' name='password' required value={state.password} autoComplete='off'
+              placeholder={i18n.t('account.password')} onChange={this.handleChange} />
           </div>
           <div>
             <Button type='submit' classes='submit' disabled={state.submitting} text={i18n.t('general.submit')} />
@@ -241,8 +251,12 @@ class Login extends Component {
           }
         </div>
       </div>
-    )
+    );
   }
 }
+
+Login.propTypes = {
+  handleLoginClick: PropTypes.func,
+};
 
 export default Login;

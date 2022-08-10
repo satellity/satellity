@@ -9,18 +9,18 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.api = new API();
-    let user = this.api.user.local();
+    const user = this.api.user.local();
     this.state = {
       user: user,
-      topics: []
-    }
+      topics: [],
+    };
   }
 
   componentDidMount() {
     if (!!this.state.user.user_id) {
       this.api.user.topics(this.state.user.user_id).then((resp) => {
         if (resp.error) {
-          return
+          return;
         }
         this.setState({topics: resp.data});
       });
@@ -29,17 +29,17 @@ class Dashboard extends Component {
 
   render() {
     const i18n = window.i18n;
-    let state = this.state;
+    const state = this.state;
     if (!state.user.user_id) {
       return (
         <Navigate to="/" replace />
-      )
+      );
     }
 
-    let topics = state.topics.map((topic) => {
+    const topics = state.topics.map((topic) => {
       return (
         <TopicItem topic={topic} key={topic.topic_id}/>
-      )
+      );
     });
 
     return (
@@ -63,7 +63,7 @@ class Dashboard extends Component {
           <Profile />
         </aside>
       </div>
-    )
+    );
   }
 }
 

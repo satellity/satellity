@@ -27,9 +27,9 @@ class Admin {
     const tags = Array.from(new Set(params.tags.map((e) => {
       if (typeof e !== 'string') return e;
       return e.trim().replace(/\s+/g, ' ').split(' ').map((c) => {
-        c = c.trim()
+        c = c.trim();
         if (c === 'iOS' || c === 'IOS') {
-          return 'iOS'
+          return 'iOS';
         }
         return c.charAt(0).toUpperCase() + c.slice(1);
       }).join(' ');
@@ -42,9 +42,9 @@ class Admin {
     const tags = Array.from(new Set(params.tags.map((e) => {
       if (typeof e !== 'string') return e;
       return e.trim().replace(/\s+/g, ' ').split(' ').map((c) => {
-        c = c.trim()
+        c = c.trim();
         if (c === 'iOS' || c === 'IOS') {
-          return 'iOS'
+          return 'iOS';
         }
         return c.charAt(0).toUpperCase() + c.slice(1);
       }).join(' ');

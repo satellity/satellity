@@ -1,6 +1,6 @@
 import style from './show.module.scss';
 import moment from 'moment';
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import API from '../api/index.js';
 import TopicItem from '../topics/item.js';
 
@@ -9,24 +9,24 @@ class Show extends Component {
     super(props);
     this.api = new API();
     this.state = {
-      id: props.match.params.id,
+      id: 'TODO',
       user: {},
       topics: [],
-    }
+    };
   }
 
   componentDidMount() {
     this.api.user.show(this.state.id).then((resp) => {
       if (resp.error) {
-        return
+        return;
       }
-      let user = resp.data;
+      const user = resp.data;
       user.created_at = moment(user.created_at).format('l');
       user.biography = user.biography.slice(0, 256);
       this.setState({user: user}, () => {
         this.api.user.topics(this.state.id).then((resp) => {
           if (resp.error) {
-            return
+            return;
           }
           this.setState({topics: resp.data});
         });
@@ -36,11 +36,11 @@ class Show extends Component {
 
   render() {
     const i18n = window.i18n;
-    let state = this.state;
+    const state = this.state;
     const topics = state.topics.map((topic) => {
       return (
         <TopicItem topic={topic} key={topic.topic_id} profile={true}/>
-      )
+      );
     });
 
     const profile = (
@@ -65,7 +65,7 @@ class Show extends Component {
         </aside>
         <main className='column main'>
           <div className={style.title}>
-              {i18n.t('user.topics')}
+            {i18n.t('user.topics')}
           </div>
           <div className={style.topics}>
             <ul>
@@ -74,7 +74,7 @@ class Show extends Component {
           </div>
         </main>
       </div>
-    )
+    );
   }
 }
 

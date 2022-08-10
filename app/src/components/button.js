@@ -1,42 +1,49 @@
 import style from './button.module.scss';
-import React, {Component} from 'react';
+import React from 'react';
 import {Link} from 'react-router-dom';
 import Loading from './loading.js';
+import PropTypes from 'prop-types';
 
-class Button extends Component {
-  render() {
-    let classes = this.props.classes.split(' ').map((name) => {
-      return style[[name]]
-    }).join(' ');
+const Button = ({classes, type, text, original, action}) => {
+  classes = classes.split(' ').map((name) => {
+    return style[[name]];
+  }).join(' ');
 
-    if (this.props.original && this.props.type === 'link') {
-      return (
-        <a href={this.props.action} className={classes}>{this.props.text}</a>
-      );
-    }
-
-    if (this.props.type === 'link') {
-      return (
-        <Link to={this.props.action} className={classes}>{this.props.text}</Link>
-      );
-    }
-
-    if (this.props.type === 'button') {
-      return (
-        <button type={this.props.type} className={classes} disabled={this.props.disabled} onClick={this.props.click}>
-            {this.props.disabled && <Loading class='small white' />}
-              &nbsp;{this.props.text}
-          </button>
-      )
-    }
-
+  if (original && type === 'link') {
     return (
-      <button type={this.props.type} className={classes} disabled={this.props.disabled}>
-          {this.props.disabled && <Loading class='small white' />}
-            &nbsp;{this.props.text}
-        </button>
-    )
+      <a href={action} className={classes}>{text}</a>
+    );
   }
-}
+
+  if (type === 'link') {
+    return (
+      <Link to={action} className={classes}>{text}</Link>
+    );
+  }
+
+  if (type === 'button') {
+    return (
+      <button type={type} className={classes} disabled={disabled} onClick={click}>
+        {disabled && <Loading class='small white' />}
+        &nbsp;{text}
+      </button>
+    );
+  }
+
+  return (
+    <button type={type} className={classes} disabled={disabled}>
+      {disabled && <Loading class='small white' />}
+      &nbsp;{text}
+    </button>
+  );
+};
+
+Button.propTypes = {
+  classes: PropTypes.string,
+  type: PropTypes.string,
+  text: PropTypes.string,
+  original: PropTypes.string,
+  action: PropTypes.string,
+};
 
 export default Button;
