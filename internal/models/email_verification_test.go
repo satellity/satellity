@@ -1,10 +1,8 @@
 package models
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
+	"crypto/ed25519"
 	"crypto/rand"
-	"crypto/x509"
 	"encoding/hex"
 	"testing"
 
@@ -20,9 +18,7 @@ func TestEmailVerification(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(ev)
 
-	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	assert.Nil(err)
-	public, err := x509.MarshalPKIXPublicKey(priv.Public())
+	public, _, err := ed25519.GenerateKey(rand.Reader)
 	assert.Nil(err)
 	user, err := VerifyEmailVerification(ctx, ev.VerificationID, ev.Code, "jason", "nopassword", hex.EncodeToString(public))
 	assert.Nil(err)

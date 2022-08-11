@@ -20,7 +20,7 @@ CREATE INDEX IF NOT EXISTS users_createdx ON users (created_at);
 CREATE TABLE IF NOT EXISTS sessions (
   session_id            VARCHAR(36) PRIMARY KEY,
   user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
-  secret                VARCHAR(1024) NOT NULL,
+  public_key            VARCHAR(128) NOT NULL,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
@@ -106,24 +106,6 @@ CREATE TABLE IF NOT EXISTS comments (
 CREATE INDEX IF NOT EXISTS comments_topic_createdx ON comments (topic_id, created_at);
 CREATE INDEX IF NOT EXISTS comments_user_createdx ON comments (user_id, created_at);
 CREATE INDEX IF NOT EXISTS comments_score_createdx ON comments (score DESC, created_at);
-
-
-CREATE TABLE IF NOT EXISTS products (
-  product_id            VARCHAR(36) PRIMARY KEY,
-  name                  VARCHAR(512) NOT NULL,
-  body                  TEXT NOT NULL,
-  cover_url             VARCHAR(512) NOT NULL,
-  source                VARCHAR(512) NOT NULL,
-  tags                  VARCHAR[] DEFAULT '{}',
-  views_count           BIGINT NOT NULL DEFAULT 0,
-  score                 INTEGER NOT NULL DEFAULT 0,
-  user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
-  created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS products_score_createdx ON products(score DESC, updated_at DESC);
-CREATE INDEX IF NOT EXISTS products_tags_score_createdx ON products(tags, score DESC, updated_at DESC);
 
 
 CREATE TABLE IF NOT EXISTS statistics (

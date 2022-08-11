@@ -2,9 +2,6 @@ package models
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/x509"
-	"encoding/hex"
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
@@ -20,38 +17,24 @@ import (
 type Session struct {
 	SessionID string    `sql:"session_id,pk"`
 	UserID    string    `sql:"user_id"`
-	Secret    string    `sql:"secret"`
+	PublicKey string    `sql:"public_key"`
 	CreatedAt time.Time `sql:"created_at"`
 }
 
-var sessionColumns = []string{"session_id", "user_id", "secret", "created_at"}
+var sessionColumns = []string{"session_id", "user_id", "public_key", "created_at"}
 
 func (s *Session) values() []interface{} {
-	return []interface{}{s.SessionID, s.UserID, s.Secret, s.CreatedAt}
+	return []interface{}{s.SessionID, s.UserID, s.PublicKey, s.CreatedAt}
 }
 
 func sessionFromRows(row durable.Row) (*Session, error) {
 	var s Session
-	err := row.Scan(&s.SessionID, &s.UserID, &s.Secret, &s.CreatedAt)
+	err := row.Scan(&s.SessionID, &s.UserID, &s.PublicKey, &s.CreatedAt)
 	return &s, err
 }
 
 // CreateSession create a new user session
-func CreateSession(ctx context.Context, identity, password, sessionSecret string) (*User, error) {
-	data, err := hex.DecodeString(sessionSecret)
-	if err != nil {
-		return nil, session.BadDataError(ctx)
-	}
-	public, err := x509.ParsePKIXPublicKey(data)
-	if err != nil {
-		return nil, session.BadDataError(ctx)
-	}
-	switch public.(type) {
-	case *ecdsa.PublicKey:
-	default:
-		return nil, session.BadDataError(ctx)
-	}
-
+func CreateSession(ctx context.Context, identity, password, pubED25519 string) (*User, error) {
 	user, err := ReadUserByUsernameOrEmail(ctx, identity)
 	if err != nil {
 		return nil, err
@@ -67,7 +50,7 @@ func CreateSession(ctx context.Context, identity, password, sessionSecret string
 		if err != nil {
 			return err
 		}
-		s, err := user.addSession(ctx, tx, sessionSecret)
+		s, err := user.addSession(ctx, tx, pubED25519)
 		if err != nil {
 			return err
 		}
@@ -84,7 +67,7 @@ func (user *User) addSession(ctx context.Context, tx pgx.Tx, secret string) (*Se
 	s := &Session{
 		SessionID: uuid.Must(uuid.NewV4()).String(),
 		UserID:    user.UserID,
-		Secret:    secret,
+		PublicKey: secret,
 		CreatedAt: time.Now(),
 	}
 

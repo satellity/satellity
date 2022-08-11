@@ -18,7 +18,6 @@ const (
 	dropEmailVerificationDDL = `DROP TABLE IF EXISTS email_verifications;`
 	dropSessionsDDL          = `DROP TABLE IF EXISTS sessions;`
 	dropStatisticsDDL        = `DROP TABLE IF EXISTS statistics;`
-	dropProductsDDL          = `DROP TABLE IF EXISTS products;`
 	dropTopicsDDL            = `DROP TABLE IF EXISTS topics;`
 	dropTopicUsersDDL        = `DROP TABLE IF EXISTS topic_users;`
 	dropUsersDDL             = `DROP TABLE IF EXISTS users;`
@@ -27,7 +26,6 @@ const (
 func teardownTestContext(ctx context.Context) {
 	tables := []string{
 		dropStatisticsDDL,
-		dropProductsDDL,
 		dropCommentsDDL,
 		dropTopicUsersDDL,
 		dropTopicsDDL,

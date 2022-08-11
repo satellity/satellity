@@ -2,12 +2,12 @@ package models
 
 import (
 	"context"
-	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/md5"
-	"crypto/x509"
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"log"
 	"satellity/internal/clouds"
 	"satellity/internal/configs"
 	"satellity/internal/durable"
@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/jackc/pgx/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -62,20 +62,6 @@ func userFromRow(row durable.Row) (*User, error) {
 
 // CreateUser create a new user
 func CreateUser(ctx context.Context, email, username, nickname, biography, password string, sessionSecret string) (*User, error) {
-	data, err := hex.DecodeString(sessionSecret)
-	if err != nil {
-		return nil, session.BadDataError(ctx)
-	}
-	public, err := x509.ParsePKIXPublicKey(data)
-	if err != nil {
-		return nil, session.BadDataError(ctx)
-	}
-	switch public.(type) {
-	case *ecdsa.PublicKey:
-	default:
-		return nil, session.BadDataError(ctx)
-	}
-
 	email = strings.TrimSpace(email)
 	if err := validateEmailFormat(ctx, email); err != nil {
 		return nil, err
@@ -88,7 +74,7 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 	if nickname == "" {
 		nickname = username
 	}
-	password, err = validateAndEncryptPassword(ctx, password)
+	password, err := validateAndEncryptPassword(ctx, password)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +139,7 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		if !ok {
 			return nil, nil
 		}
-		if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
+		if _, ok := token.Method.(*jwt.SigningMethodEd25519); !ok {
 			return nil, nil
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
@@ -181,13 +167,14 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		if s == nil {
 			return nil, nil
 		}
-		pkix, err := hex.DecodeString(s.Secret)
+		pub, err := hex.DecodeString(s.PublicKey)
 		if err != nil {
 			return nil, err
 		}
-		return x509.ParsePKIXPublicKey(pkix)
+		return ed25519.PublicKey(pub), nil
 	})
 	if err != nil || !token.Valid {
+		log.Println("err:::", err, token.Valid)
 		return nil, nil
 	}
 	return user, nil

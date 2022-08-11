@@ -2,10 +2,8 @@ package models
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
+	"crypto/ed25519"
 	"crypto/rand"
-	"crypto/x509"
 	"encoding/hex"
 	"fmt"
 	"satellity/internal/session"
@@ -13,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/jackc/pgx/v4"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
@@ -25,9 +23,7 @@ func TestUserCRUD(t *testing.T) {
 	ctx := setupTestContext()
 	defer teardownTestContext(ctx)
 
-	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	assert.Nil(err)
-	public, err := x509.MarshalPKIXPublicKey(priv.Public())
+	public, priv, err := ed25519.GenerateKey(rand.Reader)
 	assert.Nil(err)
 
 	userCases := []struct {
@@ -97,7 +93,7 @@ func TestUserCRUD(t *testing.T) {
 				"uid": existing.UserID,
 				"sid": existing.SessionID,
 			}
-			token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+			token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims)
 			ss, err := token.SignedString(priv)
 			assert.Nil(err)
 			existing, err = AuthenticateUser(ctx, ss)
@@ -118,8 +114,7 @@ func TestUserCRUD(t *testing.T) {
 }
 
 func createTestUser(ctx context.Context, email, username, password string) *User {
-	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	public, _ := x509.MarshalPKIXPublicKey(priv.Public())
+	public, _, _ := ed25519.GenerateKey(rand.Reader)
 	user, _ := CreateUser(ctx, email, username, "nickname", "", password, hex.EncodeToString(public))
 	return user
 }
