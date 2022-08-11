@@ -180,7 +180,7 @@ func createUser(ctx context.Context, tx pgx.Tx, email, username, nickname, passw
 		t := time.Now()
 		user = &User{
 			UserID:    uuid.Must(uuid.NewV4()).String(),
-			Username:  username,
+			Username:  sql.NullString{String: username, Valid: true},
 			Nickname:  nickname,
 			Role:      UserRoleMember,
 			CreatedAt: t,

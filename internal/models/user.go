@@ -31,7 +31,7 @@ const (
 type User struct {
 	UserID            string
 	Email             sql.NullString
-	Username          string
+	Username          sql.NullString
 	Nickname          string
 	AvatarURL         string
 	Biography         string
@@ -307,7 +307,7 @@ func (u *User) Name() string {
 	if u.Nickname != "" {
 		return u.Nickname
 	}
-	return u.Username
+	return u.Username.String
 }
 
 func (u *User) isAdmin() bool {

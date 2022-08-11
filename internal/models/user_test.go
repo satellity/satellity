@@ -79,7 +79,7 @@ func TestUserCRUD(t *testing.T) {
 			existing, err = CreateSession(ctx, tc.email, tc.password, hex.EncodeToString(public))
 			assert.Nil(err)
 			assert.NotNil(existing)
-			assert.Equal(tc.username, user.Username)
+			assert.Equal(tc.username, user.Username.String)
 			assert.Equal(tc.role, user.GetRole())
 
 			sess, err := readTestSession(ctx, existing.UserID, existing.SessionID)

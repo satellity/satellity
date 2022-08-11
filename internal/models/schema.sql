@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
   user_id               VARCHAR(36) PRIMARY KEY,
   email                 VARCHAR(512),
-  username              VARCHAR(64) NOT NULL CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
+  username              VARCHAR(64) CHECK (username ~* '^[a-z0-9][a-z0-9_]{3,63}$'),
   nickname              VARCHAR(64) NOT NULL DEFAULT '',
   biography             VARCHAR(2048) NOT NULL DEFAULT '',
   avatar_url            VARCHAR(512) NOT NULL DEFAULT '',

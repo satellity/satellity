@@ -56,7 +56,7 @@ func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
 func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) {
 	accountView := AccountView{
 		UserView:  buildUser(user),
-		Username:  user.Username,
+		Username:  user.Username.String,
 		Email:     user.Email.String,
 		SessionID: user.SessionID,
 		Role:      user.GetRole(),
