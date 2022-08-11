@@ -21,7 +21,6 @@ func RegisterRoutes(router *httptreemux.TreeMux) {
 	registerCategory(api)
 	registerTopic(api)
 	registerComment(api)
-	registerProduct(api)
 	registerVerification(api)
 	admin.RegisterAdminRoutes(api)
 }
