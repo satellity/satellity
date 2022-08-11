@@ -139,12 +139,16 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		if !ok {
 			return nil, nil
 		}
+		err := claims.Valid()
+		if err != nil {
+			return nil, err
+		}
 		if _, ok := token.Method.(*jwt.SigningMethodEd25519); !ok {
 			return nil, nil
 		}
 		uid, sid := fmt.Sprint(claims["uid"]), fmt.Sprint(claims["sid"])
 		var s *Session
-		err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 			u, err := findUserByID(ctx, tx, uid)
 			if err != nil {
 				return err
