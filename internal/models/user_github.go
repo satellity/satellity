@@ -38,7 +38,7 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 		if err != nil {
 			return err
 		}
-		user, err = createUser(ctx, tx, data.Email, fmt.Sprintf("%s_GH", data.Login), data.Name, "", sessionSecret, data.NodeID, existing)
+		user, err = createUser(ctx, tx, "", data.Email, fmt.Sprintf("%s_GH", data.Login), data.Name, "", sessionSecret, data.NodeID, existing)
 		if err != nil {
 			return nil
 		}

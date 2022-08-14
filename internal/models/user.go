@@ -30,6 +30,7 @@ const (
 // User contains info of a register user
 type User struct {
 	UserID            string
+	PublicKey         sql.NullString
 	Email             sql.NullString
 	Username          sql.NullString
 	Nickname          string
@@ -45,15 +46,15 @@ type User struct {
 	isNew     bool
 }
 
-var userColumns = []string{"user_id", "email", "username", "nickname", "avatar_url", "biography", "encrypted_password", "github_id", "role", "created_at", "updated_at"}
+var userColumns = []string{"user_id", "public_key", "email", "username", "nickname", "avatar_url", "biography", "encrypted_password", "github_id", "role", "created_at", "updated_at"}
 
 func (u *User) values() []interface{} {
-	return []interface{}{u.UserID, u.Email, u.Username, u.Nickname, u.AvatarURL, u.Biography, u.EncryptedPassword, u.GithubID, u.Role, u.CreatedAt, u.UpdatedAt}
+	return []interface{}{u.UserID, u.PublicKey, u.Email, u.Username, u.Nickname, u.AvatarURL, u.Biography, u.EncryptedPassword, u.GithubID, u.Role, u.CreatedAt, u.UpdatedAt}
 }
 
 func userFromRow(row durable.Row) (*User, error) {
 	var u User
-	err := row.Scan(&u.UserID, &u.Email, &u.Username, &u.Nickname, &u.AvatarURL, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.Role, &u.CreatedAt, &u.UpdatedAt)
+	err := row.Scan(&u.UserID, &u.PublicKey, &u.Email, &u.Username, &u.Nickname, &u.AvatarURL, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.Role, &u.CreatedAt, &u.UpdatedAt)
 	if err == pgx.ErrNoRows {
 		return nil, nil
 	}
@@ -61,7 +62,7 @@ func userFromRow(row durable.Row) (*User, error) {
 }
 
 // CreateUser create a new user
-func CreateUser(ctx context.Context, email, username, nickname, biography, password string, sessionSecret string) (*User, error) {
+func CreateUser(ctx context.Context, email, username, nickname, biography, password string, sessionPub string) (*User, error) {
 	email = strings.TrimSpace(email)
 	if err := validateEmailFormat(ctx, email); err != nil {
 		return nil, err
@@ -81,8 +82,28 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 
 	var user *User
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		user, err = createUser(ctx, tx, "", email, username, nickname, password, sessionPub, "", nil)
+		if err != nil {
+			return err
+		}
+		_, err = upsertStatistic(ctx, tx, "users")
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return user, nil
+}
+
+func CreateWeb3User(ctx context.Context, nickname, publicKey, sig, sessionPub string) (*User, error) {
+	nickname = strings.TrimSpace(nickname)
+	if nickname == "" {
+		nickname = publicKey
+	}
+	var user *User
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
-		user, err = createUser(ctx, tx, email, username, username, password, sessionSecret, "", nil)
+		user, err = createUser(ctx, tx, publicKey, "", "", nickname, "", sessionPub, "", nil)
 		if err != nil {
 			return err
 		}

@@ -87,7 +87,7 @@ func CreateEmailVerification(ctx context.Context, purpose, email, recaptcha stri
 }
 
 // VerifyEmailVerification verify an email verification
-func VerifyEmailVerification(ctx context.Context, verificationID, code, username, password, sessionSecret string) (*User, error) {
+func VerifyEmailVerification(ctx context.Context, verificationID, code, username, password, sessionPub string) (*User, error) {
 	var user *User
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		ev, err := findEmailVerification(ctx, tx, verificationID)
@@ -117,7 +117,7 @@ func VerifyEmailVerification(ctx context.Context, verificationID, code, username
 			return err
 		}
 		if user != nil {
-			s, err := user.addSession(ctx, tx, sessionSecret)
+			s, err := user.addSession(ctx, tx, sessionPub)
 			if err != nil {
 				return err
 			}
@@ -125,7 +125,7 @@ func VerifyEmailVerification(ctx context.Context, verificationID, code, username
 			return nil
 		}
 
-		user, err = createUser(ctx, tx, ev.Email, username, username, password, sessionSecret, "", nil)
+		user, err = createUser(ctx, tx, "", ev.Email, username, username, password, sessionPub, "", nil)
 		return err
 	})
 	if err != nil {
@@ -175,16 +175,21 @@ func Reset(ctx context.Context, verificationID, code, password string) error {
 	return nil
 }
 
-func createUser(ctx context.Context, tx pgx.Tx, email, username, nickname, password, sessionSecret, githubID string, user *User) (*User, error) {
+func createUser(ctx context.Context, tx pgx.Tx, publicKey, email, username, nickname, password, sessionPub, githubID string, user *User) (*User, error) {
 	if user == nil {
 		t := time.Now()
 		user = &User{
 			UserID:    uuid.Must(uuid.NewV4()).String(),
-			Username:  sql.NullString{String: username, Valid: true},
 			Nickname:  nickname,
 			Role:      UserRoleMember,
 			CreatedAt: t,
 			UpdatedAt: t,
+		}
+		if publicKey != "" {
+			user.PublicKey = sql.NullString{String: publicKey, Valid: true}
+		}
+		if username != "" {
+			user.Username = sql.NullString{String: username, Valid: true}
 		}
 		if email != "" {
 			user.Email = sql.NullString{String: email, Valid: true}
@@ -202,7 +207,7 @@ func createUser(ctx context.Context, tx pgx.Tx, email, username, nickname, passw
 			return nil, err
 		}
 	}
-	s, err := user.addSession(ctx, tx, sessionSecret)
+	s, err := user.addSession(ctx, tx, sessionPub)
 	if err != nil {
 		return nil, err
 	}
