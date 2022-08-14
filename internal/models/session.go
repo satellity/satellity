@@ -15,10 +15,10 @@ import (
 
 // Session contains user's current login infomation
 type Session struct {
-	SessionID string    `sql:"session_id,pk"`
-	UserID    string    `sql:"user_id"`
-	PublicKey string    `sql:"public_key"`
-	CreatedAt time.Time `sql:"created_at"`
+	SessionID string
+	UserID    string
+	PublicKey string
+	CreatedAt time.Time
 }
 
 var sessionColumns = []string{"session_id", "user_id", "public_key", "created_at"}
@@ -46,7 +46,7 @@ func CreateSession(ctx context.Context, identity, password, pubED25519 string) (
 	}
 
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		_, err := tx.Exec(ctx, "DELETE FROM sessions WHERE session_id IN (SELECT session_id FROM sessions WHERE user_id=$1 ORDER BY created_at DESC OFFSET 5)", user.UserID)
+		_, err := tx.Exec(ctx, "DELETE FROM sessions WHERE session_id IN (SELECT session_id FROM sessions WHERE user_id=$1 ORDER BY user_id, created_at DESC OFFSET 8)", user.UserID)
 		if err != nil {
 			return err
 		}

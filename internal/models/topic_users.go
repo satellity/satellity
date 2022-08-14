@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"satellity/internal/durable"
 	"satellity/internal/session"
@@ -19,20 +20,26 @@ const (
 
 // TopicUser contains the relationships between topic and user
 type TopicUser struct {
-	TopicID    string
-	UserID     string
-	Liked      bool
-	Bookmarked bool
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	TopicID      string
+	UserID       string
+	LikedAt      sql.NullTime
+	BookmarkedAt sql.NullTime
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 
 	isNew bool
 }
 
-var topicUserColumns = []string{"topic_id", "user_id", "liked", "bookmarked", "created_at", "updated_at"}
+var topicUserColumns = []string{"topic_id", "user_id", "liked_at", "bookmarked_at", "created_at", "updated_at"}
 
 func (tu *TopicUser) values() []interface{} {
-	return []interface{}{tu.TopicID, tu.UserID, tu.Liked, tu.Bookmarked, tu.CreatedAt, tu.UpdatedAt}
+	return []interface{}{tu.TopicID, tu.UserID, tu.LikedAt, tu.BookmarkedAt, tu.CreatedAt, tu.UpdatedAt}
+}
+
+func topicUserFromRow(row durable.Row) (*TopicUser, error) {
+	var tu TopicUser
+	err := row.Scan(&tu.TopicID, &tu.UserID, &tu.LikedAt, &tu.BookmarkedAt, &tu.CreatedAt, &tu.UpdatedAt)
+	return &tu, err
 }
 
 // ActiondBy execute user action, like or bookmark a topic
@@ -59,8 +66,8 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var lcount, bcount int64
 		if action == TopicUserActionLiked {
-			tu.Liked = state
-			if err := tx.QueryRow(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND liked=true", topic.TopicID).Scan(&lcount); err != nil {
+			tu.LikedAt = sql.NullTime{Time: time.Now(), Valid: state}
+			if err := tx.QueryRow(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND liked_at IS NOT NULL", topic.TopicID).Scan(&lcount); err != nil {
 				return err
 			}
 			if lcount > 0 {
@@ -71,8 +78,8 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 			}
 		}
 		if action == TopicUserActionBookmarked {
-			tu.Bookmarked = state
-			if err := tx.QueryRow(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND bookmarked=true", topic.TopicID).Scan(&bcount); err != nil {
+			tu.BookmarkedAt = sql.NullTime{Time: time.Now(), Valid: state}
+			if err := tx.QueryRow(ctx, "SELECT count(*) FROM topic_users WHERE topic_id=$1 AND bookmarked_at IS NOT NULL", topic.TopicID).Scan(&bcount); err != nil {
 				return err
 			}
 			if bcount > 0 {
@@ -82,8 +89,8 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 				topic.BookmarksCount = bcount + 1
 			}
 		}
-		topic.IsLikedBy = tu.Liked
-		topic.IsBookmarkedBy = tu.Bookmarked
+		topic.IsLikedBy = tu.LikedAt.Valid
+		topic.IsBookmarkedBy = tu.BookmarkedAt.Valid
 		if _, err := tx.Exec(ctx, "UPDATE topics SET (likes_count,bookmarks_count)=($1,$2) WHERE topic_id=$3", topic.LikesCount, topic.BookmarksCount, topic.TopicID); err != nil {
 			return err
 		}
@@ -92,8 +99,12 @@ func (topic *Topic) ActiondBy(ctx context.Context, user *User, action string, st
 			_, err := tx.CopyFrom(ctx, pgx.Identifier{"topic_users"}, topicUserColumns, pgx.CopyFromRows(rows))
 			return err
 		}
-		query := fmt.Sprintf("UPDATE topic_users SET %s=$1 WHERE topic_id=$2 AND user_id=$3", action)
-		if _, err := session.Database(ctx).Exec(ctx, query, state, tu.TopicID, tu.UserID); err != nil {
+		column := "liked_at"
+		if action == TopicUserActionBookmarked {
+			column = "bookmarked_at"
+		}
+		query := fmt.Sprintf("UPDATE topic_users SET %s=$1 WHERE topic_id=$2 AND user_id=$3", column)
+		if _, err := session.Database(ctx).Exec(ctx, query, sql.NullTime{Time: time.Now(), Valid: state}, tu.TopicID, tu.UserID); err != nil {
 			return err
 		}
 		return nil
@@ -122,12 +133,6 @@ func fillTopicWithAction(ctx context.Context, topic *Topic, user *User) error {
 	if err != nil || tu == nil {
 		return err
 	}
-	topic.IsLikedBy, topic.IsBookmarkedBy = tu.Liked, tu.Bookmarked
+	topic.IsLikedBy, topic.IsBookmarkedBy = tu.LikedAt.Valid, tu.BookmarkedAt.Valid
 	return nil
-}
-
-func topicUserFromRow(row durable.Row) (*TopicUser, error) {
-	var tu TopicUser
-	err := row.Scan(&tu.TopicID, &tu.UserID, &tu.Liked, &tu.Bookmarked, &tu.CreatedAt, &tu.UpdatedAt)
-	return &tu, err
 }

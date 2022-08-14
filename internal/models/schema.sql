@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS sessions (
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS sessions_userx ON sessions (user_id);
+CREATE INDEX IF NOT EXISTS sessions_user_createdx ON sessions (user_id, created_at DESC);
 
 
 CREATE TABLE IF NOT EXISTS email_verifications (
@@ -81,16 +81,16 @@ CREATE INDEX IF NOT EXISTS topics_score_draft_createdx ON topics(score DESC, dra
 CREATE TABLE IF NOT EXISTS topic_users (
   topic_id              VARCHAR(36) NOT NULL REFERENCES topics ON DELETE CASCADE,
   user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
-  liked                 BOOL NOT NULL DEFAULT false,
-  bookmarked            BOOL NOT NULL DEFAULT false,
+  liked_at              TIMESTAMP WITH TIME ZONE,
+  bookmarked_at         TIMESTAMP WITH TIME ZONE,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY (topic_id, user_id)
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS topic_users_reversex ON topic_users(user_id, topic_id);
-CREATE INDEX IF NOT EXISTS topic_users_likedx ON topic_users(topic_id, liked);
-CREATE INDEX IF NOT EXISTS topic_users_bookmarkedx ON topic_users(topic_id, bookmarked);
+CREATE INDEX IF NOT EXISTS topic_users_likedx ON topic_users(topic_id, liked_at);
+CREATE INDEX IF NOT EXISTS topic_users_bookmarkedx ON topic_users(topic_id, bookmarked_at);
 
 
 CREATE TABLE IF NOT EXISTS comments (

@@ -20,8 +20,6 @@ import (
 
 func TestUserCRUD(t *testing.T) {
 	assert := assert.New(t)
-	ctx := setupTestContext()
-	defer teardownTestContext(ctx)
 
 	public, priv, err := ed25519.GenerateKey(rand.Reader)
 	assert.Nil(err)
@@ -43,6 +41,9 @@ func TestUserCRUD(t *testing.T) {
 
 	for _, tc := range userCases {
 		t.Run(fmt.Sprintf("user username %s", tc.username), func(t *testing.T) {
+			ctx := setupTestContext()
+			defer teardownTestContext(ctx)
+
 			if !tc.valid {
 				user, err := CreateUser(ctx, tc.email, tc.username, tc.nickname, tc.biography, tc.password, tc.sessionSecret)
 				assert.NotNil(err)
