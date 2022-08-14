@@ -56,7 +56,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS categories_namex ON categories (name);
 
 CREATE TABLE IF NOT EXISTS topics (
   topic_id              VARCHAR(36) PRIMARY KEY,
-  short_id              VARCHAR(256) NOT NULL UNIQUE,
   title                 VARCHAR(512) NOT NULL,
   body                  TEXT NOT NULL,
   topic_type            VARCHAR(256) NOT NULL,

@@ -11,7 +11,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v4"
-	hashids "github.com/speps/go-hashids"
 )
 
 // Topic related CONST
@@ -26,7 +25,6 @@ const (
 // Topic is what use talking about
 type Topic struct {
 	TopicID        string
-	ShortID        string
 	Title          string
 	Body           string
 	TopicType      string
@@ -47,15 +45,15 @@ type Topic struct {
 	Category       *Category
 }
 
-var topicColumns = []string{"topic_id", "short_id", "title", "body", "topic_type", "comments_count", "bookmarks_count", "likes_count", "views_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
+var topicColumns = []string{"topic_id", "title", "body", "topic_type", "comments_count", "bookmarks_count", "likes_count", "views_count", "category_id", "user_id", "score", "draft", "created_at", "updated_at"}
 
 func (t *Topic) values() []interface{} {
-	return []interface{}{t.TopicID, t.ShortID, t.Title, t.Body, t.TopicType, t.CommentsCount, t.BookmarksCount, t.LikesCount, t.ViewsCount, t.CategoryID, t.UserID, t.Score, t.Draft, t.CreatedAt, t.UpdatedAt}
+	return []interface{}{t.TopicID, t.Title, t.Body, t.TopicType, t.CommentsCount, t.BookmarksCount, t.LikesCount, t.ViewsCount, t.CategoryID, t.UserID, t.Score, t.Draft, t.CreatedAt, t.UpdatedAt}
 }
 
 func topicFromRows(row durable.Row) (*Topic, error) {
 	var t Topic
-	err := row.Scan(&t.TopicID, &t.ShortID, &t.Title, &t.Body, &t.TopicType, &t.CommentsCount, &t.BookmarksCount, &t.LikesCount, &t.ViewsCount, &t.CategoryID, &t.UserID, &t.Score, &t.Draft, &t.CreatedAt, &t.UpdatedAt)
+	err := row.Scan(&t.TopicID, &t.Title, &t.Body, &t.TopicType, &t.CommentsCount, &t.BookmarksCount, &t.LikesCount, &t.ViewsCount, &t.CategoryID, &t.UserID, &t.Score, &t.Draft, &t.CreatedAt, &t.UpdatedAt)
 	return &t, err
 }
 
@@ -97,13 +95,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
-	var err error
-	topic.ShortID, err = generateShortID("topics", t)
-	if err != nil {
-		return nil, session.ServerError(ctx, err)
-	}
-
-	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		category, err := findCategory(ctx, tx, categoryID)
 		if err != nil {
 			return err
@@ -236,19 +228,8 @@ func ReadTopic(ctx context.Context, id string) (*Topic, error) {
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
-		if err != nil {
+		if err != nil || topic == nil {
 			return err
-		}
-		if topic == nil {
-			subs := strings.Split(id, "-")
-			if len(subs) < 1 || len(subs[0]) <= 5 {
-				return nil
-			}
-			id = subs[0]
-			topic, err = findTopicByShortID(ctx, tx, id)
-			if topic == nil || err != nil {
-				return err
-			}
 		}
 		user, err := findUserByID(ctx, tx, topic.UserID)
 		if err != nil {
@@ -328,47 +309,6 @@ func findTopic(ctx context.Context, tx pgx.Tx, id string) (*Topic, error) {
 		return nil, nil
 	}
 	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(topicColumns, ",")), id)
-	t, err := topicFromRows(row)
-	if pgx.ErrNoRows == err {
-		return nil, nil
-	}
-	return t, err
-}
-
-// ReadTopicByShortID read a topic by Short ID
-func ReadTopicByShortID(ctx context.Context, id string) (*Topic, error) {
-	subs := strings.Split(id, "-")
-	if len(subs) < 1 || len(subs[0]) <= 5 {
-		return nil, nil
-	}
-	id = subs[0]
-	var topic *Topic
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		var err error
-		topic, err = findTopicByShortID(ctx, tx, id)
-		if topic == nil || err != nil {
-			return err
-		}
-		user, err := findUserByID(ctx, tx, topic.UserID)
-		if err != nil {
-			return err
-		}
-		category, err := findCategory(ctx, tx, topic.CategoryID)
-		if err != nil {
-			return err
-		}
-		topic.User = user
-		topic.Category = category
-		return nil
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return topic, nil
-}
-
-func findTopicByShortID(ctx context.Context, tx pgx.Tx, id string) (*Topic, error) {
-	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE short_id=$1", strings.Join(topicColumns, ",")), id)
 	t, err := topicFromRows(row)
 	if pgx.ErrNoRows == err {
 		return nil, nil
@@ -531,11 +471,4 @@ func topicsCount(ctx context.Context, tx pgx.Tx) (int64, error) {
 	var count int64
 	err := tx.QueryRow(ctx, "SELECT count(*) FROM topics WHERE draft=false").Scan(&count)
 	return count, err
-}
-
-func generateShortID(table string, t time.Time) (string, error) {
-	hd := hashids.NewData()
-	hd.MinLength = 5
-	h, _ := hashids.NewWithData(hd)
-	return h.EncodeInt64([]int64{t.UnixNano()})
 }

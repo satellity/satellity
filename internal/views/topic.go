@@ -10,7 +10,6 @@ import (
 type TopicView struct {
 	Type           string       `json:"type"`
 	TopicID        string       `json:"topic_id"`
-	ShortID        string       `json:"short_id"`
 	Title          string       `json:"title"`
 	Body           string       `json:"body"`
 	TopicType      string       `json:"topic_type"`
@@ -34,7 +33,6 @@ func buildTopic(topic *models.Topic) TopicView {
 	view := TopicView{
 		Type:           "topic",
 		TopicID:        topic.TopicID,
-		ShortID:        topic.ShortID,
 		Title:          topic.Title,
 		Body:           topic.Body,
 		TopicType:      topic.TopicType,
