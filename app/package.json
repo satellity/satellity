@@ -33,7 +33,7 @@
     "react-scripts": "5.0.1",
     "react-styleguidist": "^11.2.0",
     "react-timeago": "^7.1.0",
-    "sass": "^1.54.3",
+    "sass": "^1.54.4",
     "showdown": "^2.1.0",
     "showdown-highlight": "^3.0.0",
     "text-encoder-lite": "^2.0.0",
