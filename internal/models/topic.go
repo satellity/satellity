@@ -2,8 +2,8 @@ package models
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+	"net/url"
 	"satellity/internal/durable"
 	"satellity/internal/session"
 	"strings"
@@ -74,12 +74,15 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 		return nil, session.BadDataError(ctx)
 	}
 
-	if !(typ == TopicTypePost || typ == TopicTypeLink) {
+	switch typ {
+	case TopicTypePost, TopicTypeLink:
+	default:
 		return nil, session.BadDataError(ctx)
 	}
 
 	if typ == TopicTypeLink {
-		if !strings.HasPrefix(body, "http") {
+		_, err := url.ParseRequestURI(body)
+		if err != nil {
 			return nil, session.BadDataError(ctx)
 		}
 	}
@@ -104,18 +107,12 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 			return session.BadDataError(ctx)
 		}
 		topic.CategoryID = category.CategoryID
-		category.LastTopicID = sql.NullString{String: topic.TopicID, Valid: true}
-		count, err := topicsCountByCategory(ctx, tx, category.CategoryID)
-		if err != nil {
-			return err
-		}
 		if !topic.Draft {
 			_, err = upsertStatistic(ctx, tx, "topics")
 			if err != nil {
 				return err
 			}
 		}
-		category.TopicsCount, category.UpdatedAt = count+1, time.Now()
 		rows := [][]interface{}{
 			topic.values(),
 		}
@@ -126,7 +123,6 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 		return nil, session.TransactionError(ctx, err)
 	}
 	if !topic.Draft {
-		// TODO
 		emitToCategory(ctx, topic.CategoryID)
 	}
 	return topic, nil
@@ -135,31 +131,39 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 // UpdateTopic update a Topic by ID
 func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categoryID string, draft bool) (*Topic, error) {
 	title, body = strings.TrimSpace(title), strings.TrimSpace(body)
-	if title != "" && len(title) < titleSizeLimit {
+	if len(title) < titleSizeLimit {
 		return nil, session.BadDataError(ctx)
 	}
 
-	if !(typ == TopicTypePost || typ == TopicTypeLink) {
+	switch typ {
+	case TopicTypePost, TopicTypeLink:
+	default:
 		return nil, session.BadDataError(ctx)
 	}
 
 	if typ == TopicTypeLink {
-		if !strings.HasPrefix(body, "http") {
+		_, err := url.ParseRequestURI(body)
+		if err != nil {
 			return nil, session.BadDataError(ctx)
 		}
 	}
 
 	var topic *Topic
 	var prevCategoryID string
-	var prevDraft bool
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
 		if err != nil || topic == nil {
 			return err
-		} else if topic.UserID != user.UserID && !user.isAdmin() {
-			return session.AuthorizationError(ctx)
 		}
+		if !topic.isPermit(user) {
+			return session.ForbiddenError(ctx)
+		}
+		if draft && !topic.Draft {
+			return session.ForbiddenError(ctx)
+		}
+		topic.Draft = draft
+
 		topic.User = user
 		if topic.UserID != user.UserID {
 			u, err := findUserByID(ctx, tx, topic.UserID)
@@ -168,14 +172,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 			}
 			topic.User = u
 		}
-		prevDraft = topic.Draft
-		if !topic.Draft && draft {
-			return session.BadDataError(ctx)
-		}
-		topic.Draft = draft
-		if title != "" {
-			topic.Title = title
-		}
+		topic.Title = title
 		topic.Body = body
 		if categoryID != "" && topic.CategoryID != categoryID {
 			prevCategoryID = topic.CategoryID
@@ -188,14 +185,9 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 			topic.CategoryID = category.CategoryID
 			topic.Category = category
 		}
-		if typ != "" {
-			topic.TopicType = typ
-		}
-		if prevDraft && !topic.Draft {
-			_, err = upsertStatistic(ctx, tx, "topics")
-			if err != nil {
-				return err
-			}
+		topic.TopicType = typ
+		if !topic.Draft {
+			upsertStatistic(ctx, tx, "topics")
 		}
 		cols, params := durable.PrepareColumnsWithParams([]string{"title", "body", "category_id", "draft"})
 		values := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft}
@@ -212,12 +204,11 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	if prevDraft && !topic.Draft {
-		// TODO
-		emitToCategory(ctx, prevCategoryID)
-	} else if prevCategoryID != "" {
-		emitToCategory(ctx, prevCategoryID)
+	if !topic.Draft {
 		emitToCategory(ctx, topic.CategoryID)
+		if prevCategoryID != "" {
+			emitToCategory(ctx, prevCategoryID)
+		}
 	}
 	return topic, nil
 }
@@ -298,9 +289,7 @@ func ReadTopicWithRelation(ctx context.Context, id string, user *User) (*Topic, 
 	if err != nil {
 		return topic, session.TransactionError(ctx, err)
 	}
-	if err := topic.incrTopicViewsCount(ctx); err != nil {
-		session.ServerError(ctx, err)
-	}
+	topic.incrTopicViewsCount(ctx)
 	return topic, nil
 }
 
@@ -346,8 +335,8 @@ func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
 			topic.Category = set[topic.CategoryID]
 			topics = append(topics, topic)
 		}
-		if err := rows.Err(); err != nil {
-			return err
+		if rows.Err() != nil {
+			return rows.Err()
 		}
 		userSet, err := readUserSet(ctx, tx, userIDs)
 		if err != nil {
@@ -465,6 +454,16 @@ func (topic *Topic) incrTopicViewsCount(ctx context.Context) error {
 		return session.TransactionError(ctx, err)
 	}
 	return nil
+}
+
+func (topic *Topic) isPermit(user *User) bool {
+	if user == nil {
+		return false
+	}
+	if user.isAdmin() {
+		return true
+	}
+	return topic.UserID == user.UserID
 }
 
 func topicsCount(ctx context.Context, tx pgx.Tx) (int64, error) {

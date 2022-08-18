@@ -79,7 +79,7 @@ func TestTopicCRUD(t *testing.T) {
 			assert.NotNil(topic)
 			assert.Equal("hell", topic.Title)
 			assert.Equal("orld", topic.Body)
-			topic, err = user.UpdateTopic(ctx, topic.TopicID, "", "orld orld", TopicTypePost, "", tc.draft)
+			topic, err = user.UpdateTopic(ctx, topic.TopicID, topic.Title, "orld orld", TopicTypePost, topic.CategoryID, tc.draft)
 			assert.Nil(err)
 			assert.NotNil(topic)
 			assert.Equal("hell", topic.Title)
