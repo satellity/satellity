@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/jackc/pgx/v4"
@@ -112,6 +113,32 @@ func TestUserCRUD(t *testing.T) {
 			assert.Len(users, tc.count)
 		})
 	}
+}
+
+func TestWeb3UserCRUD(t *testing.T) {
+	assert := assert.New(t)
+	ctx := setupTestContext()
+	defer teardownTestContext(ctx)
+
+	public, _, err := ed25519.GenerateKey(rand.Reader)
+	assert.Nil(err)
+
+	privateKey, err := crypto.HexToECDSA("0123456789012345678901234567890123456789012345678901234567890123")
+	assert.Nil(err)
+
+	nickname := "abc"
+	publicKey := "0x14791697260E4c9A71f18484C9f997B308e59325"
+	data := fmt.Sprintf("Satellity:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
+	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
+	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
+	hash := crypto.Keccak256Hash([]byte(msg))
+	signature, err := crypto.Sign(hash.Bytes(), privateKey)
+	assert.Nil(err)
+
+	user, err := CreateWeb3User(ctx, nickname, publicKey, hex.EncodeToString(public), hex.EncodeToString(signature))
+	assert.Nil(err)
+	assert.NotNil(user)
+	assert.Equal(nickname, user.Nickname)
 }
 
 func createTestUser(ctx context.Context, email, username, password string) *User {

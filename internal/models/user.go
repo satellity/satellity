@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/jackc/pgx/v4"
@@ -95,13 +96,31 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 	return user, nil
 }
 
-func CreateWeb3User(ctx context.Context, nickname, publicKey, sig, sessionPub string) (*User, error) {
+func CreateWeb3User(ctx context.Context, nickname, publicKey, sessionPub, sig string) (*User, error) {
+	sigBuf, _ := hex.DecodeString(sig)
+	data := fmt.Sprintf("Satellity:%s:%s:%s", nickname, publicKey, sessionPub)
+	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
+	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
+	hash := crypto.Keccak256Hash([]byte(msg))
+	sigPublicKey, err := crypto.Ecrecover(hash.Bytes(), sigBuf)
+	if err != nil {
+		return nil, session.BadDataErrorWithFieldAndData(ctx, "signature", "invalid", sig)
+	}
+	pubKey, err := crypto.UnmarshalPubkey(sigPublicKey)
+	if err != nil {
+		return nil, session.BadDataErrorWithFieldAndData(ctx, "signature", "invalid", sig)
+	}
+	address := crypto.PubkeyToAddress(*pubKey)
+	if publicKey != address.Hex() {
+		return nil, session.BadDataErrorWithFieldAndData(ctx, "signature", "invalid", sig)
+	}
+
 	nickname = strings.TrimSpace(nickname)
 	if nickname == "" {
 		nickname = publicKey
 	}
 	var user *User
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		user, err = createUser(ctx, tx, publicKey, "", "", nickname, "", sessionPub, "", nil)
 		if err != nil {
