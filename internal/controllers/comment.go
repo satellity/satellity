@@ -80,7 +80,7 @@ func (impl *commentImpl) comments(w http.ResponseWriter, r *http.Request, params
 		views.RenderErrorResponse(w, r, err)
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if comments, err := topic.ReadComments(r.Context(), offset); err != nil {
+	} else if comments, err := models.ReadComments(r.Context(), offset, topic, nil); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComments(w, r, comments)

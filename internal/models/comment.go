@@ -105,107 +105,53 @@ func (comment *Comment) Update(ctx context.Context, body string, user *User) err
 	return nil
 }
 
-// ReadComments read comments by topicID, parameters: offset
-func (topic *Topic) ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
-	if offset.IsZero() {
-		offset = time.Now()
-	}
-
-	var comments []*Comment
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at LIMIT $3", strings.Join(commentColumns, ","))
-		rows, err := tx.Query(ctx, query, topic.TopicID, offset, LIMIT)
-		if err != nil {
-			return err
-		}
-		defer rows.Close()
-
-		userIds := make([]string, 0)
-		for rows.Next() {
-			c, err := commentFromRows(rows)
-			if err != nil {
-				return err
-			}
-			userIds = append(userIds, c.UserID)
-			comments = append(comments, c)
-		}
-		if err := rows.Err(); err != nil {
-			return err
-		}
-		userSet, err := readUserSet(ctx, tx, userIds)
-		if err != nil {
-			return err
-		}
-		for i, c := range comments {
-			comments[i].User = userSet[c.UserID]
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return comments, nil
-}
-
-// ReadComments read comments by userID, parameters: offset
-func (user *User) ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
-	if offset.IsZero() {
-		offset = time.Now()
-	}
-	rows, err := session.Database(ctx).Query(ctx, fmt.Sprintf("SELECT %s FROM comments WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentColumns, ",")), user.UserID, offset, LIMIT)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var comments []*Comment
-	for rows.Next() {
-		c, err := commentFromRows(rows)
-		if err != nil {
-			return nil, err
-		}
-		c.User = user
-		comments = append(comments, c)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return comments, nil
-}
-
 // ReadComments read all comments, parameters: offset default time.Now()
-func ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
+func ReadComments(ctx context.Context, offset time.Time, topic *Topic, user *User) ([]*Comment, error) {
 	if offset.IsZero() {
 		offset = time.Now()
+	}
+	query := fmt.Sprintf("SELECT %s FROM comments WHERE updated_at<$1 ORDER BY updated_at DESC LIMIT $2", strings.Join(commentColumns, ","))
+	params := []any{offset, LIMIT}
+	if topic != nil {
+		query = fmt.Sprintf("SELECT %s FROM comments WHERE topic_id=$1 AND created_at<$2 ORDER BY created_at LIMIT $3", strings.Join(commentColumns, ","))
+		params = append([]any{topic.TopicID}, params...)
+	}
+	if user != nil {
+		query = fmt.Sprintf("SELECT %s FROM comments WHERE user_id=$1 AND created_at<$2 ORDER BY created_at DESC LIMIT $3", strings.Join(commentColumns, ","))
+		params = append([]any{user.UserID}, params...)
 	}
 
 	var comments []*Comment
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM comments WHERE updated_at<$1 ORDER BY updated_at DESC LIMIT $2", strings.Join(commentColumns, ","))
-		rows, err := tx.Query(ctx, query, offset, LIMIT)
+		rows, err := tx.Query(ctx, query, params...)
 		if err != nil {
 			return err
 		}
 		defer rows.Close()
 
-		userIds := []string{}
+		var userIds []string
 		for rows.Next() {
 			comment, err := commentFromRows(rows)
 			if err != nil {
 				return err
 			}
-			userIds = append(userIds, comment.UserID)
+			comment.User = user
+			if comment.User == nil {
+				userIds = append(userIds, comment.UserID)
+			}
 			comments = append(comments, comment)
 		}
 		if err := rows.Err(); err != nil {
 			return err
 		}
-		userSet, err := readUserSet(ctx, tx, userIds)
-		if err != nil {
-			return err
-		}
-		for i, comment := range comments {
-			comments[i].User = userSet[comment.UserID]
+		if len(userIds) > 0 {
+			userSet, err := readUserSet(ctx, tx, userIds)
+			if err != nil {
+				return err
+			}
+			for i, comment := range comments {
+				comments[i].User = userSet[comment.UserID]
+			}
 		}
 		return nil
 	})

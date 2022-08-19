@@ -34,7 +34,7 @@ func (impl *commentImpl) destroy(w http.ResponseWriter, r *http.Request, params 
 
 func (impl *commentImpl) index(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	if comments, err := models.ReadComments(r.Context(), offset); err != nil {
+	if comments, err := models.ReadComments(r.Context(), offset, nil, nil); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComments(w, r, comments)
