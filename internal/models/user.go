@@ -143,8 +143,8 @@ func (u *User) UpdateProfile(ctx context.Context, nickname, biography string, av
 	}
 	u.UpdatedAt = time.Now()
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		cols, posits := durable.PrepareColumnsWithParams([]string{"nickname", "biography", "updated_at"})
-		_, err := tx.Exec(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id='%s'", cols, posits, u.UserID), u.Nickname, u.Biography, u.UpdatedAt)
+		cols, posits := durable.PrepareColumnsAndExpressions([]string{"nickname", "biography", "updated_at"}, 1)
+		_, err := tx.Exec(ctx, fmt.Sprintf("UPDATE users SET (%s)=(%s) WHERE user_id=$1", cols, posits), u.UserID, u.Nickname, u.Biography, u.UpdatedAt)
 		return err
 	})
 	if err != nil {

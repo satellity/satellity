@@ -85,7 +85,7 @@ func UpsertStatistic(ctx context.Context, name string) (*Statistic, error) {
 		}
 		s.Count = count
 		s.UpdatedAt = t
-		cols, params := durable.PrepareColumnsWithParams(statisticColumns)
+		cols, params := durable.PrepareColumnsAndExpressions(statisticColumns, 0)
 		_, err = tx.Exec(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s) ON CONFLICT (statistic_id) DO UPDATE SET (count,updated_at)=(EXCLUDED.count,EXCLUDED.updated_at)", cols, params), s.values()...)
 		statistic = s
 		return err

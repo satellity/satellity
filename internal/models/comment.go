@@ -64,9 +64,9 @@ func (user *User) CreateComment(ctx context.Context, body string, topic *Topic) 
 		if topic.UpdatedAt.Add(time.Hour * 24 * 30).After(time.Now()) {
 			topic.UpdatedAt = t
 		}
-		cols, posits := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
-		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, posits, topic.TopicID)
-		_, err = tx.Exec(ctx, query, topic.CommentsCount, topic.UpdatedAt)
+		cols, posits := durable.PrepareColumnsAndExpressions([]string{"comments_count", "updated_at"}, 1)
+		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id=$1", cols, posits)
+		_, err = tx.Exec(ctx, query, topic.TopicID, topic.CommentsCount, topic.UpdatedAt)
 		if err != nil {
 			return err
 		}
@@ -85,7 +85,7 @@ func (user *User) CreateComment(ctx context.Context, body string, topic *Topic) 
 
 // UpdateComment update the comment by id
 func (comment *Comment) Update(ctx context.Context, body string, user *User) error {
-	if comment.UserID != user.UserID && !user.isAdmin() {
+	if !comment.isPermit(user) {
 		return session.ForbiddenError(ctx)
 	}
 	body = strings.TrimSpace(body)
@@ -95,8 +95,8 @@ func (comment *Comment) Update(ctx context.Context, body string, user *User) err
 	comment.Body = body
 	comment.UpdatedAt = time.Now()
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		cols, posits := durable.PrepareColumnsWithParams([]string{"body", "updated_at"})
-		_, err := tx.Exec(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, posits, comment.CommentID), comment.Body, comment.UpdatedAt)
+		cols, posits := durable.PrepareColumnsAndExpressions([]string{"body", "updated_at"}, 1)
+		_, err := tx.Exec(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id=$1", cols, posits), comment.CommentID, comment.Body, comment.UpdatedAt)
 		return err
 	})
 	if err != nil {
@@ -236,9 +236,9 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 			return err
 		}
 		topic.CommentsCount = count - 1
-		cols, posits := durable.PrepareColumnsWithParams([]string{"comments_count", "updated_at"})
-		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, posits, topic.TopicID)
-		_, err = tx.Exec(ctx, query, topic.CommentsCount, topic.UpdatedAt)
+		cols, posits := durable.PrepareColumnsAndExpressions([]string{"comments_count", "updated_at"}, 1)
+		query := fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id=$1", cols, posits)
+		_, err = tx.Exec(ctx, query, topic.TopicID, topic.CommentsCount, topic.UpdatedAt)
 		if err != nil {
 			return err
 		}
@@ -286,4 +286,14 @@ func commentsCount(ctx context.Context, tx pgx.Tx) (int64, error) {
 	var count int64
 	err := tx.QueryRow(ctx, "SELECT count(*) FROM comments").Scan(&count)
 	return count, err
+}
+
+func (comment *Comment) isPermit(user *User) bool {
+	if user == nil {
+		return false
+	}
+	if user.isAdmin() {
+		return true
+	}
+	return comment.UserID == user.UserID
 }

@@ -84,8 +84,8 @@ func (d *Database) RunInTransaction(ctx context.Context, fn func(pgx.Tx) error) 
 	return tx.Commit(ctx)
 }
 
-// PrepareColumnsWithParams prepare columns and placeholders
-func PrepareColumnsWithParams(columns []string) (string, string) {
+// PrepareColumnsAndExpressions prepare columns and placeholders
+func PrepareColumnsAndExpressions(columns []string, offset int) (string, string) {
 	if len(columns) < 1 {
 		return "", ""
 	}
@@ -96,7 +96,7 @@ func PrepareColumnsWithParams(columns []string) (string, string) {
 			params.WriteString(",")
 		}
 		cols.WriteString(column)
-		params.WriteString(fmt.Sprintf("$%d", i+1))
+		params.WriteString(fmt.Sprintf("$%d", i+1+offset))
 	}
 	return cols.String(), params.String()
 }

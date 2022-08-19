@@ -105,9 +105,9 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 		category.Description = description
 		category.Position = position
 		category.UpdatedAt = time.Now()
-		cols, posits := durable.PrepareColumnsWithParams([]string{"name", "alias", "description", "position", "updated_at"})
-		values := []interface{}{category.Name, category.Alias, category.Description, category.Position, category.UpdatedAt}
-		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, posits, category.CategoryID), values...)
+		cols, posits := durable.PrepareColumnsAndExpressions([]string{"name", "alias", "description", "position", "updated_at"}, 1)
+		values := []interface{}{category.CategoryID, category.Name, category.Alias, category.Description, category.Position, category.UpdatedAt}
+		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id=$1", cols, posits), values...)
 		return err
 	})
 	if err != nil {
@@ -219,9 +219,9 @@ func emitToCategory(ctx context.Context, id string) (*Category, error) {
 			category.TopicsCount = count
 		}
 		category.UpdatedAt = time.Now()
-		cols, posits := durable.PrepareColumnsWithParams([]string{"last_topic_id", "topics_count", "updated_at"})
-		values := []interface{}{category.LastTopicID, category.TopicsCount, category.UpdatedAt}
-		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id='%s'", cols, posits, category.CategoryID), values...)
+		cols, posits := durable.PrepareColumnsAndExpressions([]string{"last_topic_id", "topics_count", "updated_at"}, 1)
+		values := []interface{}{category.CategoryID, category.LastTopicID, category.TopicsCount, category.UpdatedAt}
+		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id=$1", cols, posits), values...)
 		return err
 	})
 	if err != nil {

@@ -173,9 +173,9 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 		}
 		topic.TopicType = typ
 		topic.UpdatedAt = time.Now()
-		cols, params := durable.PrepareColumnsWithParams([]string{"title", "body", "category_id", "draft", "updated_at"})
-		values := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft, topic.UpdatedAt}
-		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), values...)
+		cols, params := durable.PrepareColumnsAndExpressions([]string{"title", "body", "category_id", "draft", "updated_at"}, 1)
+		values := []interface{}{topic.TopicID, topic.Title, topic.Body, topic.CategoryID, topic.Draft, topic.UpdatedAt}
+		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id=$1", cols, params), values...)
 		return err
 	})
 	if err != nil {
