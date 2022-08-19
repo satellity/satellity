@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"satellity/internal/middlewares"
 	"satellity/internal/models"
+	"satellity/internal/session"
 	"satellity/internal/views"
 	"time"
 
@@ -20,7 +21,11 @@ func registerAdminComment(router *httptreemux.Group) {
 }
 
 func (impl *commentImpl) destroy(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if err := middlewares.CurrentUser(r).DeleteComment(r.Context(), params["id"]); err != nil {
+	if comment, err := models.ReadComment(r.Context(), params["id"]); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else if comment == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
+	} else if err = comment.Delete(r.Context(), middlewares.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)

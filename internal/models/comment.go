@@ -216,15 +216,11 @@ func ReadComments(ctx context.Context, offset time.Time) ([]*Comment, error) {
 }
 
 // DeleteComment delete a comment by ID
-func (user *User) DeleteComment(ctx context.Context, id string) error {
+func (comment *Comment) Delete(ctx context.Context, user *User) error {
+	if !comment.isPermit(user) {
+		return session.ForbiddenError(ctx)
+	}
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		comment, err := findComment(ctx, tx, id)
-		if err != nil || comment == nil {
-			return err
-		}
-		if !user.isAdmin() && user.UserID != comment.UserID {
-			return session.ForbiddenError(ctx)
-		}
 		topic, err := findTopic(ctx, tx, comment.TopicID)
 		if err != nil {
 			return err

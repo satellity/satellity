@@ -66,7 +66,7 @@ func TestCommentCRUD(t *testing.T) {
 			topic, _ = ReadTopic(ctx, topic.TopicID)
 			assert.NotNil(topic)
 			assert.Equal(int64(1), topic.CommentsCount)
-			err = user.DeleteComment(ctx, comment.CommentID)
+			err = comment.Delete(ctx, user)
 			assert.Nil(err)
 			topic, err = ReadTopic(ctx, topic.TopicID)
 			assert.Nil(err)

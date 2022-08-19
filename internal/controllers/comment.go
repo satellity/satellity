@@ -63,7 +63,11 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 }
 
 func (impl *commentImpl) destory(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if err := middlewares.CurrentUser(r).DeleteComment(r.Context(), params["id"]); err != nil {
+	if comment, err := models.ReadComment(r.Context(), params["id"]); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else if comment == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
+	} else if err = comment.Delete(r.Context(), middlewares.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)
