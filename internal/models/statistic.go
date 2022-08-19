@@ -17,6 +17,12 @@ import (
 // SolidStatisticID is used to generate a solid id from name
 const SolidStatisticID = "540cbd3c-f4eb-479c-bcd8-b5629af57267"
 
+const (
+	StatisticTypeUsers    = "users"
+	StatisticTypeTopics   = "topics"
+	StatisticTypeComments = "comments"
+)
+
 // Statistic is the body of statistic
 type Statistic struct {
 	StatisticID string
@@ -32,46 +38,62 @@ func (s *Statistic) values() []interface{} {
 	return []interface{}{s.StatisticID, s.Name, s.Count, s.CreatedAt, s.UpdatedAt}
 }
 
-func upsertStatistic(ctx context.Context, tx pgx.Tx, name string) (*Statistic, error) {
+func statisticFromRows(row durable.Row) (*Statistic, error) {
+	var s Statistic
+	err := row.Scan(&s.StatisticID, &s.Name, &s.Count, &s.CreatedAt, &s.UpdatedAt)
+	return &s, err
+}
+
+func UpsertStatistic(ctx context.Context, name string) (*Statistic, error) {
 	id, err := generateStatisticID(SolidStatisticID, name)
 	if err != nil {
 		return nil, session.ServerError(ctx, err)
 	}
 	switch name {
-	case "users", "topics", "comments":
+	case StatisticTypeUsers,
+		StatisticTypeTopics,
+		StatisticTypeComments:
 	default:
 		return nil, session.BadDataError(ctx)
 	}
 
-	s, err := findStatistic(ctx, tx, id)
-	if err != nil {
-		return nil, err
-	}
-	var count int64
-	switch name {
-	case "users":
-		count, err = usersCount(ctx, tx)
-	case "topics":
-		count, err = topicsCount(ctx, tx)
-	case "comments":
-		count, err = commentsCount(ctx, tx)
-	}
-	if err != nil {
-		return nil, err
-	}
-	t := time.Now()
-	if s == nil {
-		s = &Statistic{
-			StatisticID: id,
-			Name:        name,
-			CreatedAt:   t,
+	var statistic *Statistic
+	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		s, err := findStatistic(ctx, tx, id)
+		if err != nil {
+			return err
 		}
+		var count int64
+		switch name {
+		case "users":
+			count, err = usersCount(ctx, tx)
+		case "topics":
+			count, err = topicsCount(ctx, tx)
+		case "comments":
+			count, err = commentsCount(ctx, tx)
+		}
+		if err != nil {
+			return err
+		}
+		t := time.Now()
+		if s == nil {
+			s = &Statistic{
+				StatisticID: id,
+				Name:        name,
+				CreatedAt:   t,
+			}
+		}
+		s.Count = count
+		s.UpdatedAt = t
+		cols, params := durable.PrepareColumnsWithParams(statisticColumns)
+		_, err = tx.Exec(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s) ON CONFLICT (statistic_id) DO UPDATE SET (count,updated_at)=(EXCLUDED.count,EXCLUDED.updated_at)", cols, params), s.values()...)
+		statistic = s
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
 	}
-	s.Count = count
-	s.UpdatedAt = t
-	cols, params := durable.PrepareColumnsWithParams(statisticColumns)
-	_, err = tx.Exec(ctx, fmt.Sprintf("INSERT INTO statistics(%s) VALUES (%s) ON CONFLICT (statistic_id) DO UPDATE SET (count,updated_at)=(EXCLUDED.count,EXCLUDED.updated_at)", cols, params), s.values()...)
-	return s, err
+	return statistic, nil
 }
 
 func findStatistic(ctx context.Context, tx pgx.Tx, id string) (*Statistic, error) {
@@ -85,12 +107,6 @@ func findStatistic(ctx context.Context, tx pgx.Tx, id string) (*Statistic, error
 		return nil, nil
 	}
 	return s, err
-}
-
-func statisticFromRows(row durable.Row) (*Statistic, error) {
-	var s Statistic
-	err := row.Scan(&s.StatisticID, &s.Name, &s.Count, &s.CreatedAt, &s.UpdatedAt)
-	return &s, err
 }
 
 func generateStatisticID(ID, name string) (string, error) {

@@ -77,10 +77,6 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 			return err
 		}
 		c.TopicID = topic.TopicID
-		_, err = upsertStatistic(ctx, tx, "comments")
-		if err != nil {
-			return err
-		}
 		rows := [][]interface{}{c.values()}
 		_, err = tx.CopyFrom(ctx, pgx.Identifier{"comments"}, commentColumns, pgx.CopyFromRows(rows))
 		return err
@@ -89,6 +85,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		return nil, session.TransactionError(ctx, err)
 	}
 	c.User = user
+	UpsertStatistic(ctx, StatisticTypeComments)
 	return c, nil
 }
 

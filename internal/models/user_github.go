@@ -39,15 +39,12 @@ func CreateGithubUser(ctx context.Context, code, sessionSecret string) (*User, e
 			return err
 		}
 		user, err = createUser(ctx, tx, "", data.Email, fmt.Sprintf("%s_GH", data.Login), data.Name, "", sessionSecret, data.NodeID, existing)
-		if err != nil {
-			return nil
-		}
-		_, err = upsertStatistic(ctx, tx, "users")
 		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
+	UpsertStatistic(ctx, StatisticTypeUsers)
 	return user, nil
 }
 

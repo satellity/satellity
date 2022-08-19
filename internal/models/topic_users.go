@@ -125,6 +125,16 @@ func readTopicUser(ctx context.Context, topicID, userID string) (*TopicUser, err
 	return tu, err
 }
 
+func findTopicUser(ctx context.Context, tx pgx.Tx, topicID, userID string) (*TopicUser, error) {
+	query := fmt.Sprintf("SELECT %s FROM topic_users WHERE topic_id=$1 AND user_id=$2", strings.Join(topicUserColumns, ","))
+	row := tx.QueryRow(ctx, query, topicID, userID)
+	tu, err := topicUserFromRow(row)
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	}
+	return tu, err
+}
+
 func fillTopicWithAction(ctx context.Context, topic *Topic, user *User) error {
 	if user == nil {
 		return nil

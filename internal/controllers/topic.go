@@ -78,7 +78,7 @@ func (impl *topicImpl) draft(w http.ResponseWriter, r *http.Request, params map[
 }
 
 func (impl *topicImpl) show(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if topic, err := models.ReadTopicWithRelation(r.Context(), params["id"], middlewares.CurrentUser(r)); err != nil {
+	if topic, err := models.ReadTopicFull(r.Context(), params["id"], middlewares.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else if topic == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))

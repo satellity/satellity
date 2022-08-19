@@ -84,15 +84,12 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 	var user *User
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		user, err = createUser(ctx, tx, "", email, username, nickname, password, sessionPub, "", nil)
-		if err != nil {
-			return err
-		}
-		_, err = upsertStatistic(ctx, tx, "users")
 		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
+	UpsertStatistic(ctx, StatisticTypeUsers)
 	return user, nil
 }
 
@@ -123,15 +120,12 @@ func CreateWeb3User(ctx context.Context, nickname, publicKey, sessionPub, sig st
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		user, err = createUser(ctx, tx, publicKey, "", "", nickname, "", sessionPub, "", nil)
-		if err != nil {
-			return err
-		}
-		_, err = upsertStatistic(ctx, tx, "users")
 		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
+	UpsertStatistic(ctx, StatisticTypeUsers)
 	return user, nil
 }
 

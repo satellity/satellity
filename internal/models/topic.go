@@ -107,12 +107,6 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 			return session.BadDataError(ctx)
 		}
 		topic.CategoryID = category.CategoryID
-		if !topic.Draft {
-			_, err = upsertStatistic(ctx, tx, "topics")
-			if err != nil {
-				return err
-			}
-		}
 		rows := [][]interface{}{
 			topic.values(),
 		}
@@ -123,6 +117,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 		return nil, session.TransactionError(ctx, err)
 	}
 	if !topic.Draft {
+		UpsertStatistic(ctx, StatisticTypeTopics)
 		emitToCategory(ctx, topic.CategoryID)
 	}
 	return topic, nil
@@ -186,9 +181,6 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 			topic.Category = category
 		}
 		topic.TopicType = typ
-		if !topic.Draft {
-			upsertStatistic(ctx, tx, "topics")
-		}
 		cols, params := durable.PrepareColumnsWithParams([]string{"title", "body", "category_id", "draft"})
 		values := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft}
 		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), values...)
@@ -205,6 +197,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 		return nil, session.TransactionError(ctx, err)
 	}
 	if !topic.Draft {
+		UpsertStatistic(ctx, StatisticTypeTopics)
 		emitToCategory(ctx, topic.CategoryID)
 		if prevCategoryID != "" {
 			emitToCategory(ctx, prevCategoryID)
@@ -219,24 +212,25 @@ func ReadTopic(ctx context.Context, id string) (*Topic, error) {
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		topic, err = findTopic(ctx, tx, id)
-		if err != nil || topic == nil {
-			return err
-		}
-		user, err := findUserByID(ctx, tx, topic.UserID)
-		if err != nil {
-			return err
-		}
-		category, err := findCategory(ctx, tx, topic.CategoryID)
-		if err != nil {
-			return err
-		}
-		topic.User = user
-		topic.Category = category
-		return nil
+		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
+	return topic, nil
+}
+
+//ReadTopicWithRelation read a topic with user's status like and bookmark
+func ReadTopicFull(ctx context.Context, id string, user *User) (*Topic, error) {
+	topic, err := ReadTopic(ctx, id)
+	if err != nil || topic == nil {
+		return topic, err
+	}
+	err = topic.FillOut(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	topic.incrViewsCount(ctx)
 	return topic, nil
 }
 
@@ -256,6 +250,7 @@ func (user *User) DeleteTopic(ctx context.Context, id string) error {
 	if err != nil {
 		return session.TransactionError(ctx, err)
 	}
+	UpsertStatistic(ctx, StatisticTypeTopics)
 	return nil
 }
 
@@ -263,33 +258,18 @@ func (user *User) DeleteTopic(ctx context.Context, id string) error {
 func (user *User) DraftTopic(ctx context.Context) (*Topic, error) {
 	var topic *Topic
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		var err error
 		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND draft=true LIMIT 1", strings.Join(topicColumns, ","))
 		row := tx.QueryRow(ctx, query, user.UserID)
-		topic, err = topicFromRows(row)
+		exist, err := topicFromRows(row)
 		if err == pgx.ErrNoRows {
-			topic = nil
 			return nil
 		}
+		topic = exist
 		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	return topic, nil
-}
-
-//ReadTopicWithRelation read a topic with user's status like and bookmark
-func ReadTopicWithRelation(ctx context.Context, id string, user *User) (*Topic, error) {
-	topic, err := ReadTopic(ctx, id)
-	if err != nil || topic == nil {
-		return topic, err
-	}
-	err = fillTopicWithAction(ctx, topic, user)
-	if err != nil {
-		return topic, session.TransactionError(ctx, err)
-	}
-	topic.incrTopicViewsCount(ctx)
 	return topic, nil
 }
 
@@ -447,7 +427,34 @@ func topicsCountByCategory(ctx context.Context, tx pgx.Tx, id string) (int64, er
 	return count, err
 }
 
-func (topic *Topic) incrTopicViewsCount(ctx context.Context) error {
+func (topic *Topic) FillOut(ctx context.Context, user *User) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		user, err := findUserByID(ctx, tx, topic.UserID)
+		if err != nil {
+			return err
+		}
+		topic.User = user
+		category, err := findCategory(ctx, tx, topic.CategoryID)
+		if err != nil {
+			return err
+		}
+		topic.Category = category
+		if user != nil {
+			tu, err := findTopicUser(ctx, tx, topic.TopicID, user.UserID)
+			if err != nil || tu == nil {
+				return err
+			}
+			topic.IsLikedBy, topic.IsBookmarkedBy = tu.LikedAt.Valid, tu.BookmarkedAt.Valid
+		}
+		return nil
+	})
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
+}
+
+func (topic *Topic) incrViewsCount(ctx context.Context) error {
 	topic.ViewsCount += 1
 	_, err := session.Database(ctx).Exec(ctx, "UPDATE topics SET views_count=$1 WHERE topic_id=$2", topic.ViewsCount, topic.TopicID)
 	if err != nil {
