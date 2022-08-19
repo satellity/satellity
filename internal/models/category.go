@@ -155,8 +155,26 @@ func ReadAllCategories(ctx context.Context) ([]*Category, error) {
 	return categories, nil
 }
 
-func readCategorySet(ctx context.Context, tx pgx.Tx) (map[string]*Category, error) {
-	categories, err := readCategories(ctx, tx)
+func readCategories(ctx context.Context, tx pgx.Tx) ([]*Category, error) {
+	rows, err := tx.Query(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 500", strings.Join(categoryColumns, ",")))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var categories []*Category
+	for rows.Next() {
+		category, err := categoryFromRows(rows)
+		if err != nil {
+			return nil, err
+		}
+		categories = append(categories, category)
+	}
+	return categories, rows.Err()
+}
+
+func readCategorySet(ctx context.Context, tx pgx.Tx, ids []string) (map[string]*Category, error) {
+	categories, err := readCategoriesByIds(ctx, tx, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +185,8 @@ func readCategorySet(ctx context.Context, tx pgx.Tx) (map[string]*Category, erro
 	return set, nil
 }
 
-func readCategories(ctx context.Context, tx pgx.Tx) ([]*Category, error) {
-	rows, err := tx.Query(ctx, fmt.Sprintf("SELECT %s FROM categories ORDER BY position LIMIT 500", strings.Join(categoryColumns, ",")))
+func readCategoriesByIds(ctx context.Context, tx pgx.Tx, ids []string) ([]*Category, error) {
+	rows, err := tx.Query(ctx, fmt.Sprintf("SELECT %s FROM categories WHERE category_id IN ('%s') LIMIT 100", strings.Join(categoryColumns, ","), strings.Join(ids, "','")))
 	if err != nil {
 		return nil, err
 	}

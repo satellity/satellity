@@ -35,7 +35,7 @@ func (impl *categoryImpl) topics(w http.ResponseWriter, r *http.Request, params 
 		views.RenderErrorResponse(w, r, err)
 	} else if category == nil {
 		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
-	} else if topics, err := category.ReadTopics(r.Context(), offset); err != nil {
+	} else if topics, err := models.ReadTopics(r.Context(), offset, category, nil); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)

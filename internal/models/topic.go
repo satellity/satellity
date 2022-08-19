@@ -277,123 +277,66 @@ func findTopic(ctx context.Context, tx pgx.Tx, id string) (*Topic, error) {
 }
 
 // ReadTopics read all topics, parameters: offset default time.Now()
-func ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
+func ReadTopics(ctx context.Context, offset time.Time, category *Category, user *User) ([]*Topic, error) {
 	if offset.IsZero() {
 		offset = time.Now()
 	}
 
+	query := fmt.Sprintf("SELECT %s FROM topics WHERE draft=false AND updated_at<$1 ORDER BY draft,updated_at DESC LIMIT $2", strings.Join(topicColumns, ","))
+	params := []any{offset, LIMIT}
+	if category != nil {
+		query = fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND updated_at<$2 ORDER BY category_id,draft,updated_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		params = append([]any{category.CategoryID}, params...)
+	}
+	if user != nil {
+		query = fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND draft=false AND created_at<$2 ORDER BY user_id,draft,created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		params = append([]any{user.UserID}, params...)
+	}
+
 	var topics []*Topic
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		set, err := readCategorySet(ctx, tx)
-		if err != nil {
-			return err
-		}
-
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE draft=false AND updated_at<$1 ORDER BY draft,updated_at DESC LIMIT $2", strings.Join(topicColumns, ","))
-		rows, err := tx.Query(ctx, query, offset, LIMIT)
+		rows, err := tx.Query(ctx, query, params...)
 		if err != nil {
 			return err
 		}
 		defer rows.Close()
 
-		userIDs := []string{}
+		var userIDs, categoryIDs []string
 		for rows.Next() {
 			topic, err := topicFromRows(rows)
 			if err != nil {
 				return err
 			}
-			userIDs = append(userIDs, topic.UserID)
-			topic.Category = set[topic.CategoryID]
+			topic.Category = category
+			topic.User = user
+			if topic.Category == nil {
+				categoryIDs = append(categoryIDs, topic.CategoryID)
+			}
+			if topic.User == nil {
+				userIDs = append(userIDs, topic.UserID)
+			}
 			topics = append(topics, topic)
 		}
 		if rows.Err() != nil {
 			return rows.Err()
 		}
-		userSet, err := readUserSet(ctx, tx, userIDs)
-		if err != nil {
-			return err
-		}
-		for i, topic := range topics {
-			topics[i].User = userSet[topic.UserID]
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return topics, nil
-}
-
-// ReadTopics read user's topics, parameters: offset default time.Now()
-func (user *User) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
-	if offset.IsZero() {
-		offset = time.Now()
-	}
-
-	var topics []*Topic
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		set, err := readCategorySet(ctx, tx)
-		if err != nil {
-			return err
-		}
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE user_id=$1 AND draft=false AND created_at<$2 ORDER BY user_id,draft,created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
-		rows, err := tx.Query(ctx, query, user.UserID, offset, LIMIT)
-		if err != nil {
-			return err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			topic, err := topicFromRows(rows)
+		if len(userIDs) > 0 {
+			userSet, err := readUserSet(ctx, tx, userIDs)
 			if err != nil {
 				return err
 			}
-			topic.User = user
-			topic.Category = set[topic.CategoryID]
-			topics = append(topics, topic)
+			for i, topic := range topics {
+				topics[i].User = userSet[topic.UserID]
+			}
 		}
-		return rows.Err()
-	})
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
-	}
-	return topics, nil
-}
-
-// ReadTopics read topics by CategoryID order by created_at DESC
-func (category *Category) ReadTopics(ctx context.Context, offset time.Time) ([]*Topic, error) {
-	if offset.IsZero() {
-		offset = time.Now()
-	}
-
-	var topics []*Topic
-	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		query := fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND updated_at<$2 ORDER BY category_id,draft,updated_at DESC LIMIT $3", strings.Join(topicColumns, ","))
-		rows, err := tx.Query(ctx, query, category.CategoryID, offset, LIMIT)
-		if err != nil {
-			return err
-		}
-		defer rows.Close()
-
-		userIDs := []string{}
-		for rows.Next() {
-			topic, err := topicFromRows(rows)
+		if len(categoryIDs) > 0 {
+			categorySet, err := readCategorySet(ctx, tx, categoryIDs)
 			if err != nil {
 				return err
 			}
-			userIDs = append(userIDs, topic.UserID)
-			topic.Category = category
-			topics = append(topics, topic)
-		}
-		if err := rows.Err(); err != nil {
-			return err
-		}
-		userSet, err := readUserSet(ctx, tx, userIDs)
-		if err != nil {
-			return err
-		}
-		for i, topic := range topics {
-			topics[i].User = userSet[topic.UserID]
+			for i, topic := range topics {
+				topics[i].Category = categorySet[topic.CategoryID]
+			}
 		}
 		return nil
 	})

@@ -34,7 +34,7 @@ func (impl *topicImpl) destroy(w http.ResponseWriter, r *http.Request, params ma
 
 func (impl *topicImpl) index(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	offset, _ := time.Parse(time.RFC3339Nano, r.URL.Query().Get("offset"))
-	if topics, err := models.ReadTopics(r.Context(), offset); err != nil {
+	if topics, err := models.ReadTopics(r.Context(), offset, nil, nil); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderTopics(w, r, topics)
