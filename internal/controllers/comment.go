@@ -34,7 +34,11 @@ func (impl *commentImpl) create(w http.ResponseWriter, r *http.Request, _ map[st
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	if comment, err := middlewares.CurrentUser(r).CreateComment(r.Context(), body.TopicID, body.Body); err != nil {
+	if topic, err := models.ReadTopic(r.Context(), body.TopicID); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else if topic == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
+	} else if comment, err := middlewares.CurrentUser(r).CreateComment(r.Context(), body.Body, topic); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComment(w, r, comment)
@@ -48,7 +52,10 @@ func (impl *commentImpl) update(w http.ResponseWriter, r *http.Request, params m
 		return
 	}
 
-	if comment, err := middlewares.CurrentUser(r).CreateComment(r.Context(), params["id"], body.Body); err != nil {
+	if comment, err := models.ReadComment(r.Context(), params["id"]); err != nil {
+	} else if comment == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
+	} else if err := comment.Update(r.Context(), body.Body, middlewares.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderComment(w, r, comment)

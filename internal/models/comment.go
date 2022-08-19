@@ -42,7 +42,7 @@ func commentFromRows(row durable.Row) (*Comment, error) {
 }
 
 // CreateComment create a new comment
-func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Comment, error) {
+func (user *User) CreateComment(ctx context.Context, body string, topic *Topic) (*Comment, error) {
 	body = strings.TrimSpace(body)
 	if len(body) < commentBodySizeLimit {
 		return nil, session.BadDataError(ctx)
@@ -56,13 +56,7 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 		UpdatedAt: t,
 	}
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		topic, err := findTopic(ctx, tx, topicID)
-		if err != nil {
-			return err
-		} else if topic == nil {
-			return session.NotFoundError(ctx)
-		}
-		count, err := commentsCountByTopic(ctx, tx, topicID)
+		count, err := commentsCountByTopic(ctx, tx, topic.TopicID)
 		if err != nil {
 			return err
 		}
@@ -90,32 +84,25 @@ func (user *User) CreateComment(ctx context.Context, topicID, body string) (*Com
 }
 
 // UpdateComment update the comment by id
-func (user *User) UpdateComment(ctx context.Context, id, body string) (*Comment, error) {
+func (comment *Comment) Update(ctx context.Context, body string, user *User) error {
+	if comment.UserID != user.UserID && !user.isAdmin() {
+		return session.ForbiddenError(ctx)
+	}
 	body = strings.TrimSpace(body)
 	if len(body) < commentBodySizeLimit {
-		return nil, session.BadDataError(ctx)
+		return session.BadDataError(ctx)
 	}
-	var comment *Comment
+	comment.Body = body
+	comment.UpdatedAt = time.Now()
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		var err error
-		comment, err = findComment(ctx, tx, id)
-		if err != nil {
-			return err
-		} else if comment == nil {
-			return session.NotFoundError(ctx)
-		} else if comment.UserID != user.UserID && !user.isAdmin() {
-			return session.ForbiddenError(ctx)
-		}
-		comment.Body = body
-		comment.UpdatedAt = time.Now()
 		cols, posits := durable.PrepareColumnsWithParams([]string{"body", "updated_at"})
-		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, posits, comment.CommentID), comment.Body, comment.UpdatedAt)
+		_, err := tx.Exec(ctx, fmt.Sprintf("UPDATE comments SET (%s)=(%s) WHERE comment_id='%s'", cols, posits, comment.CommentID), comment.Body, comment.UpdatedAt)
 		return err
 	})
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return session.TransactionError(ctx, err)
 	}
-	return comment, nil
+	return nil
 }
 
 // ReadComments read comments by topicID, parameters: offset
@@ -262,6 +249,19 @@ func (user *User) DeleteComment(ctx context.Context, id string) error {
 		return session.TransactionError(ctx, err)
 	}
 	return nil
+}
+
+func ReadComment(ctx context.Context, id string) (*Comment, error) {
+	var comment *Comment
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		var err error
+		comment, err = findComment(ctx, tx, id)
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return comment, nil
 }
 
 func findComment(ctx context.Context, tx pgx.Tx, id string) (*Comment, error) {

@@ -32,20 +32,19 @@ func TestCommentCRUD(t *testing.T) {
 	}{
 		{topic.TopicID, "", false},
 		{topic.TopicID, "      ", false},
-		{uuid.Must(uuid.NewV4()).String(), "comment body", false},
 		{topic.TopicID, "comment body", true},
 	}
 
 	for _, tc := range commentCases {
 		t.Run(fmt.Sprintf("comment body %s", tc.body), func(t *testing.T) {
 			if !tc.valid {
-				comment, err := user.CreateComment(ctx, tc.topicID, tc.body)
+				comment, err := user.CreateComment(ctx, tc.body, topic)
 				assert.NotNil(err)
 				assert.Nil(comment)
 				return
 			}
 
-			comment, err := user.CreateComment(ctx, tc.topicID, tc.body)
+			comment, err := user.CreateComment(ctx, tc.body, topic)
 			assert.Nil(err)
 			assert.NotNil(comment)
 			assert.Equal(tc.body, comment.Body)
@@ -55,16 +54,9 @@ func TestCommentCRUD(t *testing.T) {
 			new, err = readTestComment(ctx, uuid.Must(uuid.NewV4()).String())
 			assert.Nil(err)
 			assert.Nil(new)
-			new, err = user.UpdateComment(ctx, uuid.Must(uuid.NewV4()).String(), "comment body")
-			assert.NotNil(err)
-			assert.Nil(new)
-			new, err = user.UpdateComment(ctx, comment.CommentID, "    ")
-			assert.NotNil(err)
-			assert.Nil(new)
-			new, err = user.UpdateComment(ctx, comment.CommentID, "new comment body")
+			err = comment.Update(ctx, "new comment body", user)
 			assert.Nil(err)
-			assert.NotNil(new)
-			assert.Equal("new comment body", new.Body)
+			assert.Equal("new comment body", comment.Body)
 			comments, err := topic.ReadComments(ctx, time.Time{})
 			assert.Nil(err)
 			assert.Len(comments, 1)
