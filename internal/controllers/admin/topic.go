@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"satellity/internal/middlewares"
 	"satellity/internal/models"
+	"satellity/internal/session"
 	"satellity/internal/views"
 	"time"
 
@@ -20,7 +21,11 @@ func registerAdminTopic(router *httptreemux.Group) {
 }
 
 func (impl *topicImpl) destroy(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if err := middlewares.CurrentUser(r).DeleteTopic(r.Context(), params["id"]); err != nil {
+	if topic, err := models.ReadTopic(r.Context(), params["id"]); err != nil {
+		views.RenderErrorResponse(w, r, err)
+	} else if topic == nil {
+		views.RenderErrorResponse(w, r, session.NotFoundError(r.Context()))
+	} else if err := topic.Delete(r.Context(), middlewares.CurrentUser(r)); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderBlankResponse(w, r)

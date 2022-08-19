@@ -159,14 +159,6 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 		}
 		topic.Draft = draft
 
-		topic.User = user
-		if topic.UserID != user.UserID {
-			u, err := findUserByID(ctx, tx, topic.UserID)
-			if err != nil {
-				return err
-			}
-			topic.User = u
-		}
 		topic.Title = title
 		topic.Body = body
 		if categoryID != "" && topic.CategoryID != categoryID {
@@ -178,11 +170,11 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 				return session.BadDataError(ctx)
 			}
 			topic.CategoryID = category.CategoryID
-			topic.Category = category
 		}
 		topic.TopicType = typ
-		cols, params := durable.PrepareColumnsWithParams([]string{"title", "body", "category_id", "draft"})
-		values := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft}
+		topic.UpdatedAt = time.Now()
+		cols, params := durable.PrepareColumnsWithParams([]string{"title", "body", "category_id", "draft", "updated_at"})
+		values := []interface{}{topic.Title, topic.Body, topic.CategoryID, topic.Draft, topic.UpdatedAt}
 		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE topics SET (%s)=(%s) WHERE topic_id='%s'", cols, params, topic.TopicID), values...)
 		return err
 	})
@@ -190,11 +182,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 		return nil, session.TransactionError(ctx, err)
 	}
 	if topic == nil {
-		return nil, session.NotFoundError(ctx)
-	}
-	err = fillTopicWithAction(ctx, topic, user)
-	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return nil, nil
 	}
 	if !topic.Draft {
 		UpsertStatistic(ctx, StatisticTypeTopics)
@@ -230,16 +218,19 @@ func ReadTopicFull(ctx context.Context, id string, user *User) (*Topic, error) {
 	if err != nil {
 		return nil, err
 	}
-	topic.incrViewsCount(ctx)
+	topic.IncrViewsCount(ctx)
 	return topic, nil
 }
 
-func (user *User) DeleteTopic(ctx context.Context, id string) error {
-	if !user.isAdmin() {
+func (topic *Topic) Delete(ctx context.Context, user *User) error {
+	if user == nil {
+		return session.ForbiddenError(ctx)
+	}
+	if !(user.isAdmin() || (topic.Draft && topic.UserID == user.UserID)) {
 		return session.ForbiddenError(ctx)
 	}
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		topic, err := findTopic(ctx, tx, id)
+		topic, err := findTopic(ctx, tx, topic.TopicID)
 		if err != nil || topic == nil {
 			return err
 		}
@@ -421,12 +412,6 @@ func (category *Category) latestTopic(ctx context.Context, tx pgx.Tx) (*Topic, e
 	return t, err
 }
 
-func topicsCountByCategory(ctx context.Context, tx pgx.Tx, id string) (int64, error) {
-	var count int64
-	err := tx.QueryRow(ctx, "SELECT count(*) FROM topics WHERE category_id=$1 AND draft=false", id).Scan(&count)
-	return count, err
-}
-
 func (topic *Topic) FillOut(ctx context.Context, user *User) error {
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		user, err := findUserByID(ctx, tx, topic.UserID)
@@ -454,7 +439,7 @@ func (topic *Topic) FillOut(ctx context.Context, user *User) error {
 	return nil
 }
 
-func (topic *Topic) incrViewsCount(ctx context.Context) error {
+func (topic *Topic) IncrViewsCount(ctx context.Context) error {
 	topic.ViewsCount += 1
 	_, err := session.Database(ctx).Exec(ctx, "UPDATE topics SET views_count=$1 WHERE topic_id=$2", topic.ViewsCount, topic.TopicID)
 	if err != nil {
@@ -476,5 +461,11 @@ func (topic *Topic) isPermit(user *User) bool {
 func topicsCount(ctx context.Context, tx pgx.Tx) (int64, error) {
 	var count int64
 	err := tx.QueryRow(ctx, "SELECT count(*) FROM topics WHERE draft=false").Scan(&count)
+	return count, err
+}
+
+func topicsCountByCategory(ctx context.Context, tx pgx.Tx, id string) (int64, error) {
+	var count int64
+	err := tx.QueryRow(ctx, "SELECT count(*) FROM topics WHERE category_id=$1 AND draft=false", id).Scan(&count)
 	return count, err
 }
