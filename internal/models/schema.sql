@@ -22,7 +22,7 @@ CREATE INDEX IF NOT EXISTS users_createdx ON users (created_at);
 CREATE TABLE IF NOT EXISTS sessions (
   session_id            VARCHAR(36) PRIMARY KEY,
   user_id               VARCHAR(36) NOT NULL REFERENCES users ON DELETE CASCADE,
-  public_key            VARCHAR(128) NOT NULL,
+  public_key            VARCHAR(128) NOT NULL UNIQUE,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 

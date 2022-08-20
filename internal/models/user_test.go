@@ -22,7 +22,7 @@ import (
 func TestUserCRUD(t *testing.T) {
 	assert := assert.New(t)
 
-	public, priv, err := ed25519.GenerateKey(rand.Reader)
+	public, _, err := ed25519.GenerateKey(rand.Reader)
 	assert.Nil(err)
 
 	userCases := []struct {
@@ -78,7 +78,9 @@ func TestUserCRUD(t *testing.T) {
 			existing, err = ReadUserByUsernameOrEmail(ctx, strings.ToUpper(tc.email))
 			assert.Nil(err)
 			assert.NotNil(existing)
-			existing, err = CreateSession(ctx, tc.email, tc.password, hex.EncodeToString(public))
+			publicNew, privNew, err := ed25519.GenerateKey(rand.Reader)
+			assert.Nil(err)
+			existing, err = CreateSession(ctx, tc.email, tc.password, hex.EncodeToString(publicNew))
 			assert.Nil(err)
 			assert.NotNil(existing)
 			assert.Equal(tc.username, user.Username.String)
@@ -96,7 +98,7 @@ func TestUserCRUD(t *testing.T) {
 				"sid": existing.SessionID,
 			}
 			token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims)
-			ss, err := token.SignedString(priv)
+			ss, err := token.SignedString(privNew)
 			assert.Nil(err)
 			existing, err = AuthenticateUser(ctx, ss)
 			assert.Nil(err)
