@@ -199,7 +199,7 @@ func readCategoriesByIds(ctx context.Context, tx pgx.Tx, ids []string) ([]*Categ
 
 // emitToCategory update category's info, e.g.: LastTopicID, TopicsCount
 func emitToCategory(ctx context.Context, id string) (*Category, error) {
-	if _, err := uuid.FromString(id); err != nil {
+	if uuid.FromStringOrNil(id).String() != id {
 		return nil, nil
 	}
 	var category *Category
@@ -224,7 +224,7 @@ func emitToCategory(ctx context.Context, id string) (*Category, error) {
 		}
 		category.TopicsCount = 0
 		if category.LastTopicID.Valid {
-			count, err := topicsCountByCategory(ctx, tx, category.CategoryID)
+			count, err := fetchTopicsCount(ctx, tx, category.CategoryID)
 			if err != nil {
 				return err
 			}

@@ -68,7 +68,7 @@ func UpsertStatistic(ctx context.Context, name string) (*Statistic, error) {
 		case "users":
 			count, err = usersCount(ctx, tx)
 		case "topics":
-			count, err = topicsCount(ctx, tx)
+			count, err = fetchTopicsCount(ctx, tx, "TOTAL")
 		case "comments":
 			count, err = commentsCount(ctx, tx)
 		}

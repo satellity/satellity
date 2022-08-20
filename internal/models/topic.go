@@ -282,10 +282,10 @@ func ReadTopics(ctx context.Context, offset time.Time, category *Category, user 
 		offset = time.Now()
 	}
 
-	query := fmt.Sprintf("SELECT %s FROM topics WHERE draft=false AND updated_at<$1 ORDER BY draft,updated_at DESC LIMIT $2", strings.Join(topicColumns, ","))
+	query := fmt.Sprintf("SELECT %s FROM topics WHERE draft=false AND created_at<$1 ORDER BY draft,created_at DESC LIMIT $2", strings.Join(topicColumns, ","))
 	params := []any{offset, LIMIT}
 	if category != nil {
-		query = fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND updated_at<$2 ORDER BY category_id,draft,updated_at DESC LIMIT $3", strings.Join(topicColumns, ","))
+		query = fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false AND created_at<$2 ORDER BY category_id,draft,created_at DESC LIMIT $3", strings.Join(topicColumns, ","))
 		params = append([]any{category.CategoryID}, params...)
 	}
 	if user != nil {
@@ -347,7 +347,7 @@ func ReadTopics(ctx context.Context, offset time.Time, category *Category, user 
 }
 
 func (category *Category) latestTopic(ctx context.Context, tx pgx.Tx) (*Topic, error) {
-	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false ORDER BY category_id,draft,updated_at DESC LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE category_id=$1 AND draft=false ORDER BY category_id,draft,created_at DESC LIMIT 1", strings.Join(topicColumns, ",")), category.CategoryID)
 	t, err := topicFromRows(row)
 	if err == pgx.ErrNoRows {
 		return nil, nil
@@ -391,6 +391,18 @@ func (topic *Topic) IncrViewsCount(ctx context.Context) error {
 	return nil
 }
 
+func fetchTopicsCount(ctx context.Context, tx pgx.Tx, categoryID string) (int64, error) {
+	var count int64
+	query := "SELECT count(*) FROM topics WHERE draft=false"
+	params := []any{}
+	if uuid.FromStringOrNil(categoryID).String() == categoryID {
+		query = "SELECT count(*) FROM topics WHERE category_id=$1 AND draft=false"
+		params = []any{categoryID}
+	}
+	err := tx.QueryRow(ctx, query, params...).Scan(&count)
+	return count, err
+}
+
 func (topic *Topic) isPermit(user *User) bool {
 	if user == nil {
 		return false
@@ -399,16 +411,4 @@ func (topic *Topic) isPermit(user *User) bool {
 		return true
 	}
 	return topic.UserID == user.UserID
-}
-
-func topicsCount(ctx context.Context, tx pgx.Tx) (int64, error) {
-	var count int64
-	err := tx.QueryRow(ctx, "SELECT count(*) FROM topics WHERE draft=false").Scan(&count)
-	return count, err
-}
-
-func topicsCountByCategory(ctx context.Context, tx pgx.Tx, id string) (int64, error) {
-	var count int64
-	err := tx.QueryRow(ctx, "SELECT count(*) FROM topics WHERE category_id=$1 AND draft=false", id).Scan(&count)
-	return count, err
 }
