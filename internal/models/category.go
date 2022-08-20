@@ -85,17 +85,11 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 }
 
 // UpdateCategory update fields of a category
-func UpdateCategory(ctx context.Context, id, name, alias, description string, position int64) (*Category, error) {
+func (category *Category) Update(ctx context.Context, name, alias, description string, position int64) error {
 	alias, name = strings.TrimSpace(alias), strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 
-	var category *Category
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		var err error
-		category, err = findCategory(ctx, tx, id)
-		if err != nil || category == nil {
-			return err
-		}
 		if name != "" {
 			category.Name = name
 		}
@@ -107,13 +101,13 @@ func UpdateCategory(ctx context.Context, id, name, alias, description string, po
 		category.UpdatedAt = time.Now()
 		cols, posits := durable.PrepareColumnsAndExpressions([]string{"name", "alias", "description", "position", "updated_at"}, 1)
 		values := []interface{}{category.CategoryID, category.Name, category.Alias, category.Description, category.Position, category.UpdatedAt}
-		_, err = tx.Exec(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id=$1", cols, posits), values...)
+		_, err := tx.Exec(ctx, fmt.Sprintf("UPDATE categories SET (%s)=(%s) WHERE category_id=$1", cols, posits), values...)
 		return err
 	})
 	if err != nil {
-		return nil, session.TransactionError(ctx, err)
+		return session.TransactionError(ctx, err)
 	}
-	return category, nil
+	return nil
 }
 
 // ReadCategory read a category by ID
