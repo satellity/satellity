@@ -184,6 +184,7 @@ func createUser(ctx context.Context, tx pgx.Tx, publicKey, email, username, nick
 			Role:      UserRoleMember,
 			CreatedAt: t,
 			UpdatedAt: t,
+			isNew:     true,
 		}
 		if publicKey != "" {
 			user.PublicKey = sql.NullString{String: publicKey, Valid: true}

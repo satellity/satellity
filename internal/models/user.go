@@ -118,14 +118,23 @@ func CreateWeb3User(ctx context.Context, nickname, publicKey, sessionPub, sig st
 	}
 	var user *User
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		var err error
+		old, err := findUserByPublicKey(ctx, tx, publicKey)
+		if err != nil {
+			return err
+		}
+		if old != nil {
+			user = old
+			return nil
+		}
 		user, err = createUser(ctx, tx, publicKey, "", "", nickname, "", sessionPub, "", nil)
 		return err
 	})
 	if err != nil {
 		return nil, session.TransactionError(ctx, err)
 	}
-	UpsertStatistic(ctx, StatisticTypeUsers)
+	if user.isNew {
+		UpsertStatistic(ctx, StatisticTypeUsers)
+	}
 	return user, nil
 }
 
@@ -315,6 +324,15 @@ func findUserByIdentity(ctx context.Context, tx pgx.Tx, identity string) (*User,
 		return nil, err
 	}
 	return user, nil
+}
+
+func findUserByPublicKey(ctx context.Context, tx pgx.Tx, public string) (*User, error) {
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM users WHERE public_key=$1 LIMIT 1", strings.Join(userColumns, ",")), public)
+	user, err := userFromRow(row)
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	}
+	return user, err
 }
 
 // GetAvatar return the avatar of the user

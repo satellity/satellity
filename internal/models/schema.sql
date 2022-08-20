@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_emailx ON users ((LOWER(email)));
 CREATE UNIQUE INDEX IF NOT EXISTS users_usernamex ON users ((LOWER(username)));
+CREATE UNIQUE INDEX IF NOT EXISTS users_public_keyx ON users ((LOWER(public_key)));
 CREATE INDEX IF NOT EXISTS users_createdx ON users (created_at);
 
 
