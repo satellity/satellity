@@ -398,7 +398,3 @@ func validateAndEncryptPassword(ctx context.Context, password string) (string, e
 	}
 	return string(hashedPassword), nil
 }
-
-func isPermit(userID string, user *User) bool {
-	return userID == user.UserID || user.isAdmin()
-}

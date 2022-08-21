@@ -118,7 +118,7 @@ func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID 
 	}
 	if !topic.Draft {
 		UpsertStatistic(ctx, StatisticTypeTopics)
-		emitToCategory(ctx, topic.CategoryID)
+		EmitToCategory(ctx, topic.CategoryID)
 	}
 	return topic, nil
 }
@@ -186,9 +186,9 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 	}
 	if !topic.Draft {
 		UpsertStatistic(ctx, StatisticTypeTopics)
-		emitToCategory(ctx, topic.CategoryID)
+		EmitToCategory(ctx, topic.CategoryID)
 		if prevCategoryID != "" {
-			emitToCategory(ctx, prevCategoryID)
+			EmitToCategory(ctx, prevCategoryID)
 		}
 	}
 	return topic, nil
@@ -220,6 +220,18 @@ func ReadTopicFull(ctx context.Context, id string, user *User) (*Topic, error) {
 	}
 	topic.IncrViewsCount(ctx)
 	return topic, nil
+}
+
+func findTopic(ctx context.Context, tx pgx.Tx, id string) (*Topic, error) {
+	if uuid.FromStringOrNil(id).String() != id {
+		return nil, nil
+	}
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(topicColumns, ",")), id)
+	t, err := topicFromRows(row)
+	if pgx.ErrNoRows == err {
+		return nil, nil
+	}
+	return t, err
 }
 
 func (topic *Topic) Delete(ctx context.Context, user *User) error {
@@ -262,18 +274,6 @@ func (user *User) DraftTopic(ctx context.Context) (*Topic, error) {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return topic, nil
-}
-
-func findTopic(ctx context.Context, tx pgx.Tx, id string) (*Topic, error) {
-	if _, err := uuid.FromString(id); err != nil {
-		return nil, nil
-	}
-	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM topics WHERE topic_id=$1", strings.Join(topicColumns, ",")), id)
-	t, err := topicFromRows(row)
-	if pgx.ErrNoRows == err {
-		return nil, nil
-	}
-	return t, err
 }
 
 // ReadTopics read all topics, parameters: offset default time.Now()

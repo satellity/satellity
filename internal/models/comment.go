@@ -56,7 +56,7 @@ func (user *User) CreateComment(ctx context.Context, body string, topic *Topic) 
 		UpdatedAt: t,
 	}
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		count, err := commentsCountByTopic(ctx, tx, topic.TopicID)
+		count, err := fetchCommentsCount(ctx, tx, topic.TopicID)
 		if err != nil {
 			return err
 		}
@@ -173,7 +173,7 @@ func (comment *Comment) Delete(ctx context.Context, user *User) error {
 		} else if topic == nil {
 			return session.BadDataError(ctx)
 		}
-		count, err := commentsCountByTopic(ctx, tx, comment.TopicID)
+		count, err := fetchCommentsCount(ctx, tx, comment.TopicID)
 		if err != nil {
 			return err
 		}
@@ -218,15 +218,15 @@ func findComment(ctx context.Context, tx pgx.Tx, id string) (*Comment, error) {
 	return c, err
 }
 
-func commentsCountByTopic(ctx context.Context, tx pgx.Tx, id string) (int64, error) {
+func fetchCommentsCount(ctx context.Context, tx pgx.Tx, topicID string) (int64, error) {
 	var count int64
-	err := tx.QueryRow(ctx, "SELECT count(*) FROM comments WHERE topic_id=$1", id).Scan(&count)
-	return count, err
-}
-
-func commentsCount(ctx context.Context, tx pgx.Tx) (int64, error) {
-	var count int64
-	err := tx.QueryRow(ctx, "SELECT count(*) FROM comments").Scan(&count)
+	query := "SELECT count(*) FROM comments"
+	params := []any{}
+	if uuid.FromStringOrNil(topicID).String() == topicID {
+		query = "SELECT count(*) FROM comments WHERE topic_id=$1"
+		params = []any{topicID}
+	}
+	err := tx.QueryRow(ctx, query, params...).Scan(&count)
 	return count, err
 }
 

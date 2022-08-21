@@ -131,6 +131,8 @@ func ReadCategoryByIDOrName(ctx context.Context, identity string) (*Category, er
 	c, err := categoryFromRows(row)
 	if err == pgx.ErrNoRows {
 		return nil, nil
+	} else if err != nil {
+		return nil, session.TransactionError(ctx, err)
 	}
 	return c, nil
 }
@@ -197,19 +199,14 @@ func readCategoriesByIds(ctx context.Context, tx pgx.Tx, ids []string) ([]*Categ
 	return categories, rows.Err()
 }
 
-// emitToCategory update category's info, e.g.: LastTopicID, TopicsCount
-func emitToCategory(ctx context.Context, id string) (*Category, error) {
-	if uuid.FromStringOrNil(id).String() != id {
-		return nil, nil
-	}
+// EmitToCategory update category's info, e.g.: LastTopicID, TopicsCount
+func EmitToCategory(ctx context.Context, id string) (*Category, error) {
 	var category *Category
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		category, err = findCategory(ctx, tx, id)
-		if err != nil {
+		if err != nil || category == nil {
 			return err
-		} else if category == nil {
-			return session.NotFoundError(ctx)
 		}
 		topic, err := category.latestTopic(ctx, tx)
 		if err != nil {
@@ -243,7 +240,7 @@ func emitToCategory(ctx context.Context, id string) (*Category, error) {
 }
 
 func findCategory(ctx context.Context, tx pgx.Tx, id string) (*Category, error) {
-	if _, err := uuid.FromString(id); err != nil {
+	if uuid.FromStringOrNil(id).String() != id {
 		return nil, nil
 	}
 

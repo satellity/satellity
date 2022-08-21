@@ -65,12 +65,12 @@ func UpsertStatistic(ctx context.Context, name string) (*Statistic, error) {
 		}
 		var count int64
 		switch name {
-		case "users":
+		case StatisticTypeUsers:
 			count, err = usersCount(ctx, tx)
-		case "topics":
-			count, err = fetchTopicsCount(ctx, tx, "TOTAL")
-		case "comments":
-			count, err = commentsCount(ctx, tx)
+		case StatisticTypeTopics:
+			count, err = fetchTopicsCount(ctx, tx, "ALL")
+		case StatisticTypeComments:
+			count, err = fetchCommentsCount(ctx, tx, "ALL")
 		}
 		if err != nil {
 			return err
@@ -97,7 +97,7 @@ func UpsertStatistic(ctx context.Context, name string) (*Statistic, error) {
 }
 
 func findStatistic(ctx context.Context, tx pgx.Tx, id string) (*Statistic, error) {
-	if _, err := uuid.FromString(id); err != nil {
+	if uuid.FromStringOrNil(id).String() != id {
 		return nil, nil
 	}
 

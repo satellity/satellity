@@ -17,7 +17,7 @@ import (
 type Session struct {
 	SessionID string
 	UserID    string
-	PublicKey string
+	PublicKey string // ed25519 Public Key
 	CreatedAt time.Time
 }
 
@@ -77,10 +77,10 @@ func (user *User) addSession(ctx context.Context, tx pgx.Tx, secret string) (*Se
 }
 
 func readSession(ctx context.Context, tx pgx.Tx, uid, sid string) (*Session, error) {
-	if id, _ := uuid.FromString(uid); id.String() == uuid.Nil.String() {
+	if uuid.FromStringOrNil(uid).String() != uid {
 		return nil, nil
 	}
-	if id, _ := uuid.FromString(sid); id.String() == uuid.Nil.String() {
+	if uuid.FromStringOrNil(sid).String() != sid {
 		return nil, nil
 	}
 
