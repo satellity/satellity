@@ -34,7 +34,7 @@ func startHTTP(db *pgxpool.Pool, logger *zap.Logger, port string) error {
 	handler = middlewares.Logger(handler, durable.NewLogger(logger))
 	handler = handlers.ProxyHeaders(handler)
 
-	log.Println("HTTP server running at:", port)
+	log.Printf("HTTP server running at: http://localhost:%s", port)
 	return http.ListenAndServe(fmt.Sprintf(":%s", port), handler)
 }
 

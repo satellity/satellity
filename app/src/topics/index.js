@@ -54,7 +54,7 @@ class Index extends Component {
         }
       }
       this.setState({user: user, category: current, category_id: categoryId, categories: resp.data}, () => {
-        this.fetchTopics(category_id);
+        this.fetchTopics(categoryId);
       });
     });
   }
