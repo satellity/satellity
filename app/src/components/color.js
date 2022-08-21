@@ -3,7 +3,7 @@ class ColorUtils {
     this.colors = ['#EF564F', '#4B93D1', '#9354CA', '#877D6A', '#F9BA48'];
   }
 
-  colour(str, alpha) {
+  display(str, alpha) {
     let i = Math.floor(Math.random() * 100);
     if (str !== '') {
       i = str.charCodeAt(0);
