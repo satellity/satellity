@@ -65,11 +65,11 @@ func CreateCategory(ctx context.Context, name, alias, description string, positi
 
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		if position == 0 {
-			count, err := categoryCount(ctx, tx)
+			last, err := lastCategoryPosition(ctx, tx)
 			if err != nil {
 				return err
 			}
-			category.Position = count
+			category.Position = last + 1
 		}
 
 		rows := [][]interface{}{
@@ -255,12 +255,12 @@ func findCategory(ctx context.Context, tx pgx.Tx, id string) (*Category, error) 
 	return c, err
 }
 
-func categoryCount(ctx context.Context, tx pgx.Tx) (int64, error) {
-	var count int64
-	row := tx.QueryRow(ctx, "SELECT count(*) FROM categories")
-	err := row.Scan(&count)
-	if err != nil {
-		return 0, session.TransactionError(ctx, err)
+func lastCategoryPosition(ctx context.Context, tx pgx.Tx) (int64, error) {
+	var position int64
+	row := tx.QueryRow(ctx, "SELECT position FROM categories ORDER BY position DESC LIMIT 1")
+	err := row.Scan(&position)
+	if err == pgx.ErrNoRows {
+		return 0, nil
 	}
-	return count, nil
+	return position, err
 }
