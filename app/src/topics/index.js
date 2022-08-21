@@ -2,12 +2,12 @@ import style from './index.module.scss';
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import {Helmet} from 'react-helmet';
-import Config from '../components/config.js';
-import Base64 from '../components/base64.js';
-import Loading from '../components/loading.js';
-import API from '../api/index.js';
+import Config from 'components/config.js';
+import Base64 from 'components/base64.js';
+import Loading from 'components/loading.js';
+import API from 'api/index.js';
+import Widget from 'home/widget.js';
 import TopicItem from './item.js';
-import Widget from '../home/widget.js';
 
 class Index extends Component {
   constructor(props) {
