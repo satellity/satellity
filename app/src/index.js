@@ -4,6 +4,7 @@ import {createRoot} from 'react-dom/client';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import showdown from 'showdown';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import API from './api/index.js';
 import Locale from './locale/index.js';
 import MainLayout from './layouts/main.js';
@@ -57,18 +58,22 @@ if (!!locale) {
 window.i18n = new Locale(language);
 window.api = new API();
 
+const queryClient = new QueryClient();
+
 const container = document.getElementById('root');
 const root = createRoot(container); // createRoot(container!) if you use TypeScript
 
 root.render(
-    <BrowserRouter>
-      <Routes>
-        <Route path='/oauth/:provider/callback' element={<Oauth />} />
-        <Route path='/admin' element={<AdminRoute />} />
-        <Route path='/404' element={<NoMatch />} />
-        <Route path='/' element={<MainLayout />} />
-      </Routes>
-    </BrowserRouter>,
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/oauth/:provider/callback' element={<Oauth />} />
+          <Route path='/admin' element={<AdminRoute />} />
+          <Route path='/404' element={<NoMatch />} />
+          <Route path='/' element={<MainLayout />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>,
 );
 
 // If you want your app to work offline and load faster, you can change
