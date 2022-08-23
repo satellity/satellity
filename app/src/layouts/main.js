@@ -1,10 +1,7 @@
 import style from './main.module.scss';
 import React, {Component} from 'react';
-import {Route, Routes} from 'react-router-dom';
+import {Routes, Outlet} from 'react-router-dom';
 import Header from './header.js';
-import Home from '../home/view.js';
-import User from '../users/view.js';
-import Topic from '../topics/view.js';
 
 class MainLayout extends Component {
   constructor(props) {
@@ -20,15 +17,8 @@ class MainLayout extends Component {
       <div className={style.container}>
         <Header />
         <div className='wrapper'>
+          <Outlet />
           <Routes>
-            <Route index path='/' element={<Topic.Index />} />
-            <Route exact path='/dashboard' element={<Home.Dashboard />} />
-            <Route exact path='/categories/:id' element={<Topic.Index />} />
-            <Route exact path='/user/edit' element={<User.Edit />} />
-            <Route path='/users/:id' element={<User.Show />} />
-            <Route exact path='/topics/new' element={<Topic.New />} />
-            <Route path='/topics/:id/edit' element={<Topic.New />} />
-            <Route path='/topics/:id' element={<Topic.Show />} />
           </Routes>
         </div>
       </div>

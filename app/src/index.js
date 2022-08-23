@@ -11,6 +11,8 @@ import MainLayout from './layouts/main.js';
 import NoMatch from './layouts/sink.js';
 import AdminRoute from './admin/admin.js';
 import Oauth from './users/oauth.js';
+import User from 'users/view.js';
+import Topic from 'topics/view.js';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faBookmark, faComment, faComments, faEdit, faEye, faEyeSlash, faTrashAlt, faHeart} from '@fortawesome/free-regular-svg-icons';
 import {
@@ -70,7 +72,15 @@ root.render(
           <Route path='/oauth/:provider/callback' element={<Oauth />} />
           <Route path='/admin' element={<AdminRoute />} />
           <Route path='/404' element={<NoMatch />} />
-          <Route path='/' element={<MainLayout />} />
+          <Route path='/' element={<MainLayout />}>
+            <Route index element={<Topic.Index />} />
+            <Route path="categories/:id" element={<Topic.Index />} />
+            <Route path='user/edit' element={<User.Edit />} />
+            <Route path='users/:id' element={<User.Show />} />
+            <Route path='topics/new' element={<Topic.New />} />
+            <Route path='topics/:id/edit' element={<Topic.New />} />
+            <Route path='topics/:id' element={<Topic.Show />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>,

@@ -9,7 +9,7 @@ const Avatar = ({user, classes}) => {
 };
 
 Avatar.propTypes = {
-  user: PropTypes.objecta,
+  user: PropTypes.object,
   classes: PropTypes.string,
 };
 
