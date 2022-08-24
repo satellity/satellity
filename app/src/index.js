@@ -71,7 +71,6 @@ root.render(
         <Routes>
           <Route path='/oauth/:provider/callback' element={<Oauth />} />
           <Route path='/admin' element={<AdminRoute />} />
-          <Route path='/404' element={<NoMatch />} />
           <Route path='/' element={<MainLayout />}>
             <Route index element={<Topic.Index />} />
             <Route path="categories/:id" element={<Topic.Index />} />
@@ -81,6 +80,7 @@ root.render(
             <Route path='topics/:id/edit' element={<Topic.New />} />
             <Route path='topics/:id' element={<Topic.Show />} />
           </Route>
+          <Route path='/404' element={<NoMatch />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>,

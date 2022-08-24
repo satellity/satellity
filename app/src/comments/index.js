@@ -24,7 +24,7 @@ class CommentIndex extends Component {
   }
 
   componentDidMount() {
-    this.api.comment.index('TODO').then((resp) => {
+    this.api.comment.index('9bbf66af-f142-4806-bc14-1c8ec506fe12').then((resp) => {
       if (resp.error) {
         return;
       }
