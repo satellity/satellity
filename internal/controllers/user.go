@@ -30,7 +30,7 @@ func registerUser(router *httptreemux.Group) {
 	router.POST("/oauth/:provider", impl.oauth)
 	router.POST("/sessions", impl.create)
 	router.POST("/me", impl.update)
-	router.GET("/me", impl.current)
+	router.GET("/me", impl.me)
 	router.GET("/users/:id", impl.show)
 	router.GET("/users/:id/topics", impl.topics)
 }
@@ -75,7 +75,7 @@ func (impl *userImpl) update(w http.ResponseWriter, r *http.Request, _ map[strin
 	}
 }
 
-func (impl *userImpl) current(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+func (impl *userImpl) me(w http.ResponseWriter, r *http.Request, _ map[string]string) {
 	views.RenderAccount(w, r, middlewares.CurrentUser(r))
 }
 

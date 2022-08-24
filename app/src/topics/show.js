@@ -9,7 +9,7 @@ import {Helmet} from 'react-helmet';
 import API from 'api/index.js';
 import Config from 'components/config.js';
 import SiteWidget from 'home/widget.js';
-import CommentList from 'comments/index.js';
+import Comment from 'comments/view.js';
 import Loading from 'components/loading.js';
 import {titleToId} from 'utils';
 
@@ -140,7 +140,7 @@ const Show = () => {
       <main className='column main'>
         {loading && loadingView}
         {!loading && topicView}
-        {!loading && <CommentList topicId={topic.topic_id} commentsCount={topic.comments_count} />}
+        {!loading && <Comment.Index topicId={topic.topic_id} commentsCount={topic.comments_count} />}
       </main>
       <aside className='column aside'>
         <SiteWidget />

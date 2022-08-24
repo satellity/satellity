@@ -13,3 +13,14 @@ export const useCategory = () => {
       },
   );
 };
+
+export const useMe = () => {
+  return useQuery(
+      ['me'],
+      () => api.user.local(),
+      {
+        cacheTime: Infinity,
+        staleTime: Infinity,
+      },
+  );
+};

@@ -1,131 +1,81 @@
-import style from './index.module.scss';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import TimeAgo from 'react-timeago';
 import showdown from 'showdown';
-import API from '../api/index.js';
-import Avatar from '../users/avatar.js';
-import CommentNew from './new.js';
+import PropTypes from 'prop-types';
+import API from 'api/index.js';
+import Avatar from 'users/avatar.js';
+import New from './new.js';
 
-class CommentIndex extends Component {
-  constructor(props) {
-    super(props);
-    this.api = new API();
-    this.state = {
-      user: this.api.user.local(),
-      comments: [],
-      comments_count: 'todo',
-    };
+import style from './index.module.scss';
 
-    this.converter = new showdown.Converter();
-    this.handleClick = this.handleClick.bind(this);
-    this.handleActionClick = this.handleActionClick.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
+const Index = (props) => {
+  const i18n = window.i18n;
+  const api = new API();
+  const converter = new showdown.Converter();
 
-  componentDidMount() {
-    this.api.comment.index('9bbf66af-f142-4806-bc14-1c8ec506fe12').then((resp) => {
+  const {topicId, commentsCount} = props;
+
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    api.comment.index(topicId).then((resp) => {
       if (resp.error) {
         return;
       }
       const comments = resp.data.map((comment) => {
-        comment.body = this.converter.makeHtml(comment.body);
-        comment.handling = false;
+        comment.body = converter.makeHtml(comment.body);
         return comment;
       });
-      this.setState({comments: comments});
+      setComments(comments);
     });
-  }
+  }, [topicId]);
 
-  handleActionClick(e, id) {
-    e.preventDefault();
-    const comments = this.state.comments.map((comment) => {
-      if (comment.comment_id === id) {
-        comment.handling = !comment.handling;
-      } else {
-        comment.handling = false;
-      }
-      return comment;
-    });
-    this.setState({comments: comments});
-  }
+  const handleSubmit = (comment) => {
+    comment.body = converter.makeHtml(comment.body);
+    comments.push(comment);
+    setComments(comments);
+  };
 
-  handleClick(e, id) {
-    e.preventDefault();
-    this.api.comment.delete(id).then((resp) => {
-      if (resp.error) {
-        return;
-      }
-      const comments = this.state.comments.filter((comment) => comment.comment_id !== id);
-      this.setState({comments: comments});
-    });
-  }
-
-  handleSubmit(comment) {
-    const newComments = this.state.comments.slice();
-    comment.body = this.converter.makeHtml(comment.body);
-    newComments.push(comment);
-    this.setState({comments: newComments, comments_count: newComments.length});
-  }
-
-  render() {
-    const i18n = window.i18n;
-    const state = this.state;
-    const comments = state.comments.map((comment) => {
-      let action;
-      if (state.user.user_id === comment.user_id) {
-        action = (
-          <span className={style.station}>
-            <FontAwesomeIcon icon={['fas', 'ellipsis-v']} className={style.ellipsis} onClick={(e) => this.handleActionClick(e, comment.comment_id)} />
-            {
-              comment.handling &&
-              <div className={style.actions}>
-                <div onClick={(e) => this.handleClick(e, comment.comment_id)} className={style.action}>
-                  <FontAwesomeIcon icon={['far', 'trash-alt']} className={style.trash} />
-                  <span className={style.delete}>{i18n.t('general.delete')}</span>
-                </div>
-              </div>
-            }
-          </span>
-        );
-      }
-
-      return (
-        <li className={style.comment} key={comment.comment_id}>
-          <div className={style.profile}>
-            <Avatar user={comment.user} />
-            <div className={style.detail}>
-              {comment.user.nickname}
-              <div className={style.time}>
-                <TimeAgo date={comment.created_at} />
-              </div>
-            </div>
-            {action}
-          </div>
-          <article className='md' dangerouslySetInnerHTML={{__html: comment.body}}>
-          </article>
-        </li>
-      );
-    });
-
-    const commentsContainer = (
-      <div className={style.container}>
-        <h3>{i18n.t('comment.count', {count: state.comments_count})}</h3>
-        <ul className={style.comments}>
-          {comments}
-        </ul>
-      </div>
-    );
-
+  const commentsView = comments.map((comment) => {
     return (
-      <div>
-        {this.state.comments_count > 0 && commentsContainer}
-        <CommentNew
-          topicId={'TODO'}
-          handleSubmit={this.handleSubmit} />
-      </div>
+      <li className={style.comment} key={comment.comment_id}>
+        <div className={style.profile}>
+          <Avatar user={comment.user} />
+          <div className={style.detail}>
+            {comment.user.nickname}
+            <div className={style.time}>
+              <TimeAgo date={comment.created_at} />
+            </div>
+          </div>
+        </div>
+        <article className='md' dangerouslySetInnerHTML={{__html: comment.body}}>
+        </article>
+      </li>
     );
-  }
-}
+  });
 
-export default CommentIndex;
+  const commentsContainer = (
+    <div className={style.container}>
+      <h3>{i18n.t('comment.count', {count: commentsCount})}</h3>
+      <ul className={style.comments}>
+        {commentsView}
+      </ul>
+    </div>
+  );
+
+  return (
+    <div>
+      {commentsCount > 0 && commentsContainer}
+      <New
+        topicId={topicId}
+        handleSubmit={handleSubmit} />
+    </div>
+  );
+};
+
+Index.propTypes = {
+  topicId: PropTypes.string,
+  commentsCount: PropTypes.number,
+};
+
+export default Index;
