@@ -22,6 +22,9 @@ type userRequest struct {
 	Nickname      string `json:"nickname"`
 	Avatar        string `json:"avatar"`
 	Biography     string `json:"biography"`
+	PublicKey     string `json:"public_key"`
+	SessionPublic string `json:"session_public"`
+	Signature     string `json:"signature"`
 }
 
 func registerUser(router *httptreemux.Group) {
@@ -54,7 +57,7 @@ func (impl *userImpl) create(w http.ResponseWriter, r *http.Request, _ map[strin
 		views.RenderErrorResponse(w, r, session.BadRequestError(r.Context()))
 		return
 	}
-	if user, err := models.CreateSession(r.Context(), body.Email, body.Password, body.SessionSecret); err != nil {
+	if user, err := models.CreateWeb3User(r.Context(), body.Nickname, body.PublicKey, body.SessionPublic, body.Signature); err != nil {
 		views.RenderErrorResponse(w, r, err)
 	} else {
 		views.RenderAccount(w, r, user)
