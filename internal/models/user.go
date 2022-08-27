@@ -95,7 +95,7 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 
 func CreateWeb3User(ctx context.Context, nickname, publicKey, sessionPub, sig string) (*User, error) {
 	sigBuf, _ := hex.DecodeString(sig)
-	data := fmt.Sprintf("Satellity:%s:%s:%s", nickname, publicKey, sessionPub)
+	data := fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, sessionPub)
 	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
 	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	hash := crypto.Keccak256Hash([]byte(msg))

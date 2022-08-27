@@ -130,7 +130,7 @@ func TestWeb3UserCRUD(t *testing.T) {
 
 	nickname := "abc"
 	publicKey := "0x14791697260E4c9A71f18484C9f997B308e59325"
-	data := fmt.Sprintf("Satellity:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
+	data := fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
 	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
 	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	hash := crypto.Keccak256Hash([]byte(msg))
@@ -148,7 +148,7 @@ func TestWeb3UserCRUD(t *testing.T) {
 	assert.Equal(user.UserID, old.UserID)
 
 	nickname = "abcd"
-	data = fmt.Sprintf("Satellity:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
+	data = fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
 	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
 	msg = fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	hash = crypto.Keccak256Hash([]byte(msg))

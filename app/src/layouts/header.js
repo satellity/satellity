@@ -5,7 +5,7 @@ import {ethers} from 'ethers';
 import Web3Modal from 'web3modal';
 import API from 'api/index.js';
 import Config from 'components/config.js';
-import Login from './login.js';
+import {shortAddress} from 'utils';
 
 import logo from 'assets/images/logo.svg';
 import style from './main.module.scss';
@@ -16,7 +16,6 @@ const providerOptions = {
 
 const Header = () => {
   const [address, setAddress] = useState('');
-  const [logging] = useState(false);
   const [web3Modal, setWeb3Modal] = useState(null);
 
   const handleLoginClick = async (e) => {
@@ -90,8 +89,7 @@ const Header = () => {
         </div>
         {profile}
       </header>
-      {logging && <Login handleLoginClick={handleLoginClick} />}
-      {address}
+      {shortAddress(address)}
     </div>
   );
 };
