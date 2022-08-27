@@ -12,6 +12,7 @@
     "axios": "^0.27.2",
     "base64-js": "^1.5.1",
     "codemirror": "^6.0.1",
+    "ethers": "^5.7.0",
     "jose": "^4.9.0",
     "js-base64": "^3.7.2",
     "js-cookie": "^3.0.1",
@@ -40,10 +41,11 @@
     "showdown-highlight": "^3.0.0",
     "text-encoder-lite": "^2.0.0",
     "uuid": "^8.3.2",
-    "uuid-validate": "^0.0.3"
+    "uuid-validate": "^0.0.3",
+    "web3modal": "^1.9.9"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3010 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
