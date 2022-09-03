@@ -1,10 +1,10 @@
 import forge from 'node-forge';
 import moment from 'moment';
-import KJUR from 'jsrsasign';
 import {v4 as uuidv4} from 'uuid';
-import Cookies from 'js-cookie';
 import axios from 'axios';
 import Noty from 'noty';
+import * as jose from 'jose';
+import {decode} from '@stablelib/hex';
 import Category from './category.js';
 import Topic from './topic.js';
 import Comment from './comment.js';
@@ -26,17 +26,46 @@ Noty.overrideDefaults({
   },
 });
 
+const sign = async (method, uri, body) => {
+  if (typeof body !== 'string') {
+    body = '';
+  }
+  const me = new Me().value();
+  if (!me) {
+    return '';
+  }
+
+  const expire = moment.utc().add(30, 'minutes').unix();
+  const md = forge.md.sha256.create();
+  md.update(method + uri + body);
+
+  const payload = {
+    uid: me.user_id,
+    sid: me.session_id,
+    exp: expire,
+    jti: uuidv4(),
+    sig: md.digest().toHex(),
+  };
+
+  const token = await new jose.SignJWT(payload).
+      setProtectedHeader({alg: 'EdDSA'}).
+      sign(decode(me.private));
+  return token;
+};
+
 axios.defaults.headers.common['Content-Type'] = 'application/json';
-axios.interceptors.request.use(function(config) {
+axios.interceptors.request.use(async (config) => {
   config.url = '/api' + config.url;
   const {method, url, data} = config;
-  config.headers.common['Authorization'] = `Bearer ${token(method, url, data)}`;
+  const token = await sign(method, url, data);
+  console.log('sign:::', token, method, uri, data);
+  config.headers.common['Authorization'] = `Bearer ${token}`;
   return config;
-}, function(error) {
+}, (error) => {
   return Promise.reject(error);
 });
 
-axios.interceptors.response.use(function(response) {
+axios.interceptors.response.use((response) => {
   if (!!response.status && (response.status >= 200 && response.status < 300)) {
     const data = response.data;
     if (!!data.error) {
@@ -54,7 +83,7 @@ axios.interceptors.response.use(function(response) {
     return data;
   }
   return response;
-}, function(error) {
+}, (error) => {
   let status; let data;
   // TODO: should clear error.request and error
   if (error.response) {
@@ -73,47 +102,6 @@ axios.interceptors.response.use(function(response) {
   return {error: {code: status, description: data}};
 });
 
-function token(method, uri, body) {
-  const priv = window.localStorage.getItem('token');
-  const pwd = Cookies.get('sid');
-  if (!priv || !pwd) {
-    return '';
-  }
-  Cookies.set('sid', pwd, {expires: 365});
-
-  const uid = window.localStorage.getItem('uid');
-  const sid = window.localStorage.getItem('sid');
-  return sign(uid, sid, priv, method, uri, body);
-}
-
-function sign(uid, sid, privateKey, method, uri, body) {
-  if (typeof body !== 'string') {
-    body = '';
-  }
-
-  const expire = moment.utc().add(30, 'minutes').unix();
-  const md = forge.md.sha256.create();
-  md.update(method + uri + body);
-
-  const oHeader = {alg: 'ES256', typ: 'JWT'};
-  const oPayload = {
-    uid: uid,
-    sid: sid,
-    exp: expire,
-    jti: uuidv4(),
-    sig: md.digest().toHex(),
-  };
-  const sHeader = JSON.stringify(oHeader);
-  const sPayload = JSON.stringify(oPayload);
-  const pwd = Cookies.get('sid');
-  try {
-    KJUR.KEYUTIL.getKey(privateKey, pwd);
-  } catch (e) {
-    return '';
-  }
-  return KJUR.jws.JWS.sign('ES256', sHeader, sPayload, privateKey, pwd);
-}
-
 class API {
   constructor() {
     this.axios = axios;
@@ -121,7 +109,7 @@ class API {
     this.topic = new Topic(this);
     this.comment = new Comment(this);
     this.user = new User(this);
-    this.me = new Me(this);
+    this.me = new Me();
     this.verification = new Verification(this);
     this.client = new Client(this);
   }

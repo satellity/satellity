@@ -27,7 +27,9 @@ const Nodes = () => {
     return;
   }
 
-  const categoriesView = data.map((category) => {
+  // TODO
+  const categories = data || [];
+  const categoriesView = categories.map((category) => {
     return (
       <Link to={`/categories/${category.name}`} className={`${style.node} ${categoryId === category.name ? style.current : ''}`}
         key={category.category_id}>

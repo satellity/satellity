@@ -11,6 +11,7 @@
     "@stablelib/base64": "^1.0.1",
     "@stablelib/ed25519": "^1.0.3",
     "@stablelib/hex": "^1.0.1",
+    "@stablelib/utf8": "^1.0.1",
     "@tanstack/react-query": "^4.2.1",
     "axios": "^0.27.2",
     "base64-js": "^1.5.1",

@@ -17,9 +17,12 @@ const providerOptions = {
 };
 
 const Header = () => {
-  const user = new API().user;
+  const api = new API();
+  const user = api.user;
+  const meData = api.me;
 
   const [address, setAddress] = useState('');
+  const [me, setMe] = useState(meData.value());
   const [web3Modal, setWeb3Modal] = useState(null);
 
   const handleLoginClick = async (e) => {
@@ -55,7 +58,12 @@ const Header = () => {
     const sessionPrivate = encode(key.secretKey, true);
     const msg = ethers.utils.id(`Satellite::${userAddress}:${sessionPublic}`);
     const sig = await provider.getSigner().signMessage(msg);
-    user.create(userAddress, sessionPublic, sessionPrivate, sig.slice(2));
+    user.create(userAddress, sessionPublic, sessionPrivate, sig.slice(2)).then((resp) => {
+      if (resp.error) {
+        return;
+      }
+      setMe(resp.data);
+    });
     setAddress(userAddress);
   };
 
@@ -74,32 +82,29 @@ const Header = () => {
   }, [web3Modal]);
 
   let profile = <span className={style.navi} onClick={handleLoginClick}>Login</span>;
-  if (user.loggedIn()) {
+  if (!!me) {
     profile = (
       <div className={style.navis}>
         <Link to='/topics/new' className={`${style.navi}`}> <FontAwesomeIcon icon={['fa', 'plus']} /> </Link>
-        <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {user.local().nickname} </Link>
+        <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {shortAddress(me.nickname)} </Link>
       </div>
     );
   }
 
   return (
-    <div>
-      <header className={style.header}>
-        <Link className={style.site} to='/'>
-          <img className={style.logo} src={logo} alt={Config.Name} />
-          <span className={style.name}>{Config.Name}</span>
-        </Link>
+    <header className={style.header}>
+      <Link className={style.site} to='/'>
+        <img className={style.logo} src={logo} alt={Config.Name} />
+        <span className={style.name}>{Config.Name}</span>
+      </Link>
 
-        <div className={style.menus}>
-          <Link className={`${style.menu} ${window.location.pathname === '/' ? style.current : ''}` } to='/'>
-            Home
-          </Link>
-        </div>
-        {profile}
-      </header>
-      {shortAddress(address)}
-    </div>
+      <div className={style.menus}>
+        <Link className={`${style.menu} ${window.location.pathname === '/' ? style.current : ''}` } to='/'>
+          Home
+        </Link>
+      </div>
+      {profile}
+    </header>
   );
 };
 

@@ -1,4 +1,6 @@
 import KJUR from 'jsrsasign';
+import {encode as encodeBase64, decode as decodeBase64} from '@stablelib/base64';
+import {encode as encodeUTF8, decode as decodeUTF8} from '@stablelib/utf8';
 import {v4 as uuidv4} from 'uuid';
 import Cookies from 'js-cookie';
 import Base64 from '../components/base64.js';
@@ -80,11 +82,14 @@ class User {
 
   create(publicKey, sessionPublic, sessionPrivate, sig) {
     const data = {public_key: publicKey, session_public: sessionPublic, signature: sig};
-    this.api.axios.post('/sessions', data).then((resp) => {
+    return this.api.axios.post('/sessions', data).then((resp) => {
       if (resp.error) {
         return resp;
       }
-      console.log('sessions:', resp.data);
+      const user = resp.data;
+      user.private = sessionPrivate;
+      window.localStorage.setItem('user', encodeBase64(encodeUTF8(JSON.stringify(data))));
+      return resp;
     });
   }
 
@@ -115,11 +120,17 @@ class User {
   }
 
   local() {
-    const user = window.localStorage.getItem('user');
-    if (!user) {
+    const source = window.localStorage.getItem('user');
+    if (!source) {
+      window.localStorage.clear();
       return {};
     }
-    return JSON.parse(this.base64.decode(user));
+    user = JSON.parse(decodeUTF8(decodeBase64(user)));
+    if (!user.private) {
+      window.localStorage.clear();
+      return {};
+    }
+    return user;
   }
 
   loggedIn() {
