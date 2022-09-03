@@ -14,7 +14,7 @@ func TestTopicCRUD(t *testing.T) {
 	ctx := setupTestContext()
 	defer teardownTestContext(ctx)
 
-	user := createTestUser(ctx, "im.yuqlee@gmail.com", "username", "password")
+	user := createTestUser(ctx, "im.yuqlee@gmail.com", "password")
 	assert.NotNil(user)
 	category, _ := CreateCategory(ctx, "name", "alias", "Description", 0)
 	assert.NotNil(category)
@@ -115,7 +115,7 @@ func TestTopicCRUD(t *testing.T) {
 		})
 	}
 
-	user = createTestUser(ctx, "im.jadeydi@gmail.com", "usernamex", "password")
+	user = createTestUser(ctx, "im.jadeydi@gmail.com", "password")
 	assert.NotNil(user)
 	category, _ = CreateCategory(ctx, "new name", "new alias", "New Description", 2)
 	assert.NotNil(category)

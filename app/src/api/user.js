@@ -78,6 +78,16 @@ class User {
     });
   }
 
+  create(publicKey, sessionPublic, sessionPrivate, sig) {
+    const data = {public_key: publicKey, session_public: sessionPublic, signature: sig};
+    this.api.axios.post('/sessions', data).then((resp) => {
+      if (resp.error) {
+        return resp;
+      }
+      console.log('sessions:', resp.data);
+    });
+  }
+
   update(params) {
     const i = params.avatar_url.indexOf(',');
     const data = {nickname: params.nickname, biography: params.biography, avatar: params.avatar_url.slice(i+1)};

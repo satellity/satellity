@@ -35,7 +35,7 @@ func sessionFromRows(row durable.Row) (*Session, error) {
 
 // CreateSession create a new user session
 func CreateSession(ctx context.Context, identity, password, pubED25519 string) (*User, error) {
-	user, err := ReadUserByUsernameOrEmail(ctx, identity)
+	user, err := ReadUserByEmail(ctx, identity)
 	if err != nil {
 		return nil, err
 	} else if user == nil {

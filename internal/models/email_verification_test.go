@@ -20,7 +20,7 @@ func TestEmailVerification(t *testing.T) {
 
 	public, _, err := ed25519.GenerateKey(rand.Reader)
 	assert.Nil(err)
-	user, err := VerifyEmailVerification(ctx, ev.VerificationID, ev.Code, "jason", "nopassword", hex.EncodeToString(public))
+	user, err := VerifyEmailVerification(ctx, ev.VerificationID, ev.Code, "nopassword", hex.EncodeToString(public))
 	assert.Nil(err)
 	assert.NotNil(user)
 	user, err = ReadUser(ctx, user.UserID)

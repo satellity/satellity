@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {ethers} from 'ethers';
+import {generateKeyPair} from '@stablelib/ed25519';
+import {encode} from '@stablelib/hex';
 import Web3Modal from 'web3modal';
 import API from 'api/index.js';
 import Config from 'components/config.js';
@@ -15,6 +17,8 @@ const providerOptions = {
 };
 
 const Header = () => {
+  const user = new API().user;
+
   const [address, setAddress] = useState('');
   const [web3Modal, setWeb3Modal] = useState(null);
 
@@ -43,9 +47,15 @@ const Header = () => {
 
     // Subscribe to instance disconnection
     instance.on('disconnect', (error) => {
-      console.log('disconnect', error);
+      // console.log('disconnect', error);
     });
     const userAddress = await provider.getSigner().getAddress();
+    const key = generateKeyPair();
+    const sessionPublic = encode(key.publicKey, true);
+    const sessionPrivate = encode(key.secretKey, true);
+    const msg = ethers.utils.id(`Satellite::${userAddress}:${sessionPublic}`);
+    const sig = await provider.getSigner().signMessage(msg);
+    user.create(userAddress, sessionPublic, sessionPrivate, sig.slice(2));
     setAddress(userAddress);
   };
 
@@ -63,7 +73,6 @@ const Header = () => {
     }
   }, [web3Modal]);
 
-  const user = new API().user;
   let profile = <span className={style.navi} onClick={handleLoginClick}>Login</span>;
   if (user.loggedIn()) {
     profile = (

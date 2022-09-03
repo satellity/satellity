@@ -33,7 +33,6 @@ type User struct {
 	UserID            string
 	PublicKey         sql.NullString
 	Email             sql.NullString
-	Username          sql.NullString
 	Nickname          string
 	AvatarURL         string
 	Biography         string
@@ -47,15 +46,15 @@ type User struct {
 	isNew     bool
 }
 
-var userColumns = []string{"user_id", "public_key", "email", "username", "nickname", "avatar_url", "biography", "encrypted_password", "github_id", "role", "created_at", "updated_at"}
+var userColumns = []string{"user_id", "public_key", "email", "nickname", "avatar_url", "biography", "encrypted_password", "github_id", "role", "created_at", "updated_at"}
 
 func (u *User) values() []interface{} {
-	return []interface{}{u.UserID, u.PublicKey, u.Email, u.Username, u.Nickname, u.AvatarURL, u.Biography, u.EncryptedPassword, u.GithubID, u.Role, u.CreatedAt, u.UpdatedAt}
+	return []interface{}{u.UserID, u.PublicKey, u.Email, u.Nickname, u.AvatarURL, u.Biography, u.EncryptedPassword, u.GithubID, u.Role, u.CreatedAt, u.UpdatedAt}
 }
 
 func userFromRow(row durable.Row) (*User, error) {
 	var u User
-	err := row.Scan(&u.UserID, &u.PublicKey, &u.Email, &u.Username, &u.Nickname, &u.AvatarURL, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.Role, &u.CreatedAt, &u.UpdatedAt)
+	err := row.Scan(&u.UserID, &u.PublicKey, &u.Email, &u.Nickname, &u.AvatarURL, &u.Biography, &u.EncryptedPassword, &u.GithubID, &u.Role, &u.CreatedAt, &u.UpdatedAt)
 	if err == pgx.ErrNoRows {
 		return nil, nil
 	}
@@ -63,19 +62,12 @@ func userFromRow(row durable.Row) (*User, error) {
 }
 
 // CreateUser create a new user
-func CreateUser(ctx context.Context, email, username, nickname, biography, password string, sessionPub string) (*User, error) {
+func CreateUser(ctx context.Context, email, nickname, biography, password string, sessionPub string) (*User, error) {
 	email = strings.TrimSpace(email)
 	if err := validateEmailFormat(ctx, email); err != nil {
 		return nil, err
 	}
-	username = strings.TrimSpace(username)
-	if len(username) < 3 {
-		return nil, session.BadDataError(ctx)
-	}
 	nickname = strings.TrimSpace(nickname)
-	if nickname == "" {
-		nickname = username
-	}
 	password, err := validateAndEncryptPassword(ctx, password)
 	if err != nil {
 		return nil, err
@@ -83,7 +75,7 @@ func CreateUser(ctx context.Context, email, username, nickname, biography, passw
 
 	var user *User
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		user, err = createUser(ctx, tx, "", email, username, nickname, password, sessionPub, "", nil)
+		user, err = createUser(ctx, tx, "", email, nickname, password, sessionPub, "", nil)
 		return err
 	})
 	if err != nil {
@@ -99,6 +91,13 @@ func CreateWeb3User(ctx context.Context, nickname, publicKey, sessionPub, sig st
 	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
 	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	hash := crypto.Keccak256Hash([]byte(msg))
+
+	if sigBuf[64] != 27 && sigBuf[64] != 28 && sigBuf[64] != 1 && sigBuf[64] != 0 {
+		return nil, fmt.Errorf("invalid signature type")
+	}
+	if sigBuf[64] >= 27 {
+		sigBuf[64] -= 27
+	}
 	sigPublicKey, err := crypto.Ecrecover(hash.Bytes(), sigBuf)
 	if err != nil {
 		return nil, session.BadDataErrorWithFieldAndData(ctx, "signature", "invalid", sig)
@@ -126,7 +125,7 @@ func CreateWeb3User(ctx context.Context, nickname, publicKey, sessionPub, sig st
 			user = old
 			return nil
 		}
-		user, err = createUser(ctx, tx, publicKey, "", "", nickname, "", sessionPub, "", nil)
+		user, err = createUser(ctx, tx, publicKey, "", nickname, "", sessionPub, "", nil)
 		return err
 	})
 	if err != nil {
@@ -296,8 +295,8 @@ func ReadUser(ctx context.Context, id string) (*User, error) {
 	return user, nil
 }
 
-// ReadUserByUsernameOrEmail read user by identity, which is an email or username.
-func ReadUserByUsernameOrEmail(ctx context.Context, identity string) (*User, error) {
+// ReadUserByEmail read user by identity, which is an email.
+func ReadUserByEmail(ctx context.Context, identity string) (*User, error) {
 	identity = strings.ToLower(strings.TrimSpace(identity))
 	if len(identity) < 3 {
 		return nil, nil
@@ -316,7 +315,7 @@ func ReadUserByUsernameOrEmail(ctx context.Context, identity string) (*User, err
 }
 
 func findUserByIdentity(ctx context.Context, tx pgx.Tx, identity string) (*User, error) {
-	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM users WHERE username=$1 OR email=$1 LIMIT 1", strings.Join(userColumns, ",")), identity)
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM users WHERE email=$1 LIMIT 1", strings.Join(userColumns, ",")), identity)
 	user, err := userFromRow(row)
 	if err == pgx.ErrNoRows {
 		return nil, nil
@@ -354,12 +353,9 @@ func (u *User) GetRole() string {
 	return UserRoleMember
 }
 
-// Name is nickname or username
+// Name is nickname
 func (u *User) Name() string {
-	if u.Nickname != "" {
-		return u.Nickname
-	}
-	return u.Username.String
+	return u.Nickname
 }
 
 func (u *User) isAdmin() bool {

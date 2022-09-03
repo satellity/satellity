@@ -27,7 +27,6 @@ func TestUserCRUD(t *testing.T) {
 
 	userCases := []struct {
 		email         string
-		username      string
 		nickname      string
 		biography     string
 		password      string
@@ -36,46 +35,42 @@ func TestUserCRUD(t *testing.T) {
 		count         int
 		valid         bool
 	}{
-		{"im.yuqlee@gmail.com", "username", "nickname", "", "pass", hex.EncodeToString(public), "member", 0, false},
-		{"im.yuqlee@gmail.com", "username", "nickname", "", "     pass     ", hex.EncodeToString(public), "member", 1, true},
+		{"im.yuqlee@gmail.com", "nickname", "", "pass", hex.EncodeToString(public), "member", 0, false},
+		{"im.yuqlee@gmail.com", "nickname", "", "     pass     ", hex.EncodeToString(public), "member", 1, true},
 	}
 
 	for _, tc := range userCases {
-		t.Run(fmt.Sprintf("user username %s", tc.username), func(t *testing.T) {
+		t.Run(fmt.Sprintf("user username %s", tc.nickname), func(t *testing.T) {
 			ctx := setupTestContext()
 			defer teardownTestContext(ctx)
 
 			if !tc.valid {
-				user, err := CreateUser(ctx, tc.email, tc.username, tc.nickname, tc.biography, tc.password, tc.sessionSecret)
+				user, err := CreateUser(ctx, tc.email, tc.nickname, tc.biography, tc.password, tc.sessionSecret)
 				assert.NotNil(err)
 				assert.Nil(user)
 				return
 			}
 
-			user, err := CreateUser(ctx, tc.email, tc.username, tc.nickname, tc.biography, tc.password, tc.sessionSecret)
+			user, err := CreateUser(ctx, tc.email, tc.nickname, tc.biography, tc.password, tc.sessionSecret)
 			assert.Nil(err)
 			assert.NotNil(user)
 
 			existing, err := ReadUser(ctx, user.UserID)
 			assert.Nil(err)
 			assert.NotNil(existing)
-			assert.Equal(user.Username, existing.Username)
 			assert.Equal(user.Nickname, existing.Nickname)
 			err = bcrypt.CompareHashAndPassword([]byte(existing.EncryptedPassword.String), []byte(tc.password))
 			assert.Nil(err)
 			existing, err = ReadUser(ctx, uuid.Must(uuid.NewV4()).String())
 			assert.Nil(err)
 			assert.Nil(existing)
-			existing, err = ReadUserByUsernameOrEmail(ctx, "None")
+			existing, err = ReadUserByEmail(ctx, "None")
 			assert.Nil(err)
 			assert.Nil(existing)
-			existing, err = ReadUserByUsernameOrEmail(ctx, tc.email)
+			existing, err = ReadUserByEmail(ctx, tc.email)
 			assert.Nil(err)
 			assert.NotNil(existing)
-			existing, err = ReadUserByUsernameOrEmail(ctx, tc.username)
-			assert.Nil(err)
-			assert.NotNil(existing)
-			existing, err = ReadUserByUsernameOrEmail(ctx, strings.ToUpper(tc.email))
+			existing, err = ReadUserByEmail(ctx, strings.ToUpper(tc.email))
 			assert.Nil(err)
 			assert.NotNil(existing)
 			publicNew, privNew, err := ed25519.GenerateKey(rand.Reader)
@@ -83,7 +78,6 @@ func TestUserCRUD(t *testing.T) {
 			existing, err = CreateSession(ctx, tc.email, tc.password, hex.EncodeToString(publicNew))
 			assert.Nil(err)
 			assert.NotNil(existing)
-			assert.Equal(tc.username, user.Username.String)
 			assert.Equal(tc.role, user.GetRole())
 
 			sess, err := readTestSession(ctx, existing.UserID, existing.SessionID)
@@ -105,10 +99,6 @@ func TestUserCRUD(t *testing.T) {
 			assert.NotNil(existing)
 			err = existing.UpdateProfile(ctx, "Jason", "", "")
 			assert.Nil(err)
-			assert.Equal("Jason", existing.Name())
-			existing, err = ReadUserByUsernameOrEmail(ctx, tc.username)
-			assert.Nil(err)
-			assert.NotNil(existing)
 			assert.Equal("Jason", existing.Name())
 			users, err := ReadUsers(ctx, time.Time{})
 			assert.Nil(err)
@@ -162,9 +152,9 @@ func TestWeb3UserCRUD(t *testing.T) {
 	assert.Equal("abc", old.Nickname)
 }
 
-func createTestUser(ctx context.Context, email, username, password string) *User {
+func createTestUser(ctx context.Context, email, password string) *User {
 	public, _, _ := ed25519.GenerateKey(rand.Reader)
-	user, _ := CreateUser(ctx, email, username, "nickname", "", password, hex.EncodeToString(public))
+	user, _ := CreateUser(ctx, email, "nickname", "", password, hex.EncodeToString(public))
 	return user
 }
 

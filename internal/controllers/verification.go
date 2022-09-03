@@ -21,7 +21,6 @@ type verificationRequest struct {
 	Recaptcha     string `json:"recaptcha"`
 	Email         string `json:"email"`
 	Code          string `json:"code"`
-	Username      string `json:"username"`
 	Password      string `json:"password"`
 	Purpose       string `json:"purpose"`
 	SessionSecret string `json:"session_secret"`
@@ -56,7 +55,7 @@ func (impl *verificationImpl) verify(w http.ResponseWriter, r *http.Request, par
 
 	switch body.Purpose {
 	case purposeUser:
-		user, err := models.VerifyEmailVerification(r.Context(), params["id"], body.Code, body.Username, body.Password, body.SessionSecret)
+		user, err := models.VerifyEmailVerification(r.Context(), params["id"], body.Code, body.Password, body.SessionSecret)
 		if err != nil {
 			views.RenderErrorResponse(w, r, err)
 		} else {

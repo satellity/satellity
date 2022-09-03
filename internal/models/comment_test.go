@@ -17,7 +17,7 @@ func TestCommentCRUD(t *testing.T) {
 	ctx := setupTestContext()
 	defer teardownTestContext(ctx)
 
-	user := createTestUser(ctx, "im.yuqlee@gmail.com", "username", "password")
+	user := createTestUser(ctx, "im.yuqlee@gmail.com", "password")
 	assert.NotNil(user)
 	category, _ := CreateCategory(ctx, "name", "alias", "Description", 0)
 	assert.NotNil(category)

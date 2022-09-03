@@ -20,7 +20,6 @@ type UserView struct {
 // AccountView is the response body of a sign in user
 type AccountView struct {
 	UserView
-	Username  string `json:"username"`
 	Email     string `json:"email"`
 	SessionID string `json:"session_id"`
 	Role      string `json:"role"`
@@ -56,7 +55,6 @@ func RenderUsers(w http.ResponseWriter, r *http.Request, users []*models.User) {
 func RenderAccount(w http.ResponseWriter, r *http.Request, user *models.User) {
 	accountView := AccountView{
 		UserView:  buildUser(user),
-		Username:  user.Username.String,
 		Email:     user.Email.String,
 		SessionID: user.SessionID,
 		Role:      user.GetRole(),
