@@ -88,7 +88,7 @@ class User {
       }
       const user = resp.data;
       user.private = sessionPrivate;
-      window.localStorage.setItem('user', encodeBase64(encodeUTF8(JSON.stringify(data))));
+      window.localStorage.setItem('user', encodeBase64(encodeUTF8(JSON.stringify(user))));
       return resp;
     });
   }
@@ -125,7 +125,7 @@ class User {
       window.localStorage.clear();
       return {};
     }
-    user = JSON.parse(decodeUTF8(decodeBase64(user)));
+    const user = JSON.parse(decodeUTF8(decodeBase64(source)));
     if (!user.private) {
       window.localStorage.clear();
       return {};

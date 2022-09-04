@@ -3,8 +3,10 @@ import moment from 'moment';
 import {v4 as uuidv4} from 'uuid';
 import axios from 'axios';
 import Noty from 'noty';
-import * as jose from 'jose';
-import {decode} from '@stablelib/hex';
+import {decode as decodeHex} from '@stablelib/hex';
+import {encodeURLSafe} from '@stablelib/base64';
+import {sign as signED25519} from '@stablelib/ed25519';
+import {encode as encodeUTF8} from '@stablelib/utf8';
 import Category from './category.js';
 import Topic from './topic.js';
 import Comment from './comment.js';
@@ -26,7 +28,7 @@ Noty.overrideDefaults({
   },
 });
 
-const sign = async (method, uri, body) => {
+const signToken = (method, uri, body) => {
   if (typeof body !== 'string') {
     body = '';
   }
@@ -47,18 +49,17 @@ const sign = async (method, uri, body) => {
     sig: md.digest().toHex(),
   };
 
-  const token = await new jose.SignJWT(payload).
-      setProtectedHeader({alg: 'EdDSA'}).
-      sign(decode(me.private));
-  return token;
+  const header = encodeURLSafe(encodeUTF8(JSON.stringify({alg: 'EdDSA', typ: 'JWT'}))).replaceAll('=', '');
+  const payloadStr = encodeURLSafe(encodeUTF8(JSON.stringify(payload))).replaceAll('=', '');
+  const sig = encodeURLSafe(signED25519(decodeHex(me.private), encodeUTF8(`${header}.${payloadStr}`))).replaceAll('=', '');
+  return `${header}.${payloadStr}.${sig}`;
 };
 
 axios.defaults.headers.common['Content-Type'] = 'application/json';
-axios.interceptors.request.use(async (config) => {
+axios.interceptors.request.use((config) => {
   config.url = '/api' + config.url;
   const {method, url, data} = config;
-  const token = await sign(method, url, data);
-  console.log('sign:::', token, method, uri, data);
+  const token = signToken(method, url, data);
   config.headers.common['Authorization'] = `Bearer ${token}`;
   return config;
 }, (error) => {

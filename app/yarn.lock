@@ -8241,11 +8241,6 @@ jest@^27.4.3:
     import-local "^3.0.2"
     jest-cli "^27.5.1"
 
-jose@^4.9.0:
-  version "4.9.0"
-  resolved "https://registry.yarnpkg.com/jose/-/jose-4.9.0.tgz#98ecaf81b13361d1931c0126e3f765549c782f92"
-  integrity sha512-RgaqEOZLkVO+ViN3KkN44XJt9g7+wMveUv59sVLaTxONcUPc8ZpfqOCeLphVBZyih2dgkvZ0Ap1CNcokvY7Uyw==
-
 js-base64@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.2.tgz#816d11d81a8aff241603d19ce5761e13e41d7745"

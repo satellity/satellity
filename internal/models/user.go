@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"satellity/internal/clouds"
 	"satellity/internal/configs"
 	"satellity/internal/durable"
@@ -123,7 +122,8 @@ func CreateWeb3User(ctx context.Context, nickname, publicKey, sessionPub, sig st
 		}
 		if old != nil {
 			user = old
-			return nil
+			_, err = user.addSession(ctx, tx, sessionPub)
+			return err
 		}
 		user, err = createUser(ctx, tx, publicKey, "", nickname, "", sessionPub, "", nil)
 		return err
@@ -220,7 +220,6 @@ func AuthenticateUser(ctx context.Context, tokenString string) (*User, error) {
 		return ed25519.PublicKey(pub), nil
 	})
 	if err != nil || !token.Valid {
-		log.Println("err:::", err, token.Valid)
 		return nil, nil
 	}
 	return user, nil

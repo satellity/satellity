@@ -73,6 +73,7 @@ func (user *User) addSession(ctx context.Context, tx pgx.Tx, secret string) (*Se
 
 	rows := [][]interface{}{s.values()}
 	_, err := tx.CopyFrom(ctx, pgx.Identifier{"sessions"}, sessionColumns, pgx.CopyFromRows(rows))
+	user.SessionID = s.SessionID
 	return s, err
 }
 
