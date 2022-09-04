@@ -9,9 +9,9 @@ import (
 	"path"
 	"path/filepath"
 	"satellity/internal/configs"
-	"satellity/internal/controllers"
 	"satellity/internal/durable"
 	"satellity/internal/middlewares"
+	"satellity/internal/routes"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/gorilla/handlers"
@@ -24,8 +24,7 @@ import (
 func startHTTP(db *pgxpool.Pool, logger *zap.Logger, port string) error {
 	database := durable.WrapDatabase(db)
 	router := httptreemux.New()
-	controllers.RegisterHanders(router)
-	controllers.RegisterRoutes(router)
+	routes.RegisterRoutes(router)
 
 	handler := middlewares.Authenticate(router)
 	handler = middlewares.Constraint(handler)

@@ -1,10 +1,10 @@
-package controllers
+package routes
 
 import (
 	"net/http"
 	"runtime"
 	"satellity/internal/configs"
-	"satellity/internal/controllers/admin"
+	"satellity/internal/routes/admin"
 	"satellity/internal/session"
 	"satellity/internal/views"
 
@@ -13,6 +13,7 @@ import (
 
 // RegisterRoutes register all routes
 func RegisterRoutes(router *httptreemux.TreeMux) {
+	RegisterHanders(router)
 	api := router.NewGroup("/api")
 
 	api.GET("/_hc", health)
