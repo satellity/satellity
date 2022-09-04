@@ -13,6 +13,7 @@
     "@stablelib/hex": "^1.0.1",
     "@stablelib/utf8": "^1.0.1",
     "@tanstack/react-query": "^4.2.1",
+    "@uiw/react-codemirror": "^4.12.0",
     "axios": "^0.27.2",
     "base64-js": "^1.5.1",
     "codemirror": "^6.0.1",
@@ -44,7 +45,6 @@
     "showdown-highlight": "^3.0.0",
     "text-encoder-lite": "^2.0.0",
     "uuid": "^8.3.2",
-    "uuid-validate": "^0.0.3",
     "web3modal": "^1.9.9"
   },
   "scripts": {

@@ -86,7 +86,7 @@ const Header = () => {
     profile = (
       <div className={style.navis}>
         <Link to='/topics/new' className={`${style.navi}`}> <FontAwesomeIcon icon={['fa', 'plus']} /> </Link>
-        <Link to='/user/edit' className={`${style.navi} ${style.user}`}> {shortAddress(me.nickname)} </Link>
+        <span> {shortAddress(me.nickname)} </span>
       </div>
     );
   }

@@ -12,7 +12,7 @@ class Me {
       return undefined;
     }
     const user = JSON.parse(decodeUTF8(decodeBase64(source)));
-    if (!user.private) {
+    if (!user.user_id || !user.session_id || !user.private) {
       window.localStorage.clear();
       return undefined;
     }

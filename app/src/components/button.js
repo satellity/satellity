@@ -4,26 +4,27 @@ import {Link} from 'react-router-dom';
 import Loading from './loading.js';
 import PropTypes from 'prop-types';
 
-const Button = ({classes, type, text, original, action}) => {
-  classes = classes.split(' ').map((name) => {
+const Button = (props) => {
+  const {classes, type, text, original, action, disabled} = props;
+  const klass = classes.split(' ').map((name) => {
     return style[[name]];
   }).join(' ');
 
   if (original && type === 'link') {
     return (
-      <a href={action} className={classes}>{text}</a>
+      <a href={action} className={klass}>{text}</a>
     );
   }
 
   if (type === 'link') {
     return (
-      <Link to={action} className={classes}>{text}</Link>
+      <Link to={action} className={klass}>{text}</Link>
     );
   }
 
   if (type === 'button') {
     return (
-      <button type={type} className={classes} disabled={disabled} onClick={click}>
+      <button type={type} className={klass} disabled={disabled} onClick={click}>
         {disabled && <Loading class='small white' />}
         &nbsp;{text}
       </button>
@@ -31,7 +32,7 @@ const Button = ({classes, type, text, original, action}) => {
   }
 
   return (
-    <button type={type} className={classes} disabled={disabled}>
+    <button type={type} className={klass} disabled={disabled}>
       {disabled && <Loading class='small white' />}
       &nbsp;{text}
     </button>
@@ -40,6 +41,7 @@ const Button = ({classes, type, text, original, action}) => {
 
 Button.propTypes = {
   classes: PropTypes.string,
+  disabled: PropTypes.boolean,
   type: PropTypes.string,
   text: PropTypes.string,
   original: PropTypes.string,
