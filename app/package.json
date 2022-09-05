@@ -39,7 +39,7 @@
     "react-scripts": "5.0.1",
     "react-styleguidist": "^11.2.0",
     "react-timeago": "^7.1.0",
-    "sass": "^1.54.5",
+    "sass": "^1.54.8",
     "short-uuid": "^4.2.0",
     "showdown": "^2.1.0",
     "showdown-highlight": "^3.0.0",
