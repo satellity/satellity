@@ -22,44 +22,46 @@ const Nodes = () => {
     setCategoryId(id || 'latest');
   }, [id]);
 
-  if (isLoading) {
-    return;
-  }
-
-  console.log(data);
-
-  const categories = data.map((category) => {
-    let clazz = style.node;
-    if (categoryId === category.name) {
-      clazz += ` ${style.current}`;
-    }
-    return (
-      <Link to={`/categories/${category.name}`} className={`${clazz}`}
-        key={category.category_id}>
-        {category.alias}
-      </Link>
-    );
-  });
 
   let clazz = style.node;
   if (categoryId === 'latest') {
     clazz += ` ${style.current}`;
   }
+  const latest = (
+    <Link to='/' key='latest' className={`${clazz}`}>
+      {i18n.t('home.latest')}
+    </Link>
+  );
+
+  let categories = [latest];
+  if (!isLoading) {
+    categories = categories.concat(data.map((category) => {
+      clazz = style.node;
+      if (categoryId === category.name) {
+        clazz += ` ${style.current}`;
+      }
+      return (
+        <Link
+          to={`/categories/${category.name}`}
+          className={`${clazz}`}
+          key={category.category_id}>
+          {category.alias}
+        </Link>
+      );
+    }));
+  }
+
   return (
     <div className={style.nodes}>
-      <Link to='/' className={`${clazz}`}>
-        {i18n.t('home.latest')}
-      </Link>
       {categories}
     </div>
   );
 };
 
-const Index = () => {
+const Topics = () => {
   const {id} = useParams();
   const [searchParams] = useSearchParams();
 
-  const [i18n] = useState(window.i18n);
   const [loading, setLoading] = useState(true);
   const [categoryId, setCategoryId] = useState(id || 'latest');
   const [pagination] = useState(30);
@@ -88,11 +90,13 @@ const Index = () => {
     });
   }, [categoryId, searchParams.get('offset')]);
 
-  const loadingView = (
-    <div className={style.loading}>
-      <Loading />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className={style.loading}>
+        <Loading />
+      </div>
+    );
+  }
 
   const topicsView = topics.map((topic) => {
     return (
@@ -100,32 +104,34 @@ const Index = () => {
     );
   });
 
+  return (
+    <>
+      <ul className={style.topics}> {topicsView} </ul>
+      {
+        topics.length >= pagination && offset &&
+          (
+            <div className={style.load}>
+              <Link to={`?offset=${offset}`}>{i18n.t('general.next')}</Link>
+            </div>
+          )
+      }
+    </>
+  );
+};
+
+const Index = () => {
   const title = `${i18n.t('site.title')} - ${Config.Name}`;
   const description = i18n.t('site.description');
 
   return (
     <div className='container'>
-      {
-        !loading &&
-          <Helmet>
-            <title>{title}</title>
-            <meta name='description' content={description} />
-          </Helmet>
-      }
+      <Helmet>
+        <title>{title}</title>
+        <meta name='description' content={description} />
+      </Helmet>
       <main className='column main'>
         <Nodes />
-
-        {loading && loadingView}
-
-        {!loading && <ul className={style.topics}> {topicsView} </ul>}
-        {
-          topics.length >= pagination && offset &&
-            (
-              <div className={style.load}>
-                <Link to={`?offset=${offset}`}>{i18n.t('general.next')}</Link>
-              </div>
-            )
-        }
+        <Topics />
       </main>
       <aside className='column aside'>
         <Widget />
