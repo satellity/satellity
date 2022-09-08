@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useParams, useSearchParams} from 'react-router-dom';
 import {Helmet} from 'react-helmet';
-import {useParams, useSearchParams} from 'react-router-dom';
 import Config from 'components/config.js';
 import Loading from 'components/loading.js';
 import API from 'api/index.js';
@@ -27,23 +26,31 @@ const Nodes = () => {
     return;
   }
 
-  // TODO
-  const categories = data || [];
-  const categoriesView = categories.map((category) => {
+  console.log(data);
+
+  const categories = data.map((category) => {
+    let clazz = style.node;
+    if (categoryId === category.name) {
+      clazz += ` ${style.current}`;
+    }
     return (
-      <Link to={`/categories/${category.name}`} className={`${style.node} ${categoryId === category.name ? style.current : ''}`}
+      <Link to={`/categories/${category.name}`} className={`${clazz}`}
         key={category.category_id}>
         {category.alias}
       </Link>
     );
   });
 
+  let clazz = style.node;
+  if (categoryId === 'latest') {
+    clazz += ` ${style.current}`;
+  }
   return (
     <div className={style.nodes}>
-      <Link to='/' className={`${style.node} ${categoryId === 'latest' ? style.current : ''}`}>
+      <Link to='/' className={`${clazz}`}>
         {i18n.t('home.latest')}
       </Link>
-      {categoriesView}
+      {categories}
     </div>
   );
 };

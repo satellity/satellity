@@ -1,7 +1,7 @@
 import style from './new.module.scss';
 import React, {useEffect, useState} from 'react';
 import {validate} from 'uuid';
-import {Navigate} from 'react-router-dom';
+import {Navigate, useParams} from 'react-router-dom';
 import {useCategory} from 'services';
 import API from 'api/index.js';
 import Loading from 'components/loading.js';
@@ -13,6 +13,10 @@ const New = (props) => {
   const [loading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [topic, setTopic] = useState({});
+
+  const {id} = useParams();
+
+  console.log(id);
 
   useEffect(() => {
   }, []);

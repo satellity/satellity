@@ -8,6 +8,7 @@ export const useCategory = () => {
       ['categories'],
       () => api.category.index().then((res) => res.data),
       {
+        placeholderData: [],
         cacheTime: Infinity,
         staleTime: Infinity,
       },

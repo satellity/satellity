@@ -5,7 +5,7 @@ import Loading from './loading.js';
 import PropTypes from 'prop-types';
 
 const Button = (props) => {
-  const {classes, type, text, original, action, disabled} = props;
+  const {classes, disabled, type, text, original, action} = props;
   const klass = classes.split(' ').map((name) => {
     return style[[name]];
   }).join(' ');
@@ -41,7 +41,7 @@ const Button = (props) => {
 
 Button.propTypes = {
   classes: PropTypes.string,
-  disabled: PropTypes.boolean,
+  disabled: PropTypes.bool,
   type: PropTypes.string,
   text: PropTypes.string,
   original: PropTypes.string,
