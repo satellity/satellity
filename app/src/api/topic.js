@@ -28,7 +28,7 @@ class Topic {
   }
 
   action(action, id) {
-    if (action === 'like' || action === 'unlike' || action === 'bookmark' || action === 'unsave') {
+    if (action === 'like' || action === 'unlike' || action === 'bookmark' || action === 'unbookmark') {
       return this.api.axios.post(`/topics/${id}/${action}`, {});
     }
     return new Promise((resolve) => {

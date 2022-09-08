@@ -30,7 +30,7 @@ func registerTopic(router *httptreemux.Group) {
 	router.POST("/topics/:id/like", impl.like)
 	router.POST("/topics/:id/unlike", impl.unlike)
 	router.POST("/topics/:id/bookmark", impl.bookmark)
-	router.POST("/topics/:id/unsave", impl.unsave)
+	router.POST("/topics/:id/unbookmark", impl.unsave)
 	router.GET("/topics", impl.index)
 	router.GET("/topics/draft", impl.draft)
 	router.GET("/topics/:id", impl.show)

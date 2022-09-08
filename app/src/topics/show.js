@@ -22,12 +22,14 @@ const Topic = () => {
 
   const {id} = useParams();
   const [loading, setLoading] = useState(true);
+  const [actioning, setActioning] = useState('');
   const [me] = useState(meData.value());
+  const [topicId] = useState(titleToId(id));
   const [topic, setTopic] = useState({});
 
   useEffect(() => {
     setLoading(true);
-    api.topic.show(titleToId(id)).then((resp) => {
+    api.topic.show(topicId).then((resp) => {
       if (resp.error) {
         return;
       }
@@ -48,6 +50,24 @@ const Topic = () => {
   }
 
   const handleClick = (e, action) => {
+    setActioning(action);
+    if (action === 'like' && topic.is_liked_by) {
+      action = 'unlike';
+    }
+    if (action === 'bookmark' && topic.is_bookmarked_by) {
+      action = 'unbookmark';
+    }
+    api.topic.action(action, topicId).then((resp) => {
+      if (resp.error) {
+        return;
+      }
+      const data = resp.data;
+      data.short_body = data.body.substring(0, 128);
+      data.html_body = converter.makeHtml(data.body);
+      setTopic(data);
+    }).finally(() => {
+      setActioning('');
+    });
   };
 
   const seoView = (
@@ -111,23 +131,23 @@ const Topic = () => {
         }
         <span className={style.item}>
           {
-            topic.actioning !== 'like' &&
+            actioning !== 'like' &&
               <span className={`${style.action} ${topic.is_liked_by}`} onClick={(e) => handleClick(e, 'like')}>
                 {topic.likes_count > 0 && <span>{topic.likes_count}</span>}
                 <FontAwesomeIcon icon={['far', 'heart']} style={like}/>
               </span>
           }
-          {topic.actioning === 'like' && <Loading class='small' />}
+          {actioning === 'like' && <Loading class='small' />}
         </span>
         <span className={style.item}>
           {
-            topic.actioning !== 'bookmark' &&
+            actioning !== 'bookmark' &&
               <span className={`${style.action} ${topic.is_bookmarked_by}`} onClick={(e) => handleClick(e, 'bookmark')}>
                 {topic.bookmarks_count > 0 && <span>{topic.bookmarks_count}</span>}
                 <FontAwesomeIcon icon={['far', 'bookmark']} style={bookmark}/>
               </span>
           }
-          {topic.actioning === 'bookmark' && <Loading class='small' />}
+          {actioning === 'bookmark' && <Loading class='small' />}
         </span>
       </div>
     </div>

@@ -355,7 +355,7 @@ func (category *Category) latestTopic(ctx context.Context, tx pgx.Tx) (*Topic, e
 	return t, err
 }
 
-func (topic *Topic) FillOut(ctx context.Context, user *User) error {
+func (topic *Topic) FillOut(ctx context.Context, current *User) error {
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		user, err := findUserByID(ctx, tx, topic.UserID)
 		if err != nil {
@@ -367,8 +367,8 @@ func (topic *Topic) FillOut(ctx context.Context, user *User) error {
 			return err
 		}
 		topic.Category = category
-		if user != nil {
-			tu, err := findTopicUser(ctx, tx, topic.TopicID, user.UserID)
+		if current != nil {
+			tu, err := findTopicUser(ctx, tx, topic.TopicID, current.UserID)
 			if err != nil || tu == nil {
 				return err
 			}
