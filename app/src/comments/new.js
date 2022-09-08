@@ -6,12 +6,13 @@ import Button from 'components/button.js';
 import style from './index.module.scss';
 
 const New = (props) => {
-  const i18n = window.i18n;
   const api = new API();
+  const meData = api.me;
 
-  const {topicId} = props;
+  const {topicId, submitComment} = props;
   const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [me] = useState(meData.value());
 
   const handleChange = (e) => {
     const {value} = e.target;
@@ -24,17 +25,18 @@ const New = (props) => {
       return;
     }
     setSubmitting(true);
-    api.comment.create(body).then((resp) => {
+    api.comment.create({topic_id: topicId, body}).then((resp) => {
       if (resp.error) {
-        setSubmitting(false);
         return;
       }
+      submitComment(resp.data);
       setBody('');
+    }).finally(() => {
       setSubmitting(false);
     });
   };
 
-  if (!api.user.loggedIn()) {
+  if (!me) {
     return (
       <div className={style.custom}>
         {i18n.t('comment.custom')}
@@ -59,6 +61,7 @@ const New = (props) => {
 
 New.propTypes = {
   topicId: PropTypes.string,
+  submitComment: PropTypes.func,
 };
 
 export default New;

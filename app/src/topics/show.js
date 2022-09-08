@@ -10,6 +10,7 @@ import Config from 'components/config.js';
 import Loading from 'components/loading.js';
 import Comment from 'comments/view.js';
 import SiteWidget from 'home/widget.js';
+import Avatar from 'users/avatar.js';
 import {titleToId} from 'utils';
 
 import style from './show.module.scss';
@@ -96,7 +97,7 @@ const Topic = () => {
             <span className={style.views}>{topic.views_count} views</span>
           </div>
         </div>
-        <img src={topic.user.avatar_url} className={style.avatar} alt={topic.user.nickname} />
+        <Avatar user={topic.user} />
       </header>
       <div>
         {topic.body !== '' && <article className={`md ${style.body}`} dangerouslySetInnerHTML={{__html: topic.html_body}} />}

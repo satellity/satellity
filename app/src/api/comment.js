@@ -9,8 +9,7 @@ class Comment {
   }
 
   create(params) {
-    const data = {topic_id: params.topic_id, body: params.body};
-    return this.api.axios.post('/comments', data);
+    return this.api.axios.post('/comments', params);
   }
 
   update(id, params) {

@@ -9,11 +9,10 @@ import New from './new.js';
 import style from './index.module.scss';
 
 const Index = (props) => {
-  const i18n = window.i18n;
+  const {topicId, commentsCount} = props;
+
   const api = new API();
   const converter = new showdown.Converter();
-
-  const {topicId, commentsCount} = props;
 
   const [comments, setComments] = useState([]);
 
@@ -30,10 +29,12 @@ const Index = (props) => {
     });
   }, [topicId]);
 
-  const handleSubmit = (comment) => {
+  const submitComment = (comment) => {
+    if (!comment) {
+      return;
+    }
     comment.body = converter.makeHtml(comment.body);
-    comments.push(comment);
-    setComments(comments);
+    setComments((old) => [...old, comment]);
   };
 
   const commentsView = comments.map((comment) => {
@@ -48,8 +49,7 @@ const Index = (props) => {
             </div>
           </div>
         </div>
-        <article className='md' dangerouslySetInnerHTML={{__html: comment.body}}>
-        </article>
+        <article className='md' dangerouslySetInnerHTML={{__html: comment.body}} />
       </li>
     );
   });
@@ -64,12 +64,10 @@ const Index = (props) => {
   );
 
   return (
-    <div>
+    <>
       {commentsCount > 0 && commentsContainer}
-      <New
-        topicId={topicId}
-        handleSubmit={handleSubmit} />
-    </div>
+      <New topicId={topicId} submitComment={submitComment} />
+    </>
   );
 };
 
