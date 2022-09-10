@@ -9,7 +9,12 @@ import API from './api/index.js';
 import Locale from './locale/index.js';
 import MainLayout from './layouts/main.js';
 import NoMatch from './layouts/sink.js';
-import AdminRoute from './admin/admin.js';
+import AdminRoute from 'admin/admin.js';
+import AdminIndex from 'admin/index.js';
+import AdminCategory from 'admin/categories/view.js';
+import AdminUsers from 'admin/users/index.js';
+import AdminTopics from 'admin/topics/index.js';
+import AdminComments from 'admin/comments/index.js';
 import Oauth from './users/oauth.js';
 import User from 'users/view.js';
 import Topic from 'topics/view.js';
@@ -70,7 +75,15 @@ root.render(
       <BrowserRouter>
         <Routes>
           <Route path='/oauth/:provider/callback' element={<Oauth />} />
-          <Route path='/admin' element={<AdminRoute />} />
+          <Route path='/admin' element={<AdminRoute />}>
+            <Route index element={AdminIndex} />
+            <Route exact path={`users`} element={<AdminUsers />} />
+            <Route exact path={`topics`} element={<AdminTopics />} />
+            <Route exact path={`comments`} element={<AdminComments />} />
+            <Route exact path={`categories`} element={<AdminCategory.Index />} />
+            <Route exact path={`categories/new`} element={<AdminCategory.New />} />
+            <Route path={`categories/:id/edit`} element={<AdminCategory.Edit />} />
+          </Route>
           <Route path='/' element={<MainLayout />}>
             <Route index element={<Topic.Index />} />
             <Route path="categories/:id" element={<Topic.Index />} />

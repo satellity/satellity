@@ -1,51 +1,69 @@
-import style from './new.module.scss';
 import React, {useEffect, useState} from 'react';
-import {validate} from 'uuid';
 import {Navigate, useParams} from 'react-router-dom';
+import CodeMirror from '@uiw/react-codemirror';
+import {markdown, markdownLanguage} from '@codemirror/lang-markdown';
+import {languages} from '@codemirror/language-data';
+import {validate} from 'uuid';
 import {useCategory} from 'services';
 import API from 'api/index.js';
 import Loading from 'components/loading.js';
 import Button from 'components/button.js';
 
-const New = (props) => {
+import style from './new.module.scss';
+
+const Form = (props) => {
   const [api] = useState(new API());
-  const [i18n] = useState(window.i18n);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [topic, setTopic] = useState({});
+  const [topic] = useState({});
+  const [topicId, setTopicId] = useState('draft');
+  const [categoryId, setCategoryId] = useState('');
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  // const [draft] = useState(false);
 
   const {id} = useParams();
 
-  console.log(id);
-
   useEffect(() => {
-  }, []);
+    if (id) {
+      setTopicId(id);
+    }
+    api.topic.show(topicId).then((resp) => {
+      if (resp.error) {
+        return;
+      }
+      if (resp.data) {
+        setTopicId(resp.data.topic_id);
+        setCategoryId(resp.data.category_id);
+        setTitle(resp.data.title);
+      }
+      setLoading(false);
+    });
+  }, [id]);
 
   const handleChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.type === 'checkbox' ? (e.target.checked ? 'LINK' : 'POST') : e.target.value;
-    topic[name] = value;
-    setTopic(topic);
+    setTitle(e.target.value);
+  };
+
+  const handleBodyChange = (value) => {
+    setBody(value);
   };
 
   const handleCategoryClick = (e, value) => {
-    e.preventDefault();
-    topic['category_id'] = value;
-    setTopic(topic);
+    setCategoryId(value);
   };
 
-  const submitForm = () => {
-    setSubmitting(true);
-    if (validate(topic.topic_id)) {
-      api.topic.update(topic.topic_id, topic).then((resp) => {
-        if (resp.error) {
-          return;
-        }
-        setSubmitting(false);
-      });
+  const submitForm = (e) => {
+    e.preventDefault();
+    if (submitting) {
       return;
     }
-    api.topic.create(topic).then((resp) => {
+    setSubmitting(true);
+    let request = api.topic.create(topic);
+    if (validate(topic.topic_id)) {
+      request = api.topic.update(topic.topic_id, topic);
+    }
+    request.then((resp) => {
       if (resp.error) {
         return;
       }
@@ -53,10 +71,25 @@ const New = (props) => {
     });
   };
 
-  if (!api.me.value()) {
-    return (
-      <Navigate to="/" replace />
-    );
+
+  const {isLoading, data} = useCategory();
+
+  useEffect(() => {
+    if (data.length > 0) {
+      setCategoryId(data[0].category_id);
+    };
+  }, [data]);
+
+  let categories = [];
+  if (!isLoading) {
+    categories = data.map((c) => {
+      return (
+        <span key={c.category_id} className={`${style.category} ${c.category_id === categoryId ? style.active : ''}`}
+          onClick={(e) => handleCategoryClick(e, c.category_id)}>
+          {c.alias}
+        </span>
+      );
+    });
   }
 
   if (loading) {
@@ -67,22 +100,9 @@ const New = (props) => {
     );
   }
 
-  const {isLoading, data} = useCategory();
-  let categories = [];
-  if (!isLoading) {
-    categories = data.map((c) => {
-      return (
-        <span key={c.category_id} className={`${style.category} ${c.category_id === topic.category_id ? style.active : ''}`}
-          onClick={(e) => handleCategoryClick(e, c.category_id)}>
-          {c.alias}
-        </span>
-      );
-    });
-  }
-
-  let title = <h1>{i18n.t('topic.title.new')}</h1>;
-  if (validate(topic.topic_id)) {
-    title = <h1>{i18n.t('topic.title.edit', {name: topic.title})}</h1>;
+  let titleView = <h1>{i18n.t('topic.title.new')}</h1>;
+  if (validate(topicId)) {
+    titleView = <h1>{i18n.t('topic.title.edit', {name: title})}</h1>;
   }
 
   const form = (
@@ -91,36 +111,47 @@ const New = (props) => {
         {categories}
       </div>
       <div>
-        <input type='text' name='title' pattern='.{3,}' required value={topic.title} autoComplete='off' placeholder={i18n.t('topic.placeholder.title')}
+        <input type='text' name='title' pattern='.{3,}' required value={title} autoComplete='off' placeholder={i18n.t('topic.placeholder.title')}
           onChange={handleChange} />
       </div>
-      <div className={style.upload}>
-        <a href='https://imgur.com/upload' target='_blank' rel='noopener noreferrer'>Does not support upload image, please use imgur first.</a>
+      <div>
+        <CodeMirror
+          value={body}
+          height={body.split('\n').length > 16 ? 'auto': '300px'}
+          extensions={[markdown({base: markdownLanguage, codeLanguages: languages})]}
+          onChange={handleBodyChange}
+        />
       </div>
-      {
-        topic.topic_type === 'LINK' &&
-          <div>
-            <textarea name='body' rows='2' value={topic.body} onChange={handleChange} className={style.link}
-              placeholder={i18n.t('topic.placeholder.url')} />
-          </div>
-      }
+      <div className={style.upload}>
+        <a href='https://imgur.com/upload' target='_blank' rel='noopener noreferrer'>Choose imgur upload image first.</a>
+      </div>
       <div className={style.submit}>
         <Button type='submit' classes='submit' disabled={submitting} text={i18n.t('general.submit')} />
-        {
-          !submitting &&
-            (topic.topic_id === '' || topic.draft) &&
-            <span className={style.draft}>{i18n.t('general.draft')}</span>
-        }
       </div>
     </form>
   );
 
   return (
+    <>
+      {titleView}
+      {form}
+    </>
+  );
+};
+
+const New = () => {
+  const api = new API();
+  if (!api.me.value()) {
+    return (
+      <Navigate to="/" replace />
+    );
+  }
+
+  return (
     <div className='container'>
       <main className='column main'>
         <div className={style.form}>
-          {title}
-          {form}
+          <Form />
         </div>
       </main>
       <aside className='column aside'>
@@ -140,6 +171,5 @@ const New = (props) => {
 //   {icon: 'list-ol', action: 'ol', identity: '1. '},
 //   {icon: 'list-ul', action: 'ul', identity: '* '},
 // ];
-
 
 export default New;

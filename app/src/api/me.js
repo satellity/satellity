@@ -19,6 +19,11 @@ class Me {
     return user;
   }
 
+  isAdmin() {
+    const me = this.value();
+    return me && me.role === 'admin';
+  }
+
   signOut() {
     window.localStorage.clear();
   }
