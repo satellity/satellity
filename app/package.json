@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@codemirror/lang-markdown": "^6.0.1",
+    "@codemirror/language-data": "^6.1.0",
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-brands-svg-icons": "^6.1.2",
     "@fortawesome/free-regular-svg-icons": "^6.1.2",
@@ -39,7 +41,7 @@
     "react-scripts": "5.0.1",
     "react-styleguidist": "^11.2.0",
     "react-timeago": "^7.1.0",
-    "sass": "^1.54.5",
+    "sass": "^1.54.9",
     "short-uuid": "^4.2.0",
     "showdown": "^2.1.0",
     "showdown-highlight": "^3.0.0",
