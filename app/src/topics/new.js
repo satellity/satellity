@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Navigate, useParams} from 'react-router-dom';
+import {Navigate, useParams, useNavigate} from 'react-router-dom';
 import CodeMirror from '@uiw/react-codemirror';
 import {markdown, markdownLanguage} from '@codemirror/lang-markdown';
 import {languages} from '@codemirror/language-data';
@@ -12,30 +12,29 @@ import Button from 'components/button.js';
 import style from './new.module.scss';
 
 const Form = (props) => {
+  const navigate = useNavigate();
+  const {id} = useParams();
+
   const [api] = useState(new API());
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [topic] = useState({});
   const [topicId, setTopicId] = useState('draft');
   const [categoryId, setCategoryId] = useState('');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   // const [draft] = useState(false);
 
-  const {id} = useParams();
-
   useEffect(() => {
-    if (id) {
-      setTopicId(id);
-    }
-    api.topic.show(topicId).then((resp) => {
+    api.topic.show(id || topicId).then((resp) => {
       if (resp.error) {
         return;
       }
-      if (resp.data) {
-        setTopicId(resp.data.topic_id);
-        setCategoryId(resp.data.category_id);
-        setTitle(resp.data.title);
+      const topic = resp.data;
+      if (topic) {
+        setTopicId(topic.topic_id);
+        setCategoryId(topic.category_id);
+        setTitle(topic.title);
+        setBody(topic.body);
       }
       setLoading(false);
     });
@@ -59,14 +58,19 @@ const Form = (props) => {
       return;
     }
     setSubmitting(true);
-    let request = api.topic.create(topic);
-    if (validate(topic.topic_id)) {
-      request = api.topic.update(topic.topic_id, topic);
+    const params = {title: title, body: body, category_id: categoryId, topic_type: 'POST', draft: false};
+    let request;
+    if (validate(topicId)) {
+      request = api.topic.update(topicId, params);
+    } else {
+      request = api.topic.create(params);
     }
     request.then((resp) => {
       if (resp.error) {
         return;
       }
+      navigate('/');
+    }).finally(() => {
       setSubmitting(false);
     });
   };
