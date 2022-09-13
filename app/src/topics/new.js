@@ -12,6 +12,34 @@ import {seoTitle} from 'utils';
 
 import style from './new.module.scss';
 
+const Nodes = ({categoryId, setCategoryId}) => {
+  const {isLoading, data} = useCategory();
+
+  const handleCategoryClick = (e, value) => {
+    setCategoryId(value);
+  };
+
+  if (isLoading) {
+    return;
+  }
+
+  useEffect(() => {
+    if (data.length > 0 && !categoryId) {
+      setCategoryId(data[0].category_id);
+    };
+  }, [data]);
+
+  const categories = data.map((c) => {
+    return (
+      <span key={c.category_id} className={`${style.category} ${c.category_id === categoryId ? style.active : ''}`}
+        onClick={(e) => handleCategoryClick(e, c.category_id)}>
+        {c.alias}
+      </span>
+    );
+  });
+  return categories;
+};
+
 const Form = (props) => {
   const navigate = useNavigate();
   const {id} = useParams();
@@ -59,10 +87,6 @@ const Form = (props) => {
     setBody(value);
   };
 
-  const handleCategoryClick = (e, value) => {
-    setCategoryId(value);
-  };
-
   const submitForm = (e, autoSave) => {
     if (e) {
       e.preventDefault();
@@ -102,27 +126,6 @@ const Form = (props) => {
     });
   };
 
-
-  const {isLoading, data} = useCategory();
-
-  useEffect(() => {
-    if (data.length > 0 && !categoryId) {
-      setCategoryId(data[0].category_id);
-    };
-  }, [data]);
-
-  let categories = [];
-  if (!loading && !isLoading) {
-    categories = data.map((c) => {
-      return (
-        <span key={c.category_id} className={`${style.category} ${c.category_id === categoryId ? style.active : ''}`}
-          onClick={(e) => handleCategoryClick(e, c.category_id)}>
-          {c.alias}
-        </span>
-      );
-    });
-  }
-
   if (loading) {
     return (
       <div className={style.loading}>
@@ -139,7 +142,7 @@ const Form = (props) => {
   const form = (
     <form onSubmit={(e) => submitForm(e, false)}>
       <div className={style.categories}>
-        {categories}
+        <Nodes categoryId={categoryId} setCategoryId={setCategoryId}/>
       </div>
       <div>
         <input type='text' name='title' pattern='.{3,}' required value={title} autoComplete='off' placeholder={i18n.t('topic.placeholder.title')}
