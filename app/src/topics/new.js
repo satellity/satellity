@@ -8,6 +8,7 @@ import {useCategory} from 'services';
 import API from 'api/index.js';
 import Loading from 'components/loading.js';
 import Button from 'components/button.js';
+import {seoTitle} from 'utils';
 
 import style from './new.module.scss';
 
@@ -69,7 +70,8 @@ const Form = (props) => {
       if (resp.error) {
         return;
       }
-      navigate('/');
+      const topic = resp.data;
+      navigate(`/topics/${seoTitle(topic.title, topic.topic_id)}`);
     }).finally(() => {
       setSubmitting(false);
     });

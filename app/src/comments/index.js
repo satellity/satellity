@@ -15,6 +15,7 @@ const Index = (props) => {
   const converter = new showdown.Converter();
 
   const [comments, setComments] = useState([]);
+  const [count, setCount] = useState(commentsCount);
 
   useEffect(() => {
     api.comment.index(topicId).then((resp) => {
@@ -35,6 +36,7 @@ const Index = (props) => {
     }
     comment.body = converter.makeHtml(comment.body);
     setComments((old) => [...old, comment]);
+    setCount(count+1);
   };
 
   const commentsView = comments.map((comment) => {
@@ -56,7 +58,7 @@ const Index = (props) => {
 
   const commentsContainer = (
     <div className={style.container}>
-      <h3>{i18n.t('comment.count', {count: commentsCount})}</h3>
+      <h3>{i18n.t('comment.count', {count})}</h3>
       <ul className={style.comments}>
         {commentsView}
       </ul>
@@ -65,7 +67,7 @@ const Index = (props) => {
 
   return (
     <>
-      {commentsCount > 0 && commentsContainer}
+      {count > 0 && commentsContainer}
       <New topicId={topicId} submitComment={submitComment} />
     </>
   );
