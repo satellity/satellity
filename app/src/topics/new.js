@@ -23,7 +23,7 @@ const Form = (props) => {
   const [categoryId, setCategoryId] = useState('');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
-  // const [draft] = useState(false);
+  const [draft, setDraft] = useState(true);
 
   useEffect(() => {
     api.topic.show(id || topicId).then((resp) => {
@@ -36,10 +36,20 @@ const Form = (props) => {
         setCategoryId(topic.category_id);
         setTitle(topic.title);
         setBody(topic.body);
+        setDraft(topic.draft);
       }
       setLoading(false);
     });
   }, [id]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      submitForm(undefined, true);
+    }, 10000);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [categoryId, title, body]);
 
   const handleChange = (e) => {
     setTitle(e.target.value);
@@ -53,13 +63,25 @@ const Form = (props) => {
     setCategoryId(value);
   };
 
-  const submitForm = (e) => {
-    e.preventDefault();
+  const submitForm = (e, autoSave) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (submitting) {
       return;
     }
+    if (!validate(categoryId)) {
+      return;
+    }
+    if (title.length <= 3) {
+      return;
+    }
     setSubmitting(true);
-    const params = {title: title, body: body, category_id: categoryId, topic_type: 'POST', draft: false};
+    let dra = draft;
+    if (!autoSave) {
+      dra = false;
+    }
+    const params = {title, body, category_id: categoryId, topic_type: 'POST', draft: dra};
     let request;
     if (validate(topicId)) {
       request = api.topic.update(topicId, params);
@@ -71,7 +93,10 @@ const Form = (props) => {
         return;
       }
       const topic = resp.data;
-      navigate(`/topics/${seoTitle(topic.title, topic.topic_id)}`);
+      setTopicId(topic.topic_id);
+      if (!autoSave) {
+        navigate(`/topics/${seoTitle(topic.title, topic.topic_id)}`);
+      }
     }).finally(() => {
       setSubmitting(false);
     });
@@ -81,13 +106,13 @@ const Form = (props) => {
   const {isLoading, data} = useCategory();
 
   useEffect(() => {
-    if (data.length > 0) {
+    if (data.length > 0 && !categoryId) {
       setCategoryId(data[0].category_id);
     };
   }, [data]);
 
   let categories = [];
-  if (!isLoading) {
+  if (!loading && !isLoading) {
     categories = data.map((c) => {
       return (
         <span key={c.category_id} className={`${style.category} ${c.category_id === categoryId ? style.active : ''}`}
@@ -112,7 +137,7 @@ const Form = (props) => {
   }
 
   const form = (
-    <form onSubmit={submitForm}>
+    <form onSubmit={(e) => submitForm(e, false)}>
       <div className={style.categories}>
         {categories}
       </div>
