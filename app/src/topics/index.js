@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import {Link, useParams, useSearchParams} from 'react-router-dom';
 import {Helmet} from 'react-helmet';
-import Config from 'components/config.js';
 import Loading from 'components/loading.js';
 import API from 'api/index.js';
 import Widget from 'home/widget.js';
 import {useCategory} from 'services';
+import {site} from 'utils';
 import TopicItem from './item.js';
 
 import style from './index.module.scss';
@@ -70,18 +70,18 @@ const Topics = () => {
 
   useEffect(() => {
     setCategoryId(id || 'latest');
+    setOffset('');
   }, [id]);
 
   useEffect(() => {
     setLoading(true);
-    const request = categoryId === 'latest' ?
-      api.topic.index(offset) :
-      api.category.topics(categoryId, offset);
+    const request = api.category.topics(categoryId, offset);
 
     request.then((resp) => {
       if (resp.error) {
         return;
       }
+      console.log(resp);
       const data = resp.data;
       const offset = data.length >= pagination ? data[data.length-1].created_at : '';
       setOffset(offset);
@@ -120,7 +120,7 @@ const Topics = () => {
 };
 
 const Index = () => {
-  const title = `${i18n.t('site.title')} - ${Config.Name}`;
+  const title = `${i18n.t('site.title')} - ${site.Name}`;
   const description = i18n.t('site.description');
 
   return (

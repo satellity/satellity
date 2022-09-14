@@ -2,19 +2,13 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 import TimeAgo from 'react-timeago';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import ColorUtils from 'components/color.js';
-import Avatar from 'users/avatar.js';
 import PropTypes from 'prop-types';
-import {seoTitle} from 'utils';
+import Avatar from 'users/avatar.js';
+import {colorful, seoTitle, shortAddress} from 'utils';
 
 import style from './item.module.scss';
 
-const TopicItem = (props) => {
-  const {profile, topic} = props;
-
-  const color = new ColorUtils();
-
-  const i18n = window.i18n;
+const TopicItem = ({profile, topic}) => {
   let comments;
   if (topic.comments_count > 0) {
     comments = (
@@ -43,13 +37,13 @@ const TopicItem = (props) => {
         }
         <div>
           <Link className={style.node} to={`/categories/${topic.category.name}`}
-            style={{color: color.display(topic.category.name, 1), backgroundColor: color.display(topic.category.name, 0.3)}}>
+            style={{color: colorful(topic.category.name, 1), backgroundColor: colorful(topic.category.name, 0.3)}}>
             {topic.category.alias}
           </Link>
           {
             !profile &&
               <span className={style.fullname}>
-                <Link to={`/users/${topic.user.user_id}`}>{topic.user.nickname.slice(0, 16)}</Link>
+                {shortAddress(topic.user.nickname)}
               </span>
           }
           <span className={style.sep}>{i18n.t('topic.at')}</span>
