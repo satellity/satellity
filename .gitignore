@@ -1,9 +1,8 @@
 .DS_Store
 bin
 satellity
-internal/configs/*
-!internal/configs/config.go
-!internal/configs/config.example
+config.yaml
+internal/tasks
 publish
 public
 app/public/sitemap.xml

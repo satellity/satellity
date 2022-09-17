@@ -45,7 +45,7 @@ func teardownTestContext(ctx context.Context) {
 }
 
 func setupTestContext() context.Context {
-	if err := configs.Init("../configs/config.yaml", testEnvironment); err != nil {
+	if err := configs.Init(testEnvironment); err != nil {
 		log.Panicln(err)
 	}
 	config := configs.AppConfig

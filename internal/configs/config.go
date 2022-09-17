@@ -1,10 +1,13 @@
 package configs
 
 import (
-	"io/ioutil"
+	_ "embed"
 
 	yaml "gopkg.in/yaml.v2"
 )
+
+//go:embed config.yaml
+var data []byte
 
 // Constants of configs
 const (
@@ -62,14 +65,9 @@ type Option struct {
 var AppConfig *Option
 
 // Init is using to initialize the configs
-func Init(file, env string) error {
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		return err
-	}
-
+func Init(env string) error {
 	var options map[string]Option
-	err = yaml.Unmarshal(data, &options)
+	err := yaml.Unmarshal(data, &options)
 	if err != nil {
 		return err
 	}

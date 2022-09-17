@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path"
-	"path/filepath"
 	"satellity/internal/configs"
 	"satellity/internal/durable"
 	"satellity/internal/middlewares"
@@ -39,7 +36,6 @@ func startHTTP(db *pgxpool.Pool, logger *zap.Logger, port string) error {
 
 func main() {
 	var options struct {
-		Config      string `short:"c" long:"config" description:"Where's the config file place, default ./internal/configs/config.yaml"`
 		Environment string `short:"e" long:"environment" default:"development"`
 	}
 	p := flags.NewParser(&options, flags.Default)
@@ -47,15 +43,7 @@ func main() {
 		log.Panicln(err)
 	}
 
-	if options.Config == "" {
-		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		if err != nil {
-			log.Panicln(err)
-		}
-		options.Config = path.Join(dir, "internal/configs/config.yaml")
-	}
-
-	if err := configs.Init(options.Config, options.Environment); err != nil {
+	if err := configs.Init(options.Environment); err != nil {
 		log.Panicln(err)
 	}
 
