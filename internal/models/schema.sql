@@ -107,6 +107,16 @@ CREATE INDEX IF NOT EXISTS comments_user_createdx ON comments (user_id, created_
 CREATE INDEX IF NOT EXISTS comments_score_createdx ON comments (score DESC, created_at);
 
 
+CREATE TABLE IF NOT EXISTS sources (
+  source_id             VARCHAR(36) PRIMARY KEY,
+  author                VARCHAR(512) NOT NULL,
+  host                  VARCHAR(128) NOT NULL,
+  link                  VARCHAR(1024) NOT NULL,
+  created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+
 CREATE TABLE IF NOT EXISTS statistics (
   statistic_id          VARCHAR(36) PRIMARY KEY,
   name                  VARCHAR(512) NOT NULL,

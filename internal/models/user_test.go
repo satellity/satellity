@@ -132,10 +132,30 @@ func TestWeb3UserCRUD(t *testing.T) {
 	assert.NotNil(user)
 	assert.Equal(nickname, user.Nickname)
 
+	public, _, err = ed25519.GenerateKey(rand.Reader)
+	assert.Nil(err)
+
+	data = fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
+	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
+	msg = fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
+	hash = crypto.Keccak256Hash([]byte(msg))
+	signature, err = crypto.Sign(hash.Bytes(), privateKey)
+	assert.Nil(err)
+
 	old, err := CreateWeb3User(ctx, nickname, publicKey, hex.EncodeToString(public), hex.EncodeToString(signature))
 	assert.Nil(err)
 	assert.NotNil(user)
 	assert.Equal(user.UserID, old.UserID)
+
+	public, _, err = ed25519.GenerateKey(rand.Reader)
+	assert.Nil(err)
+
+	data = fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
+	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
+	msg = fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
+	hash = crypto.Keccak256Hash([]byte(msg))
+	signature, err = crypto.Sign(hash.Bytes(), privateKey)
+	assert.Nil(err)
 
 	nickname = "abcd"
 	data = fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
