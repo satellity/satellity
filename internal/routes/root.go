@@ -23,6 +23,7 @@ func RegisterRoutes(router *httptreemux.TreeMux) {
 	registerTopic(api)
 	registerComment(api)
 	registerVerification(api)
+	registerGist(api)
 	admin.RegisterAdminRoutes(api)
 }
 

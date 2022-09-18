@@ -23,6 +23,8 @@ type Gist struct {
 	PublishAt time.Time
 	CreatedAt time.Time
 	UpdatedAt time.Time
+
+	Source *Source
 }
 
 var gistColumns = []string{"gist_id", "identity", "title", "source_id", "genre", "cardinal", "link", "publish_at", "created_at", "updated_at"}
