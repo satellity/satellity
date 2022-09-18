@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS gists (
   source_id             VARCHAR(36) NOT NULL,
   genre                 VARCHAR(128) NOT NULL,
   cardinal              BOOL NOT NULL DEFAULT false,
+  link                  VARCHAR(256) NOT NULL UNIQUE,
   publish_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()

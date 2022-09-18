@@ -14,7 +14,7 @@ func TestGistCRUD(t *testing.T) {
 
 	source := testCreateSource(ctx)
 	assert.NotNil(source)
-	gist, err := CreateGist(ctx, "identity", "gist title", "release", true, time.Now(), source)
+	gist, err := CreateGist(ctx, "identity", "gist title", "release", true, "link", time.Now(), source)
 	assert.Nil(err)
 	assert.NotNil(gist)
 	err = gist.Update(ctx, "gist title updated", "release", true)

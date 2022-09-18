@@ -19,24 +19,25 @@ type Gist struct {
 	SourceID  string
 	Genre     string
 	Cardinal  bool
+	Link      string
 	PublishAt time.Time
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-var gistColumns = []string{"gist_id", "identity", "title", "source_id", "genre", "cardinal", "publish_at", "created_at", "updated_at"}
+var gistColumns = []string{"gist_id", "identity", "title", "source_id", "genre", "cardinal", "link", "publish_at", "created_at", "updated_at"}
 
 func gistFromRow(row durable.Row) (*Gist, error) {
 	var g Gist
-	err := row.Scan(&g.GistID, &g.Identity, &g.Title, &g.SourceID, &g.Genre, &g.Cardinal, &g.PublishAt, &g.CreatedAt, &g.UpdatedAt)
+	err := row.Scan(&g.GistID, &g.Identity, &g.Title, &g.SourceID, &g.Genre, &g.Cardinal, &g.Link, &g.PublishAt, &g.CreatedAt, &g.UpdatedAt)
 	return &g, err
 }
 
 func (g *Gist) values() []any {
-	return []any{g.GistID, g.Identity, g.Title, g.SourceID, g.Genre, g.Cardinal, g.PublishAt, g.CreatedAt, g.UpdatedAt}
+	return []any{g.GistID, g.Identity, g.Title, g.SourceID, g.Genre, g.Cardinal, &g.Link, g.PublishAt, g.CreatedAt, g.UpdatedAt}
 }
 
-func CreateGist(ctx context.Context, identity, title, genre string, cardinal bool, publishedAt time.Time, source *Source) (*Gist, error) {
+func CreateGist(ctx context.Context, identity, title, genre string, cardinal bool, link string, publishedAt time.Time, source *Source) (*Gist, error) {
 	identity = strings.TrimSpace(identity)
 	title = strings.TrimSpace(title)
 	id := generateUniqueID(identity)
@@ -49,6 +50,7 @@ func CreateGist(ctx context.Context, identity, title, genre string, cardinal boo
 		SourceID:  source.SourceID,
 		Genre:     genre,
 		Cardinal:  cardinal,
+		Link:      link,
 		PublishAt: publishedAt,
 		CreatedAt: t,
 		UpdatedAt: t,
