@@ -18,23 +18,24 @@ type Source struct {
 	Author    string
 	Host      string
 	Link      string
+	LogoURL   string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-var sourceColumns = []string{"source_id", "author", "host", "link", "created_at", "updated_at"}
+var sourceColumns = []string{"source_id", "author", "host", "link", "logo_url", "created_at", "updated_at"}
 
 func (s *Source) values() []any {
-	return []any{s.SourceID, s.Author, s.Host, s.Link, s.CreatedAt, s.UpdatedAt}
+	return []any{s.SourceID, s.Author, s.Host, s.Link, s.LogoURL, s.CreatedAt, s.UpdatedAt}
 }
 
 func sourceFromRows(row durable.Row) (*Source, error) {
 	var s Source
-	err := row.Scan(&s.SourceID, &s.Author, &s.Host, &s.Link, &s.CreatedAt, &s.UpdatedAt)
+	err := row.Scan(&s.SourceID, &s.Author, &s.Host, &s.Link, &s.LogoURL, &s.CreatedAt, &s.UpdatedAt)
 	return &s, err
 }
 
-func CreateSource(ctx context.Context, author, link string) (*Source, error) {
+func CreateSource(ctx context.Context, author, link, logo string) (*Source, error) {
 	author = strings.TrimSpace(author)
 	link = strings.TrimSpace(link)
 
@@ -52,11 +53,14 @@ func CreateSource(ctx context.Context, author, link string) (*Source, error) {
 	host := uri.Host
 	host = strings.Replace(host, "www.", "", 0)
 
+	id := generateUniqueID(link)
+
 	t := time.Now()
 	source := &Source{
-		SourceID:  uuid.Must(uuid.NewV4()).String(),
+		SourceID:  id,
 		Author:    author,
 		Link:      link,
+		LogoURL:   logo,
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
@@ -65,7 +69,7 @@ func CreateSource(ctx context.Context, author, link string) (*Source, error) {
 		source.values(),
 	}
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		old, err := findSourceByLink(ctx, tx, link)
+		old, err := findSource(ctx, tx, id)
 		if err != nil {
 			return err
 		} else if old != nil {
@@ -81,18 +85,22 @@ func CreateSource(ctx context.Context, author, link string) (*Source, error) {
 	return source, nil
 }
 
-func (s *Source) Update(ctx context.Context, author, host string) error {
+func (s *Source) Update(ctx context.Context, author, host, logo string) error {
 	author = strings.TrimSpace(author)
 	host = strings.TrimSpace(host)
+	logo = strings.TrimSpace(logo)
 	if author != "" {
 		s.Author = author
 	}
 	if host != "" {
 		s.Host = host
 	}
+	if logo != "" {
+		s.LogoURL = logo
+	}
 
-	cols, posits := durable.PrepareColumnsAndExpressions([]string{"author", "host"}, 1)
-	values := []interface{}{s.SourceID, s.Author, s.Host}
+	cols, posits := durable.PrepareColumnsAndExpressions([]string{"author", "host", "logo_url"}, 1)
+	values := []interface{}{s.SourceID, s.Author, s.Host, s.LogoURL}
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("UPDATE sources SET (%s)=(%s) WHERE source_id=$1", cols, posits)
 		_, err := tx.Exec(ctx, query, values...)

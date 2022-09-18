@@ -112,9 +112,26 @@ CREATE TABLE IF NOT EXISTS sources (
   author                VARCHAR(512) NOT NULL,
   host                  VARCHAR(128) NOT NULL,
   link                  VARCHAR(1024) NOT NULL UNIQUE,
+  logo_url              VARCHAR(1024) NOT NULL,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
+
+
+CREATE TABLE IF NOT EXISTS gists (
+  gist_id               VARCHAR(36) PRIMARY KEY,
+  identity              VARCHAR(256) NOT NULL UNIQUE,
+  title                 VARCHAR(1024) NOT NULL DEFAULT '',
+  source_id             VARCHAR(36) NOT NULL,
+  genre                 VARCHAR(128) NOT NULL,
+  cardinal              BOOL NOT NULL DEFAULT false,
+  publish_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS gists_cardinalx ON gists (genre, publish_at DESC);
+CREATE INDEX IF NOT EXISTS gists_genrex ON gists (genre, publish_at DESC);
 
 
 CREATE TABLE IF NOT EXISTS statistics (
