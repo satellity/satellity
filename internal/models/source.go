@@ -65,7 +65,14 @@ func CreateSource(ctx context.Context, author, link string) (*Source, error) {
 		source.values(),
 	}
 	err = session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
-		_, err := tx.CopyFrom(ctx, pgx.Identifier{"sources"}, sourceColumns, pgx.CopyFromRows(rows))
+		old, err := findSourceByLink(ctx, tx, link)
+		if err != nil {
+			return err
+		} else if old != nil {
+			source = old
+			return nil
+		}
+		_, err = tx.CopyFrom(ctx, pgx.Identifier{"sources"}, sourceColumns, pgx.CopyFromRows(rows))
 		return err
 	})
 	if err != nil {
@@ -147,6 +154,15 @@ func findSource(ctx context.Context, tx pgx.Tx, id string) (*Source, error) {
 	}
 
 	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM sources WHERE source_id=$1", strings.Join(sourceColumns, ",")), id)
+	s, err := sourceFromRows(row)
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	}
+	return s, err
+}
+
+func findSourceByLink(ctx context.Context, tx pgx.Tx, link string) (*Source, error) {
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM sources WHERE link=$1", strings.Join(sourceColumns, ",")), link)
 	s, err := sourceFromRows(row)
 	if err == pgx.ErrNoRows {
 		return nil, nil

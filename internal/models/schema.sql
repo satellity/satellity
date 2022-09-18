@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS sources (
   source_id             VARCHAR(36) PRIMARY KEY,
   author                VARCHAR(512) NOT NULL,
   host                  VARCHAR(128) NOT NULL,
-  link                  VARCHAR(1024) NOT NULL,
+  link                  VARCHAR(1024) NOT NULL UNIQUE,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );

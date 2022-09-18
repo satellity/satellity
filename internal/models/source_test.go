@@ -15,6 +15,10 @@ func TestSourceCRUD(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(source)
 
+	source, err = CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom")
+	assert.Nil(err)
+	assert.NotNil(source)
+
 	sources, err := ReadSources(ctx)
 	assert.Nil(err)
 	assert.Len(sources, 1)
