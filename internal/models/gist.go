@@ -12,6 +12,10 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+const (
+	GIST_GENRE_RELEASE = "RELEASE"
+)
+
 type Gist struct {
 	GistID    string
 	Identity  string

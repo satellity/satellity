@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -24,7 +25,7 @@ func TestSourceCRUD(t *testing.T) {
 	assert.Nil(err)
 	assert.Len(sources, 1)
 
-	err = source.Update(ctx, "jason", "host", "logo")
+	err = source.Update(ctx, "jason", "host", "logo", time.Now())
 	assert.Nil(err)
 	old, err := ReadSource(ctx, source.SourceID)
 	assert.Nil(err)

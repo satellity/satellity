@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
-	"log"
 	"net/http"
+	"satellity/internal/models"
 	"time"
 )
 
@@ -20,30 +20,42 @@ type Entry struct {
 }
 
 type Feed struct {
-	Updated string   `xml:"updated"`
-	Entries []*Entry `xml:"entry"`
+	Updated time.Time `xml:"updated"`
+	Entries []*Entry  `xml:"entry"`
 }
 
-func Release(ctx context.Context, link string) error {
-	resp, err := client.Get(link)
+func Release(ctx context.Context, s *models.Source) error {
+	now := time.Now()
+	resp, err := client.Get(s.Link)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 429 {
-		return fmt.Errorf("%s too many requests %d", link, resp.StatusCode)
+		return fmt.Errorf("%s too many requests %d", s.Link, resp.StatusCode)
 	}
 	if resp.StatusCode == 403 {
-		return fmt.Errorf("%s forbidden %d", link, resp.StatusCode)
+		return fmt.Errorf("%s forbidden %d", s.Link, resp.StatusCode)
 	}
 	var feed Feed
 	err = xml.NewDecoder(resp.Body).Decode(&feed)
 	if err != nil {
 		return err
 	}
-	log.Printf("Feed %#v", feed)
-	return nil
+
+	if feed.Updated.After(s.UpdatedAt) {
+		for _, entry := range feed.Entries {
+			if entry.Updated.Before(s.UpdatedAt) {
+				break
+			}
+			_, err = models.CreateGist(ctx, entry.Id, entry.Title, models.GIST_GENRE_RELEASE, false, entry.Link.Href, entry.Updated, s)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return s.Update(ctx, "", "", "", now)
 }
 
 var client *http.Client

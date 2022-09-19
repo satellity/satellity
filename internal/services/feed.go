@@ -15,7 +15,7 @@ func Run(db *durable.Database) {
 	for {
 		err := loopSources(ctx)
 		if err != nil {
-			log.Printf("services.loopSources error %s", err)
+			log.Printf("services.loopSources error %s \n", err)
 			time.Sleep(3 * time.Second)
 			continue
 		}
@@ -30,11 +30,10 @@ func loopSources(ctx context.Context) error {
 	}
 	for _, s := range sources {
 		log.Println("fetch", s.Link)
-		err := feeds.Release(ctx, s.Link)
+		err := feeds.Release(ctx, s)
 		if err != nil {
 			return err
 		}
-		break
 	}
 	return nil
 }

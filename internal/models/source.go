@@ -85,7 +85,7 @@ func CreateSource(ctx context.Context, author, link, logo string) (*Source, erro
 	return source, nil
 }
 
-func (s *Source) Update(ctx context.Context, author, host, logo string) error {
+func (s *Source) Update(ctx context.Context, author, host, logo string, updated time.Time) error {
 	author = strings.TrimSpace(author)
 	host = strings.TrimSpace(host)
 	logo = strings.TrimSpace(logo)
@@ -99,8 +99,8 @@ func (s *Source) Update(ctx context.Context, author, host, logo string) error {
 		s.LogoURL = logo
 	}
 
-	cols, posits := durable.PrepareColumnsAndExpressions([]string{"author", "host", "logo_url"}, 1)
-	values := []interface{}{s.SourceID, s.Author, s.Host, s.LogoURL}
+	cols, posits := durable.PrepareColumnsAndExpressions([]string{"author", "host", "logo_url", "updated_at"}, 1)
+	values := []interface{}{s.SourceID, s.Author, s.Host, s.LogoURL, updated}
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("UPDATE sources SET (%s)=(%s) WHERE source_id=$1", cols, posits)
 		_, err := tx.Exec(ctx, query, values...)
@@ -126,7 +126,7 @@ func ReadSources(ctx context.Context) ([]*Source, error) {
 }
 
 func readSources(ctx context.Context, tx pgx.Tx) ([]*Source, error) {
-	rows, err := tx.Query(ctx, fmt.Sprintf("SELECT %s FROM sources LIMIT 3000", strings.Join(sourceColumns, ",")))
+	rows, err := tx.Query(ctx, fmt.Sprintf("SELECT %s FROM sources ORDER BY updated_at LIMIT 3000", strings.Join(sourceColumns, ",")))
 	if err != nil {
 		return nil, err
 	}

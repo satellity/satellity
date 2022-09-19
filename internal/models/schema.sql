@@ -117,6 +117,8 @@ CREATE TABLE IF NOT EXISTS sources (
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX IF NOT EXISTS sources_updatedx ON sources (updated_at);
+
 
 CREATE TABLE IF NOT EXISTS gists (
   gist_id               VARCHAR(36) PRIMARY KEY,
