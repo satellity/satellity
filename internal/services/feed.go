@@ -30,7 +30,7 @@ func loopSources(ctx context.Context) error {
 	}
 	for _, s := range sources {
 		log.Println("fetch", s.Link)
-		err := feeds.Release(ctx, s)
+		err := feeds.Github(ctx, s)
 		if err != nil {
 			return err
 		}

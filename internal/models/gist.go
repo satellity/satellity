@@ -13,17 +13,20 @@ import (
 )
 
 const (
+	GIST_GENRE_DEFAULT = "DEFAULT"
 	GIST_GENRE_RELEASE = "RELEASE"
 )
 
 type Gist struct {
 	GistID    string
 	Identity  string
+	Author    string
 	Title     string
 	SourceID  string
 	Genre     string
 	Cardinal  bool
 	Link      string
+	Body      string
 	PublishAt time.Time
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -31,19 +34,19 @@ type Gist struct {
 	Source *Source
 }
 
-var gistColumns = []string{"gist_id", "identity", "title", "source_id", "genre", "cardinal", "link", "publish_at", "created_at", "updated_at"}
+var gistColumns = []string{"gist_id", "identity", "author", "title", "source_id", "genre", "cardinal", "link", "body", "publish_at", "created_at", "updated_at"}
 
 func gistFromRow(row durable.Row) (*Gist, error) {
 	var g Gist
-	err := row.Scan(&g.GistID, &g.Identity, &g.Title, &g.SourceID, &g.Genre, &g.Cardinal, &g.Link, &g.PublishAt, &g.CreatedAt, &g.UpdatedAt)
+	err := row.Scan(&g.GistID, &g.Identity, &g.Author, &g.Title, &g.SourceID, &g.Genre, &g.Cardinal, &g.Link, &g.Body, &g.PublishAt, &g.CreatedAt, &g.UpdatedAt)
 	return &g, err
 }
 
 func (g *Gist) values() []any {
-	return []any{g.GistID, g.Identity, g.Title, g.SourceID, g.Genre, g.Cardinal, &g.Link, g.PublishAt, g.CreatedAt, g.UpdatedAt}
+	return []any{g.GistID, g.Identity, g.Author, g.Title, g.SourceID, g.Genre, g.Cardinal, g.Link, g.Body, g.PublishAt, g.CreatedAt, g.UpdatedAt}
 }
 
-func CreateGist(ctx context.Context, identity, title, genre string, cardinal bool, link string, publishedAt time.Time, source *Source) (*Gist, error) {
+func CreateGist(ctx context.Context, identity, author, title, genre string, cardinal bool, link, body string, publishedAt time.Time, source *Source) (*Gist, error) {
 	identity = strings.TrimSpace(identity)
 	title = strings.TrimSpace(title)
 	id := generateUniqueID(identity)
@@ -52,11 +55,13 @@ func CreateGist(ctx context.Context, identity, title, genre string, cardinal boo
 	gist := &Gist{
 		GistID:    id,
 		Identity:  identity,
+		Author:    author,
 		Title:     title,
 		SourceID:  source.SourceID,
 		Genre:     genre,
 		Cardinal:  cardinal,
 		Link:      link,
+		Body:      body,
 		PublishAt: publishedAt,
 		CreatedAt: t,
 		UpdatedAt: t,

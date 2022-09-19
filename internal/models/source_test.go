@@ -13,11 +13,11 @@ func TestSourceCRUD(t *testing.T) {
 	ctx := setupTestContext()
 	defer teardownTestContext(ctx)
 
-	source, err := CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo")
+	source, err := CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo", "locality")
 	assert.Nil(err)
 	assert.NotNil(source)
 
-	source, err = CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo")
+	source, err = CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo", "locality")
 	assert.Nil(err)
 	assert.NotNil(source)
 
@@ -33,6 +33,6 @@ func TestSourceCRUD(t *testing.T) {
 	assert.Equal("jason", old.Author)
 }
 func testCreateSource(ctx context.Context) *Source {
-	source, _ := CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo")
+	source, _ := CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo", "locality")
 	return source
 }

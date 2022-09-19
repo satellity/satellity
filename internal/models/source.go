@@ -19,23 +19,24 @@ type Source struct {
 	Host      string
 	Link      string
 	LogoURL   string
+	Locality  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-var sourceColumns = []string{"source_id", "author", "host", "link", "logo_url", "created_at", "updated_at"}
+var sourceColumns = []string{"source_id", "author", "host", "link", "logo_url", "locality", "created_at", "updated_at"}
 
 func (s *Source) values() []any {
-	return []any{s.SourceID, s.Author, s.Host, s.Link, s.LogoURL, s.CreatedAt, s.UpdatedAt}
+	return []any{s.SourceID, s.Author, s.Host, s.Link, s.LogoURL, s.CreatedAt, s.Locality, s.UpdatedAt}
 }
 
 func sourceFromRows(row durable.Row) (*Source, error) {
 	var s Source
-	err := row.Scan(&s.SourceID, &s.Author, &s.Host, &s.Link, &s.LogoURL, &s.CreatedAt, &s.UpdatedAt)
+	err := row.Scan(&s.SourceID, &s.Author, &s.Host, &s.Link, &s.LogoURL, &s.Locality, &s.CreatedAt, &s.UpdatedAt)
 	return &s, err
 }
 
-func CreateSource(ctx context.Context, author, link, logo string) (*Source, error) {
+func CreateSource(ctx context.Context, author, link, logo, locality string) (*Source, error) {
 	author = strings.TrimSpace(author)
 	link = strings.TrimSpace(link)
 
@@ -61,6 +62,7 @@ func CreateSource(ctx context.Context, author, link, logo string) (*Source, erro
 		Author:    author,
 		Link:      link,
 		LogoURL:   logo,
+		Locality:  locality,
 		CreatedAt: t,
 		UpdatedAt: t,
 	}

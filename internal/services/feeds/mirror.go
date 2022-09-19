@@ -4,12 +4,11 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
-	"net/http"
 	"satellity/internal/models"
 	"time"
 )
 
-type Entry struct {
+type EntryMirror struct {
 	Id      string    `xml:"id"`
 	Updated time.Time `xml:"updated"`
 	Link    struct {
@@ -17,14 +16,17 @@ type Entry struct {
 	} `xml:"link"`
 	Title   string `xml:"title"`
 	Content string `xml:"content"`
+	Author  struct {
+		Name string `xml:"name"`
+	} `xml:"author"`
 }
 
-type Github struct {
-	Updated time.Time `xml:"updated"`
-	Entries []*Entry  `xml:"entry"`
+type Mirror struct {
+	Updated time.Time      `xml:"updated"`
+	Entries []*EntryMirror `xml:"entry"`
 }
 
-func Github(ctx context.Context, s *models.Source) error {
+func FetchMirror(ctx context.Context, s *models.Source) error {
 	now := time.Now()
 	resp, err := client.Get(s.Link)
 	if err != nil {
@@ -38,7 +40,7 @@ func Github(ctx context.Context, s *models.Source) error {
 	if resp.StatusCode == 403 {
 		return fmt.Errorf("%s forbidden %d", s.Link, resp.StatusCode)
 	}
-	var feed Github
+	var feed Mirror
 	err = xml.NewDecoder(resp.Body).Decode(&feed)
 	if err != nil {
 		return err
@@ -49,19 +51,11 @@ func Github(ctx context.Context, s *models.Source) error {
 			if entry.Updated.Before(s.UpdatedAt) {
 				break
 			}
-			_, err = models.CreateGist(ctx, entry.Id, "", entry.Title, models.GIST_GENRE_RELEASE, false, entry.Link.Href, entry.Content, entry.Updated, s)
+			_, err = models.CreateGist(ctx, entry.Id, entry.Author.Name, entry.Title, models.GIST_GENRE_DEFAULT, true, entry.Link.Href, entry.Content, entry.Updated, s)
 			if err != nil {
 				return err
 			}
 		}
 	}
 	return s.Update(ctx, "", "", "", now)
-}
-
-var client *http.Client
-
-func init() {
-	client = &http.Client{
-		Timeout: 10 * time.Second,
-	}
 }
