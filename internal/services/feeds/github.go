@@ -24,7 +24,7 @@ type Github struct {
 	Entries []*Entry  `xml:"entry"`
 }
 
-func Github(ctx context.Context, s *models.Source) error {
+func FetchGithub(ctx context.Context, s *models.Source) error {
 	now := time.Now()
 	resp, err := client.Get(s.Link)
 	if err != nil {

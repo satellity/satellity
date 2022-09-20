@@ -36,6 +36,7 @@ func TestSourceCRUD(t *testing.T) {
 	assert.NotNil(old)
 	assert.Equal("jason", old.Author)
 }
+
 func testCreateSource(ctx context.Context) *Source {
 	source, _ := CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo", "locality")
 	return source
