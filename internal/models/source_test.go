@@ -13,6 +13,10 @@ func TestSourceCRUD(t *testing.T) {
 	ctx := setupTestContext()
 	defer teardownTestContext(ctx)
 
+	sources, err := ReadSources(ctx)
+	assert.Nil(err)
+	assert.Len(sources, 0)
+
 	source, err := CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo", "locality")
 	assert.Nil(err)
 	assert.NotNil(source)
@@ -21,7 +25,7 @@ func TestSourceCRUD(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(source)
 
-	sources, err := ReadSources(ctx)
+	sources, err = ReadSources(ctx)
 	assert.Nil(err)
 	assert.Len(sources, 1)
 

@@ -27,7 +27,7 @@ type Source struct {
 var sourceColumns = []string{"source_id", "author", "host", "link", "logo_url", "locality", "created_at", "updated_at"}
 
 func (s *Source) values() []any {
-	return []any{s.SourceID, s.Author, s.Host, s.Link, s.LogoURL, s.CreatedAt, s.Locality, s.UpdatedAt}
+	return []any{s.SourceID, s.Author, s.Host, s.Link, s.LogoURL, s.Locality, s.CreatedAt, s.UpdatedAt}
 }
 
 func sourceFromRows(row durable.Row) (*Source, error) {
