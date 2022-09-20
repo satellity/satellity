@@ -179,3 +179,14 @@ func findSourceByLink(ctx context.Context, tx pgx.Tx, link string) (*Source, err
 	}
 	return s, err
 }
+
+func (s *Source) Delete(ctx context.Context) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		_, err := tx.Exec(ctx, "DELETE FROM sources WHERE source_id=$1", s.SourceID)
+		return err
+	})
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
+}

@@ -177,3 +177,14 @@ func findGist(ctx context.Context, tx pgx.Tx, id string) (*Gist, error) {
 	}
 	return s, err
 }
+
+func (g *Gist) Delete(ctx context.Context) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		_, err := tx.Exec(ctx, "DELETE FROM gists WHERE gist_id=$1", g.GistID)
+		return err
+	})
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
+}

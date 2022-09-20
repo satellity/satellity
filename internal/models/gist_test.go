@@ -26,4 +26,10 @@ func TestGistCRUD(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(old)
 	assert.Equal("gist title updated", old.Title)
+
+	err = gist.Delete(ctx)
+	assert.Nil(err)
+	old, err = ReadGist(ctx, gist.GistID)
+	assert.Nil(err)
+	assert.Nil(old)
 }

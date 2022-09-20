@@ -35,6 +35,12 @@ func TestSourceCRUD(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(old)
 	assert.Equal("jason", old.Author)
+
+	err = source.Delete(ctx)
+	assert.Nil(err)
+	old, err = ReadSource(ctx, source.SourceID)
+	assert.Nil(err)
+	assert.Nil(old)
 }
 
 func testCreateSource(ctx context.Context) *Source {
