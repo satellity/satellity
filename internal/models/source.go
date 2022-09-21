@@ -60,6 +60,7 @@ func CreateSource(ctx context.Context, author, link, logo, locality string) (*So
 	source := &Source{
 		SourceID:  id,
 		Author:    author,
+		Host:      host,
 		Link:      link,
 		LogoURL:   logo,
 		Locality:  locality,

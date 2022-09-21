@@ -13,7 +13,7 @@ const Item = ({gist}) => {
     <div className={style.gist}>
       <a href={gist.link}>{gist.title}</a>
       <div className={style.meta}>
-        {author} · <TimeAgo date={gist.publish_at} />
+        {author} · {gist.source.host} · <TimeAgo date={gist.publish_at} />
       </div>
     </div>
   );

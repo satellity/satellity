@@ -20,6 +20,7 @@ func TestSourceCRUD(t *testing.T) {
 	source, err := CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo", "locality")
 	assert.Nil(err)
 	assert.NotNil(source)
+	assert.Equal("github.com", source.Host)
 
 	source, err = CreateSource(ctx, "github", "https://github.com/AlphaWallet/alpha-wallet-ios/releases.atom", "logo", "locality")
 	assert.Nil(err)
