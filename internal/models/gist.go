@@ -149,6 +149,13 @@ func readGists(ctx context.Context, tx pgx.Tx, query string, args ...interface{}
 		}
 		gists = append(gists, gist)
 	}
+	sources, err := readSourceSet(ctx, tx, gists)
+	if err != nil {
+		return nil, err
+	}
+	for i, g := range gists {
+		gists[i].Source = sources[g.GistID]
+	}
 	return gists, nil
 }
 
@@ -171,11 +178,14 @@ func findGist(ctx context.Context, tx pgx.Tx, id string) (*Gist, error) {
 	}
 
 	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM gists WHERE gist_id=$1", strings.Join(gistColumns, ",")), id)
-	s, err := gistFromRow(row)
+	g, err := gistFromRow(row)
 	if err == pgx.ErrNoRows {
 		return nil, nil
+	} else if err != nil {
+		return nil, err
 	}
-	return s, err
+	g.Source, err = findSource(ctx, tx, id)
+	return g, err
 }
 
 func (g *Gist) Delete(ctx context.Context) error {

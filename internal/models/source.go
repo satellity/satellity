@@ -145,6 +145,32 @@ func readSources(ctx context.Context, tx pgx.Tx) ([]*Source, error) {
 	return sources, rows.Err()
 }
 
+func readSourceSet(ctx context.Context, tx pgx.Tx, gists []*Gist) (map[string]*Source, error) {
+	ids := make([]string, len(gists))
+	for i, g := range gists {
+		ids[i] = g.SourceID
+	}
+	set := make(map[string]*Source)
+	if len(ids) < 1 {
+		return set, nil
+	}
+	query := fmt.Sprintf("SELECT %s FROM sources WHRE id=ANY($1)", strings.Join(sourceColumns, ","))
+	rows, err := tx.Query(ctx, query, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		source, err := sourceFromRows(rows)
+		if err != nil {
+			return nil, err
+		}
+		set[source.SourceID] = source
+	}
+	return set, rows.Err()
+}
+
 func ReadSource(ctx context.Context, id string) (*Source, error) {
 	var source *Source
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
