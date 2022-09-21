@@ -1,0 +1,16 @@
+@import '../assets/css/constant.scss';
+
+// styles for item
+.gist {
+  padding: .3rem .5rem;
+  border-radius: .2rem;
+
+  &:nth-child(odd) {
+    background: #eceff1;
+  }
+
+  .meta {
+    font-size: .75rem;
+    color: $color-font-light-grey;
+  }
+}

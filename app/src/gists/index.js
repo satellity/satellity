@@ -3,6 +3,7 @@ import {useSearchParams} from 'react-router-dom';
 import API from 'api/index.js';
 import Loading from 'components/loading.js';
 import Widget from 'components/widget.js';
+import Item from './item.js';
 
 import style from './index.module.scss';
 
@@ -42,9 +43,7 @@ const Index = () => {
 
   const list = gists.map((g) => {
     return (
-      <div key={g.gist_id}>
-        {g.title}
-      </div>
+      <Item key={g.gist_id} gist={g} />
     );
   });
 

@@ -154,7 +154,7 @@ func readGists(ctx context.Context, tx pgx.Tx, query string, args ...interface{}
 		return nil, err
 	}
 	for i, g := range gists {
-		gists[i].Source = sources[g.GistID]
+		gists[i].Source = sources[g.SourceID]
 	}
 	return gists, nil
 }
