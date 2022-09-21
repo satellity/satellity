@@ -14,6 +14,7 @@ import Client from './client.js';
 import User from './user.js';
 import Me from './me.js';
 import Verification from './verification.js';
+import Gist from './gist.js';
 
 Noty.overrideDefaults({
   type: 'error',
@@ -113,6 +114,7 @@ class API {
     this.me = new Me();
     this.verification = new Verification(this);
     this.client = new Client(this);
+    this.gist = new Gist(this);
   }
 }
 

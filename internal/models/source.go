@@ -154,7 +154,7 @@ func readSourceSet(ctx context.Context, tx pgx.Tx, gists []*Gist) (map[string]*S
 	if len(ids) < 1 {
 		return set, nil
 	}
-	query := fmt.Sprintf("SELECT %s FROM sources WHRE id=ANY($1)", strings.Join(sourceColumns, ","))
+	query := fmt.Sprintf("SELECT %s FROM sources WHERE source_id=ANY($1)", strings.Join(sourceColumns, ","))
 	rows, err := tx.Query(ctx, query, ids)
 	if err != nil {
 		return nil, err
