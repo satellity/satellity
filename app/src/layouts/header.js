@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {ethers} from 'ethers';
 import {generateKeyPair} from '@stablelib/ed25519';
 import {encode} from '@stablelib/hex';
@@ -85,7 +84,6 @@ const Header = () => {
   if (!!me) {
     profile = (
       <div className={style.navis}>
-        <Link to='/topics/new' className={`${style.navi}`}> <FontAwesomeIcon icon={['fa', 'plus']} /> </Link>
         <span> {shortAddress(me.nickname)} </span>
       </div>
     );
@@ -99,9 +97,6 @@ const Header = () => {
       </Link>
 
       <div className={style.menus}>
-        <Link className={`${style.menu} ${window.location.pathname === '/' ? style.current : ''}` } to='/'>
-          Home
-        </Link>
       </div>
       {profile}
     </header>
