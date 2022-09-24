@@ -49,8 +49,21 @@
     border-color: $color-main-red;
   }
 }
-.navis {
+.account {
   display: flex;
+  box-sizing: border-box;
+  padding: .5rem .2rem;
+  font-size: 1rem;
+  .name {
+    display: flex;
+    background: $color-bg-grey;
+    border-radius: 1.6rem;
+    padding: 0 1.6rem;
+    img {
+      width: 1.2rem;
+      margin-right: .5rem;
+    }
+  }
 }
 .navi {
   cursor: pointer;

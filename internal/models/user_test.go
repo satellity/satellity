@@ -120,8 +120,7 @@ func TestWeb3UserCRUD(t *testing.T) {
 
 	nickname := "abc"
 	publicKey := "0x14791697260E4c9A71f18484C9f997B308e59325"
-	data := fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
-	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
+	data := fmt.Sprintf("GmGn:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
 	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	hash := crypto.Keccak256Hash([]byte(msg))
 	signature, err := crypto.Sign(hash.Bytes(), privateKey)
@@ -135,8 +134,7 @@ func TestWeb3UserCRUD(t *testing.T) {
 	public, _, err = ed25519.GenerateKey(rand.Reader)
 	assert.Nil(err)
 
-	data = fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
-	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
+	data = fmt.Sprintf("GmGn:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
 	msg = fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	hash = crypto.Keccak256Hash([]byte(msg))
 	signature, err = crypto.Sign(hash.Bytes(), privateKey)
@@ -150,16 +148,14 @@ func TestWeb3UserCRUD(t *testing.T) {
 	public, _, err = ed25519.GenerateKey(rand.Reader)
 	assert.Nil(err)
 
-	data = fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
-	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
+	data = fmt.Sprintf("GmGn:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
 	msg = fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	hash = crypto.Keccak256Hash([]byte(msg))
 	signature, err = crypto.Sign(hash.Bytes(), privateKey)
 	assert.Nil(err)
 
 	nickname = "abcd"
-	data = fmt.Sprintf("Satellite:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
-	data = "0x" + hex.EncodeToString(crypto.Keccak256Hash([]byte(data)).Bytes())
+	data = fmt.Sprintf("GmGn:%s:%s:%s", nickname, publicKey, hex.EncodeToString(public))
 	msg = fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	hash = crypto.Keccak256Hash([]byte(msg))
 	signature, err = crypto.Sign(hash.Bytes(), privateKey)

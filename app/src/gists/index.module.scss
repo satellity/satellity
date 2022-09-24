@@ -49,6 +49,11 @@
     }
 
     .amount {
+      &:after {
+        content: '$';
+        font-size: .75rem;
+        color: $color-font-light-grey;
+      }
     }
   }
 }

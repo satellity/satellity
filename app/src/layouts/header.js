@@ -9,6 +9,7 @@ import Config from 'components/config.js';
 import {shortAddress} from 'utils';
 
 import logo from 'assets/images/logo.svg';
+import userSVG from 'assets/images/user.svg';
 import style from './main.module.scss';
 
 const providerOptions = {
@@ -55,7 +56,7 @@ const Header = () => {
     const key = generateKeyPair();
     const sessionPublic = encode(key.publicKey, true);
     const sessionPrivate = encode(key.secretKey, true);
-    const msg = ethers.utils.id(`Satellite::${userAddress}:${sessionPublic}`);
+    const msg = `GmGn::${userAddress}:${sessionPublic}`;
     const sig = await provider.getSigner().signMessage(msg);
     user.create(userAddress, sessionPublic, sessionPrivate, sig.slice(2)).then((resp) => {
       if (resp.error) {
@@ -83,8 +84,11 @@ const Header = () => {
   let profile = <span className={style.navi} onClick={handleLoginClick}>Login</span>;
   if (!!me) {
     profile = (
-      <div className={style.navis}>
-        <span> {shortAddress(me.nickname)} </span>
+      <div className={style.account}>
+        <span className={style.name}>
+          <img src={userSVG} alt={me.nickname} />
+          {shortAddress(me.nickname)}
+        </span>
       </div>
     );
   }
