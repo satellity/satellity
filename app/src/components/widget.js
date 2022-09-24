@@ -7,6 +7,9 @@ const Widget = ({children}) => {
   return (
     <div className={style.widget}>
       {children}
+      <div className={style.slogan}>
+        News, updates, in-depth analysis, about blockchain, Web3, DAO.
+      </div>
       <div className={style.copyright}>
         © 2022 - Now
       </div>

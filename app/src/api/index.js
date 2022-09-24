@@ -15,6 +15,7 @@ import User from './user.js';
 import Me from './me.js';
 import Verification from './verification.js';
 import Gist from './gist.js';
+import CoinGecko from './cgc.js';
 
 Noty.overrideDefaults({
   type: 'error',
@@ -115,6 +116,7 @@ class API {
     this.verification = new Verification(this);
     this.client = new Client(this);
     this.gist = new Gist(this);
+    this.cgc = new CoinGecko();
   }
 }
 

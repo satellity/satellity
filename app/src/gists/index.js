@@ -4,12 +4,13 @@ import API from 'api/index.js';
 import Loading from 'components/loading.js';
 import Widget from 'components/widget.js';
 import Item from './item.js';
+import Chart from './chart.js';
 
 import style from './index.module.scss';
 
 const api = new API();
 
-const Index = () => {
+const List = () => {
   const [searchParams] = useSearchParams();
 
   const [loading, setLoading] = useState(true);
@@ -48,12 +49,22 @@ const Index = () => {
   });
 
   return (
+    <>
+      {list}
+    </>
+  );
+};
+
+const Index = () => {
+  return (
     <div className='container'>
       <main className='column main'>
-        {list}
+        <List />
       </main>
       <aside className='column aside'>
-        <Widget />
+        <Widget>
+          <Chart />
+        </Widget>
       </aside>
     </div>
   );
