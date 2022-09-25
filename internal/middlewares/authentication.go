@@ -15,6 +15,7 @@ var whitelist = [][2]string{
 	{"GET", "^/api/products"},
 	{"GET", "^/api/categories"},
 	{"GET", "^/api/client"},
+	{"GET", "^/api/gists"},
 	{"GET", "^/api/topics"},
 	{"GET", "^/api/users"},
 	{"POST", "^/api/oauth"},

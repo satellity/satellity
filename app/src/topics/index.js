@@ -81,7 +81,6 @@ const Topics = () => {
       if (resp.error) {
         return;
       }
-      console.log(resp);
       const data = resp.data;
       const offset = data.length >= pagination ? data[data.length-1].created_at : '';
       setOffset(offset);

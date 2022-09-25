@@ -1,0 +1,59 @@
+@import '../assets/css/constant.scss';
+
+// styles for item
+.gist {
+  padding: .3rem .5rem;
+  border-radius: .2rem;
+
+  &:nth-child(odd) {
+    background: #eceff1;
+  }
+
+  .meta {
+    font-size: .75rem;
+    color: $color-font-light-grey;
+  }
+}
+
+// styles for chart
+.box {
+  border: solid 1px $color-border-grey;
+
+  .item {
+    padding: .3rem .5rem;
+    display: flex;
+    justify-content: space-between;
+
+    &:nth-child(odd) {
+      background: #eceff1;
+    }
+
+    .second {
+      font-size: .875rem;
+    }
+
+    .unit {
+      color: $color-font-light-grey;
+    }
+
+    .price {
+      text-align: right;
+    }
+
+    .descent {
+      color: #e15241;
+    }
+
+    .ascent {
+      color: #4EAF0A;
+    }
+
+    .amount {
+      &:after {
+        content: '$';
+        font-size: .75rem;
+        color: $color-font-light-grey;
+      }
+    }
+  }
+}

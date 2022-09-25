@@ -12,14 +12,25 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+const (
+	GIST_GENRE_DEFAULT    = "DEFAULT"
+	GIST_GENRE_RELEASE    = "RELEASE"
+	GIST_GENRE_UPDATE     = "UPDATE"
+	GIST_GENRE_NEWS       = "NEWS"
+	GIST_GENRE_NEWSLETTER = "NEWSLETTER"
+	GIST_GENRE_RESEARCH   = "RESEARCH"
+)
+
 type Gist struct {
 	GistID    string
 	Identity  string
+	Author    string
 	Title     string
 	SourceID  string
 	Genre     string
 	Cardinal  bool
 	Link      string
+	Body      string
 	PublishAt time.Time
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -27,19 +38,19 @@ type Gist struct {
 	Source *Source
 }
 
-var gistColumns = []string{"gist_id", "identity", "title", "source_id", "genre", "cardinal", "link", "publish_at", "created_at", "updated_at"}
+var gistColumns = []string{"gist_id", "identity", "author", "title", "source_id", "genre", "cardinal", "link", "body", "publish_at", "created_at", "updated_at"}
 
 func gistFromRow(row durable.Row) (*Gist, error) {
 	var g Gist
-	err := row.Scan(&g.GistID, &g.Identity, &g.Title, &g.SourceID, &g.Genre, &g.Cardinal, &g.Link, &g.PublishAt, &g.CreatedAt, &g.UpdatedAt)
+	err := row.Scan(&g.GistID, &g.Identity, &g.Author, &g.Title, &g.SourceID, &g.Genre, &g.Cardinal, &g.Link, &g.Body, &g.PublishAt, &g.CreatedAt, &g.UpdatedAt)
 	return &g, err
 }
 
 func (g *Gist) values() []any {
-	return []any{g.GistID, g.Identity, g.Title, g.SourceID, g.Genre, g.Cardinal, &g.Link, g.PublishAt, g.CreatedAt, g.UpdatedAt}
+	return []any{g.GistID, g.Identity, g.Author, g.Title, g.SourceID, g.Genre, g.Cardinal, g.Link, g.Body, g.PublishAt, g.CreatedAt, g.UpdatedAt}
 }
 
-func CreateGist(ctx context.Context, identity, title, genre string, cardinal bool, link string, publishedAt time.Time, source *Source) (*Gist, error) {
+func CreateGist(ctx context.Context, identity, author, title, genre string, cardinal bool, link, body string, publishedAt time.Time, source *Source) (*Gist, error) {
 	identity = strings.TrimSpace(identity)
 	title = strings.TrimSpace(title)
 	id := generateUniqueID(identity)
@@ -48,11 +59,13 @@ func CreateGist(ctx context.Context, identity, title, genre string, cardinal boo
 	gist := &Gist{
 		GistID:    id,
 		Identity:  identity,
+		Author:    author,
 		Title:     title,
 		SourceID:  source.SourceID,
 		Genre:     genre,
 		Cardinal:  cardinal,
 		Link:      link,
+		Body:      body,
 		PublishAt: publishedAt,
 		CreatedAt: t,
 		UpdatedAt: t,
@@ -136,6 +149,13 @@ func readGists(ctx context.Context, tx pgx.Tx, query string, args ...interface{}
 		}
 		gists = append(gists, gist)
 	}
+	sources, err := readSourceSet(ctx, tx, gists)
+	if err != nil {
+		return nil, err
+	}
+	for i, g := range gists {
+		gists[i].Source = sources[g.SourceID]
+	}
 	return gists, nil
 }
 
@@ -158,9 +178,23 @@ func findGist(ctx context.Context, tx pgx.Tx, id string) (*Gist, error) {
 	}
 
 	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM gists WHERE gist_id=$1", strings.Join(gistColumns, ",")), id)
-	s, err := gistFromRow(row)
+	g, err := gistFromRow(row)
 	if err == pgx.ErrNoRows {
 		return nil, nil
+	} else if err != nil {
+		return nil, err
 	}
-	return s, err
+	g.Source, err = findSource(ctx, tx, id)
+	return g, err
+}
+
+func (g *Gist) Delete(ctx context.Context) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		_, err := tx.Exec(ctx, "DELETE FROM gists WHERE gist_id=$1", g.GistID)
+		return err
+	})
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
 }

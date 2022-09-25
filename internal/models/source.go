@@ -19,23 +19,24 @@ type Source struct {
 	Host      string
 	Link      string
 	LogoURL   string
+	Locality  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-var sourceColumns = []string{"source_id", "author", "host", "link", "logo_url", "created_at", "updated_at"}
+var sourceColumns = []string{"source_id", "author", "host", "link", "logo_url", "locality", "created_at", "updated_at"}
 
 func (s *Source) values() []any {
-	return []any{s.SourceID, s.Author, s.Host, s.Link, s.LogoURL, s.CreatedAt, s.UpdatedAt}
+	return []any{s.SourceID, s.Author, s.Host, s.Link, s.LogoURL, s.Locality, s.CreatedAt, s.UpdatedAt}
 }
 
 func sourceFromRows(row durable.Row) (*Source, error) {
 	var s Source
-	err := row.Scan(&s.SourceID, &s.Author, &s.Host, &s.Link, &s.LogoURL, &s.CreatedAt, &s.UpdatedAt)
+	err := row.Scan(&s.SourceID, &s.Author, &s.Host, &s.Link, &s.LogoURL, &s.Locality, &s.CreatedAt, &s.UpdatedAt)
 	return &s, err
 }
 
-func CreateSource(ctx context.Context, author, link, logo string) (*Source, error) {
+func CreateSource(ctx context.Context, author, link, logo, locality string) (*Source, error) {
 	author = strings.TrimSpace(author)
 	link = strings.TrimSpace(link)
 
@@ -59,8 +60,10 @@ func CreateSource(ctx context.Context, author, link, logo string) (*Source, erro
 	source := &Source{
 		SourceID:  id,
 		Author:    author,
+		Host:      host,
 		Link:      link,
 		LogoURL:   logo,
+		Locality:  locality,
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
@@ -85,7 +88,7 @@ func CreateSource(ctx context.Context, author, link, logo string) (*Source, erro
 	return source, nil
 }
 
-func (s *Source) Update(ctx context.Context, author, host, logo string) error {
+func (s *Source) Update(ctx context.Context, author, host, logo string, updated time.Time) error {
 	author = strings.TrimSpace(author)
 	host = strings.TrimSpace(host)
 	logo = strings.TrimSpace(logo)
@@ -99,8 +102,8 @@ func (s *Source) Update(ctx context.Context, author, host, logo string) error {
 		s.LogoURL = logo
 	}
 
-	cols, posits := durable.PrepareColumnsAndExpressions([]string{"author", "host", "logo_url"}, 1)
-	values := []interface{}{s.SourceID, s.Author, s.Host, s.LogoURL}
+	cols, posits := durable.PrepareColumnsAndExpressions([]string{"author", "host", "logo_url", "updated_at"}, 1)
+	values := []interface{}{s.SourceID, s.Author, s.Host, s.LogoURL, updated}
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("UPDATE sources SET (%s)=(%s) WHERE source_id=$1", cols, posits)
 		_, err := tx.Exec(ctx, query, values...)
@@ -126,7 +129,7 @@ func ReadSources(ctx context.Context) ([]*Source, error) {
 }
 
 func readSources(ctx context.Context, tx pgx.Tx) ([]*Source, error) {
-	rows, err := tx.Query(ctx, fmt.Sprintf("SELECT %s FROM sources LIMIT 3000", strings.Join(sourceColumns, ",")))
+	rows, err := tx.Query(ctx, fmt.Sprintf("SELECT %s FROM sources ORDER BY updated_at LIMIT 3000", strings.Join(sourceColumns, ",")))
 	if err != nil {
 		return nil, err
 	}
@@ -141,6 +144,32 @@ func readSources(ctx context.Context, tx pgx.Tx) ([]*Source, error) {
 		sources = append(sources, source)
 	}
 	return sources, rows.Err()
+}
+
+func readSourceSet(ctx context.Context, tx pgx.Tx, gists []*Gist) (map[string]*Source, error) {
+	ids := make([]string, len(gists))
+	for i, g := range gists {
+		ids[i] = g.SourceID
+	}
+	set := make(map[string]*Source)
+	if len(ids) < 1 {
+		return set, nil
+	}
+	query := fmt.Sprintf("SELECT %s FROM sources WHERE source_id=ANY($1)", strings.Join(sourceColumns, ","))
+	rows, err := tx.Query(ctx, query, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		source, err := sourceFromRows(rows)
+		if err != nil {
+			return nil, err
+		}
+		set[source.SourceID] = source
+	}
+	return set, rows.Err()
 }
 
 func ReadSource(ctx context.Context, id string) (*Source, error) {
@@ -176,4 +205,15 @@ func findSourceByLink(ctx context.Context, tx pgx.Tx, link string) (*Source, err
 		return nil, nil
 	}
 	return s, err
+}
+
+func (s *Source) Delete(ctx context.Context) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		_, err := tx.Exec(ctx, "DELETE FROM sources WHERE source_id=$1", s.SourceID)
+		return err
+	})
+	if err != nil {
+		return session.TransactionError(ctx, err)
+	}
+	return nil
 }

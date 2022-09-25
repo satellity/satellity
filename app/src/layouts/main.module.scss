@@ -4,7 +4,6 @@
   min-height: 100vh;
 }
 .header {
-  background: white;
   display: flex;
   align-items: center;
   font-size: 1.2rem;
@@ -22,14 +21,13 @@
   color: $color-main-red;
   display: flex;
   align-items: center;
-  font-size: 1.125rem;
+  font-size: 1.5rem;
   font-weight: bold;
   text-align: center;
-  text-transform: uppercase;
   padding-right: 1.3rem;
   margin-right: 1.6rem;
   .logo {
-    width: 1.2rem;
+    width: 1.5rem;
     margin-right: .4rem;
   }
 }
@@ -50,8 +48,21 @@
     border-color: $color-main-red;
   }
 }
-.navis {
+.account {
   display: flex;
+  box-sizing: border-box;
+  padding: .5rem .2rem;
+  font-size: 1rem;
+  .name {
+    display: flex;
+    background: $color-bg-grey;
+    border-radius: 1.6rem;
+    padding: 0 1.6rem;
+    img {
+      width: 1.2rem;
+      margin-right: .5rem;
+    }
+  }
 }
 .navi {
   cursor: pointer;
@@ -78,8 +89,5 @@
 @media only screen and (max-width: 64rem) {
   .header {
     padding: 0 .8rem;
-  }
-  .site {
-    display: none;
   }
 }

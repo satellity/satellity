@@ -9,25 +9,24 @@ import (
 	"satellity/internal/durable"
 	"satellity/internal/middlewares"
 	"satellity/internal/routes"
+	"satellity/internal/services"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/gorilla/handlers"
-	"github.com/jackc/pgx/v4/pgxpool"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/unrolled/render"
 	"go.uber.org/zap"
 )
 
-func startHTTP(db *pgxpool.Pool, logger *zap.Logger, port string) error {
-	database := durable.WrapDatabase(db)
+func startHTTP(db *durable.Database, logger *durable.Logger, port string) error {
 	router := httptreemux.New()
 	routes.RegisterRoutes(router)
 
 	handler := middlewares.Authenticate(router)
 	handler = middlewares.Constraint(handler)
-	handler = middlewares.Context(handler, database, render.New())
+	handler = middlewares.Context(handler, db, render.New())
 	handler = middlewares.State(handler)
-	handler = middlewares.Logger(handler, durable.NewLogger(logger))
+	handler = middlewares.Logger(handler, logger)
 	handler = handlers.ProxyHeaders(handler)
 
 	log.Printf("HTTP server running at: http://localhost:%s", port)
@@ -37,6 +36,7 @@ func startHTTP(db *pgxpool.Pool, logger *zap.Logger, port string) error {
 func main() {
 	var options struct {
 		Environment string `short:"e" long:"environment" default:"development"`
+		Service     string `short:"s" long:"service" default:"http"`
 	}
 	p := flags.NewParser(&options, flags.Default)
 	if _, err := p.Parse(); err != nil {
@@ -56,6 +56,7 @@ func main() {
 		Name:     config.Database.Name,
 	})
 	defer db.Close()
+	database := durable.WrapDatabase(db)
 
 	logger, err := zap.NewDevelopment()
 	if config.Environment == "production" {
@@ -64,8 +65,14 @@ func main() {
 	if err != nil {
 		log.Panicln(err)
 	}
+	output := durable.NewLogger(logger)
 
-	if err := startHTTP(db, logger, config.HTTP.Port); err != nil {
-		log.Panicln(err)
+	switch options.Service {
+	case "feed":
+		services.Run(database)
+	default:
+		if err := startHTTP(database, output, config.HTTP.Port); err != nil {
+			log.Panicln(err)
+		}
 	}
 }

@@ -113,19 +113,24 @@ CREATE TABLE IF NOT EXISTS sources (
   host                  VARCHAR(128) NOT NULL,
   link                  VARCHAR(1024) NOT NULL UNIQUE,
   logo_url              VARCHAR(1024) NOT NULL,
+  locality              VARCHAR(128) NOT NULL,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS sources_updatedx ON sources (updated_at);
 
 
 CREATE TABLE IF NOT EXISTS gists (
   gist_id               VARCHAR(36) PRIMARY KEY,
   identity              VARCHAR(256) NOT NULL UNIQUE,
+  author                VARCHAR(512) NOT NULL,
   title                 VARCHAR(1024) NOT NULL DEFAULT '',
   source_id             VARCHAR(36) NOT NULL,
   genre                 VARCHAR(128) NOT NULL,
   cardinal              BOOL NOT NULL DEFAULT false,
   link                  VARCHAR(256) NOT NULL UNIQUE,
+  body                  TEXT NOT NULL,
   publish_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
