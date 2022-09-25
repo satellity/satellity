@@ -18,10 +18,10 @@ func TestService(t *testing.T) {
 		Timeout: 10 * time.Second,
 	}
 
-	link := "https://medium.com/feed/@alchemistcoin"
+	link := "https://unblock256.substack.com/feed"
 	resp, _ := client.Get(link)
 
-	var feed feeds.Medium
+	var feed feeds.SubStack
 	err := xml.NewDecoder(resp.Body).Decode(&feed)
 	assert.Nil(err)
 	log.Println(feed.Channel.Updated)
