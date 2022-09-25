@@ -51,7 +51,7 @@ const Chart = () => {
         </div>
         <div className={style.price}>
           <div className={style.amount}> {token.usd} </div>
-          <div className={`${style.second} ${token.usd_24h_change < 0 ? style.descent : style.ascent}`}>${change}</div>
+          <div className={`${style.second} ${token.usd_24h_change < 0 ? style.descent : style.ascent}`}>{change}</div>
         </div>
       </div>
     );
