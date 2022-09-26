@@ -43,6 +43,7 @@ func loopSources(ctx context.Context) error {
 		if err != nil {
 			log.Printf("loopSources link %s error %s \n", s.Link, err)
 			time.Sleep(time.Second)
+			s.Update(ctx, "", "", "", s.Wreck+1, time.Time{}, time.Time{})
 			continue
 		}
 	}
