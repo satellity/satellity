@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"satellity/internal/models"
+	"sort"
 	"time"
 )
 
@@ -49,14 +50,25 @@ func FetchSubStack(ctx context.Context, s *models.Source) error {
 	if err != nil {
 		return err
 	}
+
+	published := time.Time{}
 	if updated.After(s.UpdatedAt) {
-		for _, entry := range feed.Entries {
+		entries := feed.Entries
+		sort.Slice(entries, func(i, j int) bool {
+			ati, _ := time.Parse("Mon, 02 Jan 2006 15:04:05 GMT", entries[i].Updated)
+			atj, _ := time.Parse("Mon, 02 Jan 2006 15:04:05 GMT", entries[j].Updated)
+			return ati.Before(atj)
+		})
+		for _, entry := range entries {
 			at, err := time.Parse("Mon, 02 Jan 2006 15:04:05 GMT", entry.Updated)
 			if err != nil {
 				continue
 			}
+			if published.Before(at) {
+				published = at
+			}
 			if at.Before(s.UpdatedAt) {
-				break
+				continue
 			}
 			_, err = models.CreateGist(ctx, entry.Id, entry.Author, entry.Title, models.GIST_GENRE_DEFAULT, true, entry.Link, entry.Content, at, s)
 			if err != nil {
@@ -64,5 +76,5 @@ func FetchSubStack(ctx context.Context, s *models.Source) error {
 			}
 		}
 	}
-	return s.Update(ctx, "", "", "", now)
+	return s.Update(ctx, "", "", "", 0, published, now)
 }

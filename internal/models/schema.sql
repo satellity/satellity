@@ -114,6 +114,8 @@ CREATE TABLE IF NOT EXISTS sources (
   link                  VARCHAR(1024) NOT NULL UNIQUE,
   logo_url              VARCHAR(1024) NOT NULL,
   locality              VARCHAR(128) NOT NULL,
+  wreck                 INTEGER NOT NULL DEFAULT 0,
+  published_at          TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );

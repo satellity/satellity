@@ -14,25 +14,27 @@ import (
 )
 
 type Source struct {
-	SourceID  string
-	Author    string
-	Host      string
-	Link      string
-	LogoURL   string
-	Locality  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	SourceID    string
+	Author      string
+	Host        string
+	Link        string
+	LogoURL     string
+	Locality    string
+	Wreck       int64
+	PublishedAt time.Time
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
-var sourceColumns = []string{"source_id", "author", "host", "link", "logo_url", "locality", "created_at", "updated_at"}
+var sourceColumns = []string{"source_id", "author", "host", "link", "logo_url", "locality", "published_at", "wreck", "created_at", "updated_at"}
 
 func (s *Source) values() []any {
-	return []any{s.SourceID, s.Author, s.Host, s.Link, s.LogoURL, s.Locality, s.CreatedAt, s.UpdatedAt}
+	return []any{s.SourceID, s.Author, s.Host, s.Link, s.LogoURL, s.Locality, s.PublishedAt, s.Wreck, s.CreatedAt, s.UpdatedAt}
 }
 
 func sourceFromRows(row durable.Row) (*Source, error) {
 	var s Source
-	err := row.Scan(&s.SourceID, &s.Author, &s.Host, &s.Link, &s.LogoURL, &s.Locality, &s.CreatedAt, &s.UpdatedAt)
+	err := row.Scan(&s.SourceID, &s.Author, &s.Host, &s.Link, &s.LogoURL, &s.Locality, &s.PublishedAt, &s.Wreck, &s.CreatedAt, &s.UpdatedAt)
 	return &s, err
 }
 
@@ -58,14 +60,16 @@ func CreateSource(ctx context.Context, author, link, logo, locality string) (*So
 
 	t := time.Now()
 	source := &Source{
-		SourceID:  id,
-		Author:    author,
-		Host:      host,
-		Link:      link,
-		LogoURL:   logo,
-		Locality:  locality,
-		CreatedAt: t,
-		UpdatedAt: t,
+		SourceID:    id,
+		Author:      author,
+		Host:        host,
+		Link:        link,
+		LogoURL:     logo,
+		Locality:    locality,
+		Wreck:       0,
+		PublishedAt: t,
+		CreatedAt:   t,
+		UpdatedAt:   t,
 	}
 
 	rows := [][]interface{}{
@@ -88,7 +92,7 @@ func CreateSource(ctx context.Context, author, link, logo, locality string) (*So
 	return source, nil
 }
 
-func (s *Source) Update(ctx context.Context, author, host, logo string, updated time.Time) error {
+func (s *Source) Update(ctx context.Context, author, host, logo string, wreck int64, publishedAt, updated time.Time) error {
 	author = strings.TrimSpace(author)
 	host = strings.TrimSpace(host)
 	logo = strings.TrimSpace(logo)
@@ -101,9 +105,16 @@ func (s *Source) Update(ctx context.Context, author, host, logo string, updated 
 	if logo != "" {
 		s.LogoURL = logo
 	}
+	s.Wreck = wreck
+	if publishedAt.After(s.PublishedAt) {
+		s.PublishedAt = publishedAt
+	}
+	if updated.After(s.UpdatedAt) {
+		s.UpdatedAt = updated
+	}
 
-	cols, posits := durable.PrepareColumnsAndExpressions([]string{"author", "host", "logo_url", "updated_at"}, 1)
-	values := []interface{}{s.SourceID, s.Author, s.Host, s.LogoURL, updated}
+	cols, posits := durable.PrepareColumnsAndExpressions([]string{"author", "host", "logo_url", "wreck", "published_at", "updated_at"}, 1)
+	values := []interface{}{s.SourceID, s.Author, s.Host, s.LogoURL, s.Wreck, s.PublishedAt, s.UpdatedAt}
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		query := fmt.Sprintf("UPDATE sources SET (%s)=(%s) WHERE source_id=$1", cols, posits)
 		_, err := tx.Exec(ctx, query, values...)

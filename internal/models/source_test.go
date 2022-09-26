@@ -30,7 +30,7 @@ func TestSourceCRUD(t *testing.T) {
 	assert.Nil(err)
 	assert.Len(sources, 1)
 
-	err = source.Update(ctx, "jason", "host", "logo", time.Now())
+	err = source.Update(ctx, "jason", "host", "logo", 0, time.Now(), time.Now())
 	assert.Nil(err)
 	old, err := ReadSource(ctx, source.SourceID)
 	assert.Nil(err)

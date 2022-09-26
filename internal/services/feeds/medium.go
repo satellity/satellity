@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"satellity/internal/models"
+	"sort"
 	"time"
 )
 
@@ -49,10 +50,18 @@ func FetchMedium(ctx context.Context, s *models.Source) error {
 	if err != nil {
 		return err
 	}
+	published := time.Time{}
 	if updated.After(s.UpdatedAt) {
-		for _, entry := range feed.Entries {
+		entries := feed.Entries
+		sort.Slice(entries, func(i, j int) bool {
+			return entries[i].Updated.Before(entries[j].Updated)
+		})
+		for _, entry := range entries {
+			if published.Before(entry.Updated) {
+				published = entry.Updated
+			}
 			if entry.Updated.Before(s.UpdatedAt) {
-				break
+				continue
 			}
 			_, err = models.CreateGist(ctx, entry.Id, entry.Author, entry.Title, models.GIST_GENRE_DEFAULT, true, entry.Link, entry.Content, entry.Updated, s)
 			if err != nil {
@@ -60,5 +69,5 @@ func FetchMedium(ctx context.Context, s *models.Source) error {
 			}
 		}
 	}
-	return s.Update(ctx, "", "", "", now)
+	return s.Update(ctx, "", "", "", 0, published, now)
 }
