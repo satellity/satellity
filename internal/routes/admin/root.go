@@ -12,4 +12,5 @@ func RegisterAdminRoutes(router *httptreemux.Group) {
 	registerAdminTopic(api)
 	registerAdminComment(api)
 	registerAdminGist(api)
+	registerAdminSource(api)
 }

@@ -65,9 +65,9 @@ func RenderTopic(w http.ResponseWriter, r *http.Request, topic *models.Topic) {
 
 // RenderTopics response a bundle of topics
 func RenderTopics(w http.ResponseWriter, r *http.Request, topics []*models.Topic) {
-	topicViews := make([]TopicView, len(topics))
+	views := make([]TopicView, len(topics))
 	for i, topic := range topics {
-		topicViews[i] = buildTopic(topic)
+		views[i] = buildTopic(topic)
 	}
-	RenderResponse(w, r, topicViews)
+	RenderResponse(w, r, views)
 }

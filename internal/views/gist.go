@@ -7,13 +7,13 @@ import (
 )
 
 type GistView struct {
-	Type      string     `json:"type"`
-	GistID    string     `json:"gist_id"`
-	Title     string     `json:"title"`
-	Author    string     `json:"author"`
-	Link      string     `json:"link"`
-	PublishAt time.Time  `json:"publish_at"`
-	Source    SourceView `json:"source"`
+	Type      string           `json:"type"`
+	GistID    string           `json:"gist_id"`
+	Title     string           `json:"title"`
+	Author    string           `json:"author"`
+	Link      string           `json:"link"`
+	PublishAt time.Time        `json:"publish_at"`
+	Source    SourceSimpleView `json:"source"`
 }
 
 func buildGist(g *models.Gist) GistView {
@@ -26,7 +26,7 @@ func buildGist(g *models.Gist) GistView {
 		PublishAt: g.PublishAt,
 	}
 	if g.Source != nil {
-		view.Source = buildSource(g.Source)
+		view.Source = buildSimpleSource(g.Source)
 	}
 	return view
 }
