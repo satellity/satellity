@@ -29,7 +29,7 @@ func FetchMedium(ctx context.Context, s *models.Source) error {
 	now := time.Now()
 	resp, err := client.Get(s.Link)
 	if err != nil {
-		return err
+		return fmt.Errorf("fetch error: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -45,13 +45,13 @@ func FetchMedium(ctx context.Context, s *models.Source) error {
 	var medium Medium
 	err = xml.NewDecoder(resp.Body).Decode(&medium)
 	if err != nil {
-		return err
+		return fmt.Errorf("xml decode error: %w", err)
 	}
 
 	feed := medium.Channel
 	updated, err := time.Parse("Mon, 02 Jan 2006 15:04:05 GMT", feed.Updated)
 	if err != nil {
-		return err
+		return fmt.Errorf("time parse error: %w", err)
 	}
 	published := time.Time{}
 	if updated.After(s.UpdatedAt) {
@@ -68,7 +68,8 @@ func FetchMedium(ctx context.Context, s *models.Source) error {
 			}
 			_, err = models.CreateGist(ctx, entry.Id, entry.Author, entry.Title, models.GIST_GENRE_DEFAULT, true, entry.Link, entry.Content, entry.Updated, s)
 			if err != nil {
-				return err
+				return fmt.Errorf("CreateGist error: %w", err)
+
 			}
 		}
 	}

@@ -81,6 +81,7 @@ func CreateGist(ctx context.Context, identity, author, title, genre string, card
 			return err
 		} else if old != nil {
 			gist = old
+			return nil
 		}
 		_, err = tx.CopyFrom(ctx, pgx.Identifier{"gists"}, gistColumns, pgx.CopyFromRows(rows))
 		return err
