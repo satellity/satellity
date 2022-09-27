@@ -1,5 +1,37 @@
 @import '../assets/css/constant.scss';
 
+.header {
+  background-color: $color-main-blue;
+  text-align: right;
+  padding: 1.6rem;
+  a.navi {
+    color: white;
+    margin-left: 0.8rem;
+  }
+  .brand {
+    color: white;
+    float: left;
+  }
+}
+
+.container {
+  position: relative;
+  &:before {
+    content: '';
+    display: block;
+    background-color: $color-main-blue;
+    width: 100%;
+    height: 6rem;
+    position: absolute;
+    z-index: -1;
+  }
+  .wrapper {
+    margin: 0 auto;
+    width: 80rem;
+    max-width: 100%;
+  }
+}
+
 .admin.layout {
   background-color: rgba($color-main-blue, $color-main-blue-alpha);
   min-height: 100vh;

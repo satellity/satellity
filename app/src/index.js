@@ -77,7 +77,7 @@ root.render(
         <Routes>
           <Route path='/oauth/:provider/callback' element={<Oauth />} />
           <Route path='/admin' element={<AdminRoute />}>
-            <Route index element={AdminIndex} />
+            <Route index element={<AdminIndex />} />
             <Route exact path={`users`} element={<AdminUsers />} />
             <Route exact path={`topics`} element={<AdminTopics />} />
             <Route exact path={`comments`} element={<AdminComments />} />
