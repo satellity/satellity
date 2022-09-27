@@ -39,6 +39,9 @@ func FetchSubStack(ctx context.Context, s *models.Source) error {
 	if resp.StatusCode == 403 {
 		return fmt.Errorf("%s forbidden %d", s.Link, resp.StatusCode)
 	}
+	if resp.StatusCode == 404 {
+		return s.Delete(ctx)
+	}
 	var substack SubStack
 	err = xml.NewDecoder(resp.Body).Decode(&substack)
 	if err != nil {

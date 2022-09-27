@@ -39,6 +39,9 @@ func FetchGithub(ctx context.Context, s *models.Source) error {
 	if resp.StatusCode == 403 {
 		return fmt.Errorf("%s forbidden %d", s.Link, resp.StatusCode)
 	}
+	if resp.StatusCode == 404 {
+		return s.Delete(ctx)
+	}
 	var feed Github
 	err = xml.NewDecoder(resp.Body).Decode(&feed)
 	if err != nil {

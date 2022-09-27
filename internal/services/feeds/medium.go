@@ -39,6 +39,9 @@ func FetchMedium(ctx context.Context, s *models.Source) error {
 	if resp.StatusCode == 403 {
 		return fmt.Errorf("%s forbidden %d", s.Link, resp.StatusCode)
 	}
+	if resp.StatusCode == 404 {
+		return s.Delete(ctx)
+	}
 	var medium Medium
 	err = xml.NewDecoder(resp.Body).Decode(&medium)
 	if err != nil {

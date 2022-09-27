@@ -18,7 +18,7 @@ func TestService(t *testing.T) {
 		Timeout: 10 * time.Second,
 	}
 
-	link := "https://unblock256.substack.com/feed"
+	link := "https://medium.com/feed/thorchain"
 	resp, _ := client.Get(link)
 
 	var feed feeds.SubStack

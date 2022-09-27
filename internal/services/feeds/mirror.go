@@ -41,6 +41,9 @@ func FetchMirror(ctx context.Context, s *models.Source) error {
 	if resp.StatusCode == 403 {
 		return fmt.Errorf("%s forbidden %d", s.Link, resp.StatusCode)
 	}
+	if resp.StatusCode == 404 {
+		return s.Delete(ctx)
+	}
 	var feed Mirror
 	err = xml.NewDecoder(resp.Body).Decode(&feed)
 	if err != nil {
