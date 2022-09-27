@@ -5,6 +5,7 @@ config.yaml
 internal/tasks
 publish
 public
+task
 app/public/sitemap.xml
 !app/public
 

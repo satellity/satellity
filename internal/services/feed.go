@@ -40,6 +40,8 @@ func loopSources(ctx context.Context) error {
 			err = feeds.FetchMirror(ctx, s)
 		case "substack":
 			err = feeds.FetchSubStack(ctx, s)
+		case "decrypt":
+			err = feeds.FetchDecrypt(ctx, s)
 		}
 		if err != nil {
 			log.Printf("loopSources link %s error %s \n", s.Link, err)
