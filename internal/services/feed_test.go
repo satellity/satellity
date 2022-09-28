@@ -18,10 +18,10 @@ func TestService(t *testing.T) {
 		Timeout: 10 * time.Second,
 	}
 
-	link := "https://decrypt.co/feed"
+	link := "https://messari.io/rss"
 	resp, _ := client.Get(link)
 
-	var feed feeds.Decrypt
+	var feed feeds.Common
 	err := xml.NewDecoder(resp.Body).Decode(&feed)
 	assert.Nil(err)
 	log.Println(feed.Channel.Updated)

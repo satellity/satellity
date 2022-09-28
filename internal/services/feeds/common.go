@@ -20,9 +20,17 @@ type EntryCommon struct {
 
 type Common struct {
 	Channel struct {
-		Updated string         `xml:"pubDate"`
-		Entries []*EntryCommon `xml:"item"`
+		Updated       string         `xml:"pubDate"`
+		LastBuildDate string         `xml:"lastBuildDate"`
+		Entries       []*EntryCommon `xml:"item"`
 	} `xml:"channel"`
+}
+
+func (c *Common) Date() string {
+	if c.Channel.Updated != "" {
+		return c.Channel.Updated
+	}
+	return c.Channel.LastBuildDate
 }
 
 func FetchCommon(ctx context.Context, s *models.Source) error {
@@ -49,7 +57,7 @@ func FetchCommon(ctx context.Context, s *models.Source) error {
 	}
 
 	feed := common.Channel
-	updated, err := time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", feed.Updated)
+	updated, err := time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", common.Date())
 	if err != nil {
 		return fmt.Errorf("time parse error: %w", err)
 	}
