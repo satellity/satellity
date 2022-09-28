@@ -11,7 +11,7 @@ import (
 )
 
 func Run(db *durable.Database) {
-	log.Println("Feed service started at", time.Now())
+	log.Println("Feed service started at:", time.Now())
 	ctx := session.WithDatabase(context.Background(), db)
 	for {
 		err := loopSources(ctx)
