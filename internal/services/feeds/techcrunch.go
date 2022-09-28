@@ -43,7 +43,9 @@ func FetchTechCrunch(ctx context.Context, s *models.Source) error {
 		return s.Delete(ctx)
 	}
 	var techcrunch TechCrunch
-	err = xml.NewDecoder(resp.Body).Decode(&techcrunch)
+	d := xml.NewDecoder(resp.Body)
+	d.Strict = false
+	err = d.Decode(&techcrunch)
 	if err != nil {
 		return fmt.Errorf("xml decode error: %w", err)
 	}
