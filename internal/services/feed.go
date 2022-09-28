@@ -42,6 +42,8 @@ func loopSources(ctx context.Context) error {
 			err = feeds.FetchSubStack(ctx, s)
 		case "decrypt":
 			err = feeds.FetchDecrypt(ctx, s)
+		case "techcrunch":
+			err = feeds.FetchTechCrunch(ctx, s)
 		}
 		if err != nil {
 			log.Printf("loopSources link %s error %s \n", s.Link, err)
