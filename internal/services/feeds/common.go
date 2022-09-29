@@ -29,13 +29,25 @@ type Common struct {
 // time: "Mon, 02 Jan 2006 15:04:05 +0000"
 func (c *Common) Date() (time.Time, error) {
 	if c.Channel.Updated != "" {
-		return time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", c.Channel.Updated)
+		t, err := time.Parse(time.RFC1123Z, c.Channel.Updated)
+		if err != nil {
+			return time.Parse(time.RFC1123, c.Channel.Updated)
+		}
+		return t, nil
 	}
-	return time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", c.Channel.LastBuildDate)
+	t, err := time.Parse(time.RFC1123Z, c.Channel.LastBuildDate)
+	if err != nil {
+		return time.Parse(time.RFC1123, c.Channel.LastBuildDate)
+	}
+	return t, nil
 }
 
 func (e *EntryCommon) Date() (time.Time, error) {
-	return time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", e.Updated)
+	t, err := time.Parse(time.RFC1123Z, e.Updated)
+	if err != nil {
+		return time.Parse(time.RFC1123, e.Updated)
+	}
+	return t, nil
 }
 
 func FetchCommon(ctx context.Context, s *models.Source) error {

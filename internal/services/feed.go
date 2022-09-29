@@ -44,7 +44,7 @@ func loopSources(ctx context.Context) error {
 			err = feeds.FetchDecrypt(ctx, s)
 		case "techcrunch":
 			err = feeds.FetchTechCrunch(ctx, s)
-		case "messari", "crunchbase", "trustnodes":
+		case "messari", "crunchbase", "trustnodes", "common":
 			err = feeds.FetchCommon(ctx, s)
 		}
 		if err != nil {
