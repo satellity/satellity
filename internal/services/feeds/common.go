@@ -26,11 +26,16 @@ type Common struct {
 	} `xml:"channel"`
 }
 
-func (c *Common) Date() string {
+// time: "Mon, 02 Jan 2006 15:04:05 +0000"
+func (c *Common) Date() (time.Time, error) {
 	if c.Channel.Updated != "" {
-		return c.Channel.Updated
+		return time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", c.Channel.Updated)
 	}
-	return c.Channel.LastBuildDate
+	return time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", c.Channel.LastBuildDate)
+}
+
+func (e *EntryCommon) Date() (time.Time, error) {
+	return time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", e.Updated)
 }
 
 func FetchCommon(ctx context.Context, s *models.Source) error {
@@ -57,7 +62,7 @@ func FetchCommon(ctx context.Context, s *models.Source) error {
 	}
 
 	feed := common.Channel
-	updated, err := time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", common.Date())
+	updated, err := common.Date()
 	if err != nil {
 		return fmt.Errorf("time parse error: %w", err)
 	}
@@ -65,12 +70,12 @@ func FetchCommon(ctx context.Context, s *models.Source) error {
 	if updated.After(s.UpdatedAt) {
 		entries := feed.Entries
 		sort.Slice(entries, func(i, j int) bool {
-			ati, _ := time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", entries[i].Updated)
-			atj, _ := time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", entries[j].Updated)
+			ati, _ := entries[i].Date()
+			atj, _ := entries[j].Date()
 			return ati.Before(atj)
 		})
 		for _, entry := range entries {
-			at, err := time.Parse("Mon, 02 Jan 2006 15:04:05 +0000", entry.Updated)
+			at, err := entry.Date()
 			if err != nil {
 				continue
 			}
