@@ -14,15 +14,26 @@ const Layout = () => {
     );
   }
 
+  const navis = [
+    ['/admin', 'Dashboard'],
+    ['/admin/users', 'Users'],
+    ['/admin/topics', 'Topics'],
+    ['/admin/comments', 'Comments'],
+    ['/admin/categories', 'Categories'],
+    ['/admin/gists', 'Gists'],
+  ];
+
+  const views = navis.map((n) => {
+    return (
+      <Link key={n[1]} to={n[0]} className={style.navi}>{n[1]}</Link>
+    );
+  });
+
   return (
     <>
       <header className={style.header}>
         <Link to='/' className={style.brand}> &larr; <span className='only-pc'>Back to {Config.Name}</span></Link>
-        <Link to='/admin' className={style.navi}>Dashboard</Link>
-        <Link to='/admin/users' className={style.navi}>Users</Link>
-        <Link to='/admin/topics' className={style.navi}>Topics</Link>
-        <Link to='/admin/comments' className={style.navi}>Comments</Link>
-        <Link to='/admin/categories' className={style.navi}>Categories</Link>
+        {views}
       </header>
       <div className={style.container}>
         <div className={style.wrapper}>
