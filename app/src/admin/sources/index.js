@@ -22,7 +22,7 @@ const Index = () => {
       <div key={s.source_id} className={style.source}>
         {s.link}
         <div className={style.meta}>
-          {s.author} · {s.host} · {s.updated_at}
+          {s.author} · {s.host} · {s.Locality} · {s.updated_at}
         </div>
       </div>
     );
