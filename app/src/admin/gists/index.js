@@ -20,7 +20,7 @@ const Index = () => {
   const list = gists.map((g) => {
     return (
       <div key={g.gist_id} className={style.gist}>
-        {g.title}
+        <a href={g.link}>{g.title}</a>
         <div className={style.meta}>
           {g.source.author} · {g.source.host} · {g.publish_at}
         </div>
