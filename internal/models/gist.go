@@ -115,6 +115,23 @@ func (g *Gist) Update(ctx context.Context, title, genre string, cardinal bool) e
 	return nil
 }
 
+func ReadAllGists(ctx context.Context, offset time.Time) ([]*Gist, error) {
+	if offset.IsZero() {
+		offset = time.Now()
+	}
+	var gists []*Gist
+	query := fmt.Sprintf("SELECT %s FROM gists WHERE publish_at<=$1 ORDER BY publish_at DESC LIMIT $2", strings.Join(gistColumns, ","))
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		var err error
+		gists, err = readGists(ctx, tx, query, offset, 512)
+		return err
+	})
+	if err != nil {
+		return nil, session.TransactionError(ctx, err)
+	}
+	return gists, nil
+}
+
 func ReadGists(ctx context.Context, offset time.Time, limit int64) ([]*Gist, error) {
 	if limit <= 0 || limit > 128 {
 		limit = 128

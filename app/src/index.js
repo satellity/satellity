@@ -80,6 +80,7 @@ root.render(
             <Route exact path={`categories`} element={<Admin.Category.Index />} />
             <Route exact path={`categories/new`} element={<Admin.Category.New />} />
             <Route path={`categories/:id/edit`} element={<Admin.Category.Edit />} />
+            <Route exact path={`gists`} element={<Admin.Gists />} />
           </Route>
           <Route path='/' element={<MainLayout />}>
             <Route index element={<Gist.Index />} />

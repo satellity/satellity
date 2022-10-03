@@ -138,8 +138,9 @@ CREATE TABLE IF NOT EXISTS gists (
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS gists_cardinalx ON gists (genre, publish_at DESC);
+CREATE INDEX IF NOT EXISTS gists_cardinalx ON gists (cardinal, publish_at DESC);
 CREATE INDEX IF NOT EXISTS gists_genrex ON gists (genre, publish_at DESC);
+CREATE INDEX IF NOT EXISTS gists_publishx ON gists (publish_at DESC);
 
 
 CREATE TABLE IF NOT EXISTS statistics (
