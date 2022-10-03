@@ -4,6 +4,7 @@ import Users from './users/index.js';
 import Topics from './topics/index.js';
 import Comments from './comments/index.js';
 import Gists from './gists/index.js';
+import Sources from './sources/index.js';
 
 export default {
   Index: Index,
@@ -12,4 +13,5 @@ export default {
   Topics: Topics,
   Comments: Comments,
   Gists: Gists,
+  Sources: Sources,
 };

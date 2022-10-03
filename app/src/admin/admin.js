@@ -21,6 +21,7 @@ const Layout = () => {
     ['/admin/comments', 'Comments'],
     ['/admin/categories', 'Categories'],
     ['/admin/gists', 'Gists'],
+    ['/admin/sources', 'Sources'],
   ];
 
   const views = navis.map((n) => {
