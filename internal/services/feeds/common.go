@@ -28,16 +28,13 @@ type Common struct {
 
 // time: "Mon, 02 Jan 2006 15:04:05 +0000"
 func (c *Common) Date() (time.Time, error) {
-	if c.Channel.Updated != "" {
-		t, err := time.Parse(time.RFC1123Z, c.Channel.Updated)
-		if err != nil {
-			return time.Parse(time.RFC1123, c.Channel.Updated)
-		}
-		return t, nil
+	updated := c.Channel.Updated
+	if updated == "" {
+		updated = c.Channel.LastBuildDate
 	}
-	t, err := time.Parse(time.RFC1123Z, c.Channel.LastBuildDate)
+	t, err := time.Parse(time.RFC1123Z, updated)
 	if err != nil {
-		return time.Parse(time.RFC1123, c.Channel.LastBuildDate)
+		return time.Parse(time.RFC1123, updated)
 	}
 	return t, nil
 }
