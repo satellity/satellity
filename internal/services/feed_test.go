@@ -18,11 +18,13 @@ func TestService(t *testing.T) {
 		Timeout: 10 * time.Second,
 	}
 
-	link := "https://news.crunchbase.com/sections/crypto/feed/"
+	link := "https://techcrunch.com/tag/bitcoin/feed/"
 	resp, _ := client.Get(link)
 
 	var feed feeds.Common
-	err := xml.NewDecoder(resp.Body).Decode(&feed)
+	d := xml.NewDecoder(resp.Body)
+	d.Strict = false
+	err := d.Decode(&feed)
 	assert.Nil(err)
 	log.Println(feed.Date())
 	for _, entry := range feed.Channel.Entries {

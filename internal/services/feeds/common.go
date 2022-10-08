@@ -68,7 +68,9 @@ func FetchCommon(ctx context.Context, s *models.Source) error {
 		return s.Delete(ctx)
 	}
 	var common Common
-	err = xml.NewDecoder(resp.Body).Decode(&common)
+	d := xml.NewDecoder(resp.Body)
+	d.Strict = false
+	err = d.Decode(&common)
 	if err != nil {
 		return fmt.Errorf("xml decode error: %w", err)
 	}
