@@ -10,12 +10,12 @@ import (
 )
 
 type EntryCommon struct {
-	Id      string `xml:"guid"`
-	Updated string `xml:"pubDate"`
-	Link    string `xml:"link"`
 	Title   string `xml:"title"`
+	Id      string `xml:"guid"`
+	Link    string `xml:"link"`
 	Content string `xml:"description"`
 	Author  string `xml:"creator"`
+	Updated string `xml:"pubDate"`
 }
 
 type Common struct {
@@ -31,6 +31,9 @@ func (c *Common) Date() (time.Time, error) {
 	updated := c.Channel.Updated
 	if updated == "" {
 		updated = c.Channel.LastBuildDate
+	}
+	if updated == "" {
+		return time.Now(), nil
 	}
 	t, err := time.Parse(time.RFC1123Z, updated)
 	if err != nil {
