@@ -20,6 +20,10 @@ class Admin {
   index() {
     return this.api.axios.get('/admin/gists');
   }
+
+  delete(id) {
+    return this.api.axios.delete(`/admin/gists/${id}`);
+  }
 }
 
 export default Gist;

@@ -13,6 +13,14 @@ class Admin {
   index() {
     return this.api.axios.get('/admin/sources');
   }
+
+  index() {
+    return this.api.axios.get('/admin/sources');
+  }
+
+  delete(id) {
+    return this.api.axios.delete(`/admin/sources/${id}`);
+  }
 }
 
 export default Source;
