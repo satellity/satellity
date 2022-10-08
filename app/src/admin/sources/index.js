@@ -44,6 +44,9 @@ const Index = () => {
         <div className={style.meta}>
           {s.author} · {s.host} · {s.locality} · {s.wreck > 0 ? `errors ${s.wreck} · `: ''}{s.updated_at}
         </div>
+        <div className={style.meta}>
+          {s.publish_at}
+        </div>
       </div>
     );
   });
