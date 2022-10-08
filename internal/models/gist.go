@@ -83,6 +83,13 @@ func CreateGist(ctx context.Context, identity, author, title, genre string, card
 			gist = old
 			return nil
 		}
+		old, err = findGistByLink(ctx, tx, gist.Link)
+		if err != nil {
+			return err
+		} else if old != nil {
+			gist = old
+			return nil
+		}
 		_, err = tx.CopyFrom(ctx, pgx.Identifier{"gists"}, gistColumns, pgx.CopyFromRows(rows))
 		return err
 	})
@@ -202,7 +209,19 @@ func findGist(ctx context.Context, tx pgx.Tx, id string) (*Gist, error) {
 	} else if err != nil {
 		return nil, err
 	}
-	g.Source, err = findSource(ctx, tx, id)
+	g.Source, err = findSource(ctx, tx, g.SourceID)
+	return g, err
+}
+
+func findGistByLink(ctx context.Context, tx pgx.Tx, link string) (*Gist, error) {
+	row := tx.QueryRow(ctx, fmt.Sprintf("SELECT %s FROM gists WHERE link=$1", strings.Join(gistColumns, ",")), link)
+	g, err := gistFromRow(row)
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+	g.Source, err = findSource(ctx, tx, g.SourceID)
 	return g, err
 }
 
