@@ -18,7 +18,7 @@ func TestService(t *testing.T) {
 		Timeout: 10 * time.Second,
 	}
 
-	link := "https://www.theblock.co/rss.xml"
+	link := "https://criptotendencia.com/feed/"
 	req, err := http.NewRequest("GET", link, nil)
 	assert.Nil(err)
 	req.Header.Set("user-agent", "Mozilla/5.0 AppleWebKit/537.36 Chrome/105.0.0.0 Safari/537.36")

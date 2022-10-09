@@ -20,7 +20,7 @@ func Run(db *durable.Database) {
 			time.Sleep(3 * time.Second)
 			continue
 		}
-		time.Sleep(time.Hour)
+		time.Sleep(15 * time.Minute)
 	}
 }
 
