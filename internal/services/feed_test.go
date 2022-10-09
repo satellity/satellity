@@ -18,7 +18,7 @@ func TestService(t *testing.T) {
 		Timeout: 10 * time.Second,
 	}
 
-	link := "http://feeds.feedburner.com/Coindesk"
+	link := "https://zycrypto.com/category/news/feed/"
 	resp, _ := client.Get(link)
 
 	var feed feeds.Common
@@ -29,7 +29,9 @@ func TestService(t *testing.T) {
 	log.Println(feed.Date())
 	log.Println(len(feed.Channel.Entries))
 	for _, entry := range feed.Channel.Entries {
-		log.Printf("%#v", entry)
+		log.Println("title>>", entry.Title)
+		log.Println("link>>", entry.Link)
+		log.Println(entry.Date())
 		break
 	}
 }
