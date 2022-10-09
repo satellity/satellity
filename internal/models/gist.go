@@ -139,18 +139,27 @@ func ReadAllGists(ctx context.Context, offset time.Time) ([]*Gist, error) {
 	return gists, nil
 }
 
-func ReadGists(ctx context.Context, offset time.Time, limit int64) ([]*Gist, error) {
+func ReadGists(ctx context.Context, genre string, offset time.Time, limit int64) ([]*Gist, error) {
 	if limit <= 0 || limit > 128 {
 		limit = 128
 	}
 	if offset.IsZero() {
 		offset = time.Now()
 	}
+	genre = strings.ToUpper(strings.TrimSpace(genre))
+	var query string
+	var params []any
+	if genre == "" {
+		query = fmt.Sprintf("SELECT %s FROM gists WHERE cardinal=true AND publish_at<=$1 ORDER BY cardinal,publish_at DESC LIMIT $2", strings.Join(gistColumns, ","))
+		params = append(params, offset, limit)
+	} else {
+		query = fmt.Sprintf("SELECT %s FROM gists WHERE genre=$1 AND publish_at<=$2 ORDER BY genre,publish_at DESC LIMIT $3", strings.Join(gistColumns, ","))
+		params = append(params, genre, offset, limit)
+	}
 	var gists []*Gist
-	query := fmt.Sprintf("SELECT %s FROM gists WHERE cardinal=true AND publish_at<=$1 ORDER BY cardinal,publish_at DESC LIMIT $2", strings.Join(gistColumns, ","))
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
-		gists, err = readGists(ctx, tx, query, offset, limit)
+		gists, err = readGists(ctx, tx, query, params...)
 		return err
 	})
 	if err != nil {
