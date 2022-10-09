@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
+	"net/http"
 	"satellity/internal/models"
 	"sort"
 	"time"
@@ -52,7 +53,12 @@ func (e *EntryCommon) Date() (time.Time, error) {
 
 func FetchCommon(ctx context.Context, s *models.Source) error {
 	now := time.Now()
-	resp, err := client.Get(s.Link)
+	req, err := http.NewRequest("GET", s.Link, nil)
+	if err != nil {
+		return fmt.Errorf("new request error: %v", err)
+	}
+	req.Header.Set("user-agent", "Mozilla/5.0 AppleWebKit/537.36 Chrome/105.0.0.0 Safari/537.36")
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("fetch error: %w", err)
 	}

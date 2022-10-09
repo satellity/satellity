@@ -18,13 +18,16 @@ func TestService(t *testing.T) {
 		Timeout: 10 * time.Second,
 	}
 
-	link := "https://zycrypto.com/category/news/feed/"
-	resp, _ := client.Get(link)
+	link := "https://www.theblock.co/rss.xml"
+	req, err := http.NewRequest("GET", link, nil)
+	assert.Nil(err)
+	req.Header.Set("user-agent", "Mozilla/5.0 AppleWebKit/537.36 Chrome/105.0.0.0 Safari/537.36")
+	resp, _ := client.Do(req)
 
 	var feed feeds.Common
 	d := xml.NewDecoder(resp.Body)
 	d.Strict = false
-	err := d.Decode(&feed)
+	err = d.Decode(&feed)
 	assert.Nil(err)
 	log.Println(feed.Date())
 	log.Println(len(feed.Channel.Entries))
