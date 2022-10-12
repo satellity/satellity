@@ -38,13 +38,13 @@ func loopSources(ctx context.Context) error {
 			err = feeds.FetchMedium(ctx, s)
 		case "mirror":
 			err = feeds.FetchMirror(ctx, s)
-		case "substack":
-			err = feeds.FetchSubStack(ctx, s)
-		case "decrypt":
-			err = feeds.FetchDecrypt(ctx, s)
-		case "techcrunch":
-			err = feeds.FetchTechCrunch(ctx, s)
-		case "messari", "crunchbase", "trustnodes", "common":
+		case "messari",
+			"substack",
+			"techcrunch",
+			"decrypt",
+			"crunchbase",
+			"trustnodes",
+			"common":
 			err = feeds.FetchCommon(ctx, s)
 		}
 		if err != nil {
