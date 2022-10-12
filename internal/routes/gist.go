@@ -15,7 +15,7 @@ type gistImpl struct{}
 func registerGist(router *httptreemux.Group) {
 	impl := &gistImpl{}
 	router.GET("/gists", impl.index)
-	router.GET("/genre/:id", impl.gists)
+	router.GET("/genres/:id", impl.gists)
 }
 
 func (impl *gistImpl) index(w http.ResponseWriter, r *http.Request, _ map[string]string) {
