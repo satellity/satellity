@@ -2,9 +2,8 @@ import React, {useState, useEffect} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import API from 'api/index.js';
 import Loading from 'components/loading.js';
-import Widget from 'components/widget.js';
 import Item from './item.js';
-import Chart from './chart.js';
+import Layout from './layout.js';
 
 import style from './index.module.scss';
 
@@ -57,16 +56,9 @@ const List = () => {
 
 const Index = () => {
   return (
-    <div className='container'>
-      <main className='column main'>
-        <List />
-      </main>
-      <aside className='column aside'>
-        <Widget>
-          <Chart />
-        </Widget>
-      </aside>
-    </div>
+    <Layout>
+      <List />
+    </Layout>
   );
 };
 
