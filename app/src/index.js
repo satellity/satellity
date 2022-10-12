@@ -85,6 +85,7 @@ root.render(
           </Route>
           <Route path='/' element={<MainLayout />}>
             <Route index element={<Gist.Index />} />
+            <Route path="genres/:genre" element={<Gist.Genre />} />
             <Route path="categories/:id" element={<Topic.Index />} />
             <Route path='user/edit' element={<User.Edit />} />
             <Route path='users/:id' element={<User.Show />} />

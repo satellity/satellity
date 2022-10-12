@@ -8,10 +8,17 @@ const Item = ({gist}) => {
   let author = gist.author;
   if (gist.author.trim().toLowerCase() !== gist.source.author.trim().toLowerCase()) {
     author = `${gist.author}, ${gist.source.author}`;
+    if (gist.author === '') {
+      author = `${gist.source.author}`;
+    }
   }
   return (
     <div className={style.gist}>
-      <a href={gist.link}>{gist.title}</a>
+      <a href={gist.link}>
+        {gist.title}
+        &nbsp;
+        {gist.source.host === 'github.com' ? `<${author}>` : ''}
+      </a>
       <div className={style.meta}>
         {author} · {gist.source.host} · <TimeAgo date={gist.publish_at} />
       </div>
