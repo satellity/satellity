@@ -1,11 +1,27 @@
 @import '../assets/css/constant.scss';
 
+// styles for layout
+.nodes {
+  margin-bottom: 1.2rem;
+}
+
+.node {
+  background: $color-bg-grey;
+  border-radius: 1.6rem;
+  padding: .5rem .8rem;
+  margin-right: .8rem;
+  &.current {
+    background: $color-bg-red;
+    color: white;
+  }
+}
+
 // styles for item
 .gist {
   padding: .3rem .5rem;
   border-radius: .2rem;
 
-  &:nth-child(odd) {
+  &:nth-child(even) {
     background: #eceff1;
   }
 
