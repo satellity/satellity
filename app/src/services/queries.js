@@ -26,6 +26,17 @@ export const useMe = () => {
   );
 };
 
+export const useGenres = (genre) => {
+  return useQuery(
+      [genre],
+      () => api.gist.genres(genre).then((resp) => resp.data),
+      {
+        cacheTime: 60 * 1000,
+        staleTime: 60 * 1000,
+      },
+  );
+};
+
 export const useFaucet = () => {
   return useQuery(
       ['faucet'],
