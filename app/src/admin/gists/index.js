@@ -47,7 +47,7 @@ const Index = () => {
       <div key={g.gist_id} className={style.gist}>
         <a href={g.link}>{g.title}</a>
         &nbsp; &nbsp;
-        <Link to='' onClick={(e) => handleDelete(e, g.gist_id, g.title)} > 🗑 </Link>
+        <Link to='' onClick={(e) => handleDelete(e, g.gist_id, g.title)} >🗑</Link>
         <div className={style.meta}>
           {g.source.author} · {g.source.host} · {g.publish_at}
         </div>
