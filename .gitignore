@@ -4,6 +4,7 @@ satellity
 config.yaml
 internal/tasks
 publish
+deploy
 public
 task
 app/public/sitemap.xml
