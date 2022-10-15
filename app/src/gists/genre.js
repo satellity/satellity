@@ -12,7 +12,6 @@ const api = new API();
 const List = () => {
   const {genre} = useParams();
   const [searchParams] = useSearchParams();
-  console.log(searchParams);
 
   const [loading, setLoading] = useState(true);
   const [gists, setGists] = useState([]);

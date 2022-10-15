@@ -17,6 +17,7 @@ import Verification from './verification.js';
 import Gist from './gist.js';
 import Source from './source.js';
 import CoinGecko from './cgc.js';
+import Chains from './chains.js';
 
 Noty.overrideDefaults({
   type: 'error',
@@ -119,6 +120,7 @@ class API {
     this.gist = new Gist(this);
     this.source = new Source(this);
     this.cgc = new CoinGecko();
+    this.chain = new Chains();
   }
 }
 

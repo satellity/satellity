@@ -25,3 +25,14 @@ export const useMe = () => {
       },
   );
 };
+
+export const useFaucet = () => {
+  return useQuery(
+      ['faucet'],
+      () => api.chain.list().then((resp) => resp.data),
+      {
+        cacheTime: 30 * 60 * 1000,
+        staleTime: 60 * 60 * 1000,
+      },
+  );
+};

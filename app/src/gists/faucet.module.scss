@@ -1,0 +1,25 @@
+@import '../assets/css/constant.scss';
+
+.name {
+  font-weight: bold;
+}
+
+.item {
+  padding: .3rem .5rem;
+  border-radius: .2rem;
+
+  &:nth-child(even) {
+    background: #eceff1;
+  }
+
+  .meta {
+    font-size: .75rem;
+    color: $color-font-light-grey;
+  }
+
+  a {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
