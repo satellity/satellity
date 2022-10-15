@@ -8,7 +8,6 @@ import style from './index.module.scss';
 
 const View = ({children}) => {
   const {genre} = useParams();
-  console.log(genre);
 
   return (
     <div className='container'>
