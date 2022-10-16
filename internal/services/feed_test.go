@@ -18,7 +18,8 @@ func TestService(t *testing.T) {
 		Timeout: 10 * time.Second,
 	}
 
-	link := "https://aave.mirror.xyz/feed/atom"
+	// link := "https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml"
+	link := "https://dailycoin.com/feed/"
 	req, err := http.NewRequest("GET", link, nil)
 	assert.Nil(err)
 	req.Header.Set("user-agent", "Mozilla/5.0 AppleWebKit/537.36 Chrome/105.0.0.0 Safari/537.36")
@@ -34,6 +35,8 @@ func TestService(t *testing.T) {
 	for _, entry := range feed.Channel.Entries {
 		log.Println("title>>", entry.Title)
 		log.Println("link>>", entry.Link)
+		log.Println("identity>>", entry.Id)
+		log.Println("author>>", entry.Author)
 		log.Println(entry.Date())
 		break
 	}
