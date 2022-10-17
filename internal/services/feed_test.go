@@ -35,7 +35,7 @@ func TestService(t *testing.T) {
 	for _, entry := range feed.Channel.Entries {
 		log.Println("title>>", entry.Title)
 		log.Println("link>>", entry.Link)
-		log.Println("identity>>", entry.Id)
+		log.Println("identity>>", entry.ID)
 		log.Println("author>>", entry.Author)
 		log.Println(entry.Date())
 		break
