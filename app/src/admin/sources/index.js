@@ -40,7 +40,7 @@ const Index = () => {
       <div key={s.source_id} className={style.source}>
         <a href={s.link}>{s.link}</a>
         &nbsp; &nbsp;
-        <Link to='' onClick={(e) => handleDelete(e, s.source_id, s.link)} >🗑</Link>
+        <Link to='' onClick={(e) => handleDelete(e, s.source_id, s.link)} >❌</Link>
         <div className={style.meta}>
           {s.author} · {s.host} · {s.locality} · {s.wreck > 0 ? `errors ${s.wreck} · `: ''}{s.updated_at}
         </div>
