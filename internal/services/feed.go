@@ -30,23 +30,7 @@ func loopSources(ctx context.Context) error {
 		return err
 	}
 	for _, s := range sources {
-		var err error
-		switch s.Locality {
-		case "github":
-			err = feeds.FetchGithub(ctx, s)
-		case "medium":
-			err = feeds.FetchMedium(ctx, s)
-		case "mirror":
-			err = feeds.FetchMirror(ctx, s)
-		case "messari",
-			"substack",
-			"techcrunch",
-			"decrypt",
-			"crunchbase",
-			"trustnodes",
-			"common":
-			err = feeds.FetchCommon(ctx, s)
-		}
+		err = feeds.FetchCommon(ctx, s)
 		if err != nil {
 			log.Printf("loopSources link %s error %s \n", s.Link, err)
 			time.Sleep(time.Second)

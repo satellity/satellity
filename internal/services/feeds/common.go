@@ -2,7 +2,6 @@ package feeds
 
 import (
 	"context"
-	"encoding/xml"
 	"fmt"
 	"net/http"
 	"satellity/internal/models"
@@ -12,7 +11,7 @@ import (
 
 type EntryCommon struct {
 	Title   string `xml:"title"`
-	Id      string `xml:"guid"`
+	ID      string `xml:"guid"`
 	Link    string `xml:"link"`
 	Content string `xml:"description"`
 	Author  string `xml:"creator"`
@@ -64,48 +63,45 @@ func FetchCommon(ctx context.Context, s *models.Source) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 429 {
+	switch resp.StatusCode {
+	case 429:
 		return fmt.Errorf("%s too many requests %d", s.Link, resp.StatusCode)
-	}
-	if resp.StatusCode == 403 {
+	case 403:
 		return fmt.Errorf("%s forbidden %d", s.Link, resp.StatusCode)
-	}
-	if resp.StatusCode == 404 {
+	case 404:
 		return s.Delete(ctx)
 	}
-	var common Common
-	d := xml.NewDecoder(resp.Body)
-	d.Strict = false
-	err = d.Decode(&common)
-	if err != nil {
-		return fmt.Errorf("xml decode error: %w", err)
+
+	var channel *Channel
+	switch s.Locality {
+	case "github":
+		channel, err = parseGithub(resp.Body)
+	case "medium":
+		channel, err = parseMedium(resp.Body)
+	case "mirror":
+		channel, err = parseMirror(resp.Body)
+	default:
+		channel, err = parseCommon(resp.Body)
 	}
 
-	feed := common.Channel
-	updated, err := common.Date()
 	if err != nil {
-		return fmt.Errorf("time parse error: %w", err)
+		return err
 	}
+
 	published := time.Time{}
-	if updated.After(s.UpdatedAt) {
-		entries := feed.Entries
-		sort.Slice(entries, func(i, j int) bool {
-			ati, _ := entries[i].Date()
-			atj, _ := entries[j].Date()
-			return ati.Before(atj)
+	if channel.UpdatedAt.After(s.UpdatedAt) {
+		gists := channel.Gists
+		sort.Slice(gists, func(i, j int) bool {
+			return gists[i].UpdatedAt.After(gists[j].UpdatedAt)
 		})
-		for _, entry := range entries {
-			at, err := entry.Date()
-			if err != nil {
+		for _, gist := range gists {
+			if published.Before(gist.UpdatedAt) {
+				published = gist.UpdatedAt
+			}
+			if published.Before(s.UpdatedAt) {
 				continue
 			}
-			if published.Before(at) {
-				published = at
-			}
-			if at.Before(s.UpdatedAt) {
-				continue
-			}
-			_, err = models.CreateGist(ctx, entry.Id, entry.Author, entry.Title, models.GIST_GENRE_DEFAULT, true, entry.Link, entry.Content, at, s)
+			_, err = models.CreateGist(ctx, gist.ID, gist.Author, gist.Title, gist.Genre, gist.Cardinal, gist.Link, gist.Content, gist.UpdatedAt, s)
 			if err != nil {
 				return fmt.Errorf("CreateGist error: %w", err)
 
@@ -113,4 +109,12 @@ func FetchCommon(ctx context.Context, s *models.Source) error {
 		}
 	}
 	return s.Update(ctx, "", "", "", 0, published, now)
+}
+
+var client *http.Client
+
+func init() {
+	client = &http.Client{
+		Timeout: 10 * time.Second,
+	}
 }

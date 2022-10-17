@@ -1,16 +1,15 @@
 package feeds
 
 import (
-	"context"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"satellity/internal/models"
-	"sort"
 	"time"
 )
 
 type EntryMedium struct {
-	Id      string    `xml:"guid"`
+	ID      string    `xml:"guid"`
 	Updated time.Time `xml:"updated"`
 	Link    string    `xml:"link"`
 	Title   string    `xml:"title"`
@@ -25,53 +24,36 @@ type Medium struct {
 	} `xml:"channel"`
 }
 
-func FetchMedium(ctx context.Context, s *models.Source) error {
-	now := time.Now()
-	resp, err := client.Get(s.Link)
-	if err != nil {
-		return fmt.Errorf("fetch error: %w", err)
-	}
-	defer resp.Body.Close()
+func (m *Medium) Date() (time.Time, error) {
+	updated := m.Channel.Updated
+	return time.Parse(time.RFC1123, updated)
+}
 
-	if resp.StatusCode == 429 {
-		return fmt.Errorf("%s too many requests %d", s.Link, resp.StatusCode)
-	}
-	if resp.StatusCode == 403 {
-		return fmt.Errorf("%s forbidden %d", s.Link, resp.StatusCode)
-	}
-	if resp.StatusCode == 404 {
-		return s.Delete(ctx)
-	}
-	var medium Medium
-	err = xml.NewDecoder(resp.Body).Decode(&medium)
+func parseMedium(r io.Reader) (*Channel, error) {
+	var common Medium
+	d := xml.NewDecoder(r)
+	d.Strict = false
+
+	err := d.Decode(&common)
 	if err != nil {
-		return fmt.Errorf("xml decode error: %w", err)
+		return nil, fmt.Errorf("xml decode error: %w", err)
 	}
 
-	feed := medium.Channel
-	updated, err := time.Parse("Mon, 02 Jan 2006 15:04:05 GMT", feed.Updated)
-	if err != nil {
-		return fmt.Errorf("time parse error: %w", err)
-	}
-	published := time.Time{}
-	if updated.After(s.UpdatedAt) {
-		entries := feed.Entries
-		sort.Slice(entries, func(i, j int) bool {
-			return entries[i].Updated.Before(entries[j].Updated)
-		})
-		for _, entry := range entries {
-			if published.Before(entry.Updated) {
-				published = entry.Updated
-			}
-			if entry.Updated.Before(s.UpdatedAt) {
-				continue
-			}
-			_, err = models.CreateGist(ctx, entry.Id, entry.Author, entry.Title, models.GIST_GENRE_DEFAULT, true, entry.Link, entry.Content, entry.Updated, s)
-			if err != nil {
-				return fmt.Errorf("CreateGist error: %w", err)
-
-			}
+	cha := common.Channel
+	channel := &Channel{}
+	channel.UpdatedAt, _ = common.Date()
+	for _, e := range cha.Entries {
+		gist := &Gist{
+			Title:     e.Title,
+			ID:        e.ID,
+			Link:      e.Link,
+			Content:   e.Content,
+			Author:    e.Author,
+			UpdatedAt: e.Updated,
+			Genre:     models.GIST_GENRE_DEFAULT,
+			Cardinal:  true,
 		}
+		channel.Gists = append(channel.Gists, gist)
 	}
-	return s.Update(ctx, "", "", "", 0, published, now)
+	return channel, nil
 }

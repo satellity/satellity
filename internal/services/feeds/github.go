@@ -1,17 +1,15 @@
 package feeds
 
 import (
-	"context"
 	"encoding/xml"
 	"fmt"
-	"net/http"
+	"io"
 	"satellity/internal/models"
-	"sort"
 	"time"
 )
 
-type Entry struct {
-	Id      string    `xml:"id"`
+type GithubEntry struct {
+	ID      string    `xml:"id"`
 	Updated time.Time `xml:"updated"`
 	Link    struct {
 		Href string `xml:"href,attr"`
@@ -21,59 +19,34 @@ type Entry struct {
 }
 
 type Github struct {
-	Updated time.Time `xml:"updated"`
-	Entries []*Entry  `xml:"entry"`
+	Updated time.Time      `xml:"updated"`
+	Entries []*GithubEntry `xml:"entry"`
 }
 
-func FetchGithub(ctx context.Context, s *models.Source) error {
-	now := time.Now()
-	resp, err := client.Get(s.Link)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
+func parseGithub(r io.Reader) (*Channel, error) {
+	var common Github
+	d := xml.NewDecoder(r)
+	d.Strict = false
 
-	if resp.StatusCode == 429 {
-		return fmt.Errorf("%s too many requests %d", s.Link, resp.StatusCode)
-	}
-	if resp.StatusCode == 403 {
-		return fmt.Errorf("%s forbidden %d", s.Link, resp.StatusCode)
-	}
-	if resp.StatusCode == 404 {
-		return s.Delete(ctx)
-	}
-	var feed Github
-	err = xml.NewDecoder(resp.Body).Decode(&feed)
+	err := d.Decode(&common)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("xml decode error: %w", err)
 	}
 
-	published := time.Time{}
-	if feed.Updated.After(s.UpdatedAt) {
-		entries := feed.Entries
-		sort.Slice(entries, func(i, j int) bool {
-			return entries[i].Updated.Before(entries[j].Updated)
-		})
-		for _, entry := range entries {
-			if published.Before(entry.Updated) {
-				published = entry.Updated
-			}
-			if entry.Updated.Before(s.UpdatedAt) {
-				continue
-			}
-			_, err = models.CreateGist(ctx, entry.Id, "", entry.Title, models.GIST_GENRE_RELEASE, false, entry.Link.Href, entry.Content, entry.Updated, s)
-			if err != nil {
-				return err
-			}
+	channel := &Channel{
+		UpdatedAt: common.Updated,
+	}
+	for _, e := range common.Entries {
+		gist := &Gist{
+			Title:     e.Title,
+			ID:        e.ID,
+			Link:      e.Link.Href,
+			Content:   e.Content,
+			UpdatedAt: e.Updated,
+			Genre:     models.GIST_GENRE_RELEASE,
+			Cardinal:  false,
 		}
+		channel.Gists = append(channel.Gists, gist)
 	}
-	return s.Update(ctx, "", "", "", 0, published, now)
-}
-
-var client *http.Client
-
-func init() {
-	client = &http.Client{
-		Timeout: 10 * time.Second,
-	}
+	return channel, nil
 }
