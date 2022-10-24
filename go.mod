@@ -3,7 +3,6 @@ module satellity
 go 1.19
 
 require (
-	github.com/btcsuite/btcutil v1.0.2
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/ethereum/go-ethereum v1.10.21
 	github.com/go-errors/errors v1.4.2
@@ -13,10 +12,8 @@ require (
 	github.com/jackc/pgconn v1.13.0
 	github.com/jackc/pgx/v4 v4.17.0
 	github.com/jessevdk/go-flags v1.5.0
-	github.com/lib/pq v1.10.6
 	github.com/mailgun/mailgun-go/v3 v3.6.4
-	github.com/speps/go-hashids v2.0.0+incompatible
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	github.com/unrolled/render v1.5.0
 	go.uber.org/zap v1.22.0
 	golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8
@@ -38,6 +35,7 @@ require (
 	github.com/jackc/pgtype v1.12.0 // indirect
 	github.com/jackc/puddle v1.2.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/lib/pq v1.10.6 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -45,6 +43,5 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/sys v0.0.0-20220817070843-5a390386f1f2 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/xerrors v0.0.0-20220517211312-f3a8303e98df // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
