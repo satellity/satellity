@@ -1125,10 +1125,10 @@
     "@codemirror/view" "^6.0.0"
     "@lezer/common" "^1.0.0"
 
-"@codemirror/commands@^6.0.0":
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/@codemirror/commands/-/commands-6.0.1.tgz#c005dd2dab2f6d90ad00d4a25bfeaaec2393efa6"
-  integrity sha512-iNHDByicYqQjs0Wo1MKGfqNbMYMyhS9WV6EwMVwsHXImlFemgEUC+c5X22bXKBStN3qnwg4fArNZM+gkv22baQ==
+"@codemirror/commands@^6.0.0", "@codemirror/commands@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@codemirror/commands/-/commands-6.1.0.tgz#c9da851f419f25dae400d7cd94f80b80ef060696"
+  integrity sha512-qCj2YqmbBjj0P1iumnlL5lBqZvJPzT+t2UvgjcaXErp5ZvMqFRVgQyrEfdXX6SX5UcvcHKBjXqno+MkUp0aYvQ==
   dependencies:
     "@codemirror/language" "^6.0.0"
     "@codemirror/state" "^6.0.0"
@@ -1324,7 +1324,7 @@
     "@codemirror/view" "^6.0.0"
     crelt "^1.0.5"
 
-"@codemirror/state@^6.0.0":
+"@codemirror/state@^6.0.0", "@codemirror/state@^6.1.1":
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/@codemirror/state/-/state-6.1.1.tgz#4f512e5e34ea23a5e10b2c1fe43f6195e90417bb"
   integrity sha512-2s+aXsxmAwnR3Rd+JDHPG/1lw0YsA9PEwl7Re88gHJHGfxyfEzKBmsN4rr53RyPIR4lzbbhJX0DCq0WlqlBIRw==
@@ -3030,10 +3030,10 @@
     "@typescript-eslint/types" "5.32.0"
     eslint-visitor-keys "^3.3.0"
 
-"@uiw/codemirror-extensions-basic-setup@4.12.0":
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/@uiw/codemirror-extensions-basic-setup/-/codemirror-extensions-basic-setup-4.12.0.tgz#575b7cb6fa4e6b5af8a84588fe41388d192ff13b"
-  integrity sha512-q+ZINOU5LdvE9kEAcjYsiNEgauhOraqXEzl3ELOno3mj2Vk3N4cIEox2ZcVlX5PVOkfKm3/bDr5d3yI7CyaZxQ==
+"@uiw/codemirror-extensions-basic-setup@4.12.1":
+  version "4.12.1"
+  resolved "https://registry.yarnpkg.com/@uiw/codemirror-extensions-basic-setup/-/codemirror-extensions-basic-setup-4.12.1.tgz#48d796bdc51298895f4dfa8d23b3d8c438bc9c3a"
+  integrity sha512-hA8RD6Xr/GpF/FI+Dr1gnhqKnu+SIwvuQIH3ZsQccacuJFo7w1pz8WxXLEkHxKLNhEJds7nhbcJ6TXQGka4qsg==
   dependencies:
     "@codemirror/autocomplete" "^6.0.0"
     "@codemirror/commands" "^6.0.0"
@@ -3043,14 +3043,16 @@
     "@codemirror/state" "^6.0.0"
     "@codemirror/view" "^6.0.0"
 
-"@uiw/react-codemirror@^4.12.0":
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/@uiw/react-codemirror/-/react-codemirror-4.12.0.tgz#7584e2a7147d564c207ac3363747b67bf67000b3"
-  integrity sha512-0gTJ0fQQi7PVePNgl6JlkUs0uJ0Mgb2P0mcHyLcgPgbP7WOL0nFbYl7cUA6Nj+CYKr/L9qqqVjSW9gpnxXiFxA==
+"@uiw/react-codemirror@^4.12.1":
+  version "4.12.1"
+  resolved "https://registry.yarnpkg.com/@uiw/react-codemirror/-/react-codemirror-4.12.1.tgz#45236075ad51e150ddb4132708aa6d8b642bd8c9"
+  integrity sha512-2QnbaGp9qn1iMpydaw6QdV6GcLCrnxHS9NTH+9lepmGrfa0Oh02lPz04wk9QMPzfGOwTkkznw3oygu3GfNOODw==
   dependencies:
     "@babel/runtime" "^7.18.6"
+    "@codemirror/commands" "^6.1.0"
+    "@codemirror/state" "^6.1.1"
     "@codemirror/theme-one-dark" "^6.0.0"
-    "@uiw/codemirror-extensions-basic-setup" "4.12.0"
+    "@uiw/codemirror-extensions-basic-setup" "4.12.1"
     codemirror "^6.0.0"
 
 "@vxna/mini-html-webpack-template@^2.0.0":
