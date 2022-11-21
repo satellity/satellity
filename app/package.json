@@ -81,6 +81,6 @@
     "babel-register": "^6.26.0",
     "eslint": ">=5.16.0",
     "eslint-config-google": "^0.14.0",
-    "eslint-plugin-react": "^7.30.1"
+    "eslint-plugin-react": "^7.31.11"
   }
 }
