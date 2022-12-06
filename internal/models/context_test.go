@@ -13,6 +13,7 @@ const (
 	testEnvironment = "test"
 	testDatabase    = "satellity_test"
 
+	dropOriginDDL            = `DROP TABLE IF EXISTS origins;`
 	dropGistDDL              = `DROP TABLE IF EXISTS gists;`
 	dropSourcesDDL           = `DROP TABLE IF EXISTS sources;`
 	dropCategoriesDDL        = `DROP TABLE IF EXISTS categories;`
@@ -27,6 +28,7 @@ const (
 
 func teardownTestContext(ctx context.Context) {
 	tables := []string{
+		dropOriginDDL,
 		dropGistDDL,
 		dropSourcesDDL,
 		dropStatisticsDDL,
