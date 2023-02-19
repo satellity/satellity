@@ -20,19 +20,20 @@ type Origin struct {
 	LogoURL    string
 	Locality   string
 	Wreck      int
+	Position   int64
 	CreatedAt  time.Time
 	UpdateAt   time.Time
 }
 
-var originColumns = []string{"origin_id", "name", "website_url", "logo_url", "locality", "wreck", "created_at", "updated_at"}
+var originColumns = []string{"origin_id", "name", "website_url", "logo_url", "locality", "wreck", "position", "created_at", "updated_at"}
 
 func (r *Origin) values() []any {
-	return []any{r.OriginID, r.Name, r.WebsiteURL, r.LogoURL, r.Locality, r.Wreck, r.CreatedAt, r.UpdateAt}
+	return []any{r.OriginID, r.Name, r.WebsiteURL, r.LogoURL, r.Locality, r.Wreck, r.Position, r.CreatedAt, r.UpdateAt}
 }
 
 func originFromRows(row durable.Row) (*Origin, error) {
 	var o Origin
-	err := row.Scan(&o.OriginID, &o.Name, &o.WebsiteURL, &o.LogoURL, &o.Locality, &o.Wreck, &o.CreatedAt, &o.UpdateAt)
+	err := row.Scan(&o.OriginID, &o.Name, &o.WebsiteURL, &o.LogoURL, &o.Locality, &o.Wreck, &o.Position, &o.CreatedAt, &o.UpdateAt)
 	return &o, err
 }
 
@@ -56,6 +57,7 @@ func CreateOrigin(ctx context.Context, name, link, logo, locality string) (*Orig
 		LogoURL:    logo,
 		Locality:   locality,
 		Wreck:      0,
+		Position:   10001,
 		CreatedAt:  t,
 		UpdateAt:   t,
 	}

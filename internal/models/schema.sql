@@ -150,11 +150,24 @@ CREATE TABLE IF NOT EXISTS origins (
   logo_url              VARCHAR(1024) NOT NULL,
   locality              VARCHAR(128) NOT NULL,
   wreck                 INTEGER NOT NULL DEFAULT 0,
+  position              INTEGER NOT NULL DEFAULT 0,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS origins_updatedx ON sources (updated_at);
+
+
+CREATE TABLE IF NOT EXISTS posts (
+  post_id               VARCHAR(36) PRIMARY KEY,
+  title                 VARCHAR(1024) NOT NULL,
+  link                  VARCHAR(1024) NOT NULL,
+  meta                  VARCHAR(1024) NOT NULL,
+  origin_id             VARCHAR(36) NOT NULL,
+  created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS posts_origin_createdx ON posts (origin_id, created_at DESC);
 
 
 CREATE TABLE IF NOT EXISTS statistics (
