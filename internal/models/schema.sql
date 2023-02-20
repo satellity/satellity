@@ -169,6 +169,28 @@ CREATE TABLE IF NOT EXISTS posts (
 
 CREATE INDEX IF NOT EXISTS posts_origin_createdx ON posts (origin_id, created_at DESC);
 
+CREATE TABLE IF NOT EXISTS assets (
+  asset_id              VARCHAR(36) PRIMARY KEY,
+  api_id                VARCHAR(1024) NOT NULL,
+  symbol                VARCHAR(1024) NOT NULL,
+  name                  VARCHAR(1024) NOT NULL,
+  image                 VARCHAR(1024) NOT NULL,
+  current_price         VARCHAR(1024) NOT NULL,
+  high_24h              VARCHAR(1024) NOT NULL,
+  low_24h               VARCHAR(1024) NOT NULL,
+  market_cap            VARCHAR(1024) NOT NULL,
+  market_cap_rank       INTEGER NOT NULL,
+  fully_diluted_valuation VARCHAR(1024) NOT NULL,
+  total_volume          VARCHAR(1024) NOT NULL,
+  circulating_supply    VARCHAR(1024) NOT NULL,
+  total_supply          VARCHAR(1024) NOT NULL,
+  max_supply            VARCHAR(1024) NOT NULL,
+  ath                   VARCHAR(1024) NOT NULL,
+  atl                   VARCHAR(1024) NOT NULL,
+  contract              VARCHAR(1024) NOT NULL,
+  updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
 
 CREATE TABLE IF NOT EXISTS statistics (
   statistic_id          VARCHAR(36) PRIMARY KEY,

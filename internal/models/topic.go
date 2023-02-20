@@ -57,7 +57,7 @@ func topicFromRows(row durable.Row) (*Topic, error) {
 	return &t, err
 }
 
-//CreateTopic create a new Topic
+// CreateTopic create a new Topic
 func (user *User) CreateTopic(ctx context.Context, title, body, typ, categoryID string, draft bool) (*Topic, error) {
 	if draft {
 		t, err := user.DraftTopic(ctx)
@@ -194,7 +194,7 @@ func (user *User) UpdateTopic(ctx context.Context, id, title, body, typ, categor
 	return topic, nil
 }
 
-//ReadTopic read a topic by ID
+// ReadTopic read a topic by ID
 func ReadTopic(ctx context.Context, id string) (*Topic, error) {
 	var topic *Topic
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
@@ -208,7 +208,7 @@ func ReadTopic(ctx context.Context, id string) (*Topic, error) {
 	return topic, nil
 }
 
-//ReadTopicWithRelation read a topic with user's status like and bookmark
+// ReadTopicWithRelation read a topic with user's status like and bookmark
 func ReadTopicFull(ctx context.Context, id string, user *User) (*Topic, error) {
 	topic, err := ReadTopic(ctx, id)
 	if err != nil || topic == nil {
@@ -257,7 +257,7 @@ func (topic *Topic) Delete(ctx context.Context, user *User) error {
 	return nil
 }
 
-//DraftTopic read the draft topic
+// DraftTopic read the draft topic
 func (user *User) DraftTopic(ctx context.Context) (*Topic, error) {
 	var topic *Topic
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {

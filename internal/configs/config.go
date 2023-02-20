@@ -43,6 +43,7 @@ type Option struct {
 		SiteKey string `yaml:"site_key"`
 		Secret  string `yaml:"secret"`
 	} `yaml:"recaptcha"`
+	Cgc       string   `yaml:"cgc"`
 	Operators []string `yaml:"operators"`
 	Email     struct {
 		Verification struct {
