@@ -64,7 +64,7 @@ func (impl *AssetImpl) loopFetchAssets(ctx context.Context) error {
 	for _, a := range assets {
 		_, err = models.UpsertAsset(ctx, a.AppID, a.Symbol, a.Name, a.Image, a.CurrentPrice.String(), a.High24h.String(), a.Low24h.String(), a.MarketCap.String(), a.MarketCapRank, a.FullyDilutedValuation.String(), a.TotalVolume.String(), a.CirculatingSupply.String(), a.TotalSupply.String(), a.MaxSupply.String(), a.ATH.String(), a.ATL.String())
 		if err != nil {
-			log.Printf("services.loopFetchAssets error %s \n", err)
+			log.Printf("services.UpsertAsset error %v \n", err)
 			time.Sleep(time.Second)
 			continue
 		}

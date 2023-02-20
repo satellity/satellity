@@ -11,6 +11,16 @@ import (
 )
 
 func Run(db *durable.Database) {
+	go func() {
+		impl := &AssetImpl{}
+		impl.Run(db)
+	}()
+
+	go func() {
+		impl := &ratioImpl{}
+		impl.Run(db)
+	}()
+
 	log.Println("Feed service started at:", time.Now())
 	ctx := session.WithDatabase(context.Background(), db)
 	for {

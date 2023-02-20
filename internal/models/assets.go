@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"fmt"
+	"log"
 	"satellity/internal/durable"
 	"satellity/internal/session"
 	"strings"
@@ -14,24 +15,26 @@ import (
 
 type Asset struct {
 	AssetID               string
-	AppID                 string `json:"id"`
-	Symbol                string `json:"symbol"`
-	Name                  string `json:"name"`
-	Image                 string `json:"image"`
-	CurrentPrice          string `json:"current_price,float64"`
-	High24h               string `json:"high_24h,float64"`
-	Low24h                string `json:"low_24h,float64"`
-	MarketCap             string `json:"market_cap,float64"`
-	MarketCapRank         int64  `json:"market_cap_rank"`
-	FullyDilutedValuation string `json:"fully_diluted_valuation,float64"`
-	TotalVolume           string `json:"total_volume,float64"`
-	CirculatingSupply     string `json:"circulating_supply,float64"`
-	TotalSupply           string `json:"total_supply,float64"`
-	MaxSupply             string `json:"max_supply,float64"`
-	ATH                   string `json:"ath,float64"`
-	ATL                   string `json:"atl,float64"`
+	AppID                 string
+	Symbol                string
+	Name                  string
+	Image                 string
+	CurrentPrice          string
+	High24h               string
+	Low24h                string
+	MarketCap             string
+	MarketCapRank         int64
+	FullyDilutedValuation string
+	TotalVolume           string
+	CirculatingSupply     string
+	TotalSupply           string
+	MaxSupply             string
+	ATH                   string
+	ATL                   string
 	Contract              string
 	UpdatedAt             time.Time
+
+	Ratios []*Ratio
 }
 
 var assetColumns = []string{"asset_id", "api_id", "symbol", "name", "image", "current_price", "high_24h", "low_24h", "market_cap", "market_cap_rank", "fully_diluted_valuation", "total_volume", "circulating_supply", "total_supply", "max_supply", "ath", "atl", "contract", "updated_at"}
@@ -84,7 +87,7 @@ func UpsertAsset(ctx context.Context, appID, symbol, name, image, price, high, l
 		}
 		if old != nil {
 			cols, posits := durable.PrepareColumnsAndExpressions([]string{"symbol", "name", "image", "current_price", "high_24h", "low_24h", "market_cap", "market_cap_rank", "fully_diluted_valuation", "total_volume", "circulating_supply", "total_supply", "max_supply", "ath", "atl", "contract", "updated_at"}, 1)
-			values := []any{asset.AssetID, asset.Symbol, asset.Name, asset.Image, asset.CurrentPrice, asset.High24h, asset.Low24h, asset.MarketCap, asset.MarketCapRank, asset.FullyDilutedValuation, asset.TotalVolume, asset.CirculatingSupply, asset.TotalSupply, asset.MaxSupply, asset.Contract, asset.UpdatedAt}
+			values := []any{asset.AssetID, asset.Symbol, asset.Name, asset.Image, asset.CurrentPrice, asset.High24h, asset.Low24h, asset.MarketCap, asset.MarketCapRank, asset.FullyDilutedValuation, asset.TotalVolume, asset.CirculatingSupply, asset.TotalSupply, asset.MaxSupply, asset.ATH, asset.ATL, asset.Contract, asset.UpdatedAt}
 			_, err := tx.Exec(ctx, fmt.Sprintf("UPDATE assets SET (%s)=(%s) WHERE asset_id=$1", cols, posits), values...)
 			return err
 		}
@@ -95,6 +98,7 @@ func UpsertAsset(ctx context.Context, appID, symbol, name, image, price, high, l
 		return err
 	})
 	if err != nil {
+		log.Println("session.TransactionError:", err)
 		return nil, session.TransactionError(ctx, err)
 	}
 	return &asset, nil
@@ -124,6 +128,14 @@ func ReadAllAssets(ctx context.Context) ([]*Asset, error) {
 		return nil, session.TransactionError(ctx, err)
 	}
 	return assets, nil
+}
+
+func ReadAssetsWithRatios(ctx context.Context) ([]*Asset, error) {
+	assets, err := ReadAllAssets(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return FillAssetWithRatios(ctx, assets)
 }
 
 func readAssets(ctx context.Context, tx pgx.Tx) ([]*Asset, error) {

@@ -70,9 +70,6 @@ func main() {
 	switch options.Service {
 	case "feed":
 		services.Run(database)
-	case "assets":
-		impl := &services.AssetImpl{}
-		impl.Run(database)
 	default:
 		if err := startHTTP(database, output, config.HTTP.Port); err != nil {
 			log.Panicln(err)

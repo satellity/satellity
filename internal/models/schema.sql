@@ -192,6 +192,20 @@ CREATE TABLE IF NOT EXISTS assets (
 );
 
 
+CREATE TABLE IF NOT EXISTS ratios (
+  ratio_id              VARCHAR(36) PRIMARY KEY,
+  category              VARCHAR(1024) NOT NULL,
+  symbol                VARCHAR(1024) NOT NULL,
+  period                VARCHAR(1024) NOT NULL,
+  long_account          VARCHAR(1024) NOT NULL,
+  short_account         VARCHAR(1024) NOT NULL,
+  long_short_ratio      VARCHAR(1024) NOT NULL,
+  timestamp_at          BIGINT NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ratio_datax ON ratios (category, symbol, period, timestamp_at DESC);
+
+
 CREATE TABLE IF NOT EXISTS statistics (
   statistic_id          VARCHAR(36) PRIMARY KEY,
   name                  VARCHAR(512) NOT NULL,
