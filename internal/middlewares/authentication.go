@@ -19,7 +19,7 @@ var whitelist = [][2]string{
 	{"GET", "^/api/genres"},
 	{"GET", "^/api/topics"},
 	{"GET", "^/api/users"},
-	{"GET", "^/api/assets"},
+	{"GET", "^/api/ratios"},
 	{"POST", "^/api/oauth"},
 	{"POST", "^/api/sessions"},
 	{"POST", "^/api/email_verifications"},

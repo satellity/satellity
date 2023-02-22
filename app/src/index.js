@@ -15,6 +15,7 @@ import Oauth from './users/oauth.js';
 import User from 'users/view.js';
 import Topic from 'topics/view.js';
 import Gist from 'gists/view.js';
+import Ratio from 'ratios/view.js';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faBookmark, faComment, faComments, faEdit, faEye, faEyeSlash, faTrashAlt, faHeart} from '@fortawesome/free-regular-svg-icons';
 import {
@@ -86,6 +87,7 @@ root.render(
           </Route>
           <Route path='/' element={<MainLayout />}>
             <Route index element={<Gist.Index />} />
+            <Route path="ratios" element={<Ratio.Index />} />
             <Route path="faucets" element={<Gist.Faucet />} />
             <Route path="genres/:genre" element={<Gist.Genre />} />
             <Route path="categories/:id" element={<Topic.Index />} />

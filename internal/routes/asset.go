@@ -13,7 +13,7 @@ type assetImpl struct{}
 func registerAsset(router *httptreemux.Group) {
 	impl := &assetImpl{}
 
-	router.GET("/assets", impl.index)
+	router.GET("/ratios", impl.index)
 }
 
 func (impl *assetImpl) index(w http.ResponseWriter, r *http.Request, params map[string]string) {

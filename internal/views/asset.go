@@ -22,7 +22,8 @@ type AssetView struct {
 	ATH                   string      `json:"ath"`
 	ATL                   string      `json:"atl"`
 	Contract              string      `json:"contract"`
-	Ratios                []RatioView `json:"radios"`
+	GlobalRatio           string      `json:"global_ratio"`
+	Ratios                []RatioView `json:"ratios"`
 }
 
 func buildAsset(a *models.Asset) AssetView {
@@ -46,6 +47,9 @@ func buildAsset(a *models.Asset) AssetView {
 	}
 	view.Ratios = make([]RatioView, len(a.Ratios))
 	for i, r := range a.Ratios {
+		if r.Category == models.GlobalLongShortAccountRatio {
+			view.GlobalRatio = r.LongShortRatio
+		}
 		view.Ratios[i] = buildRadio(r)
 	}
 	return view

@@ -47,3 +47,11 @@ export const useFaucet = () => {
       },
   );
 };
+
+export const useRatios = () => {
+  return useQuery(
+      ['ratios'],
+      () => api.ratio.index().then((resp) => resp.data),
+      {},
+  );
+};

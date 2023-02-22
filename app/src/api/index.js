@@ -18,6 +18,7 @@ import Gist from './gist.js';
 import Source from './source.js';
 import CoinGecko from './cgc.js';
 import Chains from './chains.js';
+import Ratio from './ratio.js';
 
 Noty.overrideDefaults({
   type: 'error',
@@ -121,6 +122,7 @@ class API {
     this.source = new Source(this);
     this.cgc = new CoinGecko();
     this.chain = new Chains();
+    this.ratio = new Ratio(this);
   }
 }
 
