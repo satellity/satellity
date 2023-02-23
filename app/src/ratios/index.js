@@ -36,6 +36,14 @@ const Index = () => {
       }));
       return;
     }
+    if (arrow === '↑') {
+      setArrow('↕');
+      setRatiosData(ratiosData.sort((a, b) => {
+        const r = new BigNumber(a.market_cap_rank);
+        return r.comparedTo(b.market_cap_rank);
+      }));
+      return;
+    }
     setArrow('↓');
     setRatiosData(ratiosData.sort((a, b) => {
       const r = new BigNumber(a.global_ratio);
