@@ -57,7 +57,7 @@ const Index = () => {
       }
       return (
         <div key={rr.category}>
-          {name}: {rr.long_short_ratio} / {rr.long_account} / {rr.short_account} ; {Math.floor((Date.now() - rr.timestamp) / 1000 / 60)}
+          {name}: {rr.long_short_ratio} / {rr.long_account} / {rr.short_account} ; {Math.floor((Date.now() - rr.timestamp) / 1000 / 60)}M
         </div>
       );
     });
