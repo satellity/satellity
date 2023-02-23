@@ -7,7 +7,7 @@ import style from './index.module.scss';
 
 const Index = () => {
   const [ratiosData, setRatiosData] = useState([]);
-  const [arrow, setArrow] = useState('↓');
+  const [arrow, setArrow] = useState('↕');
   const {isLoading, data} = useRatios();
 
   useEffect(() => {
