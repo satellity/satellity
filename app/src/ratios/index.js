@@ -13,8 +13,8 @@ const Index = () => {
   useEffect(() => {
     if (!isLoading) {
       setRatiosData(data.sort((a, b) => {
-        const r = new BigNumber(a.global_ratio);
-        return r.comparedTo(b.global_ratio) * -1;
+        const r = new BigNumber(a.market_cap_rank);
+        return r.comparedTo(b.market_cap_rank);
       }));
     }
   }, [isLoading]);
