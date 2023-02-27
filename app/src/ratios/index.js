@@ -82,6 +82,9 @@ const Index = () => {
         <div>
           {r.market_cap_rank} / {r.market_cap}
         </div>
+        <div>
+          {r.funding_rate}
+        </div>
         {ratios}
       </div>
     );

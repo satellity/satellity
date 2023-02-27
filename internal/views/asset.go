@@ -23,6 +23,7 @@ type AssetView struct {
 	ATL                   string      `json:"atl"`
 	Contract              string      `json:"contract"`
 	GlobalRatio           string      `json:"global_ratio"`
+	FundingRate           string      `json:"funding_rate"`
 	Ratios                []RatioView `json:"ratios"`
 }
 
