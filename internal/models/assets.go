@@ -52,23 +52,29 @@ func (a *Asset) values() []any {
 
 func UpsertAsset(ctx context.Context, appID, symbol, name, image, price, high, low, marketCap string, marketCapRank int64, valuation, volumn, supply, totalSupply, maxSupply, ath, atl string, indexes map[string]string) (*Asset, error) {
 	symbol = strings.ToUpper(symbol)
-	contract := indexes[fmt.Sprintf("%sUSDT", symbol)]
-	if contract == "" {
-		contract = indexes[fmt.Sprintf("%sBUSD", symbol)]
+	contract := fmt.Sprintf("%sUSDT", symbol)
+	rate := indexes[contract]
+	if rate == "" {
+		contract = fmt.Sprintf("%sBUSD", symbol)
+		rate = indexes[contract]
 	}
-	if contract == "" {
-		contract = indexes[fmt.Sprintf("1000%sUSDT", symbol)]
+	if rate == "" {
+		contract = fmt.Sprintf("1000%sUSDT", symbol)
+		rate = indexes[contract]
 	}
-	if contract == "" {
-		contract = indexes[fmt.Sprintf("1000%sBUSD", symbol)]
+	if rate == "" {
+		contract = fmt.Sprintf("1000%sBUSD", symbol)
+		rate = indexes[contract]
 	}
-	if contract == "" {
-		contract = indexes[fmt.Sprintf("%s2USDT", symbol)]
+	if rate == "" {
+		contract = fmt.Sprintf("%s2USDT", symbol)
+		rate = indexes[contract]
 	}
-	if contract == "" {
-		contract = indexes[fmt.Sprintf("%s2BUSD", symbol)]
+	if rate == "" {
+		contract = fmt.Sprintf("%s2BUSD", symbol)
+		rate = indexes[contract]
 	}
-	if contract == "" {
+	if rate == "" {
 		return nil, nil
 	}
 	asset := Asset{
@@ -90,7 +96,7 @@ func UpsertAsset(ctx context.Context, appID, symbol, name, image, price, high, l
 		ATH:                   ath,
 		ATL:                   atl,
 		Contract:              contract,
-		FundingRate:           indexes[contract],
+		FundingRate:           rate,
 		UpdatedAt:             time.Now(),
 	}
 	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {

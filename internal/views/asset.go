@@ -45,6 +45,7 @@ func buildAsset(a *models.Asset) AssetView {
 		ATH:                   a.ATH,
 		ATL:                   a.ATL,
 		Contract:              a.Contract,
+		FundingRate:           a.FundingRate,
 		GlobalRatio:           "0",
 	}
 	view.Ratios = make([]RatioView, len(a.Ratios))
