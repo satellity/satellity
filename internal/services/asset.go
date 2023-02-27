@@ -49,6 +49,11 @@ type Asset struct {
 }
 
 func (impl *AssetImpl) loopFetchAssets(ctx context.Context) error {
+	indexes, err := fetchPremiumIndex(ctx)
+	if err != nil {
+		return err
+	}
+
 	resp, err := http.Get(fmt.Sprintf("https://pro-api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=250&x_cg_pro_api_key=%s", configs.AppConfig.Cgc))
 	if err != nil {
 		return err
@@ -62,7 +67,7 @@ func (impl *AssetImpl) loopFetchAssets(ctx context.Context) error {
 	}
 
 	for _, a := range assets {
-		_, err = models.UpsertAsset(ctx, a.AppID, a.Symbol, a.Name, a.Image, a.CurrentPrice.String(), a.High24h.String(), a.Low24h.String(), a.MarketCap.String(), a.MarketCapRank, a.FullyDilutedValuation.String(), a.TotalVolume.String(), a.CirculatingSupply.String(), a.TotalSupply.String(), a.MaxSupply.String(), a.ATH.String(), a.ATL.String())
+		_, err = models.UpsertAsset(ctx, a.AppID, a.Symbol, a.Name, a.Image, a.CurrentPrice.String(), a.High24h.String(), a.Low24h.String(), a.MarketCap.String(), a.MarketCapRank, a.FullyDilutedValuation.String(), a.TotalVolume.String(), a.CirculatingSupply.String(), a.TotalSupply.String(), a.MaxSupply.String(), a.ATH.String(), a.ATL.String(), indexes)
 		if err != nil {
 			log.Printf("services.UpsertAsset error %v \n", err)
 			time.Sleep(time.Second)
@@ -70,4 +75,28 @@ func (impl *AssetImpl) loopFetchAssets(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+type PremiumIndex struct {
+	Symbol          string `json:"symbol"`
+	LastFundingRate string `json:"lastFundingRate"`
+}
+
+func fetchPremiumIndex(ctx context.Context) (map[string]string, error) {
+	resp, err := http.Get("https://fapi.binance.com/fapi/v1/premiumIndex")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var body []*PremiumIndex
+	err = json.NewDecoder(resp.Body).Decode(&body)
+	if err != nil {
+		return nil, err
+	}
+	set := make(map[string]string, 0)
+	for _, b := range body {
+		set[b.Symbol] = b.LastFundingRate
+	}
+	return set, nil
 }

@@ -188,6 +188,7 @@ CREATE TABLE IF NOT EXISTS assets (
   ath                   VARCHAR(1024) NOT NULL,
   atl                   VARCHAR(1024) NOT NULL,
   contract              VARCHAR(1024) NOT NULL,
+  funding_rate          VARCHAR(1024) NOT NULL,
   updated_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 

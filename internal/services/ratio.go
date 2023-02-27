@@ -9,6 +9,7 @@ import (
 	"satellity/internal/durable"
 	"satellity/internal/models"
 	"satellity/internal/session"
+	"strings"
 	"time"
 )
 
@@ -37,6 +38,10 @@ type Ratio struct {
 }
 
 func (impl *ratioImpl) loopFetchRatios(ctx context.Context) error {
+	indexes, err := fetchPremiumIndex(ctx)
+	if err != nil {
+		return err
+	}
 	assets, err := models.ReadAllAssets(ctx)
 	if err != nil {
 		return err
@@ -47,6 +52,27 @@ func (impl *ratioImpl) loopFetchRatios(ctx context.Context) error {
 		models.GlobalLongShortAccountRatio: "https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=%s&period=5m&limit=3",
 	}
 	for _, asset := range assets {
+		symbol := strings.ToUpper(asset.Symbol)
+		contract := indexes[fmt.Sprintf("%sUSDT", symbol)]
+		if contract == "" {
+			contract = indexes[fmt.Sprintf("%sBUSD", symbol)]
+		}
+		if contract == "" {
+			contract = indexes[fmt.Sprintf("1000%sUSDT", symbol)]
+		}
+		if contract == "" {
+			contract = indexes[fmt.Sprintf("1000%sBUSD", symbol)]
+		}
+		if contract == "" {
+			contract = indexes[fmt.Sprintf("%s2USDT", symbol)]
+		}
+		if contract == "" {
+			contract = indexes[fmt.Sprintf("%s2BUSD", symbol)]
+		}
+		if contract == "" {
+			asset.Delete(ctx)
+			continue
+		}
 		for k, v := range set {
 			impl.fetchRatio(ctx, k, fmt.Sprintf(v, asset.Contract))
 		}
