@@ -99,8 +99,8 @@ func UpsertAsset(ctx context.Context, appID, symbol, name, image, price, high, l
 			return err
 		}
 		if old != nil {
-			cols, posits := durable.PrepareColumnsAndExpressions([]string{"symbol", "name", "image", "current_price", "high_24h", "low_24h", "market_cap", "market_cap_rank", "fully_diluted_valuation", "total_volume", "circulating_supply", "total_supply", "max_supply", "ath", "atl", "contract", "updated_at"}, 1)
-			values := []any{asset.AssetID, asset.Symbol, asset.Name, asset.Image, asset.CurrentPrice, asset.High24h, asset.Low24h, asset.MarketCap, asset.MarketCapRank, asset.FullyDilutedValuation, asset.TotalVolume, asset.CirculatingSupply, asset.TotalSupply, asset.MaxSupply, asset.ATH, asset.ATL, asset.Contract, asset.UpdatedAt}
+			cols, posits := durable.PrepareColumnsAndExpressions([]string{"symbol", "name", "image", "current_price", "high_24h", "low_24h", "market_cap", "market_cap_rank", "fully_diluted_valuation", "total_volume", "circulating_supply", "total_supply", "max_supply", "ath", "atl", "contract", "funding_rate", "updated_at"}, 1)
+			values := []any{asset.AssetID, asset.Symbol, asset.Name, asset.Image, asset.CurrentPrice, asset.High24h, asset.Low24h, asset.MarketCap, asset.MarketCapRank, asset.FullyDilutedValuation, asset.TotalVolume, asset.CirculatingSupply, asset.TotalSupply, asset.MaxSupply, asset.ATH, asset.ATL, asset.Contract, asset.FundingRate, asset.UpdatedAt}
 			_, err := tx.Exec(ctx, fmt.Sprintf("UPDATE assets SET (%s)=(%s) WHERE asset_id=$1", cols, posits), values...)
 			return err
 		}
