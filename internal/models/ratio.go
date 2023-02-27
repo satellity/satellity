@@ -126,3 +126,11 @@ func FillAssetWithRatios(ctx context.Context, assets []*Asset) ([]*Asset, error)
 	}
 	return assets, nil
 }
+
+func DeleteRatios(ctx context.Context) error {
+	err := session.Database(ctx).RunInTransaction(ctx, func(tx pgx.Tx) error {
+		_, err := tx.Exec(ctx, "DELETE FROM ratios WHERE timestamp_at < $1", time.Now().Add(-30*time.Hour).Unix()*1000)
+		return err
+	})
+	return err
+}

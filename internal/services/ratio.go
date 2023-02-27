@@ -78,7 +78,7 @@ func (impl *ratioImpl) loopFetchRatios(ctx context.Context) error {
 		}
 		time.Sleep(300 * time.Millisecond)
 	}
-	return nil
+	return models.DeleteRatios(ctx)
 }
 
 func (impl *ratioImpl) fetchRatio(ctx context.Context, category, url string) error {
