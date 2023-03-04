@@ -94,7 +94,9 @@ const Index = () => {
     <div className='container'>
       <main className='column main'>
         <button onClick={handleSort}>sort{arrow}</button>
-        {list}
+        <div className={style.list}>
+          {list}
+        </div>
       </main>
       <aside className='column aside'>
         <Widget />

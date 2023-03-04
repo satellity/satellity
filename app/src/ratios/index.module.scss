@@ -1,4 +1,11 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .item {
+  width: 50%;
+  margin-top: 1rem;
   .info {
     display: flex;
     align-items: center;
@@ -6,5 +13,11 @@
   .icon {
     width: 1.5rem;
     margin-right: .3rem;
+  }
+}
+
+@media only screen and (max-width: 64rem) {
+  .item {
+    width: 100%;
   }
 }
